@@ -77,7 +77,6 @@ class Settings(BaseSettings):
                 name
                 for name, value in (
                     ("JWT_PRIVATE_KEY", self.jwt_private_key.get_secret_value()),
-                    ("JWT_PUBLIC_KEY", self.jwt_public_key),
                     ("FIELD_ENCRYPTION_KEYS", self.field_encryption_keys.get_secret_value()),
                 )
                 if not value

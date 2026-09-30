@@ -10,13 +10,16 @@ set -euo pipefail
 owner_pw="${CM_OWNER_PASSWORD:-cm_owner}"
 app_pw="${CM_APP_PASSWORD:-cm_app}"
 
+# psql_admin [-d DB] …: runs as a superuser, optionally in a given database.
 psql_admin() {
+  local db="postgres"
+  if [ "${1:-}" = "-d" ]; then db="$2"; shift 2; fi
   if [ -n "${ADMIN_DATABASE_URL:-}" ]; then
-    psql "$ADMIN_DATABASE_URL" -v ON_ERROR_STOP=1 "$@"
+    psql "${ADMIN_DATABASE_URL%/*}/$db" -v ON_ERROR_STOP=1 "$@"
   elif [ "$(id -u)" = "0" ]; then
-    su postgres -c "psql -v ON_ERROR_STOP=1 $(printf '%q ' "$@")"
+    su postgres -c "psql -d $db -v ON_ERROR_STOP=1 $(printf '%q ' "$@")"
   else
-    sudo -u postgres psql -v ON_ERROR_STOP=1 "$@"
+    sudo -u postgres psql -d "$db" -v ON_ERROR_STOP=1 "$@"
   fi
 }
 
