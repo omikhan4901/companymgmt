@@ -45,13 +45,17 @@ accounts to go live (see `runbooks/deploy.md`).
   to keep the free tier simple; revisit if Cloud Tasks is added.
 - Base images come from `mirror.gcr.io` (avoids Docker Hub rate limits).
 
-## Next (M1.5 then M2)
+## M1.5 marketing kit: done
 
-- M1.5 marketing kit: README with real screenshots, demo script, case study, resume
-  bullets, LinkedIn post, architecture one-pager.
+README with real screenshots (demo data from `api/scripts/demo_seed.py`), and in
+`docs/marketing/`: demo video script, case study, resume bullets, LinkedIn post,
+architecture one-pager. Only built features and measured numbers.
+
+## Next: M2
+
 - M2: Leave, Payroll (Bangladesh preset), workspace/personal export and deletion,
   nightly encrypted backups, audit retention, MFA policy for admins.
 
 ## Log
 
-- 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed.
+- 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.

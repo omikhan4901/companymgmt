@@ -1,23 +1,31 @@
 version: 2
+# Minor and patch updates come grouped (one PR per ecosystem per week); major versions
+# come as separate PRs so each breaking change is reviewed on its own.
 updates:
   - package-ecosystem: uv
     directory: /api
     schedule: { interval: weekly }
     groups:
-      python: { patterns: ["*"] }
+      python:
+        update-types: [minor, patch]
   - package-ecosystem: npm
     directory: /web
     schedule: { interval: weekly }
     groups:
-      web: { patterns: ["*"] }
+      web:
+        update-types: [minor, patch]
   - package-ecosystem: npm
     directory: /site
     schedule: { interval: weekly }
     groups:
-      site: { patterns: ["*"] }
+      site:
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }
+    groups:
+      actions:
+        update-types: [minor, patch]
   - package-ecosystem: docker
     directory: /api
     schedule: { interval: monthly }
