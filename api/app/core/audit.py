@@ -12,6 +12,7 @@ import hashlib
 import json
 import uuid
 from datetime import UTC, date, datetime
+from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import BigInteger, String, Text, UniqueConstraint, select, text
@@ -69,6 +70,8 @@ def _canonical(value: Any) -> Any:
         return value.astimezone(UTC).isoformat()
     if isinstance(value, date):
         return value.isoformat()
+    if isinstance(value, Decimal):
+        return str(value)
     if isinstance(value, dict):
         return {str(k): _canonical(v) for k, v in value.items()}
     if isinstance(value, list | tuple):

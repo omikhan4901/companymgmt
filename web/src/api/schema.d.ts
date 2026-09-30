@@ -211,6 +211,24 @@ export interface paths {
         patch: operations["edit_record_v1_attendance_records__record_id__patch"];
         trace?: never;
     };
+    "/v1/attendance/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings_v1_attendance_settings_get"];
+        /** Put Settings */
+        put: operations["put_settings_v1_attendance_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/attendance/status": {
         parameters: {
             query?: never;
@@ -1055,6 +1073,15 @@ export interface components {
         BranchIn: {
             /** Address */
             address?: string | null;
+            /**
+             * Geofence M
+             * @default 150
+             */
+            geofence_m: number;
+            /** Latitude */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /** Name */
             name: string;
             /** Timezone */
@@ -1064,6 +1091,8 @@ export interface components {
         BranchOut: {
             /** Address */
             address: string | null;
+            /** Geofence M */
+            geofence_m: number;
             /**
              * Id
              * Format: uuid
@@ -1071,6 +1100,10 @@ export interface components {
             id: string;
             /** Is Active */
             is_active: boolean;
+            /** Latitude */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
             /** Name */
             name: string;
             /** Timezone */
@@ -1082,8 +1115,19 @@ export interface components {
         BranchPatch: {
             /** Address */
             address?: string | null;
+            /**
+             * Clear Location
+             * @default false
+             */
+            clear_location: boolean;
+            /** Geofence M */
+            geofence_m?: number | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Latitude */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /** Name */
             name?: string | null;
             /** Timezone */
@@ -1095,11 +1139,13 @@ export interface components {
             branch_id?: string | null;
             /** Client Time */
             client_time?: string | null;
+            location?: components["schemas"]["GeoIn"] | null;
             /** Note */
             note?: string | null;
         };
         /** ClockOut */
         ClockOut: {
+            location?: components["schemas"]["GeoIn"] | null;
             /** Note */
             note?: string | null;
         };
@@ -1389,6 +1435,18 @@ export interface components {
              * Format: email
              */
             email: string;
+        };
+        /**
+         * GeoIn
+         * @description A position from the device (browser Geolocation API).
+         */
+        GeoIn: {
+            /** Accuracy M */
+            accuracy_m: number;
+            /** Latitude */
+            latitude: number;
+            /** Longitude */
+            longitude: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1765,10 +1823,30 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** In Accuracy M */
+            in_accuracy_m?: number | null;
+            /** In Distance M */
+            in_distance_m?: number | null;
+            /** In Geo */
+            in_geo?: string | null;
+            /** In Latitude */
+            in_latitude?: number | null;
+            /** In Longitude */
+            in_longitude?: number | null;
             /** Minutes */
             minutes: number | null;
             /** Note */
             note: string | null;
+            /** Out Accuracy M */
+            out_accuracy_m?: number | null;
+            /** Out Distance M */
+            out_distance_m?: number | null;
+            /** Out Geo */
+            out_geo?: string | null;
+            /** Out Latitude */
+            out_latitude?: number | null;
+            /** Out Longitude */
+            out_longitude?: number | null;
             /** Source */
             source: string;
             /** Status */
@@ -1859,6 +1937,33 @@ export interface components {
             /** User Agent */
             user_agent: string | null;
         };
+        /** SettingsIn */
+        SettingsIn: {
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /**
+             * Max Accuracy M
+             * @default 100
+             */
+            max_accuracy_m: number;
+        };
+        /** SettingsOut */
+        SettingsOut: {
+            /** Branches Located */
+            branches_located: number;
+            /** Branches Total */
+            branches_total: number;
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /** Max Accuracy M */
+            max_accuracy_m: number;
+        };
         /** SignupIn */
         SignupIn: {
             /** Business Name */
@@ -1932,6 +2037,8 @@ export interface components {
             employee_name: string;
             /** Forgot Clock Out */
             forgot_clock_out: boolean;
+            /** Location Mode */
+            location_mode: string;
             open_record: components["schemas"]["RecordOut"] | null;
             /** Today Minutes */
             today_minutes: number;
@@ -2543,6 +2650,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RecordOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_v1_attendance_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+        };
+    };
+    put_settings_v1_attendance_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
                 };
             };
             /** @description Validation Error */

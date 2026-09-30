@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import (
@@ -21,6 +22,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    Numeric,
     SmallInteger,
     String,
     Text,
@@ -264,6 +266,10 @@ class Branch(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
     __table_args__ = (
         UniqueConstraint("tenant_id", "id"),
         Index("uq_branches_name", "tenant_id", func.lower(text("name")), unique=True),
+        CheckConstraint("(latitude IS NULL) = (longitude IS NULL)", name="location_pair"),
+        CheckConstraint("latitude IS NULL OR latitude BETWEEN -90 AND 90", name="latitude"),
+        CheckConstraint("longitude IS NULL OR longitude BETWEEN -180 AND 180", name="longitude"),
+        CheckConstraint("geofence_m BETWEEN 25 AND 5000", name="geofence"),
     )
 
     name: Mapped[str] = mapped_column(String(120))
@@ -271,3 +277,8 @@ class Branch(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
     address: Mapped[str | None] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     opened_on: Mapped[date | None] = mapped_column(Date)
+    # Where the branch is, for location-checked clock-ins. Unset until someone places it.
+    latitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    longitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    # Radius around the branch that counts as "at work", in metres.
+    geofence_m: Mapped[int] = mapped_column(Integer, default=150, server_default="150")

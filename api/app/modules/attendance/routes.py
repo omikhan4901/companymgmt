@@ -11,7 +11,7 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
 from fastapi.responses import StreamingResponse
-from pydantic import StringConstraints
+from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import and_, func, literal, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +20,8 @@ from app.core.errors import Conflict, Forbidden, Invalid, NotFound
 from app.core.http import check_if_match, decode_cursor, encode_cursor, set_etag
 from app.core.schema import In, Note, Out, Page
 from app.core.time import today, utcnow
-from app.modules.attendance import access
-from app.modules.attendance.models import AttendanceCorrection, AttendanceRecord
+from app.modules.attendance import access, geo
+from app.modules.attendance.models import AttendanceCorrection, AttendanceRecord, AttendanceSettings
 from app.modules.attendance.service import (
     MAX_SHIFT,
     business_date_for,
@@ -34,6 +34,7 @@ from app.modules.attendance.service import (
 from app.modules.people.access import in_scope, scope_departments
 from app.modules.people.models import Employee
 from app.modules.people.service import employee_for_membership
+from app.modules.platform.catalog import WORKSPACE_MANAGE
 from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.models import Branch
 
@@ -55,6 +56,16 @@ class RecordOut(Out):
     status: str
     source: str
     note: str | None
+    in_geo: str | None = None
+    in_distance_m: int | None = None
+    in_accuracy_m: int | None = None
+    in_latitude: float | None = None
+    in_longitude: float | None = None
+    out_geo: str | None = None
+    out_distance_m: int | None = None
+    out_accuracy_m: int | None = None
+    out_latitude: float | None = None
+    out_longitude: float | None = None
     version: int
 
 
@@ -64,16 +75,39 @@ class StatusOut(Out):
     open_record: RecordOut | None
     today_minutes: int
     forgot_clock_out: bool
+    location_mode: str
+
+
+class GeoIn(In):
+    """A position from the device (browser Geolocation API)."""
+
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    accuracy_m: float = Field(ge=0, le=100_000)
 
 
 class ClockIn(In):
     branch_id: uuid.UUID | None = None
     note: Note | None = None
     client_time: datetime | None = None
+    location: GeoIn | None = None
 
 
 class ClockOut(In):
     note: Note | None = None
+    location: GeoIn | None = None
+
+
+class SettingsOut(BaseModel):
+    location_mode: Literal["off", "record", "require"]
+    max_accuracy_m: int
+    branches_total: int
+    branches_located: int
+
+
+class SettingsIn(In):
+    location_mode: Literal["off", "record", "require"]
+    max_accuracy_m: int = Field(default=100, ge=10, le=1000)
 
 
 class RecordIn(In):
@@ -187,6 +221,35 @@ async def _scoped_employee(ctx: Ctx, employee_id: uuid.UUID) -> Employee:
     return employee
 
 
+async def _settings(db: AsyncSession) -> AttendanceSettings:
+    """The workspace's attendance settings (defaults until someone changes them)."""
+    row = await db.scalar(select(AttendanceSettings))
+    return row or AttendanceSettings(location_mode="require", max_accuracy_m=100)
+
+
+async def _sites(db: AsyncSession, only: uuid.UUID | None = None) -> list[geo.Site]:
+    query = select(Branch).where(Branch.is_active.is_(True), Branch.latitude.is_not(None))
+    if only is not None:
+        query = query.where(Branch.id == only)
+    return [
+        geo.Site(b.id, float(b.latitude or 0), float(b.longitude or 0), b.geofence_m)
+        for b in await db.scalars(query)
+    ]
+
+
+def _point(location: GeoIn | None) -> geo.Point | None:
+    return geo.Point(location.latitude, location.longitude, location.accuracy_m) if location else None
+
+
+def _store(record: AttendanceRecord, prefix: str, point: geo.Point | None, result: geo.Check) -> None:
+    setattr(record, f"{prefix}_geo", result.result)
+    setattr(record, f"{prefix}_distance_m", result.distance_m)
+    if point is not None:
+        setattr(record, f"{prefix}_latitude", geo.rounded(point.latitude))
+        setattr(record, f"{prefix}_longitude", geo.rounded(point.longitude))
+        setattr(record, f"{prefix}_accuracy_m", min(round(point.accuracy_m), 100_000))
+
+
 # ---- Self service -----------------------------------------------------------------------
 
 
@@ -208,6 +271,7 @@ async def my_status(ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> St
         open_record=_record_out(record) if record else None,
         today_minutes=int(worked or 0),
         forgot_clock_out=forgot,
+        location_mode=(await _settings(ctx.db)).location_mode,
     )
 
 
@@ -226,6 +290,20 @@ async def clock_in(body: ClockIn, ctx: Ctx = Depends(allow(access.SELF, module=M
         branch = await ctx.db.get(Branch, body.branch_id)
         if branch is None or not branch.is_active:
             raise Invalid(errors=[{"field": "branch_id", "message": "Unknown branch."}])
+    settings = await _settings(ctx.db)
+    point = _point(body.location)
+    located: geo.Check | None = None
+    if settings.location_mode != "off":
+        located = geo.check(
+            point,
+            await _sites(ctx.db, only=body.branch_id),
+            max_accuracy_m=settings.max_accuracy_m,
+            prefer=body.branch_id or employee.branch_id,
+        )
+        if settings.location_mode == "require":
+            await _enforce(ctx, located, point, settings)
+        if located.branch_id is not None and body.branch_id is None:
+            branch_id = located.branch_id
     # The server's clock decides; the device's time is only kept to spot skew.
     now = utcnow()
     record = AttendanceRecord(
@@ -239,10 +317,42 @@ async def clock_in(body: ClockIn, ctx: Ctx = Depends(allow(access.SELF, module=M
         client_time=body.client_time,
         created_by=ctx.user.id,
     )
+    if located is not None:
+        _store(record, "in", point, located)
     ctx.db.add(record)
     await save(ctx.db, record)
     await ctx.db.commit()
     return _record_out(record)
+
+
+async def _enforce(
+    ctx: Ctx, located: geo.Check, point: geo.Point | None, settings: AttendanceSettings
+) -> None:
+    """Clock-in rules when location is required."""
+    if located.result == "no_fix":
+        raise Invalid(
+            "Turn on location for this site to clock in.",
+            code="location_required",
+            errors=[{"field": "location", "message": "Location is required to clock in."}],
+        )
+    if point is not None and point.accuracy_m > settings.max_accuracy_m and located.result != "inside":
+        raise Invalid(
+            "Your location isn't precise enough. Turn on precise location or step outside, then try again.",
+            code="location_imprecise",
+            extra={"accuracy_m": round(point.accuracy_m), "max_accuracy_m": settings.max_accuracy_m},
+        )
+    if located.result == "outside":
+        branch = await ctx.db.get(Branch, located.branch_id) if located.branch_id else None
+        name = branch.name if branch else "your branch"
+        raise Forbidden(
+            f"You're about {located.distance_m} m from {name}. Clock in when you get there.",
+            code="outside_area",
+            extra={
+                "distance_m": located.distance_m,
+                "branch_id": str(located.branch_id),
+                "branch_name": name,
+            },
+        )
 
 
 @router.post("/clock-out", response_model=RecordOut)
@@ -260,6 +370,12 @@ async def clock_out(body: ClockOut, ctx: Ctx = Depends(allow(access.SELF, module
         )
     if now <= record.clock_in_at:
         now = record.clock_in_at + timedelta(seconds=1)
+    settings = await _settings(ctx.db)
+    if settings.location_mode != "off":
+        # Clock-out is never blocked (that would leave shifts open); it's flagged instead.
+        point = _point(body.location)
+        sites = await _sites(ctx.db, only=record.branch_id) or await _sites(ctx.db)
+        _store(record, "out", point, geo.check(point, sites, max_accuracy_m=settings.max_accuracy_m))
     record.clock_out_at = now
     record.minutes = minutes_between(record.clock_in_at, now)
     record.status = "closed"
@@ -269,6 +385,52 @@ async def clock_out(body: ClockOut, ctx: Ctx = Depends(allow(access.SELF, module
     await save(ctx.db, record)
     await ctx.db.commit()
     return _record_out(record)
+
+
+# ---- Settings ---------------------------------------------------------------------------
+
+
+async def _settings_out(db: AsyncSession, settings: AttendanceSettings) -> SettingsOut:
+    total = await db.scalar(select(func.count()).select_from(Branch).where(Branch.is_active.is_(True)))
+    located = await db.scalar(
+        select(func.count())
+        .select_from(Branch)
+        .where(Branch.is_active.is_(True), Branch.latitude.is_not(None))
+    )
+    return SettingsOut(
+        location_mode=settings.location_mode,
+        max_accuracy_m=settings.max_accuracy_m,
+        branches_total=int(total or 0),
+        branches_located=int(located or 0),
+    )
+
+
+@router.get("/settings", response_model=SettingsOut)
+async def get_settings(ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> SettingsOut:
+    return await _settings_out(ctx.db, await _settings(ctx.db))
+
+
+@router.put("/settings", response_model=SettingsOut)
+async def put_settings(
+    body: SettingsIn, ctx: Ctx = Depends(allow(WORKSPACE_MANAGE, module=MODULE))
+) -> SettingsOut:
+    row = await ctx.db.scalar(select(AttendanceSettings).with_for_update())
+    before = {"location_mode": row.location_mode, "max_accuracy_m": row.max_accuracy_m} if row else None
+    if row is None:
+        row = AttendanceSettings(tenant_id=ctx.tenant_id)
+        ctx.db.add(row)
+    row.location_mode = body.location_mode
+    row.max_accuracy_m = body.max_accuracy_m
+    await ctx.db.flush()
+    await audit.record(
+        ctx.db,
+        "attendance.settings_changed",
+        target_type="workspace",
+        target_id=ctx.tenant_id,
+        data={"before": before, "after": body.model_dump()},
+    )
+    await ctx.db.commit()
+    return await _settings_out(ctx.db, row)
 
 
 # ---- Corrections ------------------------------------------------------------------------

@@ -152,6 +152,39 @@
       ],
       "title": "Address"
      },
+     "geofence_m": {
+      "default": 150,
+      "maximum": 5000.0,
+      "minimum": 25.0,
+      "title": "Geofence M",
+      "type": "integer"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "maximum": 90.0,
+        "minimum": -90.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "maximum": 180.0,
+        "minimum": -180.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
+     },
      "name": {
       "maxLength": 120,
       "title": "Name",
@@ -189,6 +222,10 @@
       ],
       "title": "Address"
      },
+     "geofence_m": {
+      "title": "Geofence M",
+      "type": "integer"
+     },
      "id": {
       "format": "uuid",
       "title": "Id",
@@ -197,6 +234,28 @@
      "is_active": {
       "title": "Is Active",
       "type": "boolean"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
      },
      "name": {
       "title": "Name",
@@ -217,6 +276,9 @@
      "timezone",
      "address",
      "is_active",
+     "latitude",
+     "longitude",
+     "geofence_m",
      "version"
     ],
     "title": "BranchOut",
@@ -237,6 +299,24 @@
       ],
       "title": "Address"
      },
+     "clear_location": {
+      "default": false,
+      "title": "Clear Location",
+      "type": "boolean"
+     },
+     "geofence_m": {
+      "anyOf": [
+       {
+        "maximum": 5000.0,
+        "minimum": 25.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Geofence M"
+     },
      "is_active": {
       "anyOf": [
        {
@@ -247,6 +327,32 @@
        }
       ],
       "title": "Is Active"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "maximum": 90.0,
+        "minimum": -90.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "maximum": 180.0,
+        "minimum": -180.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
      },
      "name": {
       "anyOf": [
@@ -303,6 +409,16 @@
       ],
       "title": "Client Time"
      },
+     "location": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GeoIn"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
      "note": {
       "anyOf": [
        {
@@ -322,6 +438,16 @@
    "ClockOut": {
     "additionalProperties": false,
     "properties": {
+     "location": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GeoIn"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
      "note": {
       "anyOf": [
        {
@@ -1433,6 +1559,37 @@
      "email"
     ],
     "title": "ForgotIn",
+    "type": "object"
+   },
+   "GeoIn": {
+    "additionalProperties": false,
+    "description": "A position from the device (browser Geolocation API).",
+    "properties": {
+     "accuracy_m": {
+      "maximum": 100000.0,
+      "minimum": 0.0,
+      "title": "Accuracy M",
+      "type": "number"
+     },
+     "latitude": {
+      "maximum": 90.0,
+      "minimum": -90.0,
+      "title": "Latitude",
+      "type": "number"
+     },
+     "longitude": {
+      "maximum": 180.0,
+      "minimum": -180.0,
+      "title": "Longitude",
+      "type": "number"
+     }
+    },
+    "required": [
+     "latitude",
+     "longitude",
+     "accuracy_m"
+    ],
+    "title": "GeoIn",
     "type": "object"
    },
    "HTTPValidationError": {
@@ -2612,6 +2769,61 @@
       "title": "Id",
       "type": "string"
      },
+     "in_accuracy_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Accuracy M"
+     },
+     "in_distance_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Distance M"
+     },
+     "in_geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Geo"
+     },
+     "in_latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Latitude"
+     },
+     "in_longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Longitude"
+     },
      "minutes": {
       "anyOf": [
        {
@@ -2633,6 +2845,61 @@
        }
       ],
       "title": "Note"
+     },
+     "out_accuracy_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Accuracy M"
+     },
+     "out_distance_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Distance M"
+     },
+     "out_geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Geo"
+     },
+     "out_latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Latitude"
+     },
+     "out_longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Longitude"
      },
      "source": {
       "title": "Source",
@@ -2937,6 +3204,65 @@
     "title": "SessionOut",
     "type": "object"
    },
+   "SettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "default": 100,
+      "maximum": 1000.0,
+      "minimum": 10.0,
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode"
+    ],
+    "title": "SettingsIn",
+    "type": "object"
+   },
+   "SettingsOut": {
+    "properties": {
+     "branches_located": {
+      "title": "Branches Located",
+      "type": "integer"
+     },
+     "branches_total": {
+      "title": "Branches Total",
+      "type": "integer"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode",
+     "max_accuracy_m",
+     "branches_total",
+     "branches_located"
+    ],
+    "title": "SettingsOut",
+    "type": "object"
+   },
    "SignupIn": {
     "additionalProperties": false,
     "properties": {
@@ -3149,6 +3475,10 @@
       "title": "Forgot Clock Out",
       "type": "boolean"
      },
+     "location_mode": {
+      "title": "Location Mode",
+      "type": "string"
+     },
      "open_record": {
       "anyOf": [
        {
@@ -3169,7 +3499,8 @@
      "employee_name",
      "open_record",
      "today_minutes",
-     "forgot_clock_out"
+     "forgot_clock_out",
+     "location_mode"
     ],
     "title": "StatusOut",
     "type": "object"
@@ -4321,6 +4652,66 @@
      }
     },
     "summary": "Edit Record",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/settings": {
+   "get": {
+    "operationId": "get_settings_v1_attendance_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings",
+    "tags": [
+     "attendance"
+    ]
+   },
+   "put": {
+    "operationId": "put_settings_v1_attendance_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Put Settings",
     "tags": [
      "attendance"
     ]

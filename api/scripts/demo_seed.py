@@ -19,6 +19,9 @@ import httpx
 PASSWORD = "morning cha and biscuits 26"
 DHAKA = ZoneInfo("Asia/Dhaka")
 
+# Near Shahbag, Dhaka.
+SHOP = (23.7383, 90.3958)
+
 DEPARTMENTS = {"Kitchen": ["Tea counter", "Snacks"], "Front of house": [], "Delivery": []}
 PEOPLE = [
     ("Karim Mia", "Tea counter", "Tea maker"),
@@ -64,7 +67,18 @@ def main() -> None:
                 "/v1/departments", json={"name": child, "parent_id": d["id"]}, headers=h
             ).json()["id"]
 
-    c.post("/v1/branches", json={"name": "Gulshan kiosk", "timezone": "Asia/Dhaka"}, headers=h)
+    # Branch locations, so clock-ins are checked against a 150 m area around each.
+    main = c.get("/v1/branches", headers=h).json()[0]
+    c.patch(
+        f"/v1/branches/{main['id']}",
+        json={"latitude": SHOP[0], "longitude": SHOP[1], "geofence_m": 150},
+        headers={**h, "if-match": f'W/"{main["version"]}"'},
+    ).raise_for_status()
+    c.post(
+        "/v1/branches",
+        json={"name": "Gulshan kiosk", "timezone": "Asia/Dhaka", "latitude": 23.7925, "longitude": 90.4078},
+        headers=h,
+    ).raise_for_status()
 
     roles = {r["key"]: r["id"] for r in c.get("/v1/roles", headers=h).json()}
     people: list[dict[str, str]] = []
@@ -134,7 +148,8 @@ def main() -> None:
         },
         headers=sh,
     )
-    c.post("/v1/attendance/clock-in", json={}, headers=sh)
+    at_shop = {"latitude": SHOP[0] + 0.0003, "longitude": SHOP[1], "accuracy_m": 12}
+    c.post("/v1/attendance/clock-in", json={"location": at_shop}, headers=sh).raise_for_status()
 
     # A few people are at work right now.
     for person in people[:4]:

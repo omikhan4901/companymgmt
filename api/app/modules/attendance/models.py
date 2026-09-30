@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import (
     CheckConstraint,
@@ -12,6 +13,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    Numeric,
     String,
     Text,
     UniqueConstraint,
@@ -24,6 +26,29 @@ from app.core.models import Base, IdMixin, TenantScoped, TimestampMixin, Version
 
 # Longest shift we accept in one record.
 MAX_SHIFT_HOURS = 24
+
+LOCATION_MODES = ("off", "record", "require")
+# Result of the location check at clock-in or clock-out:
+# inside/outside the branch area, no_fix = no usable location was sent,
+# no_site = no branch has a location set, so there was nothing to compare with.
+GEO_RESULTS = ("inside", "outside", "no_fix", "no_site")
+
+
+class AttendanceSettings(TenantScoped, TimestampMixin, Versioned, Base):
+    """One row per workspace (created on first change; defaults apply until then)."""
+
+    __tablename__ = "attendance_settings"
+    __table_args__ = (
+        CheckConstraint("location_mode IN ('off', 'record', 'require')", name="location_mode"),
+        CheckConstraint("max_accuracy_m BETWEEN 10 AND 1000", name="max_accuracy"),
+    )
+
+    tenant_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    # off: no location; record: save it and flag entries outside; require: clock-in only
+    # inside a branch area.
+    location_mode: Mapped[str] = mapped_column(String(10), default="require")
+    # Fixes less precise than this (metres) don't count as "inside" when location is required.
+    max_accuracy_m: Mapped[int] = mapped_column(Integer, default=100)
 
 
 class AttendanceRecord(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
@@ -55,6 +80,12 @@ class AttendanceRecord(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
         ),
         CheckConstraint("status IN ('open', 'closed', 'auto_closed')", name="status"),
         CheckConstraint("source IN ('self', 'kiosk', 'manual', 'correction')", name="source"),
+        CheckConstraint(
+            "in_geo IS NULL OR in_geo IN ('inside', 'outside', 'no_fix', 'no_site')", name="in_geo"
+        ),
+        CheckConstraint(
+            "out_geo IS NULL OR out_geo IN ('inside', 'outside', 'no_fix', 'no_site')", name="out_geo"
+        ),
         Index("ix_attendance_date", "tenant_id", "business_date"),
         Index("ix_attendance_employee_date", "tenant_id", "employee_id", "business_date"),
     )
@@ -73,6 +104,18 @@ class AttendanceRecord(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
     # Device time the client reported, kept to spot clock skew. Never used for pay.
     client_time: Mapped[datetime | None]
     created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    # Location at clock-in and clock-out, rounded to ~11 m, with the distance from the
+    # branch and the check's result. Only kept for these two moments, never tracked.
+    in_latitude: Mapped[Decimal | None] = mapped_column(Numeric(7, 4))
+    in_longitude: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    in_accuracy_m: Mapped[int | None] = mapped_column(Integer)
+    in_distance_m: Mapped[int | None] = mapped_column(Integer)
+    in_geo: Mapped[str | None] = mapped_column(String(8))
+    out_latitude: Mapped[Decimal | None] = mapped_column(Numeric(7, 4))
+    out_longitude: Mapped[Decimal | None] = mapped_column(Numeric(8, 4))
+    out_accuracy_m: Mapped[int | None] = mapped_column(Integer)
+    out_distance_m: Mapped[int | None] = mapped_column(Integer)
+    out_geo: Mapped[str | None] = mapped_column(String(8))
 
 
 class AttendanceCorrection(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):

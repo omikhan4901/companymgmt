@@ -7,6 +7,7 @@ import re
 import secrets
 import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
@@ -861,13 +862,24 @@ class BranchOut(Out):
     timezone: str
     address: str | None
     is_active: bool
+    latitude: float | None
+    longitude: float | None
+    geofence_m: int
     version: int
+
+
+Latitude = Annotated[float, Field(ge=-90, le=90)]
+Longitude = Annotated[float, Field(ge=-180, le=180)]
+Radius = Annotated[int, Field(ge=25, le=5000)]
 
 
 class BranchIn(In):
     name: ShortName
     timezone: Annotated[str, StringConstraints(max_length=64)] | None = None
     address: Annotated[str, StringConstraints(max_length=500)] | None = None
+    latitude: Latitude | None = None
+    longitude: Longitude | None = None
+    geofence_m: Radius = 150
 
 
 class BranchPatch(In):
@@ -875,6 +887,16 @@ class BranchPatch(In):
     timezone: Annotated[str, StringConstraints(max_length=64)] | None = None
     address: Annotated[str, StringConstraints(max_length=500)] | None = None
     is_active: bool | None = None
+    latitude: Latitude | None = None
+    longitude: Longitude | None = None
+    geofence_m: Radius | None = None
+    # Forget the branch's location (location checks then skip it).
+    clear_location: bool = False
+
+
+def _check_location_pair(latitude: float | None, longitude: float | None) -> None:
+    if (latitude is None) != (longitude is None):
+        raise Invalid(errors=[{"field": "longitude", "message": "Give both latitude and longitude."}])
 
 
 @router.get("/branches", response_model=list[BranchOut])
@@ -896,10 +918,14 @@ async def create_branch(body: BranchIn, ctx: Ctx = Depends(allow(BRANCHES_MANAGE
             extra={"limit": limit},
         )
     await _unique_branch_name(ctx, body.name)
+    _check_location_pair(body.latitude, body.longitude)
     branch = Branch(
         name=body.name,
         address=body.address,
         timezone=workspaces.valid_timezone(body.timezone) if body.timezone else ctx.tenant.timezone,
+        latitude=_coord(body.latitude),
+        longitude=_coord(body.longitude),
+        geofence_m=body.geofence_m,
     )
     ctx.db.add(branch)
     await ctx.db.flush()
@@ -908,6 +934,10 @@ async def create_branch(body: BranchIn, ctx: Ctx = Depends(allow(BRANCHES_MANAGE
     )
     await ctx.db.commit()
     return BranchOut.model_validate(branch)
+
+
+def _coord(value: float | None) -> Decimal | None:
+    return None if value is None else Decimal(str(round(value, 6)))
 
 
 async def _unique_branch_name(ctx: Ctx, name: str, exclude: uuid.UUID | None = None) -> None:
@@ -931,6 +961,13 @@ async def update_branch(
         raise NotFound()
     check_if_match(request, branch.version)
     changes = body.model_dump(exclude_unset=True, exclude_none=True)
+    clear = changes.pop("clear_location", False)
+    _check_location_pair(changes.get("latitude"), changes.get("longitude"))
+    if clear:
+        changes["latitude"] = changes["longitude"] = None
+    for key in ("latitude", "longitude"):
+        if key in changes:
+            changes[key] = _coord(changes[key])
     if "name" in changes:
         await _unique_branch_name(ctx, changes["name"], exclude=branch.id)
     if "timezone" in changes:
