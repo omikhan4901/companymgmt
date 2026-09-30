@@ -43,7 +43,7 @@ fi
 if [ -f "$root/site/package.json" ]; then
   cd "$root/site"
   step "site: build"
-  npm run --silent build
+  npm run --silent build >/dev/null
 fi
 
 if command -v gitleaks >/dev/null 2>&1; then

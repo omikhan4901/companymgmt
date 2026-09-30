@@ -1,0 +1,82 @@
+[
+  {
+    "key": "free",
+    "name": "Free",
+    "price_month_cents": 0,
+    "price_year_cents": 0,
+    "included_people": 5,
+    "extra_person_cents": null,
+    "max_people": 5,
+    "max_branches": 1,
+    "max_modules": 2,
+    "features": {
+      "custom_roles": false,
+      "api": false,
+      "sso": false
+    }
+  },
+  {
+    "key": "starter",
+    "name": "Starter",
+    "price_month_cents": 900,
+    "price_year_cents": 9000,
+    "included_people": 15,
+    "extra_person_cents": null,
+    "max_people": 15,
+    "max_branches": 1,
+    "max_modules": 4,
+    "features": {
+      "custom_roles": false,
+      "api": false,
+      "sso": false
+    }
+  },
+  {
+    "key": "growth",
+    "name": "Growth",
+    "price_month_cents": 2900,
+    "price_year_cents": 29000,
+    "included_people": 50,
+    "extra_person_cents": null,
+    "max_people": 50,
+    "max_branches": 3,
+    "max_modules": null,
+    "features": {
+      "custom_roles": true,
+      "api": false,
+      "sso": false
+    }
+  },
+  {
+    "key": "business",
+    "name": "Business",
+    "price_month_cents": 7900,
+    "price_year_cents": 79000,
+    "included_people": 150,
+    "extra_person_cents": 150,
+    "max_people": null,
+    "max_branches": null,
+    "max_modules": null,
+    "features": {
+      "custom_roles": true,
+      "api": true,
+      "sso": false
+    }
+  },
+  {
+    "key": "enterprise",
+    "name": "Enterprise",
+    "price_month_cents": null,
+    "price_year_cents": null,
+    "included_people": null,
+    "extra_person_cents": null,
+    "max_people": null,
+    "max_branches": null,
+    "max_modules": null,
+    "features": {
+      "custom_roles": true,
+      "api": true,
+      "sso": true
+    }
+  }
+]

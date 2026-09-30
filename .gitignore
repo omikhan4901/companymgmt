@@ -35,3 +35,6 @@ test-results/
 *.tfstate.*
 *.tfvars
 !*.tfvars.example
+
+# Astro
+site/dist/

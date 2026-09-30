@@ -1,0 +1,69 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource/plus-jakarta-sans/700.css";
+import "@fontsource/plus-jakarta-sans/800.css";
+import "@fontsource/noto-sans-bengali/400.css";
+import "../styles.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const app = import.meta.env.PUBLIC_APP_URL ?? "http://localhost:5173";
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const nav = [
+  { href: "/#features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/#security", label: "Security" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="theme-color" content="#007B7B" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <a href="#main" class="absolute -left-[9999px] top-2 z-50 rounded-lg bg-white px-4 py-2 focus:left-2">Skip to content</a>
+    <header class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
+      <nav class="container-x flex h-16 items-center justify-between gap-4" aria-label="Main">
+        <a href="/" class="inline-flex items-center gap-2" aria-label="CompanyMgmt home">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#007B7B"></rect><path d="M9 10h14v3H12.5v2.5H21v3h-8.5V22H9z" fill="#fff"></path><circle cx="25" cy="8" r="2.4" fill="#5eead4"></circle></svg>
+          <span class="font-display text-xl font-bold tracking-tight">Company<span class="text-brand">Mgmt</span></span>
+        </a>
+        <div class="hidden items-center gap-1 md:flex">
+          {nav.map((l) => <a href={l.href} class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-ink">{l.label}</a>)}
+        </div>
+        <div class="flex items-center gap-2">
+          <a href={`${app}/login`} class="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:inline-block">Sign in</a>
+          <a href={`${app}/signup`} class="rounded-[10px] bg-brand px-4 py-2 text-sm font-semibold text-white shadow-[0_6px_16px_-6px_rgba(0,123,123,.5)] hover:bg-brand-dark">Start free</a>
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="border-t border-slate-200 bg-slate-50">
+      <div class="container-x flex flex-col gap-4 py-10 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+        <p>© {new Date().getFullYear()} CompanyMgmt. Made in Dhaka.</p>
+        <nav class="flex flex-wrap gap-4" aria-label="Footer">
+          <a href="/pricing" class="hover:text-ink">Pricing</a>
+          <a href="/privacy" class="hover:text-ink">Privacy</a>
+          <a href="/terms" class="hover:text-ink">Terms</a>
+          <a href="mailto:hello@companymgmt.app" class="hover:text-ink">Contact</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

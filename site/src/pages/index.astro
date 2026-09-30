@@ -1,0 +1,100 @@
+---
+import PlanGrid from "../components/PlanGrid.astro";
+import Base from "../layouts/Base.astro";
+
+const app = import.meta.env.PUBLIC_APP_URL ?? "http://localhost:5173";
+
+const features = [
+  { icon: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>', title: "Clock in from any phone", text: "One big button. Works for night shifts and for branches in different time zones." },
+  { icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', title: "Staff without email", text: "Give each person a username. They sign in with your workspace code; no email address needed." },
+  { icon: '<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>', title: "Fix mistakes the right way", text: "Forgot to clock out? People ask for a fix, a manager approves it, and the change is recorded." },
+  { icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>', title: "Monthly timesheets", text: "Hours per person per day, ready to check and download as a spreadsheet." },
+  { icon: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 20a4 4 0 0 1 6-3.5"/>', title: "Your people in one place", text: "Profiles, departments and branches. Managers see only their own team." },
+  { icon: '<path d="M4 5h9M8.5 3v2M6 5c1 4 4 7 7 8M11 5c-1 4-4 7-7 8M13 21l4-9 4 9M14.5 18h5"/>', title: "English and বাংলা", text: "Every screen in both languages. Names in any script, on screen and in exports." },
+];
+
+const security = [
+  "Each business's data is kept apart inside the database itself, not just by the app.",
+  "Two-step verification with an authenticator app, and a list of every signed-in device.",
+  "An audit log that can't be edited, with a built-in integrity check.",
+  "National ID numbers are encrypted. Passwords are hashed with Argon2.",
+];
+
+const next = ["Leave", "Payroll", "Sales & POS", "Customers & dues", "Expenses", "Inventory", "Accounting"];
+---
+
+<Base title="CompanyMgmt – Attendance and team management for every business" description="Clock-ins, timesheets and your team in one place. Free for up to 5 people. In English and Bangla.">
+  <section class="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white">
+    <div class="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" aria-hidden="true"></div>
+    <div class="container-x relative py-16 text-center md:py-24">
+      <span class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-medium text-brand shadow-sm">Free for up to 5 people</span>
+      <h1 class="mx-auto mt-5 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+        Run your team from a tea stall to a <span class="text-brand">whole company</span>
+      </h1>
+      <p class="mx-auto mt-5 max-w-xl text-lg text-slate-600">
+        Know who's at work, fix clock-in mistakes fairly, and close the month with a timesheet you trust.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href={`${app}/signup`} class="rounded-[10px] bg-brand px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-6px_rgba(0,123,123,.5)] hover:bg-brand-dark">Create your workspace</a>
+        <a href="/pricing" class="rounded-[10px] border border-slate-300 bg-white px-6 py-3 font-semibold hover:border-brand">See pricing</a>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">No card needed. Set up in two minutes.</p>
+    </div>
+  </section>
+
+  <section id="features" class="container-x py-16">
+    <h2 class="text-center font-display text-3xl font-bold">What you get today</h2>
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        features.map((f) => (
+          <li class="rounded-2xl border border-slate-200 bg-white p-5">
+            <span class="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={f.icon} />
+            </span>
+            <h3 class="mt-3 font-semibold">{f.title}</h3>
+            <p class="mt-1 text-slate-600">{f.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="bg-slate-50">
+    <div class="container-x grid gap-8 py-16 md:grid-cols-2 md:items-center">
+      <div>
+        <h2 class="font-display text-3xl font-bold">Simple for a shop. Ready for a company.</h2>
+        <p class="mt-3 text-slate-600">
+          Tell us what kind of business you run and we switch on only what you need, with plain words and big buttons. As you grow, add branches, departments, managers and custom roles. Nothing to move, nothing to re-learn.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-6">
+        <p class="text-sm font-semibold text-slate-500">Coming next, one module at a time</p>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {next.map((m) => <li class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">{m}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="security" class="container-x py-16">
+    <h2 class="font-display text-3xl font-bold">Built to keep your data safe</h2>
+    <ul class="mt-6 grid gap-3 md:grid-cols-2">
+      {
+        security.map((s) => (
+          <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+            <svg class="mt-0.5 shrink-0 text-brand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+            <span class="text-slate-700">{s}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="bg-slate-50">
+    <div class="container-x py-16">
+      <h2 class="text-center font-display text-3xl font-bold">Simple pricing</h2>
+      <p class="mx-auto mt-2 max-w-xl text-center text-slate-600">Every paid plan starts with a 14-day Growth trial.</p>
+      <div class="mt-10"><PlanGrid /></div>
+    </div>
+  </section>
+</Base>

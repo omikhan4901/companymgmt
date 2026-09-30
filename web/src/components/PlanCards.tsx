@@ -17,8 +17,8 @@ export function planFeatures(plan: Plan, t: (k: string, v?: Record<string, unkno
   out.push(plan.max_branches === null ? t("plans.unlimitedBranches") : plan.max_branches === 1 ? t("plans.branch") : t("plans.branches", { count: formatNumber(plan.max_branches) }));
   out.push(plan.max_modules === null ? t("plans.allModules") : t("plans.modules", { count: formatNumber(plan.max_modules) }));
   if (plan.features.custom_roles) out.push(t("plans.customRoles"));
-  if (plan.features.api) out.push(t("plans.api"));
-  if (plan.features.sso) out.push(t("plans.sso"));
+  if (plan.features.api) out.push(`${t("plans.api")} (${t("common.comingSoon")})`);
+  if (plan.features.sso) out.push(`${t("plans.sso")} (${t("common.comingSoon")})`);
   return out;
 }
 

@@ -1,0 +1,35 @@
+---
+import PlanGrid from "../components/PlanGrid.astro";
+import Base from "../layouts/Base.astro";
+
+const faq = [
+  { q: "What counts as a person?", a: "Anyone with an active profile in your workspace, whether or not they can sign in. People who have left don't count." },
+  { q: "What happens when the trial ends?", a: "You move to the Free plan. Nothing is deleted. If you use more than the Free plan allows, the extra modules become read-only until you upgrade or switch some off." },
+  { q: "Can I pay in taka?", a: "Online payment is coming soon, in US dollars by card. Until then, contact us and we'll set up your plan." },
+  { q: "Can I export my data?", a: "Yes. Attendance exports to a spreadsheet today, and a full workspace export is coming with the next release." },
+];
+---
+
+<Base title="Pricing – CompanyMgmt" description="Free for up to 5 people. Paid plans from $9 a month, with a 14-day trial.">
+  <section class="container-x py-16">
+    <h1 class="text-center font-display text-4xl font-extrabold tracking-tight">Pricing</h1>
+    <p class="mx-auto mt-3 max-w-xl text-center text-slate-600">One price for your whole workspace, not per user. Pay yearly and get two months free.</p>
+    <div class="mt-10"><PlanGrid /></div>
+    <p class="mt-6 text-center text-sm text-slate-500">Prices in US dollars. Online payment is coming soon.</p>
+  </section>
+  <section class="bg-slate-50">
+    <div class="container-x max-w-3xl py-16">
+      <h2 class="font-display text-2xl font-bold">Questions</h2>
+      <dl class="mt-6 flex flex-col gap-5">
+        {
+          faq.map((f) => (
+            <div>
+              <dt class="font-semibold">{f.q}</dt>
+              <dd class="mt-1 text-slate-600">{f.a}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+</Base>
