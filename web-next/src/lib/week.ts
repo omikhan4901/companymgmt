@@ -31,3 +31,9 @@ export function daysBetween(start: string, end: string): string[] {
   for (let d = start; d <= end && out.length < 400; d = addDays(d, 1)) out.push(d);
   return out;
 }
+
+/** The last day (YYYY-MM-DD) of a month given as YYYY-MM. */
+export function lastDayOfMonth(month: string): string {
+  const [y, m] = month.split("-").map(Number);
+  return new Date(Date.UTC(y ?? 1970, m ?? 1, 0)).toISOString().slice(0, 10);
+}
