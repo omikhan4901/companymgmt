@@ -353,6 +353,10 @@ async def test_employees_only_see_their_own_records(client: httpx.AsyncClient) -
     await staff.post("/v1/attendance/clock-in", json={})
     mine = (await staff.get("/v1/attendance/records")).json()["items"]
     assert len(mine) == 1
+    owner_view = (await owner.get("/v1/attendance/records")).json()["items"]
+    assert len(owner_view) == 2
+    owner_mine = (await owner.get("/v1/attendance/records", params={"mine": True})).json()["items"]
+    assert [r["employee_id"] for r in owner_mine] == [await employee_id(owner)]
     other = await employee_id(owner)
     assert (await staff.get("/v1/attendance/records", params={"employee_id": other})).status_code == 404
     assert (await staff.get("/v1/attendance/present")).status_code == 403

@@ -495,6 +495,7 @@ async def list_records(
     end: date | None = Query(default=None, alias="to"),
     employee_id: uuid.UUID | None = None,
     branch_id: uuid.UUID | None = None,
+    mine: bool = False,
     cursor: str | None = None,
     limit: int = Query(default=100, ge=1, le=500),
 ) -> Page[RecordOut]:
@@ -506,7 +507,7 @@ async def list_records(
         Employee,
         and_(Employee.tenant_id == AttendanceRecord.tenant_id, Employee.id == AttendanceRecord.employee_id),
     )
-    if not ctx.can(access.VIEW):
+    if mine or not ctx.can(access.VIEW):
         me = await _me(ctx)
         if employee_id is not None and employee_id != me.id:
             raise NotFound()
