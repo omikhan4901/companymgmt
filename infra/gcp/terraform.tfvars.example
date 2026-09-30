@@ -1,0 +1,3 @@
+project         = "companymgmt-prod"
+region          = "asia-southeast1"
+billing_account = "" # e.g. "01ABCD-234567-89EFGH" to get budget emails
