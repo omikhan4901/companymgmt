@@ -1,0 +1,92 @@
+"""Application factory."""
+
+from __future__ import annotations
+
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import APIRouter, Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIRoute
+from sqlalchemy import text
+
+from app.core.config import get_settings
+from app.core.db import dispose_engine, open_session
+from app.core.errors import install_error_handlers
+from app.core.logging import configure_logging
+from app.core.middleware import RequestContextMiddleware
+from app.modules.attendance.routes import router as attendance_router
+from app.modules.people.routes import router as people_router
+from app.modules.platform.deps import public
+from app.modules.platform.internal import router as internal_router
+from app.modules.platform.routes_auth import plans_router
+from app.modules.platform.routes_auth import router as auth_router
+from app.modules.platform.routes_workspace import router as workspace_router
+
+log = logging.getLogger("app")
+
+ROUTERS = (
+    auth_router,
+    plans_router,
+    workspace_router,
+    people_router,
+    attendance_router,
+    internal_router,
+)
+ops_router = APIRouter(tags=["ops"])
+
+
+@ops_router.get("/healthz")
+async def healthz(_: None = Depends(public())) -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@ops_router.get("/readyz")
+async def readyz(_: None = Depends(public())) -> dict[str, str]:
+    async with open_session() as db:
+        await db.execute(text("SELECT 1"))
+    return {"status": "ready"}
+
+
+def api_routes() -> list[APIRoute]:
+    """Every endpoint, flattened (used by the route audit and isolation tests)."""
+    return [r for router in (*ROUTERS, ops_router) for r in router.routes if isinstance(r, APIRoute)]
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    yield
+    await dispose_engine()
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+    configure_logging(settings.env)
+    docs = settings.env in ("dev", "test")
+    app = FastAPI(
+        title="CompanyMgmt API",
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url="/docs" if docs else None,
+        redoc_url=None,
+        openapi_url="/v1/openapi.json",
+    )
+    install_error_handlers(app)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        allow_headers=["authorization", "content-type", "x-cm-client", "if-match", "idempotency-key"],
+        expose_headers=["etag", "x-request-id", "retry-after"],
+        max_age=600,
+    )
+    app.add_middleware(RequestContextMiddleware)
+
+    for router in (*ROUTERS, ops_router):
+        app.include_router(router)
+    return app
+
+
+app = create_app()
