@@ -15,7 +15,8 @@ if [ -f "$root/api/pyproject.toml" ]; then
   step "api: module boundaries"
   uv run lint-imports
   step "api: migrations in sync with models"
-  uv run python -m scripts.check_migrations
+  uv run alembic upgrade head >/dev/null
+  uv run alembic check
   step "api: tests"
   uv run pytest -q
 fi
