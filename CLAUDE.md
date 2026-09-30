@@ -44,9 +44,13 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 ## Working with the owner
 
 - Look and feel: calm, uncluttered screens with little text. One clear next action;
-  details only when needed. antd + Tailwind + motion, teal brand `#007B7B`. No dark
-  gradient bands, glows or illustrated mock-ups (the owner reads them as "AI-looking").
-  Dialogs never fill the screen.
+  details only when needed. Atlas design (docs/design/atlas): white by default, dark
+  mode, accents Plum (default) / Saffron / Garnet / Ink; never blue or neon. Radix +
+  Tailwind, no antd. No gradient washes, glows or illustrated mock-ups (the owner reads
+  them as "AI-looking"). Dialogs never fill the screen on desktop; phones get sheets.
+- Attendance is location-based: new attendance features must respect the workspace's
+  location mode and never track people between clock events.
+- Design new modules AI-ready (plan §3.7): logic in typed service functions, not routes.
 - Tests are rigorous and edge-case heavy but fast.
 - The owner isn't a cloud-console expert: give exact click paths or commands, and always
   the least-privilege option.
