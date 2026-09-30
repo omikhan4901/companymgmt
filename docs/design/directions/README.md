@@ -13,4 +13,4 @@ References: Connecteam, Deputy, Zoho People, Odoo and HR dashboards on Dribbble.
 The screenshots use a fallback font; the intended faces are Geist (A), Bricolage Grotesque
 with Figtree (B) and Space Grotesk with IBM Plex Sans (C).
 
-Decision: pending.
+Decision: C (Atlas), with a white default mode and a new accent. See `../atlas/`.
