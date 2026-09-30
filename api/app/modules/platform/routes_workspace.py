@@ -144,6 +144,8 @@ async def set_modules(body: ModulesIn, ctx: Ctx = Depends(allow(WORKSPACE_MANAGE
     assert sub is not None
     before = list(sub.modules)
     sub.modules = wanted
+    assert ctx.tenant is not None
+    await hooks.enable_modules(ctx.db, ctx.tenant, [m for m in wanted if m not in before])
     await audit.record(
         ctx.db,
         "workspace.modules_changed",

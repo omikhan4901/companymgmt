@@ -17,6 +17,7 @@ from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.modules.attendance.routes import router as attendance_router
+from app.modules.leave.routes import router as leave_router
 from app.modules.people.routes import router as people_router
 from app.modules.platform.deps import public
 from app.modules.platform.internal import router as internal_router
@@ -32,6 +33,7 @@ ROUTERS = (
     workspace_router,
     people_router,
     attendance_router,
+    leave_router,
     internal_router,
 )
 ops_router = APIRouter(tags=["ops"])

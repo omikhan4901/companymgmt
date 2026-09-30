@@ -47,7 +47,7 @@ MODULES: dict[str, Module] = {
     for m in (
         Module("people", "People", core=True),
         Module("attendance", "Attendance", requires=("people",)),
-        Module("leave", "Leave", requires=("people",), available=False),
+        Module("leave", "Leave", requires=("people",)),
         Module("payroll", "Payroll", requires=("people", "attendance"), available=False),
         Module("sales", "Sales & POS", available=False),
         Module("customers", "Customers & dues", available=False),
@@ -101,18 +101,36 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "attendance.manage",
             "attendance.approve",
             "attendance.export",
+            "leave.self",
+            "leave.view",
+            "leave.approve",
         ),
     ),
     BuiltinRole(
         "accountant",
         "Accountant",
         "Reads people and attendance for payroll and reports.",
-        ("people.view", "attendance.self", "attendance.view", "attendance.export"),
+        (
+            "people.view",
+            "attendance.self",
+            "attendance.view",
+            "attendance.export",
+            "leave.self",
+            "leave.view",
+        ),
     ),
     BuiltinRole(
-        "cashier", "Cashier", "Sells and clocks in. No access to other people's data.", ("attendance.self",)
+        "cashier",
+        "Cashier",
+        "Sells and clocks in. No access to other people's data.",
+        ("attendance.self", "leave.self"),
     ),
-    BuiltinRole("employee", "Employee", "Clocks in and sees their own records.", ("attendance.self",)),
+    BuiltinRole(
+        "employee",
+        "Employee",
+        "Clocks in, asks for leave and sees their own records.",
+        ("attendance.self", "leave.self"),
+    ),
 )
 
 DEFAULT_ROLE = "employee"

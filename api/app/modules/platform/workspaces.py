@@ -114,13 +114,14 @@ async def create_workspace(
         roles[r.key] = role
     await db.flush()
 
+    modules = catalog.preset_modules(business_type)
     db.add(
         Subscription(
             plan_key=BASE_PLAN,
             status="trialing",
             trial_plan_key=TRIAL_PLAN,
             trial_ends_at=datetime.now(UTC) + timedelta(days=TRIAL_DAYS),
-            modules=catalog.preset_modules(business_type),
+            modules=modules,
         )
     )
     db.add(Branch(name="Main branch", timezone=tenant.timezone))
@@ -128,6 +129,7 @@ async def create_workspace(
     db.add(membership)
     await db.flush()
     await hooks.run(hooks.member_joined, db, membership, owner)
+    await hooks.enable_modules(db, tenant, modules)
     await audit.record(
         db,
         "workspace.created",

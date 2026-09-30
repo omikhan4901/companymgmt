@@ -172,6 +172,19 @@ async def _resources(owner: Account) -> dict[str, str]:
         },
     )
     ids["correction_id"] = correction.json()["id"]
+    kinds = (await owner.get("/v1/leave/types")).json()
+    ids["leave_type_id"] = kinds[0]["id"]
+    holiday = await owner.post(
+        "/v1/leave/holidays", json={"day": f"{start.year}-12-16", "name": "Victory Day"}
+    )
+    ids["holiday_id"] = holiday.json()["id"]
+    day = (start + timedelta(days=10)).date()
+    day += timedelta(days=1 if day.isoweekday() == 5 else 0)
+    leave = await member.post(
+        "/v1/leave/requests",
+        json={"leave_type_id": ids["leave_type_id"], "start_date": str(day), "end_date": str(day)},
+    )
+    ids["request_id"] = leave.json()["id"]
     sessions = (await staff_account.get("/v1/auth/sessions")).json()
     ids["session_id"] = sessions[0]["id"]
     assert all(ids.values()), ids

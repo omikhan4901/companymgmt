@@ -3,6 +3,7 @@
 from app.core import audit, outbox, ratelimit  # noqa: F401
 from app.core.models import Base
 from app.modules.attendance import models as attendance_models  # noqa: F401
+from app.modules.leave import models as leave_models  # noqa: F401
 from app.modules.people import models as people_models  # noqa: F401
 from app.modules.platform import models as platform_models  # noqa: F401
 
