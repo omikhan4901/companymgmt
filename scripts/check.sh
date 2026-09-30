@@ -22,6 +22,9 @@ if [ -f "$root/api/pyproject.toml" ]; then
 fi
 
 if [ -f "$root/web/package.json" ]; then
+  step "api contract: web types match the backend"
+  "$root/scripts/gen-api-types.sh"
+  git -C "$root" diff --exit-code -- web/src/api/openapi.json web/src/api/schema.d.ts
   cd "$root/web"
   step "web: lint"
   npm run --silent lint
@@ -31,6 +34,10 @@ if [ -f "$root/web/package.json" ]; then
   npm run --silent test
   step "web: build"
   npm run --silent build
+  if [ "${E2E:-0}" = "1" ]; then
+    step "web: end-to-end and accessibility (Playwright)"
+    npx playwright test
+  fi
 fi
 
 if [ -f "$root/site/package.json" ]; then
