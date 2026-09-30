@@ -24,7 +24,7 @@ fi
 if [ -f "$root/web/package.json" ]; then
   step "api contract: web types match the backend"
   "$root/scripts/gen-api-types.sh"
-  git -C "$root" diff --exit-code -- web/src/api/openapi.json web/src/api/schema.d.ts
+  git -C "$root" diff --exit-code -- web/src/api/openapi.json web/src/api/schema.d.ts web-next/src/api/openapi.json web-next/src/api/schema.d.ts
   cd "$root/web"
   step "web: lint"
   npm run --silent lint
@@ -38,6 +38,18 @@ if [ -f "$root/web/package.json" ]; then
     step "web: end-to-end and accessibility (Playwright)"
     npx playwright test
   fi
+fi
+
+if [ -f "$root/web-next/package.json" ]; then
+  cd "$root/web-next"
+  step "web (Next.js): lint"
+  npm run --silent lint
+  step "web (Next.js): types"
+  npm run --silent typecheck
+  step "web (Next.js): unit tests"
+  npm run --silent test
+  step "web (Next.js): static build with security headers"
+  NEXT_TELEMETRY_DISABLED=1 npm run --silent build >/dev/null
 fi
 
 if [ -f "$root/site/package.json" ]; then

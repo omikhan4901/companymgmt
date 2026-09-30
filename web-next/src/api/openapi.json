@@ -1,0 +1,6925 @@
+{
+ "components": {
+  "schemas": {
+   "AcceptIn": {
+    "additionalProperties": false,
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "password": {
+      "anyOf": [
+       {
+        "maxLength": 128,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Password"
+     },
+     "token": {
+      "maxLength": 200,
+      "title": "Token",
+      "type": "string"
+     }
+    },
+    "required": [
+     "token"
+    ],
+    "title": "AcceptIn",
+    "type": "object"
+   },
+   "AuditOut": {
+    "properties": {
+     "action": {
+      "title": "Action",
+      "type": "string"
+     },
+     "actor_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actor Name"
+     },
+     "actor_user_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actor User Id"
+     },
+     "data": {
+      "additionalProperties": true,
+      "title": "Data",
+      "type": "object"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "ip": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ip"
+     },
+     "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+     },
+     "seq": {
+      "title": "Seq",
+      "type": "integer"
+     },
+     "target_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Target Id"
+     },
+     "target_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Target Type"
+     }
+    },
+    "required": [
+     "id",
+     "seq",
+     "occurred_at",
+     "actor_user_id",
+     "actor_name",
+     "action",
+     "target_type",
+     "target_id",
+     "data",
+     "ip"
+    ],
+    "title": "AuditOut",
+    "type": "object"
+   },
+   "BranchIn": {
+    "additionalProperties": false,
+    "properties": {
+     "address": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "geofence_m": {
+      "default": 150,
+      "maximum": 5000.0,
+      "minimum": 25.0,
+      "title": "Geofence M",
+      "type": "integer"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "maximum": 90.0,
+        "minimum": -90.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "maximum": 180.0,
+        "minimum": -180.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "timezone": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Timezone"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "BranchIn",
+    "type": "object"
+   },
+   "BranchOut": {
+    "properties": {
+     "address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "geofence_m": {
+      "title": "Geofence M",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "is_active": {
+      "title": "Is Active",
+      "type": "boolean"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "timezone": {
+      "title": "Timezone",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "timezone",
+     "address",
+     "is_active",
+     "latitude",
+     "longitude",
+     "geofence_m",
+     "version"
+    ],
+    "title": "BranchOut",
+    "type": "object"
+   },
+   "BranchPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "address": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "clear_location": {
+      "default": false,
+      "title": "Clear Location",
+      "type": "boolean"
+     },
+     "geofence_m": {
+      "anyOf": [
+       {
+        "maximum": 5000.0,
+        "minimum": 25.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Geofence M"
+     },
+     "is_active": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Is Active"
+     },
+     "latitude": {
+      "anyOf": [
+       {
+        "maximum": 90.0,
+        "minimum": -90.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Latitude"
+     },
+     "longitude": {
+      "anyOf": [
+       {
+        "maximum": 180.0,
+        "minimum": -180.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Longitude"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "timezone": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Timezone"
+     }
+    },
+    "title": "BranchPatch",
+    "type": "object"
+   },
+   "ClockIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "client_time": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Client Time"
+     },
+     "location": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GeoIn"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "title": "ClockIn",
+    "type": "object"
+   },
+   "ClockOut": {
+    "additionalProperties": false,
+    "properties": {
+     "location": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/GeoIn"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "title": "ClockOut",
+    "type": "object"
+   },
+   "CodeIn": {
+    "additionalProperties": false,
+    "properties": {
+     "code": {
+      "maxLength": 12,
+      "title": "Code",
+      "type": "string"
+     }
+    },
+    "required": [
+     "code"
+    ],
+    "title": "CodeIn",
+    "type": "object"
+   },
+   "CorrectionIn": {
+    "additionalProperties": false,
+    "properties": {
+     "clock_in_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock In At"
+     },
+     "clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock Out At"
+     },
+     "kind": {
+      "enum": [
+       "add",
+       "change",
+       "remove"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "reason": {
+      "maxLength": 500,
+      "minLength": 3,
+      "title": "Reason",
+      "type": "string"
+     },
+     "record_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Record Id"
+     }
+    },
+    "required": [
+     "kind",
+     "reason"
+    ],
+    "title": "CorrectionIn",
+    "type": "object"
+   },
+   "CorrectionOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "decided_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decided At"
+     },
+     "decided_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decided By"
+     },
+     "decision_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decision Note"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "proposed_clock_in_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Proposed Clock In At"
+     },
+     "proposed_clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Proposed Clock Out At"
+     },
+     "reason": {
+      "title": "Reason",
+      "type": "string"
+     },
+     "record_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Record Id"
+     },
+     "requested_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requested By"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "record_id",
+     "kind",
+     "proposed_clock_in_at",
+     "proposed_clock_out_at",
+     "reason",
+     "status",
+     "requested_by",
+     "decided_by",
+     "decided_at",
+     "decision_note",
+     "created_at",
+     "version"
+    ],
+    "title": "CorrectionOut",
+    "type": "object"
+   },
+   "CurrentWorkspace": {
+    "properties": {
+     "business_type": {
+      "title": "Business Type",
+      "type": "string"
+     },
+     "country": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Country"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "fiscal_year_start_month": {
+      "title": "Fiscal Year Start Month",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "locale": {
+      "title": "Locale",
+      "type": "string"
+     },
+     "membership_id": {
+      "format": "uuid",
+      "title": "Membership Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "permissions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Permissions",
+      "type": "array"
+     },
+     "plan": {
+      "$ref": "#/components/schemas/PlanOut"
+     },
+     "role": {
+      "title": "Role",
+      "type": "string"
+     },
+     "role_key": {
+      "title": "Role Key",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     },
+     "timezone": {
+      "title": "Timezone",
+      "type": "string"
+     },
+     "ui_mode": {
+      "title": "Ui Mode",
+      "type": "string"
+     },
+     "week_start": {
+      "title": "Week Start",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "slug",
+     "business_type",
+     "ui_mode",
+     "country",
+     "currency",
+     "timezone",
+     "locale",
+     "week_start",
+     "fiscal_year_start_month",
+     "role",
+     "role_key",
+     "permissions",
+     "plan",
+     "membership_id",
+     "scope_department_id"
+    ],
+    "title": "CurrentWorkspace",
+    "type": "object"
+   },
+   "DayOut": {
+    "properties": {
+     "date": {
+      "format": "date",
+      "title": "Date",
+      "type": "string"
+     },
+     "minutes": {
+      "title": "Minutes",
+      "type": "integer"
+     },
+     "needs_review": {
+      "title": "Needs Review",
+      "type": "integer"
+     },
+     "records": {
+      "title": "Records",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "date",
+     "minutes",
+     "records",
+     "needs_review"
+    ],
+    "title": "DayOut",
+    "type": "object"
+   },
+   "DecisionIn": {
+    "additionalProperties": false,
+    "properties": {
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "title": "DecisionIn",
+    "type": "object"
+   },
+   "DepartmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "parent_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Parent Id"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "DepartmentIn",
+    "type": "object"
+   },
+   "DepartmentOut": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "parent_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Parent Id"
+     },
+     "people": {
+      "title": "People",
+      "type": "integer"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "parent_id",
+     "people",
+     "version"
+    ],
+    "title": "DepartmentOut",
+    "type": "object"
+   },
+   "DepartmentPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "move_to_top": {
+      "default": false,
+      "title": "Move To Top",
+      "type": "boolean"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "parent_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Parent Id"
+     }
+    },
+    "title": "DepartmentPatch",
+    "type": "object"
+   },
+   "EmployeeIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "date_of_birth": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Date Of Birth"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "employee_code": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Code"
+     },
+     "employment_type": {
+      "default": "full_time",
+      "enum": [
+       "full_time",
+       "part_time",
+       "contract",
+       "intern",
+       "daily"
+      ],
+      "title": "Employment Type",
+      "type": "string"
+     },
+     "full_name": {
+      "maxLength": 200,
+      "title": "Full Name",
+      "type": "string"
+     },
+     "job_title": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Job Title"
+     },
+     "joined_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Joined On"
+     },
+     "national_id": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "National Id"
+     },
+     "notes": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Notes"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "pattern": "^[0-9+()\\-\\s.]{3,40}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "preferred_name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preferred Name"
+     }
+    },
+    "required": [
+     "full_name"
+    ],
+    "title": "EmployeeIn",
+    "type": "object"
+   },
+   "EmployeeOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "date_of_birth": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Date Of Birth"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "employee_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Code"
+     },
+     "employment_type": {
+      "title": "Employment Type",
+      "type": "string"
+     },
+     "full_name": {
+      "title": "Full Name",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "job_title": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Job Title"
+     },
+     "joined_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Joined On"
+     },
+     "left_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Left On"
+     },
+     "membership_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Membership Id"
+     },
+     "national_id_last4": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "National Id Last4"
+     },
+     "notes": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Notes"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "preferred_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preferred Name"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "membership_id",
+     "employee_code",
+     "full_name",
+     "preferred_name",
+     "email",
+     "phone",
+     "department_id",
+     "branch_id",
+     "job_title",
+     "employment_type",
+     "status",
+     "joined_on",
+     "left_on",
+     "date_of_birth",
+     "national_id_last4",
+     "notes",
+     "created_at",
+     "version"
+    ],
+    "title": "EmployeeOut",
+    "type": "object"
+   },
+   "EmployeePatch": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "clear": {
+      "default": [],
+      "items": {
+       "enum": [
+        "department_id",
+        "branch_id",
+        "employee_code",
+        "email",
+        "phone",
+        "job_title",
+        "preferred_name",
+        "left_on",
+        "date_of_birth",
+        "national_id",
+        "notes"
+       ],
+       "type": "string"
+      },
+      "title": "Clear",
+      "type": "array"
+     },
+     "date_of_birth": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Date Of Birth"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "employee_code": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Code"
+     },
+     "employment_type": {
+      "anyOf": [
+       {
+        "enum": [
+         "full_time",
+         "part_time",
+         "contract",
+         "intern",
+         "daily"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employment Type"
+     },
+     "full_name": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Full Name"
+     },
+     "job_title": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Job Title"
+     },
+     "joined_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Joined On"
+     },
+     "left_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Left On"
+     },
+     "national_id": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "National Id"
+     },
+     "notes": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Notes"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "pattern": "^[0-9+()\\-\\s.]{3,40}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "preferred_name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preferred Name"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "enum": [
+         "active",
+         "inactive",
+         "left"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     }
+    },
+    "title": "EmployeePatch",
+    "type": "object"
+   },
+   "ForgotIn": {
+    "additionalProperties": false,
+    "properties": {
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+     }
+    },
+    "required": [
+     "email"
+    ],
+    "title": "ForgotIn",
+    "type": "object"
+   },
+   "GeoIn": {
+    "additionalProperties": false,
+    "description": "A position from the device (browser Geolocation API).",
+    "properties": {
+     "accuracy_m": {
+      "maximum": 100000.0,
+      "minimum": 0.0,
+      "title": "Accuracy M",
+      "type": "number"
+     },
+     "latitude": {
+      "maximum": 90.0,
+      "minimum": -90.0,
+      "title": "Latitude",
+      "type": "number"
+     },
+     "longitude": {
+      "maximum": 180.0,
+      "minimum": -180.0,
+      "title": "Longitude",
+      "type": "number"
+     }
+    },
+    "required": [
+     "latitude",
+     "longitude",
+     "accuracy_m"
+    ],
+    "title": "GeoIn",
+    "type": "object"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "title": "Detail",
+      "type": "array"
+     }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+   },
+   "InviteIn": {
+    "additionalProperties": false,
+    "properties": {
+     "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     }
+    },
+    "required": [
+     "email",
+     "role_id"
+    ],
+    "title": "InviteIn",
+    "type": "object"
+   },
+   "InviteLookupOut": {
+    "properties": {
+     "account_exists": {
+      "title": "Account Exists",
+      "type": "boolean"
+     },
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "workspace": {
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace",
+     "email",
+     "name",
+     "account_exists"
+    ],
+    "title": "InviteLookupOut",
+    "type": "object"
+   },
+   "InviteOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "email",
+     "name",
+     "role_id",
+     "created_at",
+     "expires_at"
+    ],
+    "title": "InviteOut",
+    "type": "object"
+   },
+   "LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "password"
+    ],
+    "title": "LoginIn",
+    "type": "object"
+   },
+   "LoginOut": {
+    "properties": {
+     "access_token": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Access Token"
+     },
+     "challenge": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Challenge"
+     },
+     "expires_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expires At"
+     },
+     "mfa_required": {
+      "default": false,
+      "title": "Mfa Required",
+      "type": "boolean"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "title": "LoginOut",
+    "type": "object"
+   },
+   "MeOut": {
+    "properties": {
+     "email": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "email_verified": {
+      "title": "Email Verified",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "locale": {
+      "title": "Locale",
+      "type": "string"
+     },
+     "mfa_enabled": {
+      "title": "Mfa Enabled",
+      "type": "boolean"
+     },
+     "must_change_password": {
+      "title": "Must Change Password",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/CurrentWorkspace"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "workspaces": {
+      "items": {
+       "$ref": "#/components/schemas/WorkspaceRef"
+      },
+      "title": "Workspaces",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "email",
+     "username",
+     "email_verified",
+     "locale",
+     "mfa_enabled",
+     "must_change_password",
+     "workspaces",
+     "workspace"
+    ],
+    "title": "MeOut",
+    "type": "object"
+   },
+   "MemberOut": {
+    "properties": {
+     "email": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "joined_at": {
+      "format": "date-time",
+      "title": "Joined At",
+      "type": "string"
+     },
+     "mfa_enabled": {
+      "title": "Mfa Enabled",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "role": {
+      "title": "Role",
+      "type": "string"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     },
+     "role_key": {
+      "title": "Role Key",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     },
+     "staff_account": {
+      "title": "Staff Account",
+      "type": "boolean"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "user_id": {
+      "format": "uuid",
+      "title": "User Id",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "user_id",
+     "name",
+     "email",
+     "username",
+     "role_id",
+     "role",
+     "role_key",
+     "status",
+     "scope_department_id",
+     "mfa_enabled",
+     "staff_account",
+     "joined_at",
+     "version"
+    ],
+    "title": "MemberOut",
+    "type": "object"
+   },
+   "MemberPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "clear_scope": {
+      "default": false,
+      "title": "Clear Scope",
+      "type": "boolean"
+     },
+     "role_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Role Id"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "enum": [
+         "active",
+         "disabled"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     }
+    },
+    "title": "MemberPatch",
+    "type": "object"
+   },
+   "MfaSetupOut": {
+    "properties": {
+     "otpauth_uri": {
+      "title": "Otpauth Uri",
+      "type": "string"
+     },
+     "secret": {
+      "title": "Secret",
+      "type": "string"
+     }
+    },
+    "required": [
+     "secret",
+     "otpauth_uri"
+    ],
+    "title": "MfaSetupOut",
+    "type": "object"
+   },
+   "MfaVerifyIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge": {
+      "maxLength": 100,
+      "title": "Challenge",
+      "type": "string"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 12,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "recovery_code": {
+      "anyOf": [
+       {
+        "maxLength": 20,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recovery Code"
+     }
+    },
+    "required": [
+     "challenge"
+    ],
+    "title": "MfaVerifyIn",
+    "type": "object"
+   },
+   "ModulesIn": {
+    "additionalProperties": false,
+    "properties": {
+     "modules": {
+      "items": {
+       "maxLength": 30,
+       "type": "string"
+      },
+      "maxItems": 30,
+      "title": "Modules",
+      "type": "array"
+     }
+    },
+    "required": [
+     "modules"
+    ],
+    "title": "ModulesIn",
+    "type": "object"
+   },
+   "Page_AuditOut_": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/AuditOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "next_cursor": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Cursor"
+     }
+    },
+    "required": [
+     "items"
+    ],
+    "title": "Page[AuditOut]",
+    "type": "object"
+   },
+   "Page_EmployeeOut_": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/EmployeeOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "next_cursor": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Cursor"
+     }
+    },
+    "required": [
+     "items"
+    ],
+    "title": "Page[EmployeeOut]",
+    "type": "object"
+   },
+   "Page_MemberOut_": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/MemberOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "next_cursor": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Cursor"
+     }
+    },
+    "required": [
+     "items"
+    ],
+    "title": "Page[MemberOut]",
+    "type": "object"
+   },
+   "Page_RecordOut_": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/RecordOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "next_cursor": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Cursor"
+     }
+    },
+    "required": [
+     "items"
+    ],
+    "title": "Page[RecordOut]",
+    "type": "object"
+   },
+   "PasswordChangeIn": {
+    "additionalProperties": false,
+    "properties": {
+     "current_password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Current Password",
+      "type": "string"
+     },
+     "new_password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "New Password",
+      "type": "string"
+     }
+    },
+    "required": [
+     "current_password",
+     "new_password"
+    ],
+    "title": "PasswordChangeIn",
+    "type": "object"
+   },
+   "PermissionOut": {
+    "properties": {
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "module": {
+      "title": "Module",
+      "type": "string"
+     },
+     "owner_only": {
+      "title": "Owner Only",
+      "type": "boolean"
+     },
+     "scoped": {
+      "title": "Scoped",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "key",
+     "module",
+     "label",
+     "scoped",
+     "owner_only"
+    ],
+    "title": "PermissionOut",
+    "type": "object"
+   },
+   "PlanOut": {
+    "properties": {
+     "features": {
+      "additionalProperties": true,
+      "title": "Features",
+      "type": "object"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "locked_modules": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Locked Modules",
+      "type": "array"
+     },
+     "max_branches": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Branches"
+     },
+     "max_modules": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Modules"
+     },
+     "max_people": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max People"
+     },
+     "modules": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Modules",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "trial_ends_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Trial Ends At"
+     }
+    },
+    "required": [
+     "key",
+     "name",
+     "status",
+     "trial_ends_at",
+     "modules",
+     "locked_modules",
+     "max_people",
+     "max_branches",
+     "max_modules",
+     "features"
+    ],
+    "title": "PlanOut",
+    "type": "object"
+   },
+   "PresentOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "clock_in_at": {
+      "format": "date-time",
+      "title": "Clock In At",
+      "type": "string"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "employee_name",
+     "clock_in_at",
+     "branch_id"
+    ],
+    "title": "PresentOut",
+    "type": "object"
+   },
+   "ProfileIn": {
+    "additionalProperties": false,
+    "properties": {
+     "locale": {
+      "anyOf": [
+       {
+        "enum": [
+         "en",
+         "bn"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locale"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     }
+    },
+    "title": "ProfileIn",
+    "type": "object"
+   },
+   "PublicPlan": {
+    "properties": {
+     "audit_retention_days": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Audit Retention Days"
+     },
+     "extra_person_cents": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Extra Person Cents"
+     },
+     "features": {
+      "additionalProperties": true,
+      "title": "Features",
+      "type": "object"
+     },
+     "included_people": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Included People"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "max_branches": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Branches"
+     },
+     "max_modules": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Modules"
+     },
+     "max_people": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max People"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "price_month_cents": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price Month Cents"
+     },
+     "price_year_cents": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price Year Cents"
+     },
+     "storage_mb": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Storage Mb"
+     }
+    },
+    "required": [
+     "key",
+     "name",
+     "price_month_cents",
+     "price_year_cents",
+     "included_people",
+     "extra_person_cents",
+     "max_people",
+     "max_branches",
+     "max_modules",
+     "storage_mb",
+     "audit_retention_days",
+     "features"
+    ],
+    "title": "PublicPlan",
+    "type": "object"
+   },
+   "ReauthIn": {
+    "additionalProperties": false,
+    "properties": {
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 12,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "password": {
+      "anyOf": [
+       {
+        "maxLength": 128,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Password"
+     }
+    },
+    "title": "ReauthIn",
+    "type": "object"
+   },
+   "RecordIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "clock_in_at": {
+      "format": "date-time",
+      "title": "Clock In At",
+      "type": "string"
+     },
+     "clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock Out At"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "employee_id",
+     "clock_in_at"
+    ],
+    "title": "RecordIn",
+    "type": "object"
+   },
+   "RecordOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "business_date": {
+      "format": "date",
+      "title": "Business Date",
+      "type": "string"
+     },
+     "clock_in_at": {
+      "format": "date-time",
+      "title": "Clock In At",
+      "type": "string"
+     },
+     "clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock Out At"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "in_accuracy_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Accuracy M"
+     },
+     "in_distance_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Distance M"
+     },
+     "in_geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Geo"
+     },
+     "in_latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Latitude"
+     },
+     "in_longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "In Longitude"
+     },
+     "minutes": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Minutes"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "out_accuracy_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Accuracy M"
+     },
+     "out_distance_m": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Distance M"
+     },
+     "out_geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Geo"
+     },
+     "out_latitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Latitude"
+     },
+     "out_longitude": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Out Longitude"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "branch_id",
+     "business_date",
+     "clock_in_at",
+     "clock_out_at",
+     "minutes",
+     "status",
+     "source",
+     "note",
+     "version"
+    ],
+    "title": "RecordOut",
+    "type": "object"
+   },
+   "RecordPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "clock_in_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock In At"
+     },
+     "clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock Out At"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "title": "RecordPatch",
+    "type": "object"
+   },
+   "RecoveryCodesOut": {
+    "properties": {
+     "recovery_codes": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Recovery Codes",
+      "type": "array"
+     }
+    },
+    "required": [
+     "recovery_codes"
+    ],
+    "title": "RecoveryCodesOut",
+    "type": "object"
+   },
+   "ResetIn": {
+    "additionalProperties": false,
+    "properties": {
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "token": {
+      "maxLength": 200,
+      "title": "Token",
+      "type": "string"
+     }
+    },
+    "required": [
+     "token",
+     "password"
+    ],
+    "title": "ResetIn",
+    "type": "object"
+   },
+   "RoleIn": {
+    "additionalProperties": false,
+    "properties": {
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "permissions": {
+      "items": {
+       "maxLength": 60,
+       "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Permissions",
+      "type": "array"
+     }
+    },
+    "required": [
+     "name",
+     "permissions"
+    ],
+    "title": "RoleIn",
+    "type": "object"
+   },
+   "RoleOut": {
+    "properties": {
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "is_builtin": {
+      "title": "Is Builtin",
+      "type": "boolean"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "members": {
+      "title": "Members",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "permissions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Permissions",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "key",
+     "name",
+     "description",
+     "is_builtin",
+     "permissions",
+     "members"
+    ],
+    "title": "RoleOut",
+    "type": "object"
+   },
+   "RolePatch": {
+    "additionalProperties": false,
+    "properties": {
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "permissions": {
+      "anyOf": [
+       {
+        "items": {
+         "maxLength": 60,
+         "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Permissions"
+     }
+    },
+    "title": "RolePatch",
+    "type": "object"
+   },
+   "SessionOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "current": {
+      "title": "Current",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "ip": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ip"
+     },
+     "last_seen_at": {
+      "format": "date-time",
+      "title": "Last Seen At",
+      "type": "string"
+     },
+     "user_agent": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "User Agent"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "last_seen_at",
+     "ip",
+     "user_agent",
+     "current"
+    ],
+    "title": "SessionOut",
+    "type": "object"
+   },
+   "SettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "default": 100,
+      "maximum": 1000.0,
+      "minimum": 10.0,
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode"
+    ],
+    "title": "SettingsIn",
+    "type": "object"
+   },
+   "SettingsOut": {
+    "properties": {
+     "branches_located": {
+      "title": "Branches Located",
+      "type": "integer"
+     },
+     "branches_total": {
+      "title": "Branches Total",
+      "type": "integer"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode",
+     "max_accuracy_m",
+     "branches_total",
+     "branches_located"
+    ],
+    "title": "SettingsOut",
+    "type": "object"
+   },
+   "SignupIn": {
+    "additionalProperties": false,
+    "properties": {
+     "business_name": {
+      "maxLength": 120,
+      "title": "Business Name",
+      "type": "string"
+     },
+     "business_type": {
+      "enum": [
+       "shop",
+       "restaurant",
+       "retail",
+       "office",
+       "factory",
+       "other"
+      ],
+      "title": "Business Type",
+      "type": "string"
+     },
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "country": {
+      "anyOf": [
+       {
+        "pattern": "^[A-Z]{2}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Country"
+     },
+     "currency": {
+      "anyOf": [
+       {
+        "pattern": "^[A-Z]{3}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currency"
+     },
+     "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+     },
+     "locale": {
+      "default": "en",
+      "enum": [
+       "en",
+       "bn"
+      ],
+      "title": "Locale",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "team_size": {
+      "anyOf": [
+       {
+        "enum": [
+         "1",
+         "2-5",
+         "6-20",
+         "21-100",
+         "100+"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Team Size"
+     },
+     "timezone": {
+      "default": "UTC",
+      "maxLength": 64,
+      "title": "Timezone",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "email",
+     "password",
+     "business_name",
+     "business_type"
+    ],
+    "title": "SignupIn",
+    "type": "object"
+   },
+   "StaffIn": {
+    "additionalProperties": false,
+    "properties": {
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "password": {
+      "anyOf": [
+       {
+        "maxLength": 128,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Password"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     },
+     "username": {
+      "maxLength": 40,
+      "minLength": 3,
+      "title": "Username",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "username",
+     "role_id"
+    ],
+    "title": "StaffIn",
+    "type": "object"
+   },
+   "StaffOut": {
+    "properties": {
+     "member": {
+      "$ref": "#/components/schemas/MemberOut"
+     },
+     "temporary_password": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Temporary Password"
+     },
+     "workspace_code": {
+      "title": "Workspace Code",
+      "type": "string"
+     }
+    },
+    "required": [
+     "member",
+     "temporary_password",
+     "workspace_code"
+    ],
+    "title": "StaffOut",
+    "type": "object"
+   },
+   "StatusOut": {
+    "properties": {
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "forgot_clock_out": {
+      "title": "Forgot Clock Out",
+      "type": "boolean"
+     },
+     "location_mode": {
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "open_record": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/RecordOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "today_minutes": {
+      "title": "Today Minutes",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "employee_name",
+     "open_record",
+     "today_minutes",
+     "forgot_clock_out",
+     "location_mode"
+    ],
+    "title": "StatusOut",
+    "type": "object"
+   },
+   "SwitchIn": {
+    "additionalProperties": false,
+    "properties": {
+     "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "tenant_id"
+    ],
+    "title": "SwitchIn",
+    "type": "object"
+   },
+   "TempPasswordOut": {
+    "properties": {
+     "temporary_password": {
+      "title": "Temporary Password",
+      "type": "string"
+     }
+    },
+    "required": [
+     "temporary_password"
+    ],
+    "title": "TempPasswordOut",
+    "type": "object"
+   },
+   "TimesheetOut": {
+    "properties": {
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "month": {
+      "title": "Month",
+      "type": "string"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/TimesheetRow"
+      },
+      "title": "Rows",
+      "type": "array"
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     }
+    },
+    "required": [
+     "month",
+     "start",
+     "end",
+     "rows"
+    ],
+    "title": "TimesheetOut",
+    "type": "object"
+   },
+   "TimesheetRow": {
+    "properties": {
+     "days": {
+      "items": {
+       "$ref": "#/components/schemas/DayOut"
+      },
+      "title": "Days",
+      "type": "array"
+     },
+     "days_present": {
+      "title": "Days Present",
+      "type": "integer"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "total_minutes": {
+      "title": "Total Minutes",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "employee_name",
+     "days",
+     "total_minutes",
+     "days_present"
+    ],
+    "title": "TimesheetRow",
+    "type": "object"
+   },
+   "TokenIn": {
+    "additionalProperties": false,
+    "properties": {
+     "token": {
+      "maxLength": 200,
+      "title": "Token",
+      "type": "string"
+     }
+    },
+    "required": [
+     "token"
+    ],
+    "title": "TokenIn",
+    "type": "object"
+   },
+   "TokenOut": {
+    "properties": {
+     "access_token": {
+      "title": "Access Token",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "access_token",
+     "expires_at"
+    ],
+    "title": "TokenOut",
+    "type": "object"
+   },
+   "ValidationError": {
+    "properties": {
+     "ctx": {
+      "title": "Context",
+      "type": "object"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "title": "Location",
+      "type": "array"
+     },
+     "msg": {
+      "title": "Message",
+      "type": "string"
+     },
+     "type": {
+      "title": "Error Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError",
+    "type": "object"
+   },
+   "VerifyOut": {
+    "properties": {
+     "first_bad_seq": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "First Bad Seq"
+     },
+     "ok": {
+      "title": "Ok",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "ok",
+     "first_bad_seq"
+    ],
+    "title": "VerifyOut",
+    "type": "object"
+   },
+   "WorkspaceIn": {
+    "additionalProperties": false,
+    "properties": {
+     "country": {
+      "anyOf": [
+       {
+        "pattern": "^[A-Z]{2}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Country"
+     },
+     "currency": {
+      "anyOf": [
+       {
+        "pattern": "^[A-Z]{3}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currency"
+     },
+     "fiscal_year_start_month": {
+      "anyOf": [
+       {
+        "maximum": 12.0,
+        "minimum": 1.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fiscal Year Start Month"
+     },
+     "locale": {
+      "anyOf": [
+       {
+        "enum": [
+         "en",
+         "bn"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locale"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "timezone": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Timezone"
+     },
+     "ui_mode": {
+      "anyOf": [
+       {
+        "enum": [
+         "simple",
+         "standard",
+         "advanced"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ui Mode"
+     },
+     "week_start": {
+      "anyOf": [
+       {
+        "maximum": 6.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Week Start"
+     }
+    },
+    "title": "WorkspaceIn",
+    "type": "object"
+   },
+   "WorkspaceOut": {
+    "properties": {
+     "business_type": {
+      "title": "Business Type",
+      "type": "string"
+     },
+     "country": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Country"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "fiscal_year_start_month": {
+      "title": "Fiscal Year Start Month",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "locale": {
+      "title": "Locale",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     },
+     "timezone": {
+      "title": "Timezone",
+      "type": "string"
+     },
+     "ui_mode": {
+      "title": "Ui Mode",
+      "type": "string"
+     },
+     "week_start": {
+      "title": "Week Start",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "slug",
+     "business_type",
+     "ui_mode",
+     "country",
+     "currency",
+     "timezone",
+     "locale",
+     "week_start",
+     "fiscal_year_start_month",
+     "created_at"
+    ],
+    "title": "WorkspaceOut",
+    "type": "object"
+   },
+   "WorkspaceRef": {
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "role": {
+      "title": "Role",
+      "type": "string"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "slug",
+     "role"
+    ],
+    "title": "WorkspaceRef",
+    "type": "object"
+   }
+  }
+ },
+ "info": {
+  "title": "CompanyMgmt API",
+  "version": "0.1.0"
+ },
+ "openapi": "3.1.0",
+ "paths": {
+  "/healthz": {
+   "get": {
+    "operationId": "healthz_healthz_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Healthz Healthz Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Healthz",
+    "tags": [
+     "ops"
+    ]
+   }
+  },
+  "/readyz": {
+   "get": {
+    "operationId": "readyz_readyz_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Readyz Readyz Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Readyz",
+    "tags": [
+     "ops"
+    ]
+   }
+  },
+  "/v1/attendance/clock-in": {
+   "post": {
+    "operationId": "clock_in_v1_attendance_clock_in_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ClockIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecordOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Clock In",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/clock-out": {
+   "post": {
+    "operationId": "clock_out_v1_attendance_clock_out_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ClockOut"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecordOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Clock Out",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/corrections": {
+   "get": {
+    "operationId": "list_corrections_v1_attendance_corrections_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "pending",
+       "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "cancelled",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "mine",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Mine",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CorrectionOut"
+         },
+         "title": "Response List Corrections V1 Attendance Corrections Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Corrections",
+    "tags": [
+     "attendance"
+    ]
+   },
+   "post": {
+    "operationId": "request_correction_v1_attendance_corrections_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CorrectionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CorrectionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Request Correction",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/corrections/{correction_id}/approve": {
+   "post": {
+    "operationId": "approve_correction_v1_attendance_corrections__correction_id__approve_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "correction_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Correction Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CorrectionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Approve Correction",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/corrections/{correction_id}/cancel": {
+   "post": {
+    "operationId": "cancel_correction_v1_attendance_corrections__correction_id__cancel_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "correction_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Correction Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CorrectionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Cancel Correction",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/corrections/{correction_id}/reject": {
+   "post": {
+    "operationId": "reject_correction_v1_attendance_corrections__correction_id__reject_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "correction_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Correction Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CorrectionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reject Correction",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/export.csv": {
+   "get": {
+    "operationId": "export_csv_v1_attendance_export_csv_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Export Csv",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/present": {
+   "get": {
+    "operationId": "present_now_v1_attendance_present_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PresentOut"
+         },
+         "title": "Response Present Now V1 Attendance Present Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Present Now",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/records": {
+   "get": {
+    "operationId": "list_records_v1_attendance_records_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     },
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "branch_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Branch Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "mine",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Mine",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "cursor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 100,
+       "maximum": 500,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Page_RecordOut_"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Records",
+    "tags": [
+     "attendance"
+    ]
+   },
+   "post": {
+    "operationId": "add_record_v1_attendance_records_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RecordIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecordOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Record",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/records/{record_id}": {
+   "delete": {
+    "operationId": "delete_record_v1_attendance_records__record_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "record_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Record Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Record",
+    "tags": [
+     "attendance"
+    ]
+   },
+   "patch": {
+    "operationId": "edit_record_v1_attendance_records__record_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "record_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Record Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RecordPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecordOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Edit Record",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/settings": {
+   "get": {
+    "operationId": "get_settings_v1_attendance_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings",
+    "tags": [
+     "attendance"
+    ]
+   },
+   "put": {
+    "operationId": "put_settings_v1_attendance_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Put Settings",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/status": {
+   "get": {
+    "operationId": "my_status_v1_attendance_status_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Status",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/attendance/timesheet": {
+   "get": {
+    "operationId": "timesheet_v1_attendance_timesheet_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "month",
+      "required": true,
+      "schema": {
+       "pattern": "^\\d{4}-\\d{2}$",
+       "title": "Month",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TimesheetOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Timesheet",
+    "tags": [
+     "attendance"
+    ]
+   }
+  },
+  "/v1/audit": {
+   "get": {
+    "operationId": "list_audit_v1_audit_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "action",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Action"
+      }
+     },
+     {
+      "in": "query",
+      "name": "target_type",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 50,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Target Type"
+      }
+     },
+     {
+      "in": "query",
+      "name": "target_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 64,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Target Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "actor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Actor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "cursor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 50,
+       "maximum": 200,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Page_AuditOut_"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Audit",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/audit/verify": {
+   "get": {
+    "operationId": "verify_audit_v1_audit_verify_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/VerifyOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Verify Audit",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/auth/email/resend": {
+   "post": {
+    "operationId": "resend_verification_v1_auth_email_resend_post",
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Resend Verification V1 Auth Email Resend Post",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Resend Verification",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/email/verify": {
+   "post": {
+    "operationId": "verify_email_v1_auth_email_verify_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TokenIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Verify Email",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/login": {
+   "post": {
+    "operationId": "login_v1_auth_login_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LoginIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LoginOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Login",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/logout": {
+   "post": {
+    "operationId": "logout_v1_auth_logout_post",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Logout",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/me": {
+   "get": {
+    "operationId": "me_v1_auth_me_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Me",
+    "tags": [
+     "auth"
+    ]
+   },
+   "patch": {
+    "operationId": "update_profile_v1_auth_me_patch",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProfileIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Profile",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/mfa/disable": {
+   "post": {
+    "operationId": "mfa_disable_v1_auth_mfa_disable_post",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Mfa Disable",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/mfa/enable": {
+   "post": {
+    "operationId": "mfa_enable_v1_auth_mfa_enable_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CodeIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecoveryCodesOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Mfa Enable",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/mfa/recovery-codes": {
+   "post": {
+    "operationId": "mfa_new_recovery_codes_v1_auth_mfa_recovery_codes_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecoveryCodesOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Mfa New Recovery Codes",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/mfa/setup": {
+   "post": {
+    "operationId": "mfa_setup_v1_auth_mfa_setup_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MfaSetupOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Mfa Setup",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/mfa/verify": {
+   "post": {
+    "operationId": "mfa_verify_v1_auth_mfa_verify_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MfaVerifyIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Mfa Verify",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/password/change": {
+   "post": {
+    "operationId": "change_password_v1_auth_password_change_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PasswordChangeIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Change Password",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/password/forgot": {
+   "post": {
+    "operationId": "forgot_password_v1_auth_password_forgot_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ForgotIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Forgot Password V1 Auth Password Forgot Post",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Forgot Password",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/password/reset": {
+   "post": {
+    "operationId": "reset_password_v1_auth_password_reset_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ResetIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reset Password",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/reauth": {
+   "post": {
+    "operationId": "reauth_v1_auth_reauth_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReauthIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reauth",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/refresh": {
+   "post": {
+    "operationId": "refresh_v1_auth_refresh_post",
+    "parameters": [
+     {
+      "in": "cookie",
+      "name": "cm_refresh",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cm Refresh"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Refresh",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/sessions": {
+   "get": {
+    "operationId": "list_sessions_v1_auth_sessions_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/SessionOut"
+         },
+         "title": "Response List Sessions V1 Auth Sessions Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Sessions",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/sessions/revoke-others": {
+   "post": {
+    "operationId": "end_other_sessions_v1_auth_sessions_revoke_others_post",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "End Other Sessions",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/sessions/{session_id}": {
+   "delete": {
+    "operationId": "end_session_v1_auth_sessions__session_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "session_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Session Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "End Session",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/signup": {
+   "post": {
+    "operationId": "signup_v1_auth_signup_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SignupIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Signup",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/switch": {
+   "post": {
+    "operationId": "switch_workspace_v1_auth_switch_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SwitchIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Switch Workspace",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/branches": {
+   "get": {
+    "operationId": "list_branches_v1_branches_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/BranchOut"
+         },
+         "title": "Response List Branches V1 Branches Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Branches",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "post": {
+    "operationId": "create_branch_v1_branches_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BranchIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BranchOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Branch",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/branches/{branch_id}": {
+   "patch": {
+    "operationId": "update_branch_v1_branches__branch_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "branch_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Branch Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BranchPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BranchOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Branch",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/departments": {
+   "get": {
+    "operationId": "list_departments_v1_departments_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/DepartmentOut"
+         },
+         "title": "Response List Departments V1 Departments Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Departments",
+    "tags": [
+     "people"
+    ]
+   },
+   "post": {
+    "operationId": "create_department_v1_departments_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DepartmentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DepartmentOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Department",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/departments/{department_id}": {
+   "delete": {
+    "operationId": "delete_department_v1_departments__department_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "department_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Department Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Department",
+    "tags": [
+     "people"
+    ]
+   },
+   "patch": {
+    "operationId": "update_department_v1_departments__department_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "department_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Department Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DepartmentPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DepartmentOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Department",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/invites": {
+   "get": {
+    "operationId": "list_invites_v1_invites_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/InviteOut"
+         },
+         "title": "Response List Invites V1 Invites Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Invites",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "post": {
+    "operationId": "create_invite_v1_invites_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/InviteIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InviteOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Invite",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/invites/accept": {
+   "post": {
+    "description": "Accept as the signed-in user (bearer token), or create an account for the invited email.",
+    "operationId": "accept_invite_v1_invites_accept_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AcceptIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Accept Invite",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/invites/lookup": {
+   "get": {
+    "operationId": "lookup_invite_v1_invites_lookup_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "token",
+      "required": true,
+      "schema": {
+       "maxLength": 200,
+       "title": "Token",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InviteLookupOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Lookup Invite",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/invites/{invite_id}": {
+   "delete": {
+    "operationId": "revoke_invite_v1_invites__invite_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "invite_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Invite Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Revoke Invite",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/members": {
+   "get": {
+    "operationId": "list_members_v1_members_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "active",
+       "enum": [
+        "active",
+        "disabled",
+        "removed",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "cursor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 100,
+       "maximum": 200,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Page_MemberOut_"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Members",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/members/staff": {
+   "post": {
+    "operationId": "add_staff_v1_members_staff_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StaffIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StaffOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Staff",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/members/{member_id}": {
+   "delete": {
+    "operationId": "remove_member_v1_members__member_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "member_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Member Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove Member",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "patch": {
+    "operationId": "update_member_v1_members__member_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "member_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Member Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MemberPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MemberOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Member",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/members/{member_id}/reset-password": {
+   "post": {
+    "operationId": "reset_staff_password_v1_members__member_id__reset_password_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "member_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Member Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TempPasswordOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reset Staff Password",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/modules": {
+   "get": {
+    "operationId": "list_modules_v1_modules_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "additionalProperties": true,
+          "type": "object"
+         },
+         "title": "Response List Modules V1 Modules Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Modules",
+    "tags": [
+     "plans"
+    ]
+   }
+  },
+  "/v1/people": {
+   "get": {
+    "operationId": "list_people_v1_people_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "in": "query",
+      "name": "department_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Department Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "branch_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Branch Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "active",
+       "enum": [
+        "active",
+        "inactive",
+        "left",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "cursor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 50,
+       "maximum": 200,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Page_EmployeeOut_"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List People",
+    "tags": [
+     "people"
+    ]
+   },
+   "post": {
+    "operationId": "create_person_v1_people_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EmployeeIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmployeeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Person",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/people/me": {
+   "get": {
+    "operationId": "my_profile_v1_people_me_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmployeeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Profile",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/people/{employee_id}": {
+   "get": {
+    "operationId": "get_person_v1_people__employee_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "employee_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Employee Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmployeeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Person",
+    "tags": [
+     "people"
+    ]
+   },
+   "patch": {
+    "operationId": "update_person_v1_people__employee_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "employee_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Employee Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EmployeePatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EmployeeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Person",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/permissions": {
+   "get": {
+    "operationId": "list_permissions_v1_permissions_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PermissionOut"
+         },
+         "title": "Response List Permissions V1 Permissions Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Permissions",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/plans": {
+   "get": {
+    "operationId": "list_plans_v1_plans_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PublicPlan"
+         },
+         "title": "Response List Plans V1 Plans Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Plans",
+    "tags": [
+     "plans"
+    ]
+   }
+  },
+  "/v1/roles": {
+   "get": {
+    "operationId": "list_roles_v1_roles_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RoleOut"
+         },
+         "title": "Response List Roles V1 Roles Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Roles",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "post": {
+    "operationId": "create_role_v1_roles_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RoleIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RoleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Role",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/roles/{role_id}": {
+   "delete": {
+    "operationId": "delete_role_v1_roles__role_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "role_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Role Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Role",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "patch": {
+    "operationId": "update_role_v1_roles__role_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "role_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Role Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RolePatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RoleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Role",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/workspace": {
+   "get": {
+    "operationId": "get_workspace_v1_workspace_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkspaceOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Workspace",
+    "tags": [
+     "workspace"
+    ]
+   },
+   "patch": {
+    "operationId": "update_workspace_v1_workspace_patch",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WorkspaceIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WorkspaceOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Workspace",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/workspace/modules": {
+   "put": {
+    "operationId": "set_modules_v1_workspace_modules_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ModulesIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "type": "string"
+         },
+         "title": "Response Set Modules V1 Workspace Modules Put",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Set Modules",
+    "tags": [
+     "workspace"
+    ]
+   }
+  }
+ }
+}
