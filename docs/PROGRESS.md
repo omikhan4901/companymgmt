@@ -51,14 +51,22 @@ README with real screenshots (demo data from `api/scripts/demo_seed.py`), and in
 `docs/marketing/`: demo video script, case study, resume bullets, LinkedIn post,
 architecture one-pager. Only built features and measured numbers.
 
-## M1.6: in progress (new design, Next.js, location-based attendance)
+## M1.6: done (new design, Next.js, location-based attendance)
 
-- Done: location-checked clock-in on the API (branch geofences, settings off / record /
-  require, 11 tests; 116 API tests, 90.5% coverage).
-- Done: Atlas design chosen (white default, dark option, accents Plum / Saffron / Garnet /
-  Ink); theme tokens and switching in the new app.
-- In progress: one Next.js app (`web-next/`, replacing `web/` and `site/` when it reaches
-  parity), static export with per-page CSP hashes.
+- **Location check** on clock-in: branch geofences, workspace setting off / record /
+  required (default), clock-out never blocked, positions rounded to about 11 m and saved
+  only at clock events. Owners place branches with the device location.
+- **Atlas design**: white default, dark mode, four accents (Plum, Saffron, Garnet, Ink),
+  chosen per device and applied before first paint.
+- **One Next.js app** (`web/`) replaces the Vite SPA and the Astro site: static export,
+  per-page Content Security Policy with script hashes, Radix + Tailwind components.
+- **Same-origin API**: a Cloudflare Pages Function serves `/v1` on the web address, so the
+  refresh cookie is first-party even on `*.pages.dev`; with `PROXY_TOKEN` set the API
+  refuses direct `/v1` calls and takes the client IP from Cloudflare (closes an
+  X-Forwarded-For spoofing gap in per-IP rate limits).
+- Numbers: 119 API tests (90% coverage), 17 web unit tests, 6 browser scenarios × desktop
+  and phone against the production build, each page checked with axe (WCAG 2.2 AA), for
+  sideways scrolling and for CSP violations.
 
 ## Next
 
@@ -74,3 +82,4 @@ work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
 - 2026-09-30: Owner asked for a new design and a Next.js/NestJS stack. Three design directions drawn (`docs/design/directions/`); M2 Leave paused pending the choice.
 - 2026-09-30: Atlas chosen (C, white default, four accents). Location-based attendance on the API. Plan rewritten: every milestone explained, AI-ready architecture (§3.7), first market (§2.0), roadmap reordered.
+- 2026-10-01: M1.6 done: Next.js app with Atlas themes replaces web/ and site/; location-checked clock-in in the UI; /v1 served through a same-origin Pages Function.

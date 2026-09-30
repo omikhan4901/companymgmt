@@ -39,3 +39,5 @@ export interface LoginResult {
   challenge: string | null;
   access_token: string | null;
 }
+export type AttendanceSettings = S["SettingsOut"];
+export type GeoResult = "inside" | "outside" | "no_fix" | "no_site";

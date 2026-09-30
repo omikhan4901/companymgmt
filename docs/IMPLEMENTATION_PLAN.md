@@ -1,7 +1,7 @@
 # Implementation Plan: Company Management SaaS
 
-Status: **Approved by the owner on 30 September 2026. M1 and M1.5 are done; M1.6 (new
-design, Next.js, location-based attendance) is in progress.** See §9 for every milestone.
+Status: **Approved by the owner on 30 September 2026. M1, M1.5 and M1.6 are done; M2 is
+next.** See §9 for every milestone.
 Progress is tracked in [`PROGRESS.md`](PROGRESS.md).
 Product name: **CompanyMgmt** (repo `companymgmt`). The owner wants a global product, so
 the name is in plain English. It can be renamed before launch.
@@ -1044,7 +1044,7 @@ The data model and security stay the same the whole way, so no step needs a rewr
 |---|---|---|---|---|
 | M1 | Demoable slice | Sign up, invite staff, clock in, see timesheets | 12–18 d | **Done** |
 | M1.5 | Marketing kit | README, screenshots, case study, resume bullets | 3–4 d | **Done** |
-| M1.6 | New design, Next.js, location check-in | Atlas design with themes; one Next.js app; geofenced clock-in | 8–12 d | **In progress** |
+| M1.6 | New design, Next.js, location check-in | Atlas design with themes; one Next.js app; geofenced clock-in | 8–12 d | **Done** |
 | M2 | Leave, payroll, data rights | Time off, payslips (Bangladesh preset), export and deletion | 15–20 d | Next |
 | M3 | Work and knowledge | Tasks and projects, announcements, documents and policies, approvals, notifications; AI-ready foundations | 15–20 d | Planned |
 | M4 | Pilot release | Dashboards, spreadsheet import, backups, live deploy, 3–5 free pilot companies | 8–12 d | Planned |
@@ -1104,7 +1104,7 @@ is about built features and measured numbers.
 
 **Effort**: 3–4 days. **Status**: done.
 
-### M1.6: New design, Next.js, location-based attendance: **In progress**
+### M1.6: New design, Next.js, location-based attendance: **Done**
 
 **Why.** The first UI reused the ResumeX look; the owner wants a design of its own. The
 owner also asked for Next.js and for attendance to be location-based. Doing this now,
@@ -1141,7 +1141,9 @@ work, not from home.
 - Location tests cover inside, outside, imprecise, missing, unplaced branches and each
   mode. (Done: 11 tests.)
 
-**Effort**: 8–12 days. **Status**: API side done; web app being ported.
+**Effort**: 8–12 days. **Status**: done 1 Oct 2026. Also moved `/v1` behind a same-origin
+Cloudflare Pages Function, so the sign-in cookie is first-party and the API can refuse
+direct calls.
 
 ### M2: Leave, payroll and data rights
 

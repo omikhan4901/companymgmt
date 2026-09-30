@@ -1,4 +1,4 @@
-import type { FormInstance } from "antd";
+import type { FieldValues, Path, UseFormSetError } from "react-hook-form";
 
 import { ApiError } from "@/api/client";
 import i18n from "@/i18n";
@@ -17,15 +17,16 @@ export function errorMessage(error: unknown): string {
 
 /**
  * Puts field errors from the API next to the matching form fields. Returns true when at
- * least one field got an error (so the caller can skip a generic toast).
+ * least one field got an error (so the caller can skip a generic message).
  */
-export function applyFieldErrors(form: FormInstance, error: unknown): boolean {
+export function applyFieldErrors<T extends FieldValues>(setError: UseFormSetError<T>, fields: readonly string[], error: unknown): boolean {
   if (!(error instanceof ApiError) || !error.errors.length) return false;
-  const known = new Set(Object.keys(form.getFieldsValue(true) ?? {}));
-  const fields = error.errors
-    .filter((e) => known.has(e.field))
-    .map((e) => ({ name: e.field, errors: [e.message] }));
-  if (!fields.length) return false;
-  form.setFields(fields);
-  return true;
+  let applied = false;
+  for (const e of error.errors) {
+    if (fields.includes(e.field)) {
+      setError(e.field as Path<T>, { type: "server", message: e.message });
+      applied = true;
+    }
+  }
+  return applied;
 }

@@ -4,7 +4,7 @@
  * retries. Errors come back as RFC 9457 problem details.
  */
 
-export const API_URL: string = import.meta.env.VITE_API_URL ?? "";
+export const API_URL: string = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export interface FieldError {
   field: string;

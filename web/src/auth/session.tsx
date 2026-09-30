@@ -1,9 +1,11 @@
+"use client";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { api, ApiError, onAuthChange, refreshSession, setAccessToken } from "@/api/client";
 import type { CurrentWorkspace, Me, Token } from "@/api/types";
-import { currentLang, setLanguage } from "@/i18n";
+import i18n, { currentLang, preferredLanguage, setLanguage } from "@/i18n";
 
 interface SessionValue {
   ready: boolean;
@@ -26,6 +28,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => onAuthChange(setSignedIn), []);
+
+  // The page is pre-rendered in English; switch to the saved or browser language.
+  useEffect(() => {
+    const lang = preferredLanguage();
+    if (lang !== currentLang()) void i18n.changeLanguage(lang);
+  }, []);
 
   // On load, the refresh cookie (if any) gets us a fresh access token.
   useEffect(() => {

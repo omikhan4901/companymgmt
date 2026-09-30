@@ -10,7 +10,7 @@ What you'll create:
 |---|---|---|
 | Neon | Postgres database | $0 (Free plan) |
 | Google Cloud | Runs the API (Cloud Run), stores secrets | $0 (free tier) |
-| Cloudflare | Hosts the web app and the site, DNS | $0 |
+| Cloudflare | Hosts the web app and site (one static project) and forwards `/v1` to the API, DNS | $0 |
 | Resend (or any SMTP) | Sends emails | $0 (free tier) |
 | A domain (optional now) | e.g. `companymgmt.app` | ~$12/year |
 
@@ -94,14 +94,23 @@ domain later.
 
 1. Sign up at <https://dash.cloudflare.com>. (If you have a domain: **Add a site** and
    follow the steps to move its DNS to Cloudflare.)
-2. **Workers & Pages → Create → Pages → Direct upload**: create project
-   `companymgmt-app`, then again for `companymgmt-site`. (Upload anything; the first real
-   deploy replaces it.)
-3. **My Profile → API Tokens → Create token → Custom token**:
+2. **Workers & Pages → Create → Pages → Direct upload**: create one project named
+   `companymgmt`. (Upload anything; the first real deploy replaces it.) It serves the site,
+   the app, and `/v1/*` through a small function that forwards to the API, so the sign-in
+   cookie stays on your web address.
+3. Make the proxy secret (any long random value) and store it in both places:
+   ```bash
+   openssl rand -base64 32 | tr -d '\n' > proxy-token.txt
+   gcloud secrets versions add proxy-token --data-file=proxy-token.txt
+   ```
+   Then in the Pages project → **Settings → Variables and secrets**, add
+   `PROXY_TOKEN` (type *Secret*, the same value) and, after the first API deploy (step 6),
+   `API_ORIGIN` = the Cloud Run URL. Delete `proxy-token.txt` afterwards.
+4. **My Profile → API Tokens → Create token → Custom token**:
    - Permissions: *Account → Cloudflare Pages → Edit* (only this).
    - Account resources: your account. Create it and copy the token.
-4. Note your **Account ID** (Workers & Pages overview, right side).
-5. Optional, for spam protection on sign-in: **Turnstile → Add widget** for your app
+5. Note your **Account ID** (Workers & Pages overview, right side).
+6. Optional, for spam protection on sign-in: **Turnstile → Add widget** for your app
    domain. Copy the *site key* (public) and *secret key*; add the secret to Google:
    `gcloud secrets create turnstile-secret --replication-policy=user-managed --locations=asia-southeast1`
    then `gcloud secrets versions add turnstile-secret --data-file=-`, and add
@@ -127,13 +136,11 @@ Actions**:
 | Variable | `GCP_WIF_PROVIDER` | output `workload_identity_provider` |
 | Variable | `GCP_DEPLOY_SA` | output `deploy_service_account` |
 | Variable | `GCP_RUNTIME_SA` | output `runtime_service_account` |
-| Variable | `CLOUDFLARE_ACCOUNT_ID` | from step 3.4 |
-| Variable | `WEB_URL` | `https://companymgmt-app.pages.dev` (or `https://app.yourdomain`) |
-| Variable | `SITE_URL` | `https://companymgmt-site.pages.dev` (or `https://yourdomain`) |
-| Variable | `API_URL` | leave empty for now; set after the first deploy (step 6) |
+| Variable | `CLOUDFLARE_ACCOUNT_ID` | from step 3.5 |
+| Variable | `WEB_URL` | `https://companymgmt.pages.dev` (or `https://yourdomain`) |
 | Variable | `MAIL_FROM` | `CompanyMgmt <no-reply@yourdomain>` |
-| Variable | `TURNSTILE_SITE_KEY` | optional, from step 3.5 |
-| Secret | `CLOUDFLARE_API_TOKEN` | from step 3.3 |
+| Variable | `TURNSTILE_SITE_KEY` | optional, from step 3.6 |
+| Secret | `CLOUDFLARE_API_TOKEN` | from step 3.4 |
 | Variable | `DEPLOY_ENABLED` | `true` (last) |
 
 ## 6. First deploy
@@ -141,8 +148,9 @@ Actions**:
 **Actions → Deploy → Run workflow**. When it finishes:
 
 1. `gcloud run services describe companymgmt-api --region asia-southeast1 --format 'value(status.url)'`
-   prints the API address. Set it as the `API_URL` variable and run **Deploy** again (the
-   web app is built with it).
+   prints the API address. Add it as `API_ORIGIN` in the Pages project's variables
+   (step 3.3). No redeploy is needed: the function reads it on each request. From then on
+   the API answers `/v1` only through the web address.
 2. Scheduled jobs (retries for emails, daily clean-up):
 
    ```bash
@@ -160,11 +168,9 @@ Actions**:
 
 ## Custom domain (later)
 
-- Web app and site: Cloudflare → the Pages project → **Custom domains** → add
-  `app.yourdomain` / `yourdomain`.
-- API: `gcloud beta run domain-mappings create --service companymgmt-api --domain api.yourdomain --region asia-southeast1`,
-  then add the DNS records it prints in Cloudflare with the proxy **off** (grey cloud).
-  Update `API_URL`, `WEB_URL`, `SITE_URL` and redeploy.
+- Cloudflare → the `companymgmt` Pages project → **Custom domains** → add `yourdomain`.
+  The API needs no domain of its own: it is reached through `/v1` on the same address.
+  Update `WEB_URL` and redeploy.
 
 ## Rolling back
 

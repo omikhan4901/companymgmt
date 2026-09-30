@@ -22,8 +22,12 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 
 - `api/`: FastAPI modular monolith (Python 3.12, uv). Modules in `api/app/modules/<name>`,
   shared code in `api/app/core`. Alembic migrations in `api/migrations`.
-- `web/`: React + TypeScript + Vite SPA (antd + Tailwind, ResumeX design language).
-- `site/`: Astro marketing site (landing, pricing, legal).
+- `web/`: one Next.js app (App Router, TypeScript, static export) for the marketing site
+  (`src/app/(site)`) and the product (`src/app/(product)`: sign-in pages and `/app/*`).
+  Atlas design (docs/design/atlas): tokens in `src/app/globals.css`, light by default,
+  dark and four accents via `src/lib/theme.tsx`. Components in `src/components/ui`
+  (Radix + Tailwind). `npm run build` also writes `out/_headers` with a per-page CSP;
+  `npm run serve` serves `out/` like Cloudflare and proxies `/v1` to the API.
 - `infra/`: OpenTofu and deploy scripts. `docs/`: plan, progress, runbooks, security.
 
 ## Rules that are easy to break
@@ -47,5 +51,8 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 - The owner isn't a cloud-console expert: give exact click paths or commands, and always
   the least-privilege option.
 - Marketing and public pages only claim what is actually built.
+- No inline scripts or `dangerouslySetInnerHTML`: the CSP allows only each page's own
+  Next.js scripts by hash. Anything that must run before paint goes in `public/*.js`.
+- Every UI string exists in `web/src/i18n/en.ts` and `bn.ts` (TypeScript checks this).
 - A routine (`trig_01BtkyYxPZW6r7FsBrpM5TLp`) wakes this session every 2 hours so work
   continues after usage-limit pauses. Disable it when only owner input is left.

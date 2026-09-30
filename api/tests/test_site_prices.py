@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httpx
 
-SITE_PLANS = Path(__file__).resolve().parents[2] / "site" / "src" / "data" / "plans.json"
+SITE_PLANS = Path(__file__).resolve().parents[2] / "web" / "src" / "data" / "plans.json"
 FIELDS = (
     "key",
     "name",

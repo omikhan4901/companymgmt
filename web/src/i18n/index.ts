@@ -7,7 +7,9 @@ import en from "./en";
 export type Lang = "en" | "bn";
 const STORAGE_KEY = "cm.lang";
 
-function initialLanguage(): Lang {
+/** The saved language, else the browser's (only meaningful in the browser). */
+export function preferredLanguage(): Lang {
+  if (typeof window === "undefined") return "en";
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === "en" || saved === "bn") return saved;
@@ -17,19 +19,18 @@ function initialLanguage(): Lang {
   return navigator.language?.toLowerCase().startsWith("bn") ? "bn" : "en";
 }
 
-void i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, bn: { translation: bn } },
-  lng: initialLanguage(),
-  fallbackLng: "en",
-  interpolation: { escapeValue: false }, // React escapes already
-  returnNull: false,
-});
-
-function applyLang(lang: string): void {
-  document.documentElement.lang = lang;
+if (!i18n.isInitialized) {
+  void i18n.use(initReactI18next).init({
+    resources: { en: { translation: en }, bn: { translation: bn } },
+    lng: "en",
+    fallbackLng: "en",
+    interpolation: { escapeValue: false }, // React escapes already
+    returnNull: false,
+  });
+  i18n.on("languageChanged", (lang) => {
+    if (typeof document !== "undefined") document.documentElement.lang = lang;
+  });
 }
-applyLang(i18n.language);
-i18n.on("languageChanged", applyLang);
 
 export function setLanguage(lang: Lang): void {
   void i18n.changeLanguage(lang);

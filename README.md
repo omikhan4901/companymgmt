@@ -1,21 +1,26 @@
 # CompanyMgmt
 
 **Attendance and team management for every business, from a tea stall with two staff to a
-company with many branches.** Multi-tenant SaaS in English and বাংলা.
+company with many branches.** Multi-tenant SaaS in English and বাংলা, with clock-ins
+checked against each branch's location.
 
-![Timesheet](docs/screenshots/timesheet.png)
+![Home](docs/screenshots/home.png)
 
-> **Status:** Milestone 1 of 9 is built and tested. It isn't live yet; deployment is
-> scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
-> Payroll, point of sale, inventory and accounting come next ([roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap),
+> **Status:** Milestones 1, 1.5 and 1.6 are built and tested. It isn't live yet;
+> deployment is scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
+> Leave and payroll come next, then tasks, announcements and documents, then a
+> permission-aware AI assistant ([roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap),
 > [progress](docs/PROGRESS.md)).
 
 ## What it does today
 
 - **Sign up in two minutes.** Pick your language and business type; the workspace switches
   on only what you need, with a 14-day trial of the Growth plan.
-- **Clock in from any phone.** One big button. Overnight shifts count towards the day they
-  started, and every branch keeps its own time zone.
+- **Clock in from any phone, at work.** One big button. Each branch has an area on the
+  map; clock-ins outside it are refused or flagged (the owner chooses), with a clear
+  message such as "You're about 1.2 km from Gulshan kiosk". Locations are saved only at
+  clock-in and clock-out, rounded to about 11 m. Overnight shifts count towards the day
+  they started, and every branch keeps its own time zone.
 - **Fair fixes.** Forgot to clock out? People ask for a correction; a manager approves or
   rejects it; everything is recorded. Nobody can approve their own request.
 - **Monthly timesheets** per person per day, with a spreadsheet export that is safe to open
@@ -28,15 +33,18 @@ company with many branches.** Multi-tenant SaaS in English and বাংলা.
   Nobody can grant a permission they don't hold.
 - **Security you can see.** Two-step verification, a list of signed-in devices, and an
   audit log with a built-in integrity check.
+- **Your look.** Light by default, dark mode, and four accent colours; every screen
+  passes WCAG 2.2 AA checks in both modes.
 
 | | |
 |---|---|
-| ![Home](docs/screenshots/home.png) | ![Requests](docs/screenshots/corrections.png) |
-| ![People](docs/screenshots/people.png) | ![Plans](docs/screenshots/plans.png) |
+| ![Attendance records with where each clock-in happened](docs/screenshots/attendance-records.png) | ![Placing a branch on the map](docs/screenshots/branch-location.png) |
+| ![Monthly timesheet](docs/screenshots/timesheet.png) | ![Home in dark mode with the Saffron accent](docs/screenshots/home-dark.png) |
 
 <p align="center">
-  <img src="docs/screenshots/phone-home-bangla.png" width="260" alt="Staff home screen on a phone, in Bangla" />
-  <img src="docs/screenshots/phone-attendance-bangla.png" width="260" alt="Attendance on a phone, in Bangla" />
+  <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
+  <img src="docs/screenshots/phone-home-bangla.png" width="240" alt="Staff home screen on a phone, in Bangla, clocked in at the branch" />
+  <img src="docs/screenshots/phone-attendance-bangla.png" width="240" alt="Attendance on a phone, in Bangla" />
 </p>
 
 ## How it's built
@@ -44,7 +52,7 @@ company with many branches.** Multi-tenant SaaS in English and বাংলা.
 ```mermaid
 flowchart LR
   U[Browser / phone] --> CF[Cloudflare: DNS, TLS, WAF]
-  CF --> P[Pages: React app + Astro site]
+  CF --> P[Static Next.js export: site + app,<br/>per-page CSP]
   CF --> R[Cloud Run: FastAPI, scales to zero]
   R -->|"SET LOCAL app.tenant_id"| DB[(Neon Postgres<br/>row-level security)]
   R --> SM[Secret Manager]
@@ -55,8 +63,7 @@ flowchart LR
 |---|---|---|
 | API | Python 3.12, FastAPI, SQLAlchemy 2 (async, psycopg 3), Alembic | Typed, fast to build, generates an OpenAPI contract |
 | Data | PostgreSQL 16 with **forced row-level security** on every tenant table | Isolation enforced by the database, not only by code |
-| Web app | React 19, TypeScript, Vite, antd 6, Tailwind 4, TanStack Query, i18next | Static files: free to host; typed client generated from the API |
-| Site | Astro | Static, fast, no JavaScript needed |
+| Web | Next.js 16 (App Router, static export), React 19, TypeScript, Tailwind 4, Radix primitives, TanStack Query, i18next | One app for the site and the product; static files, so free to host; typed client generated from the API |
 | Hosting | Cloud Run + Neon + Cloudflare Pages | Everything scales to zero: about $1/month with no customers (the domain) |
 | Infra | OpenTofu, GitHub OIDC → least-privilege service accounts | Reproducible, no long-lived keys |
 
@@ -89,16 +96,18 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **105 API tests**, 90% line and branch coverage (CI gate: 85%), all against a real
-  Postgres: auth, isolation, workspaces, people, attendance, plans.
-- **Browser journeys** (Playwright) on desktop and phone: sign up → add staff → staff
-  signs in in Bangla and clocks in → owner sees the timesheet. **axe WCAG 2.2 AA** checks
-  run on every page visited.
+- **116 API tests**, 90% line and branch coverage (CI gate: 85%), all against a real
+  Postgres: auth, isolation, workspaces, people, attendance, location checks, plans.
+- **Browser journeys** (Playwright) on desktop and phone, against the production build
+  with its real security headers: sign up → add staff → staff signs in in Bangla and
+  clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
+  the branch; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
+  check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in
   [docs/testing/edge-cases.md](docs/testing/edge-cases.md).
-- CI also runs ruff, mypy `--strict`, ESLint, TypeScript, a migration drift check, an
-  API contract check, gitleaks, pip-audit, npm audit, Trivy and CodeQL.
+- CI also runs ruff, mypy `--strict`, ESLint, TypeScript, Vitest, a migration drift
+  check, an API contract check, gitleaks, pip-audit, npm audit, Trivy and CodeQL.
 
 ## Run it locally
 
@@ -110,7 +119,7 @@ scripts/dev-db.sh                                   # local roles and databases
 cd api && uv sync && uv run alembic upgrade head
 uv run uvicorn app.main:app --reload                # http://localhost:8000
 uv run python -m scripts.demo_seed                  # optional: a demo workspace
-cd ../web && npm install && npm run dev             # http://localhost:5173
+cd ../web && npm install && npm run dev             # http://localhost:3000
 ```
 
 Before pushing, run everything CI runs: `scripts/check.sh` (add `E2E=1` for the browser

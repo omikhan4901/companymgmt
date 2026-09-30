@@ -42,8 +42,6 @@ jobs:
           cache: npm
           cache-dependency-path: |
             web/package-lock.json
-            web-next/package-lock.json
-            site/package-lock.json
       - name: Databases and roles
         run: |
           sudo apt-get update -q && sudo apt-get install -yq postgresql-client
@@ -52,8 +50,6 @@ jobs:
         run: |
           (cd api && uv sync --frozen)
           (cd web && npm ci)
-          (cd web-next && npm ci)
-          (cd site && npm ci)
           (cd web && npx playwright install --with-deps chromium)
       - name: Run every check (same script as local)
         run: E2E=1 scripts/check.sh
@@ -107,8 +103,7 @@ jobs:
       - name: JavaScript dependencies (npm audit)
         run: |
           (cd web && npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high)
-          (cd web-next && npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high)
-          (cd site && npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high)
+
       - name: Build API image
         run: docker build -f api/Dockerfile -t companymgmt-api:${{ github.sha }} .
       - name: Scan image (Trivy)
