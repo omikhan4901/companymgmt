@@ -40,6 +40,117 @@
     "title": "AcceptIn",
     "type": "object"
    },
+   "AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": -366.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "title": "Days"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Reason",
+      "type": "string"
+     },
+     "year": {
+      "maximum": 2100.0,
+      "minimum": 2000.0,
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "leave_type_id",
+     "year",
+     "days",
+     "reason"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
+   "AdjustmentOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By"
+     },
+     "days": {
+      "title": "Days",
+      "type": "number"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "title": "Reason",
+      "type": "string"
+     },
+     "year": {
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "leave_type_id",
+     "year",
+     "days",
+     "reason",
+     "created_by",
+     "created_at"
+    ],
+    "title": "AdjustmentOut",
+    "type": "object"
+   },
    "AuditOut": {
     "properties": {
      "action": {
@@ -135,6 +246,89 @@
      "ip"
     ],
     "title": "AuditOut",
+    "type": "object"
+   },
+   "BalanceOut": {
+    "properties": {
+     "adjusted": {
+      "title": "Adjusted",
+      "type": "number"
+     },
+     "available": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Available"
+     },
+     "carried_over": {
+      "title": "Carried Over",
+      "type": "number"
+     },
+     "color": {
+      "title": "Color",
+      "type": "string"
+     },
+     "entitled": {
+      "title": "Entitled",
+      "type": "number"
+     },
+     "full_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Full Year"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "paid": {
+      "title": "Paid",
+      "type": "boolean"
+     },
+     "pending": {
+      "title": "Pending",
+      "type": "number"
+     },
+     "unlimited": {
+      "title": "Unlimited",
+      "type": "boolean"
+     },
+     "used": {
+      "title": "Used",
+      "type": "number"
+     }
+    },
+    "required": [
+     "leave_type_id",
+     "name",
+     "paid",
+     "color",
+     "unlimited",
+     "entitled",
+     "full_year",
+     "carried_over",
+     "adjusted",
+     "used",
+     "pending",
+     "available"
+    ],
+    "title": "BalanceOut",
     "type": "object"
    },
    "BranchIn": {
@@ -380,6 +574,71 @@
      }
     },
     "title": "BranchPatch",
+    "type": "object"
+   },
+   "CalendarEntry": {
+    "properties": {
+     "color": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Color"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+     },
+     "half_day": {
+      "title": "Half Day",
+      "type": "string"
+     },
+     "leave_type_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Leave Type Name"
+     },
+     "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "employee_name",
+     "start_date",
+     "end_date",
+     "half_day",
+     "status",
+     "leave_type_name",
+     "color"
+    ],
+    "title": "CalendarEntry",
     "type": "object"
    },
    "ClockIn": {
@@ -1605,6 +1864,77 @@
     "title": "HTTPValidationError",
     "type": "object"
    },
+   "HolidayIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "day": {
+      "format": "date",
+      "title": "Day",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "day",
+     "name"
+    ],
+    "title": "HolidayIn",
+    "type": "object"
+   },
+   "HolidayOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "day": {
+      "format": "date",
+      "title": "Day",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "day",
+     "name",
+     "branch_id"
+    ],
+    "title": "HolidayOut",
+    "type": "object"
+   },
    "InviteIn": {
     "additionalProperties": false,
     "properties": {
@@ -1732,6 +2062,312 @@
      "expires_at"
     ],
     "title": "InviteOut",
+    "type": "object"
+   },
+   "LeaveTypeIn": {
+    "additionalProperties": false,
+    "properties": {
+     "accrual": {
+      "default": "yearly",
+      "enum": [
+       "yearly",
+       "monthly"
+      ],
+      "title": "Accrual",
+      "type": "string"
+     },
+     "allow_half_day": {
+      "default": true,
+      "title": "Allow Half Day",
+      "type": "boolean"
+     },
+     "calendar_days": {
+      "default": false,
+      "title": "Calendar Days",
+      "type": "boolean"
+     },
+     "carry_over_max": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": 0.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "default": "0",
+      "title": "Carry Over Max"
+     },
+     "color": {
+      "default": "#6d28d9",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "title": "Color",
+      "type": "string"
+     },
+     "days_per_year": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": 0.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days Per Year"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     },
+     "paid": {
+      "default": true,
+      "title": "Paid",
+      "type": "boolean"
+     },
+     "prorate": {
+      "default": true,
+      "title": "Prorate",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "LeaveTypeIn",
+    "type": "object"
+   },
+   "LeaveTypeOut": {
+    "properties": {
+     "accrual": {
+      "enum": [
+       "yearly",
+       "monthly"
+      ],
+      "title": "Accrual",
+      "type": "string"
+     },
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "allow_half_day": {
+      "title": "Allow Half Day",
+      "type": "boolean"
+     },
+     "calendar_days": {
+      "title": "Calendar Days",
+      "type": "boolean"
+     },
+     "carry_over_max": {
+      "title": "Carry Over Max",
+      "type": "number"
+     },
+     "color": {
+      "title": "Color",
+      "type": "string"
+     },
+     "days_per_year": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days Per Year"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "paid": {
+      "title": "Paid",
+      "type": "boolean"
+     },
+     "prorate": {
+      "title": "Prorate",
+      "type": "boolean"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "paid",
+     "days_per_year",
+     "accrual",
+     "carry_over_max",
+     "allow_half_day",
+     "calendar_days",
+     "prorate",
+     "active",
+     "color",
+     "version"
+    ],
+    "title": "LeaveTypeOut",
+    "type": "object"
+   },
+   "LeaveTypePatch": {
+    "additionalProperties": false,
+    "properties": {
+     "accrual": {
+      "anyOf": [
+       {
+        "enum": [
+         "yearly",
+         "monthly"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Accrual"
+     },
+     "active": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Active"
+     },
+     "allow_half_day": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Allow Half Day"
+     },
+     "calendar_days": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Calendar Days"
+     },
+     "carry_over_max": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": 0.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Carry Over Max"
+     },
+     "color": {
+      "anyOf": [
+       {
+        "pattern": "^#[0-9a-fA-F]{6}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Color"
+     },
+     "days_per_year": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": 0.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days Per Year"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "paid": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Paid"
+     },
+     "prorate": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Prorate"
+     },
+     "unlimited": {
+      "default": false,
+      "title": "Unlimited",
+      "type": "boolean"
+     }
+    },
+    "title": "LeaveTypePatch",
     "type": "object"
    },
    "LoginIn": {
@@ -2325,6 +2961,38 @@
     "title": "PermissionOut",
     "type": "object"
    },
+   "PersonBalances": {
+    "properties": {
+     "balances": {
+      "items": {
+       "$ref": "#/components/schemas/BalanceOut"
+      },
+      "title": "Balances",
+      "type": "array"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "year": {
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "employee_name",
+     "year",
+     "balances"
+    ],
+    "title": "PersonBalances",
+    "type": "object"
+   },
    "PlanOut": {
     "properties": {
      "features": {
@@ -2417,6 +3085,52 @@
      "features"
     ],
     "title": "PlanOut",
+    "type": "object"
+   },
+   "PolicyIn": {
+    "additionalProperties": false,
+    "properties": {
+     "team_calendar": {
+      "default": true,
+      "title": "Team Calendar",
+      "type": "boolean"
+     },
+     "weekly_off": {
+      "items": {
+       "maximum": 7.0,
+       "minimum": 1.0,
+       "type": "integer"
+      },
+      "maxItems": 6,
+      "title": "Weekly Off",
+      "type": "array"
+     }
+    },
+    "required": [
+     "weekly_off"
+    ],
+    "title": "PolicyIn",
+    "type": "object"
+   },
+   "PolicyOut": {
+    "properties": {
+     "team_calendar": {
+      "title": "Team Calendar",
+      "type": "boolean"
+     },
+     "weekly_off": {
+      "items": {
+       "type": "integer"
+      },
+      "title": "Weekly Off",
+      "type": "array"
+     }
+    },
+    "required": [
+     "weekly_off",
+     "team_calendar"
+    ],
+    "title": "PolicyOut",
     "type": "object"
    },
    "PresentOut": {
@@ -2621,6 +3335,45 @@
      "features"
     ],
     "title": "PublicPlan",
+    "type": "object"
+   },
+   "QuoteOut": {
+    "properties": {
+     "available": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Available"
+     },
+     "days": {
+      "title": "Days",
+      "type": "number"
+     },
+     "enough": {
+      "title": "Enough",
+      "type": "boolean"
+     },
+     "skipped": {
+      "items": {
+       "format": "date",
+       "type": "string"
+      },
+      "title": "Skipped",
+      "type": "array"
+     }
+    },
+    "required": [
+     "days",
+     "available",
+     "enough",
+     "skipped"
+    ],
+    "title": "QuoteOut",
     "type": "object"
    },
    "ReauthIn": {
@@ -2987,6 +3740,216 @@
      "recovery_codes"
     ],
     "title": "RecoveryCodesOut",
+    "type": "object"
+   },
+   "RequestIn": {
+    "additionalProperties": false,
+    "properties": {
+     "employee_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Id"
+     },
+     "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+     },
+     "half_day": {
+      "default": "none",
+      "enum": [
+       "none",
+       "morning",
+       "afternoon"
+      ],
+      "title": "Half Day",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     },
+     "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+     }
+    },
+    "required": [
+     "leave_type_id",
+     "start_date",
+     "end_date"
+    ],
+    "title": "RequestIn",
+    "type": "object"
+   },
+   "RequestOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "days": {
+      "title": "Days",
+      "type": "number"
+     },
+     "decided_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decided At"
+     },
+     "decided_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decided By"
+     },
+     "decision_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decision Note"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+     },
+     "half_day": {
+      "title": "Half Day",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "leave_type_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Leave Type Name"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     },
+     "requested_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requested By"
+     },
+     "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "leave_type_id",
+     "start_date",
+     "end_date",
+     "half_day",
+     "days",
+     "reason",
+     "status",
+     "requested_by",
+     "decided_by",
+     "decided_at",
+     "decision_note",
+     "created_at",
+     "version"
+    ],
+    "title": "RequestOut",
     "type": "object"
    },
    "ResetIn": {
@@ -6056,6 +7019,1034 @@
     "summary": "Revoke Invite",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/leave/adjustments": {
+   "get": {
+    "operationId": "list_adjustments_v1_leave_adjustments_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "year",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maximum": 2100,
+         "minimum": 2000,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Year"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AdjustmentOut"
+         },
+         "title": "Response List Adjustments V1 Leave Adjustments Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Adjustments",
+    "tags": [
+     "leave"
+    ]
+   },
+   "post": {
+    "operationId": "add_adjustment_v1_leave_adjustments_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AdjustmentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AdjustmentOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Adjustment",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/balances": {
+   "get": {
+    "operationId": "balances_v1_leave_balances_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "year",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maximum": 2100,
+         "minimum": 2000,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Year"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PersonBalances"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Balances",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/balances/team": {
+   "get": {
+    "operationId": "team_balances_v1_leave_balances_team_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "year",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maximum": 2100,
+         "minimum": 2000,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Year"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PersonBalances"
+         },
+         "title": "Response Team Balances V1 Leave Balances Team Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Team Balances",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/calendar": {
+   "get": {
+    "operationId": "calendar_v1_leave_calendar_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CalendarEntry"
+         },
+         "title": "Response Calendar V1 Leave Calendar Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Calendar",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/holidays": {
+   "get": {
+    "operationId": "list_holidays_v1_leave_holidays_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "year",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maximum": 2100,
+         "minimum": 2000,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Year"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/HolidayOut"
+         },
+         "title": "Response List Holidays V1 Leave Holidays Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Holidays",
+    "tags": [
+     "leave"
+    ]
+   },
+   "post": {
+    "operationId": "add_holiday_v1_leave_holidays_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/HolidayIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HolidayOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Holiday",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/holidays/{holiday_id}": {
+   "delete": {
+    "operationId": "remove_holiday_v1_leave_holidays__holiday_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "holiday_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Holiday Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove Holiday",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/policy": {
+   "get": {
+    "operationId": "get_policy_v1_leave_policy_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PolicyOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Policy",
+    "tags": [
+     "leave"
+    ]
+   },
+   "put": {
+    "operationId": "put_policy_v1_leave_policy_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PolicyIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PolicyOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Put Policy",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/quote": {
+   "get": {
+    "operationId": "quote_v1_leave_quote_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "leave_type_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Leave Type Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "half_day",
+      "required": false,
+      "schema": {
+       "default": "none",
+       "enum": [
+        "none",
+        "morning",
+        "afternoon"
+       ],
+       "title": "Half Day",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/QuoteOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Quote",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/requests": {
+   "get": {
+    "operationId": "list_requests_v1_leave_requests_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "all",
+       "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "cancelled",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "mine",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Mine",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RequestOut"
+         },
+         "title": "Response List Requests V1 Leave Requests Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Requests",
+    "tags": [
+     "leave"
+    ]
+   },
+   "post": {
+    "operationId": "create_request_v1_leave_requests_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RequestIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Request",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/requests/{request_id}/approve": {
+   "post": {
+    "operationId": "approve_v1_leave_requests__request_id__approve_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "request_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Request Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Approve",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/requests/{request_id}/cancel": {
+   "post": {
+    "operationId": "cancel_v1_leave_requests__request_id__cancel_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "request_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Request Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Cancel",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/requests/{request_id}/reject": {
+   "post": {
+    "operationId": "reject_v1_leave_requests__request_id__reject_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "request_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Request Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reject",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/types": {
+   "get": {
+    "operationId": "list_types_v1_leave_types_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "include_inactive",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Include Inactive",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/LeaveTypeOut"
+         },
+         "title": "Response List Types V1 Leave Types Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Types",
+    "tags": [
+     "leave"
+    ]
+   },
+   "post": {
+    "operationId": "create_type_v1_leave_types_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LeaveTypeIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LeaveTypeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Type",
+    "tags": [
+     "leave"
+    ]
+   }
+  },
+  "/v1/leave/types/{leave_type_id}": {
+   "patch": {
+    "operationId": "update_type_v1_leave_types__leave_type_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "leave_type_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Leave Type Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LeaveTypePatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LeaveTypeOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Type",
+    "tags": [
+     "leave"
     ]
    }
   },
