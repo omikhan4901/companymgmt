@@ -40,7 +40,7 @@ for db in companymgmt companymgmt_test; do
   if [ "$exists" != "1" ]; then
     psql_admin -q -c "CREATE DATABASE $db OWNER cm_owner"
   fi
-  psql_admin -q -d "$db" -c "CREATE EXTENSION IF NOT EXISTS citext; REVOKE ALL ON SCHEMA public FROM PUBLIC; GRANT USAGE ON SCHEMA public TO cm_app; ALTER SCHEMA public OWNER TO cm_owner;"
+  psql_admin -d "$db" -q -c "CREATE EXTENSION IF NOT EXISTS citext; REVOKE ALL ON SCHEMA public FROM PUBLIC; GRANT USAGE ON SCHEMA public TO cm_app; ALTER SCHEMA public OWNER TO cm_owner;"
 done
 
 echo "Local databases ready: companymgmt, companymgmt_test"

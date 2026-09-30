@@ -109,7 +109,7 @@ jobs:
       - name: Build API image
         run: docker build -f api/Dockerfile -t companymgmt-api:${{ github.sha }} .
       - name: Scan image (Trivy)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: companymgmt-api:${{ github.sha }}
           severity: HIGH,CRITICAL
