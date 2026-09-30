@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types, tests, contract, build, e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            web/package-lock.json
+            site/package-lock.json
+      - name: Databases and roles
+        run: |
+          sudo apt-get update -q && sudo apt-get install -yq postgresql-client
+          scripts/dev-db.sh
+      - name: Install
+        run: |
+          (cd api && uv sync --frozen)
+          (cd web && npm ci)
+          (cd site && npm ci)
+          (cd web && npx playwright install --with-deps chromium)
+      - name: Run every check (same script as local)
+        run: E2E=1 scripts/check.sh
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
+
+  infra:
+    name: Infrastructure code
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.10.6
+      - name: Format and validate
+        working-directory: infra/gcp
+        run: |
+          tofu fmt -check -diff
+          tofu init -backend=false -input=false
+          tofu validate
+
+  security:
+    name: Secrets, dependencies, image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+      - name: Python dependencies (pip-audit)
+        run: |
+          cd api
+          uv export --frozen --no-dev --no-hashes > /tmp/requirements.txt
+          uvx pip-audit --strict -r /tmp/requirements.txt
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: JavaScript dependencies (npm audit)
+        run: |
+          (cd web && npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high)
+          (cd site && npm ci --ignore-scripts && npm audit --omit=dev --audit-level=high)
+      - name: Build API image
+        run: docker build -f api/Dockerfile -t companymgmt-api:${{ github.sha }} .
+      - name: Scan image (Trivy)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: companymgmt-api:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"

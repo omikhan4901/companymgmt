@@ -1,0 +1,97 @@
+name: Deploy
+
+# Deploys main after CI passes. Does nothing until the repository variable
+# DEPLOY_ENABLED is "true" (set it once the cloud accounts exist; see docs/runbooks/deploy.md).
+on:
+  workflow_run:
+    workflows: [CI]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGION: ${{ vars.GCP_REGION }}
+  PROJECT: ${{ vars.GCP_PROJECT }}
+  IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT }}/companymgmt/api
+
+jobs:
+  api:
+    if: vars.DEPLOY_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Build and push the image
+        run: |
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build -f api/Dockerfile -t "${IMAGE}:${GITHUB_SHA}" .
+          docker push "${IMAGE}:${GITHUB_SHA}"
+          echo "DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "${IMAGE}:${GITHUB_SHA}")" >> "$GITHUB_ENV"
+      - name: Run database migrations (Cloud Run job)
+        run: |
+          gcloud run jobs deploy companymgmt-migrate --region "$REGION" --image "$DIGEST" \
+            --service-account "${{ vars.GCP_RUNTIME_SA }}" \
+            --command alembic --args upgrade,head \
+            --set-env-vars ENV=prod,EMAIL_BACKEND=smtp,APP_DB_ROLE=cm_app \
+            --set-secrets MIGRATIONS_DATABASE_URL=migrations-database-url:latest,DATABASE_URL=database-url:latest,JWT_PRIVATE_KEY=jwt-private-key:latest,FIELD_ENCRYPTION_KEYS=field-encryption-keys:latest,SMTP_URL=smtp-url:latest \
+            --max-retries 0 --task-timeout 600
+          gcloud run jobs execute companymgmt-migrate --region "$REGION" --wait
+      - name: Deploy the API
+        run: |
+          gcloud run deploy companymgmt-api --region "$REGION" --image "$DIGEST" \
+            --service-account "${{ vars.GCP_RUNTIME_SA }}" \
+            --allow-unauthenticated --ingress all \
+            --min-instances 0 --max-instances 4 --concurrency 40 --cpu 1 --memory 512Mi \
+            --set-env-vars "ENV=prod,EMAIL_BACKEND=smtp,APP_DB_ROLE=cm_app,WEB_BASE_URL=${{ vars.WEB_URL }},CORS_ORIGINS=${{ vars.WEB_URL }},MAIL_FROM=${{ vars.MAIL_FROM }}" \
+            --set-secrets DATABASE_URL=database-url:latest,JWT_PRIVATE_KEY=jwt-private-key:latest,FIELD_ENCRYPTION_KEYS=field-encryption-keys:latest,SMTP_URL=smtp-url:latest,INTERNAL_TOKEN=internal-token:latest
+      - name: Smoke test
+        run: |
+          url=$(gcloud run services describe companymgmt-api --region "$REGION" --format 'value(status.url)')
+          curl --fail --retry 5 --retry-delay 3 "$url/readyz"
+
+  web:
+    needs: api
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Build the app and the site
+        env:
+          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+          PUBLIC_APP_URL: ${{ vars.WEB_URL }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          (cd web && npm ci && npm run build)
+          (cd site && npm ci && npm run build)
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: |
+            pages deploy web/dist --project-name companymgmt-app --branch main
+            pages deploy site/dist --project-name companymgmt-site --branch main
