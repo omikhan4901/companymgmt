@@ -1,6 +1,7 @@
 # Implementation Plan: Company Management SaaS
 
-Status: **Approved by the owner on 30 September 2026. Building Milestone 1.**
+Status: **Approved by the owner on 30 September 2026. M1 and M1.5 are done; M1.6 (new
+design, Next.js, location-based attendance) is in progress.** See §9 for every milestone.
 Progress is tracked in [`PROGRESS.md`](PROGRESS.md).
 Product name: **CompanyMgmt** (repo `companymgmt`). The owner wants a global product, so
 the name is in plain English. It can be renamed before launch.
@@ -17,9 +18,20 @@ Changes made during Phase 0, at the owner's request:
   the old group members are not listed as contributors. This repository becomes the
   read-only archive (§0).
 - **Payments come later.** Paddle is confirmed for a Bangladesh-based seller (the owner
-  checked this as well). Payment integration moves to Milestone 6, after the product
+  checked this as well). Payment integration moves to a later milestone (now M5), after the product
   works. Until then the product keeps pricing pages, plans and limits, managed through an
   internal subscription model that Paddle plugs into later (§6).
+
+Changes made after M1, at the owner's request:
+
+- **New design (Atlas) and Next.js.** The UI no longer reuses the ResumeX look (§8). The
+  web app and marketing site become one Next.js app (§3.1).
+- **Location-based attendance.** Clock-in is checked against a geofence around each
+  branch (M1.6).
+- **AI as a layer over company data.** The architecture is prepared for permission-aware
+  AI (§3.7), and the roadmap adds AI milestones (M6–M7).
+- **First market.** 20–100 person teams, starting with agencies in Bangladesh (§2.0). The
+  roadmap is reordered to serve them first.
 
 ---
 
@@ -28,12 +40,12 @@ Changes made during Phase 0, at the owner's request:
 0. [Repository strategy](#0-repository-strategy)
 1. [Audit of the current code](#1-audit-of-the-current-code)
 2. [Product scope, modules and pricing](#2-product-scope-modules-and-pricing)
-3. [Architecture](#3-architecture)
+3. [Architecture](#3-architecture) (incl. [§3.7 AI-ready architecture](#37-ai-ready-architecture-designed-now-built-in-m6m7))
 4. [Security requirements (ASVS L2)](#4-security-requirements-asvs-50-level-2)
 5. [Testing strategy](#5-testing-strategy)
-6. [Billing and automation with Paddle (deferred)](#6-billing-and-automation-with-paddle-deferred-to-milestone-6)
+6. [Billing and automation with Paddle (M5)](#6-billing-and-automation-with-paddle-m5)
 7. [Infrastructure, DevOps and cost](#7-infrastructure-devops-and-cost)
-8. [Design system](#8-design-system-from-resumex)
+8. [Design system: Atlas](#8-design-system-atlas)
 9. [Phased roadmap](#9-phased-roadmap)
 10. [Scope honesty: what to cut or defer](#10-scope-honesty-what-to-cut-or-defer)
 11. [Risks and open questions](#11-risks-and-open-questions)
@@ -128,6 +140,30 @@ class hierarchy), Factory Method for tasks, Facade for reports.
 
 ## 2. Product scope, modules and pricing
 
+### 2.0 Who it is for first
+
+The product works for any size, from a tea stall to a company with branches. But
+selling to "companies" in general is how new products lose to Zoho. So the first market
+is specific:
+
+- **20–100 person teams, starting with software and IT agencies in Bangladesh**, then
+  similar companies in South and Southeast Asia, then small and mid-sized businesses
+  anywhere.
+- **Positioning**: "the operating system for your 30-person company". A few tools that
+  fit together well (people, attendance, leave, payroll, tasks, announcements, documents,
+  approvals) instead of forty-seven modules. Onboarding takes minutes.
+- **How the first customers are found**: free pilots (M4). "We'll set up your company
+  for free for a month and see whether it replaces some of your current tools."
+- **What proves it works**: five companies paying $50–200 a month. That shows strangers
+  trust the product with real operations. The AI layer (M6–M7) makes a working product
+  more powerful; it is not the reason to adopt it.
+- **Trust comes first**: tenant isolation, roles, audit log, encryption, backups, export
+  and deletion, two-step verification, permission-aware AI, clear AI data handling and
+  employee privacy. All of it is built as if a real company will audit it.
+
+Shops and restaurants stay supported (Simple mode, the Shop pack in M8). They are just
+not the first sales focus.
+
 ### 2.1 Core platform (always on, every plan)
 
 Workspaces (tenants) · branches/locations · members and invites · staff accounts without
@@ -144,7 +180,7 @@ Bangla strings, tests, and an entry in the plan matrix.
 | # | Module | What it includes | Depends on |
 |---|---|---|---|
 | 1 | **People** | Employee directory, profiles, department tree, branches, job titles, documents, employment history | Core |
-| 2 | **Attendance** | Clock in/out (web, phone, shared kiosk), shifts incl. overnight, late/early rules, corrections with approval, holiday calendar, monthly timesheets | People |
+| 2 | **Attendance** | Clock in/out (web, phone, shared kiosk) **checked against a geofence around each branch**, shifts incl. overnight, late/early rules, corrections with approval, holiday calendar, monthly timesheets | People |
 | 3 | **Leave** | Leave types and balances, accrual, requests and approvals, calendar | People, Attendance |
 | 4 | **Payroll** | Salary structures (basic, house rent, medical, conveyance), pay rules, overtime from attendance, festival bonuses, deductions, advances and loans, tax deducted at source, payroll run (draft → review → finalize → lock), payslips as PDF in English and Bangla, bank/mobile-wallet transfer sheet | People, Attendance, Leave |
 | 5 | **Catalog** | Products and services, variants, units (piece, kg, cup), prices per branch, categories | Core |
@@ -154,10 +190,15 @@ Bangla strings, tests, and an entry in the plan matrix.
 | 9 | **Inventory** | Stock movement ledger, stock by branch, purchases and suppliers, transfers, stock counts, low-stock alerts, cost (weighted average) | Catalog, Sales |
 | 10 | **Accounting** | Double-entry ledger underneath. Automatic postings from sales, expenses, payroll and purchases. Cash book, receivables/payables, P&L, balance sheet, trial balance, period close | 6–9 (reads their events) |
 | 11 | **Reports & dashboards** | Dashboards across modules, saved reports, scheduled email reports, CSV/XLSX/PDF export | All |
-| 12 | **Tasks** | Tasks, assignment, status, due dates (the legacy feature, reshaped) | People |
+| 12 | **Tasks & projects** | Projects, tasks, assignment, due dates, comments, checklists, onboarding checklists (the legacy feature, reshaped) | People |
+| 12a | **Announcements** | Posts to everyone, a branch or a department, read receipts | People |
+| 12b | **Documents & policies** | Handbooks, SOPs and policies with visibility by role or department, versions, acknowledgements | People |
+| 12c | **Automations** | Trigger → condition → action workflows over domain events; built by hand or from plain language (M7) | Core |
 | 13 | **Enterprise controls** | SSO (OIDC/SAML), SCIM provisioning, custom roles with field-level permissions, approval chains, IP allowlist, API keys and outbound webhooks, audit export, dedicated database | Core |
 
 Each module owns its own reports. Module 11 adds dashboards and scheduling on top of them.
+The **AI layer** (§3.7) is not a module: it works across all of them, through each
+module's capabilities.
 
 ### 2.3 Presets for non-technical owners
 
@@ -194,7 +235,7 @@ defaults. The data model is the same, so a shop can grow without migrating.
 small fee per extra person. This keeps a tea stall at $0–9 and still costs a
 2,000-person company far less per head than Zoho One or Odoo, which charge for every user.
 Annual billing gets two months free. Regional prices (40–50% lower in lower-income
-countries, including Bangladesh) arrive with Paddle in M6, the way Odoo does it.
+countries, including Bangladesh) arrive with Paddle in M5, the way Odoo does it.
 
 | | **Free** | **Starter** | **Growth** | **Business** | **Enterprise** |
 |---|---|---|---|---|---|
@@ -220,7 +261,7 @@ Notes:
   free tiers. Starter at $9 is below one Loyverse add-on. Growth at $29 matches Zoho
   Payroll's base fee but includes attendance, POS and payroll together. Business at $79
   for 150 people works out to $0.53/person, against $1.25–37 at Zoho.
-- Prices are the starting point, re-checked against real sign-ups before M6.
+- Prices are the starting point, re-checked against the M4 pilots before billing (M5).
 - Limits are data, not code. Plans, modules and limits sit in tables that an internal
   admin console can edit, the same approach as ResumeX's plan settings.
 
@@ -237,16 +278,16 @@ Notes:
 | Database | **PostgreSQL on Neon (serverless)** | Scales to zero, has a free tier, branches for previews and tests, point-in-time restore, and read replicas later. Postgres gives transactions, constraints, `NUMERIC`, recursive CTEs and **row-level security**, which are essential for payroll and accounting. MongoDB was rejected (weak for double-entry accounting). Supabase was rejected (free projects pause, paid starts at $25). |
 | Tenancy | **Shared database and schema, `tenant_id` on every tenant row, Postgres RLS, plus an application-level guard** | Cheapest and simplest, and it scales to thousands of tenants. RLS gives a database-level backstop. Schema-per-tenant was rejected (N× migrations, pooling problems). A dedicated DB for Enterprise tenants is possible later without a rewrite (§3.6). |
 | API | REST + JSON under `/v1`, OpenAPI-first, typed TS client generated from the spec | Simple to reason about, cache and test. GraphQL was rejected (harder to authorize per field, no need). |
-| Frontend app | **React 19 + TypeScript + Vite SPA**, React Router, TanStack Query, **antd 6 + Tailwind 4**, lucide icons, `motion` | Matches the ResumeX design system and component library. A static SPA needs no server, so it is free to host. Next.js SSR was rejected: the app sits behind login, so SSR adds cost and no SEO benefit. |
-| Marketing site | **Astro** (static) with the same Tailwind tokens | Fast, SEO-friendly, no JavaScript by default. Hosts the landing, pricing, legal pages and help center. |
+| Frontend | **Next.js (App Router) + TypeScript**, exported as static files; TanStack Query, Radix primitives + **Tailwind 4**, lucide icons, i18next | One app serves the marketing pages (pre-rendered, good for SEO) and the product (rendered in the browser, behind sign-in). A static export keeps hosting free and needs no Node server; if server features are ever needed, the same app moves to Cloudflare Workers via OpenNext. The first version was a Vite SPA with antd plus an Astro site; replaced in M1.6 at the owner's request. |
 | Hosting (API) | **Google Cloud Run** (request-based billing, min instances 0) in `asia-southeast1` (Singapore) | Scales to zero with a generous free tier, and the owner already runs ResumeX on it. Singapore is close to Bangladesh and to Neon's `aws-ap-southeast-1`. |
-| Hosting (web) | **Cloudflare Pages** | Free, unlimited static bandwidth, commercial use allowed. Vercel Hobby was rejected: its terms forbid commercial use. |
+| Hosting (web) | **Cloudflare** (static assets; Pages or Workers) with per-page security headers generated at build | Free, unlimited static bandwidth, commercial use allowed. Vercel Hobby was rejected: its terms forbid commercial use. |
 | Background jobs | **Cloud Tasks** (queue) + **Cloud Scheduler** (cron), both calling authenticated internal endpoints on the same Cloud Run service; **transactional outbox** in Postgres | No always-on worker. The first 1M Cloud Tasks operations and 3 Scheduler jobs are free. The outbox guarantees events are never lost. Celery/Redis were rejected: always-on and paid. |
 | Files | **Cloudflare R2** (S3 API), per-tenant key prefix, short-lived presigned URLs | 10 GB free and zero egress fees. Accessed through a storage port, so GCS works as a drop-in. |
 | Cache | No Redis at first. Per-request memoization, a small in-process LRU for plan/permission config (with a version check), and HTTP caching for static data | Redis is an always-on cost. If shared cache or rate-limit state is needed later: Upstash Redis (free tier, pay per request). |
 | Rate limiting | Cloudflare free rate-limit rule at the edge + a Postgres counter table (UNLOGGED) in the app | No extra service. |
 | Email | Email port. Start with a free transactional provider (Resend or Brevo), move to Amazon SES (~$0.10 per 1,000) at scale | Free at 0 tenants, cheap at scale. |
 | PDF | WeasyPrint (HTML/CSS to PDF), Noto Sans Bengali bundled | Correct Bangla shaping. Reuses the design tokens. |
+| AI (M6+) | Provider port (Anthropic, OpenAI, Gemini, local model), **pgvector in the same Postgres**, tools over typed capabilities (§3.7) | No new database or vendor lock-in; isolation reuses RLS. A separate vector database was rejected: another place for tenant data to leak. |
 | Errors/observability | Sentry (free tier), Cloud Logging (structured JSON), OpenTelemetry traces (sampled), Cloud Monitoring uptime checks | All free at this scale. |
 | Infra as code | OpenTofu, with state in a GCS bucket | Reproducible environments, reviewable changes. |
 
@@ -259,7 +300,7 @@ flowchart LR
   end
   subgraph Cloudflare["Cloudflare (free)"]
     CF[DNS + TLS + WAF + rate-limit rule]
-    PAGES[Pages: SPA app + Astro site]
+    PAGES[Static Next.js export: site + app]
     R2[(R2: files, exports, backups)]
   end
   subgraph GCP["Google Cloud (asia-southeast1)"]
@@ -275,7 +316,7 @@ flowchart LR
   end
   EXT1[Email provider]
   EXT2[Sentry]
-  EXT3[Paddle, Milestone 6]
+  EXT3[Paddle, M5]
 
   U --> CF --> PAGES
   U -->|HTTPS /v1 JSON| CF --> RUN
@@ -364,8 +405,125 @@ flowchart LR
 | 0–50 tenants | Everything above. Neon free/Launch plan, Cloud Run min 0 | None |
 | 50–500 tenants | Neon autoscaling 0.25–2 CU. Cloud Run min instances 1 during Bangladesh business hours (removes cold starts). Read replica for reports | Config only |
 | Large tenant (thousands of employees) | Time-partitioned tables for attendance events, audit log and stock movements. Heavy reports and payroll runs as background jobs with progress, not in requests | Planned in the schema from the start; payroll is a job from day 1 |
-| Enterprise isolation | A `tenant_routes` table maps a tenant to a database. The session factory picks the DSN per tenant. Same schema and code, own Neon project. Tenants can be moved with a copy-and-switch job | One routing layer, designed in Milestone 1, used in Milestone 7 |
+| Enterprise isolation | A `tenant_routes` table maps a tenant to a database. The session factory picks the DSN per tenant. Same schema and code, own Neon project. Tenants can be moved with a copy-and-switch job | One routing layer, designed in M1, used in M10 |
 | Multi-region | Out of scope until revenue justifies it | – |
+
+### 3.7 AI-ready architecture (designed now, built in M6–M7)
+
+AI here is **not a chatbot bolted on**. It is a layer over the company's own data and
+workflows. It answers from real records, only within what the person asking may see,
+and it can later take actions that a person confirms. Zoho (Zia in Zoho People) and
+Atlassian (Rovo: search, answers and agents over organizational data, respecting
+existing permissions) are moving the same way.
+
+The AI itself arrives in M6. Its foundations are laid in M3, because they shape how
+every module is written.
+
+```text
+                 ┌────────────────────────────────────────────┐
+                 │ AI layer (M6–M7)                           │
+                 │ copilot chat · search · weekly brief ·     │
+                 │ actions (propose → confirm) · automations  │
+                 │ · early-warning signals                    │
+                 └───────────────────┬────────────────────────┘
+                                     │
+                 ┌───────────────────▼────────────────────────┐
+                 │ AI context layer                           │
+                 │ context builder (tenant, user, role,       │
+                 │ permissions, department scope, branch,     │
+                 │ language, time zone) · tool router ·       │
+                 │ permission-aware retrieval · guardrails ·  │
+                 │ provider port · usage metering             │
+                 └───────────────────┬────────────────────────┘
+                                     │  calls capabilities as the signed-in person
+                 ┌───────────────────▼────────────────────────┐
+                 │ Capability registry (M3)                   │
+                 │ typed read/write functions per module,     │
+                 │ each with input/output schema + permission │
+                 └───────────────────┬────────────────────────┘
+          ┌──────────────────────────┼──────────────────────────┐
+     People & time              Work                       Knowledge
+     people, attendance,        tasks, projects,           documents, policies,
+     leave, payroll             approvals, automations     announcements, SOPs
+          └──────────────────────────┼──────────────────────────┘
+                                     │
+                   Postgres (row-level security, pgvector)
+```
+
+**Rules**
+
+1. **The AI gets tools, never database access.** The model never sees SQL or tables.
+   It picks from registered capabilities such as `leave.balance(employee)`,
+   `attendance.absences(period, group_by)`, `tasks.overdue(scope)` and
+   `documents.search(query)`. The backend runs each one exactly as the REST API would:
+   same tenant binding, same row-level security, same permission and department-scope
+   check. The model explains the structured result; it doesn't compute it.
+2. **One implementation, two front doors.** From M3 on, business logic lives in typed
+   service functions. REST routes are thin wrappers over them, and the capability
+   registry exposes the same functions to the AI. Nothing the AI can do bypasses a check
+   the API has, and a test enforces this (M3 "done when").
+3. **Role-aware by construction.** Every AI request starts from the same `Ctx` as an API
+   call. "Who is on leave today?" returns the asker's team for a staff member, their
+   department for a manager, and the company for HR, because the capabilities already
+   scope the query.
+4. **Retrieval respects permissions.** Document chunks live in a tenant table with
+   forced RLS. Each chunk carries `tenant_id`, `document_id`, and visibility (roles,
+   departments). Embeddings sit in **pgvector in the same Postgres**, so the isolation
+   that protects every other table protects them too; there is no separate vector store
+   that could leak. Filters are applied in SQL before similarity ranking, never after.
+5. **Actions: propose → confirm → execute.** Write capabilities return a *proposal*
+   (what will change, for whom). Only an explicit confirmation from the person executes
+   it, through the normal API path, recorded in the audit log with `via: ai` and the
+   conversation ID. Text inside documents or records can never trigger an action.
+6. **Automations are data, not code.** A plain-language request becomes a workflow
+   definition: JSON with a trigger (schedule or domain event), conditions and actions,
+   checked against a schema. A person reviews it before it is saved. The workflow
+   engine runs it and keeps a run history.
+
+   ```json
+   {"trigger": {"schedule": "MON 09:00"},
+    "condition": {"task.status": "overdue"},
+    "action": {"type": "notify", "channel": "email", "to": "task.assignee"}}
+   ```
+7. **The company as a graph, in plain SQL.** The relations already exist: company →
+   branches, departments → people → shifts, leave → tasks → projects → documents.
+   Capabilities follow them ("Why is the Dhaka team's project late?" → overdue tasks →
+   assignees → their leave and attendance). A graph database isn't needed.
+8. **Provider port.** One interface:
+   `chat(request)`, `structured(request, schema)` and `embed(texts)`.
+   - Adapters for Anthropic, OpenAI and Gemini, plus a local model server (vLLM/Ollama)
+     for customers whose data must stay in their environment (M10).
+   - The model is chosen per task (a small model for routing and summaries, a larger one
+     for hard questions) and per workspace.
+9. **Predictions support decisions; they don't make them.** Signals start as plain
+   statistics (trend changes, outliers against the team's own history) and are explained
+   in words. There is no automatic judgment of individuals.
+   - Individual-level signals can be switched off per workspace.
+   - Employees are told what is computed.
+10. **Trust and cost.**
+    - AI is off until the owner enables it and accepts the AI terms.
+    - Providers are used with zero-retention, no-training settings, and the list of
+      providers is published.
+    - Only the fields a capability needs are sent to the model.
+    - Prompts and answers are logged with redaction, kept for 30 days by default.
+    - Each workspace has a monthly AI allowance by plan, with metering, caching and
+      budget alerts.
+    - An evaluation suite (expected answers, expected refusals, leakage probes) runs in
+      CI once M6 starts.
+
+**What this changes before M6**
+- M2 onward: new modules (leave, payroll) put their logic in service functions, not in
+  routes.
+- M3:
+  - Move existing attendance and people logic into services.
+  - Add the capability registry and context builder.
+  - Extend the outbox into a general domain-events stream.
+  - Store document visibility metadata.
+- M4: reporting aggregates are written as capabilities, so dashboards and the AI share
+  them.
+- Backend layout: `api/app/ai/` holds `context`, `tools`, `retrieval`, `providers`,
+  `prompts`, `guardrails` and `evals`. It depends on module services, never the other
+  way round (import-linter enforces this).
 
 ---
 
@@ -397,11 +555,11 @@ text.
 - [ ] A4. **Access token**: EdDSA-signed JWT with a pinned algorithm, 10-minute lifetime, claims `sub`, `tid`, `sid`, `iat`, `exp`, `aud`, `iss`, kept in memory only (never localStorage).
 - [ ] A5. **Refresh token**: 256-bit random, stored only as a SHA-256 hash, httpOnly + Secure + `SameSite=Strict`, path-scoped cookie. **Rotated on every use.** Reuse of an old token revokes the whole token family and emails the user. Idle timeout 7 days, absolute 30 days, both configurable per workspace (shorter for Business+).
 - [ ] A6. **Session revocation**: every request checks the session row (`revoked_at`, user disabled, membership removed). A sessions page lists devices and can log out one or all. Password change, MFA reset and member removal revoke sessions.
-- [ ] A7. **MFA**: TOTP (RFC 6238, ±1 step drift) with 10 single-use recovery codes stored hashed. The TOTP secret is encrypted with AES-256-GCM. A workspace can require MFA for owners/admins (on by default for Business+). Passkeys (WebAuthn) in Milestone 7.
+- [ ] A7. **MFA**: TOTP (RFC 6238, ±1 step drift) with 10 single-use recovery codes stored hashed. The TOTP secret is encrypted with AES-256-GCM. A workspace can require MFA for owners/admins (on by default for Business+). Passkeys (WebAuthn) in M10.
 - [ ] A8. **Step-up re-authentication** (password or TOTP within the last 5 minutes) before: changing password or MFA, exporting data, finalizing payroll, changing roles, deleting the workspace.
 - [ ] A9. **Brute force**: per-account and per-IP limits with growing delays, and a Cloudflare Turnstile challenge after 5 failures. No hard lockout that an attacker could use to lock out a real user. The same generic error and similar timing whether or not the account exists.
 - [ ] A10. Password reset: single-use token, stored hashed, valid for 30 minutes, sessions revoked afterwards, same response for unknown emails.
-- [ ] A11. **POS device PIN** (Milestone 3): only on a device registered by an admin, only for roles marked "PIN allowed" (e.g. cashier), rate-limited, and never valid on the web.
+- [ ] A11. **POS device PIN** (M8): only on a device registered by an admin, only for roles marked "PIN allowed" (e.g. cashier), rate-limited, and never valid on the web.
 - [ ] A12. Every auth event (login, fail, MFA, reset, revoke, token reuse) is in the audit log.
 
 ### 4.3 Authorization: RBAC + custom roles (V8)
@@ -432,7 +590,7 @@ text.
 - [ ] D6. **SQL injection**: ORM or bound parameters only. A Semgrep rule bans string-built SQL.
 - [ ] D7. **XSS**: React escaping, no `dangerouslySetInnerHTML` (lint rule), CSP. Any future rich text is sanitized with an allowlist.
 - [ ] D8. **CSRF**: the API uses bearer tokens, not cookies. The one cookie endpoint (refresh) requires `SameSite=Strict`, an `Origin` check against an allowlist, and a custom header.
-- [ ] D9. **SSRF**: the server never fetches user-supplied URLs until outbound webhooks exist (Milestone 7). Those go through an HTTPS-only fetcher that blocks private, link-local and metadata IP ranges, re-checks after DNS resolution, and has timeouts and size limits.
+- [ ] D9. **SSRF**: the server never fetches user-supplied URLs until outbound webhooks exist (M10). Those go through an HTTPS-only fetcher that blocks private, link-local and metadata IP ranges, re-checks after DNS resolution, and has timeouts and size limits.
 - [ ] D10. **Files**: type checked by magic bytes against an allowlist, images re-encoded, size limits per plan, downloads served with `Content-Disposition: attachment` from a separate origin.
 - [ ] D11. CSV/XLSX export escapes formula injection (`=`, `+`, `-`, `@` prefixes).
 - [ ] D12. Error responses leak no internals. Debug is off in production (config test).
@@ -529,7 +687,7 @@ gets a test ID and the expected behaviour.
 
 **Lifecycle and state**
 27. **Tenant deleted mid-request**: a request that started before deletion finishes or fails cleanly. Later requests get `410 Gone` with a restore link for owners during the grace period.
-28. **Subscription expires mid-session** (after Milestone 6; until then, the plan changes by admin): the next request sees the new entitlements. Writes to locked modules get `402` with an upgrade prompt, and reads and export keep working. No data loss in forms, because the draft is kept client-side.
+28. **Subscription expires mid-session** (after M5; until then, the plan changes by admin): the next request sees the new entitlements. Writes to locked modules get `402` with an upgrade prompt, and reads and export keep working. No data loss in forms, because the draft is kept client-side.
 29. **Role changed while logged in**: the next request uses the new permissions. The UI reacts to `403` by refreshing the permission set and hiding the action.
 30. Member removed while clocked in → attendance auto-closes at removal time with a note.
 31. Last owner tries to leave or demote themselves → blocked with an explanation.
@@ -565,10 +723,10 @@ Targets are starting points. The first run sets a baseline and the targets get t
 
 ---
 
-## 6. Billing and automation with Paddle (deferred to Milestone 6)
+## 6. Billing and automation with Paddle (M5)
 
 **Owner decision (Phase 0): build the product first, then add payment integration.**
-Until Milestone 6 the product has the pricing page, plans, limits, trials and module
+Until M5 the product has the pricing page, plans, limits, trials and module
 switches, managed through an internal `subscriptions` table and an internal admin
 console. No payments are taken.
 
@@ -591,7 +749,7 @@ console. No payments are taken.
   2. **Fee on small prices**: see §2.4. Prefer annual billing or a country price for the
      cheapest plan.
   3. **Domain review needs a live site** with product description, pricing, terms,
-     privacy and refund policy, and a working product. This fits Milestone 6 naturally.
+     privacy and refund policy, and a working product. This fits M5 naturally.
   4. **Receiving foreign payouts in Bangladesh**: bank wires and Payoneer to a BD bank
      account are normal for software exports, but the tax treatment (e.g. ICT/ITES export
      income) should be confirmed with an accountant (Q7).
@@ -741,87 +899,84 @@ updated.** Assumptions: small tenants, mostly Bangladesh business hours, API ins
 
 ---
 
-## 8. Design system (from ResumeX)
+## 8. Design system: Atlas
 
-Taken from `omikhan4901/cse299` (ResumeX): `client/src/app/globals.css`,
-`components/Providers.jsx`, `Navbar.jsx`, `Dashboard.jsx`, the home page and its
-`CLAUDE.md`. The new app follows it for most of the UI and adapts it where a data-heavy
-business app needs something different.
+The first UI reused the ResumeX design language. The owner asked for a design of the
+product's own. Three directions were drawn (`docs/design/directions/`), and the owner
+chose **Atlas** with a white default mode, a dark mode option, and four accents that are
+neither blue nor neon. Reference screens are in `docs/design/atlas/`.
 
 ### 8.1 Tokens
 
-| Token | Value | Use | Contrast (checked) |
+All colours are CSS variables on `<html>` (`web/src/app/globals.css`).
+
+- **Mode**: `.dark` switches every token.
+- **Accent**: `data-accent` switches the accent.
+- **Where the choice lives**: a person's choice is stored on their device and applied by
+  a tiny script before the first paint, so the page never flashes the wrong theme.
+
+| Token | Light (default) | Dark | Use |
 |---|---|---|---|
-| `brand` | `#007B7B` (teal) | Primary buttons, links, active nav, focus rings | 5.10:1 on white (AA text); white on brand 5.10:1 |
-| `brand-dark` | `#006262` | Hover/pressed | 7.18:1 on white |
-| `brand-50 / 100 / 200` | `#EFFAFA` / `#D5F2F1` / `#A9E3E1` | Icon tiles, active pill, soft borders | brand on brand-50: 4.79:1 |
-| `ink` | `#0F1F2A` | Body text and headings | 16.8:1 on white |
-| `navy` | `#002A3A` | Avatars, dark accents | – |
-| Neutrals | Tailwind `slate` (50 bands, 200 borders, 500 secondary text, 600 nav text) | Surfaces and text | slate-500 on white 4.76:1, on slate-50 4.55:1 (AA). **slate-400 (2.56:1) only for decorative icons, never text** |
-| Accent | `#5EEAD4` (logo dot), amber (highlights/warnings: `amber-50` bg, `amber-900` text) | Rare | amber-900 on amber-50 8.75:1 |
-| Radius | antd `borderRadius: 10`. Cards `rounded-2xl`, icon tiles `rounded-xl`, pills `rounded-full` | | |
-| Shadow | Primary button `0 6px 16px -6px rgba(0,123,123,.5)`. Cards flat, `hover:shadow-xl` | | |
+| `bg` | `#f6f6f7` | `#0e0e11` | Page background (grey, not navy, so nothing reads blue) |
+| `surface` / `surface-2` | `#ffffff` / `#f8f8f9` | `#16161b` / `#1c1c22` | Cards, inputs / insets |
+| `border` | `#e4e4e7` | `#2a2a32` | Hairlines |
+| `text` / `muted` | `#16161d` / `#5b5b66` | `#ededf0` / `#a1a1aa` | Text (muted passes AA on every surface) |
+| Status | green / amber / red soft pairs | darker fills, lighter text | Approved / waiting / rejected, never the accent |
+
+| Accent | Light: fill, text on it | Dark: fill, text on it | Note |
+|---|---|---|---|
+| **Plum** (default) | `#6d28d9`, white | `#a78bfa`, near-black | No clash with status colours |
+| Saffron | `#b45309`, white | `#f59e0b`, near-black | Warnings shift towards red so they stay distinct |
+| Garnet | `#9f1239`, white | `#fb7185`, near-black | Errors keep their icon and label, not only colour |
+| Ink | `#18181b`, white | `#e4e4e7`, near-black | Monochrome |
+
+Each accent also has a soft tint and a soft-text colour, used for the active navigation
+item, badges and links. Every pair is checked for WCAG AA.
 
 ### 8.2 Typography
 
-- **Inter** for body and UI. **Plus Jakarta Sans** 600/700/800 (`font-display`) for
-  headings, with tight tracking.
-- App page title: `font-display text-3xl font-bold text-ink`, with one short subtitle in
-  `text-slate-500`. Hero (marketing only): `text-4xl → 6xl font-extrabold`,
-  `leading-[1.08]`.
-- **New for this product**: **Noto Sans Bengali** (UI and PDFs) as the Bangla font, with
-  line height raised to 1.6 for Bangla. `tabular-nums` for every number in tables, money
-  and timesheets.
+- **Space Grotesk** 500–700 for headings and big numbers. **IBM Plex Sans** 400–600 for
+  text. **Noto Sans Bengali** for Bangla, with line height 1.6.
+- All three are self-hosted (no third-party font requests).
+- `tabular-nums` for every number in tables, money and timesheets.
 
-### 8.3 Layout and spacing
+### 8.3 Layout
 
-- `container-x`: max width 1200 px, side padding 1.25 rem (2 rem from `md`). App pages use
-  `py-8 md:py-12`. Card grids use `gap-6`, 1 → 2 (`sm`) → 4 (`lg`) columns.
-- Sticky header: `h-16`, `bg-white/85 backdrop-blur-md`, bottom border `slate-200/70`.
-- **Adapted for the suite**: ResumeX uses a top nav. With up to 12 modules the app uses a
-  **collapsible left sidebar** on desktop (module icons + labels, active item on a
-  `brand-50` pill), and a **bottom tab bar** on phones with the 4 most-used modules plus
-  "More". Data-heavy screens (Business/Enterprise) can widen to full width with a compact
-  table density toggle.
-- Breakpoints: Tailwind defaults. Every screen is designed phone-first at 360 px. POS is
-  designed for a 7–10" tablet in landscape and a phone in portrait.
+- **Desktop**: a narrow app rail on the left (module icons with labels, an "Apps"
+  launcher for the rest, a mode toggle at the bottom) and a content area with a page
+  header.
+- **Home screen**: a grid of cards of mixed sizes (bento), with one accent-filled hero
+  card ("On shift now").
+- **Phone**: a bottom tab bar (Today, Hours, Leave, Me). Dialogs become bottom sheets.
+  Every screen is designed at 360 px first.
+- **Density**: comfortable by default; tables stay readable on phones by scrolling inside
+  a focusable region.
 
-### 8.4 Components and patterns
+### 8.4 Components
 
-- **antd 6** components themed through `ConfigProvider` (primary `#007B7B`, text
-  `#0F1F2A`, radius 10), with **Tailwind** for layout and one-off styling. Icons:
-  **lucide** at 15–18 px. Motion: `motion` library.
-- Cards: `rounded-2xl border border-slate-200 bg-white`, hover `shadow-xl`.
-- Icon tile: `size-10 rounded-xl bg-brand-50 text-brand`.
-- Call-to-action row: a bordered card with icon tile, title, one-line description and
-  an arrow that nudges right on hover.
-- "Create new" tile: dashed `border-2 border-slate-300` that turns brand on hover.
-- Banners: `rounded-2xl` with a matching `-200` border and `-50` background (amber for
-  "needs attention", brand for "next step").
-- Status pills: `rounded-full px-2 py-0.5 text-[11px] font-semibold`.
-- Loading uses skeletons that match the final layout. Empty and error states use antd
-  `Result` with **one clear action**.
-- Dialogs never fill the screen: capped height, scroll inside.
-- Motion: spring entrances (stiffness 260–400, damping 26–32), short staggers, the
-  animated active nav pill (`layoutId`). Everything respects
-  `prefers-reduced-motion` (`MotionConfig reducedMotion="user"`).
+A small in-repo kit on **Radix primitives** (dialog, menu, tabs, radio group, switch)
+styled with **Tailwind 4**:
+
+- Buttons (primary / secondary / solid / ghost / danger), inputs and native selects
+  (the phone's own picker), a labelled field wrapper that wires help and error text to
+  the control.
+- Cards, badges, avatars, tables, a toast (sonner) and a ⌘K command palette (cmdk).
+- Icons: lucide at 16–20 px.
+
+There is no antd any more, so the product doesn't look like a generic admin template.
 
 ### 8.5 Tone and look
 
-- **Calm, uncluttered, little text.** One clear next action per screen. Details appear
-  only when needed (progressive disclosure).
-- Short, friendly, second-person copy in sentence case ("Keep a version for every kind
-  of job" in ResumeX; here, "Add the people who work with you").
-- Errors say what happened and what to do next. Destructive actions confirm with the
-  object's name, and "undo" is preferred where possible.
-- **Avoid** (the owner's rule): dark gradient bands, glows, illustrated mock-ups. They
-  read as "AI-looking". Marketing may use the subtle brand-50 grid and the one animated
-  gradient headline word, as ResumeX does.
+- Calm and uncluttered: one clear next action per screen, details on demand.
+- Short, friendly copy in sentence case.
+- Errors say what happened and what to do next ("You're about 420 m from Main branch.
+  Clock in when you get there.").
+- **Avoid**: gradient washes, glows, illustrated mock-ups and emoji in the UI.
 
 ### 8.6 Accessibility (WCAG 2.2 AA)
 
-- Contrast from §8.1 is checked in CI by axe on every e2e page.
-- Full keyboard use, with visible focus rings (2 px brand, offset). Skip link. Logical
+- Contrast from §8.1 is checked in CI by axe on every e2e page, in light and dark mode.
+- Full keyboard use, with visible focus rings (2 px accent, offset). Skip link. Logical
   focus order in dialogs, and focus returns to the trigger on close.
 - Touch targets ≥ 44×44 px (POS ≥ 56 px).
 - Forms: every input has a visible label, errors are linked with `aria-describedby`, and
@@ -850,99 +1005,431 @@ business app needs something different.
 
 ## 9. Phased roadmap
 
-Effort is in **focused working days** (implementation sessions plus owner review). It is
-a range, not a promise. Every milestone ends with all CI gates green, a deploy to
-staging and production, an updated ASVS checklist, an updated edge-case list, and a
-short demo script.
+### 9.1 How to read this roadmap
 
-### M1: Demoable slice (resume-ready), ~12–18 days
+A **milestone** is a release a real person can use. Each one ends with the product
+working end to end, deployed, and better than before. None of them is a pile of
+half-finished parts.
 
-**Scope**
-- New repo, monorepo layout (`api/`, `web/`, `site/`, `infra/`, `docs/`), CI gates
-  (§5.2), Docker Compose, OpenTofu for staging and prod, deploy pipeline.
-- Core: workspace sign-up and onboarding (§8.7), email verification, login, refresh
-  rotation, **TOTP MFA**, sessions page with revoke, password reset, rate limiting,
-  Turnstile, invites, branches, built-in roles and permissions, **audit log with hash
-  chain**, plans/limits/module switches (internal, no payment), English + Bangla.
-- Modules: **People** (directory, department tree, branches) and **Attendance**
-  (clock in/out, overnight shifts, corrections with approval, monthly timesheet, CSV
-  export).
-- Marketing site: landing, **pricing page** (plans from §2.4, "Start free trial"),
-  terms, privacy.
-- Tests: the isolation suite, the M1 part of the edge-case list, e2e for
-  sign-up → invite → clock-in → timesheet, axe on every page, baseline k6 run.
+Every milestone below uses the same layout:
+
+- **Why**: the problem it solves and why it comes at this point.
+- **For whom**: which customers or people it serves.
+- **What people can do**: the features, written as what a user can actually do.
+- **What gets built**: the technical work behind it.
+- **Done when**: checks that must all pass before the milestone is called finished.
+- **Effort** and **Status**.
+
+Effort is in **focused working days**: implementation sessions plus the owner's review.
+It is a range, not a promise.
+
+Every milestone also carries the same finishing work, not repeated below: all CI gates
+green (§5.2), deployed to staging and production, the ASVS checklist and the edge-case
+list updated, English and Bangla complete, WCAG 2.2 AA checked in light and dark mode,
+and a short demo script.
+
+**Order and why.** The first paying market is **20–100 person teams**, starting with
+software and IT agencies in Bangladesh (§2.0). What they need first is people,
+attendance, leave, payroll, tasks, announcements and documents. So the order is:
+
+1. Make that core excellent (M1–M3).
+2. Put it in front of real pilot companies (M4).
+3. Start charging (M5).
+4. Add the AI layer on top of real data (M6–M7).
+5. Widen to shops and restaurants (M8), then accounting (M9) and large companies (M10).
+
+The data model and security stay the same the whole way, so no step needs a rewrite.
+
+| # | Milestone | In one line | Effort | Status |
+|---|---|---|---|---|
+| M1 | Demoable slice | Sign up, invite staff, clock in, see timesheets | 12–18 d | **Done** |
+| M1.5 | Marketing kit | README, screenshots, case study, resume bullets | 3–4 d | **Done** |
+| M1.6 | New design, Next.js, location check-in | Atlas design with themes; one Next.js app; geofenced clock-in | 8–12 d | **In progress** |
+| M2 | Leave, payroll, data rights | Time off, payslips (Bangladesh preset), export and deletion | 15–20 d | Next |
+| M3 | Work and knowledge | Tasks and projects, announcements, documents and policies, approvals, notifications; AI-ready foundations | 15–20 d | Planned |
+| M4 | Pilot release | Dashboards, spreadsheet import, backups, live deploy, 3–5 free pilot companies | 8–12 d | Planned |
+| M5 | Billing | Paddle checkout, renewals, dunning | 8–12 d | Planned |
+| M6 | AI copilot (read-only) | "Ask my company", policy Q&A with sources, weekly company brief | 12–16 d | Planned |
+| M7 | AI actions and automation | AI proposes, person confirms; plain-language automations; early-warning signals | 15–20 d | Planned |
+| M8 | Shop pack | Point of sale, dues ("baki khata"), expenses | 15–20 d | Planned |
+| M9 | Inventory and accounting | Stock, purchases, double-entry books | 20–25 d | Planned |
+| M10 | Enterprise | SSO, SCIM, API keys, dedicated database, bring-your-own AI model | 20–30 d | Planned |
+| M11 | Launch hardening | Full ASVS L2 sign-off, restore drill, runbooks, status page | 7–10 d | Planned |
+
+**Total**: about 160–220 focused days for everything. The product is sellable to its
+first market after **M5**, and noticeably different from competitors after **M6**.
+
+---
+
+### M1: Demoable slice: **Done**
+
+**Why.** Prove the foundation (multi-tenancy, security, two useful modules) with
+something a stranger can try, and have a resume-ready project early.
+
+**For whom.** Any small team that wants to know who is at work and for how long.
+
+**What people can do**
+- Sign up, name the business, choose English or Bangla, and get a workspace with a
+  14-day Growth trial.
+- Invite people by email, or create staff accounts without email (workspace code +
+  username), with a forced password change on first sign-in.
+- Clock in and out from a phone. Overnight shifts and branch time zones are handled.
+- Ask for a time fix; a manager approves or rejects it.
+- See today's attendance, monthly timesheets and CSV exports (safe to open in Excel).
+- Keep the account safe: two-step verification, recovery codes, a list of signed-in
+  devices, and a tamper-evident audit log.
+
+**What gets built.** FastAPI modular monolith; Postgres with forced row-level security
+and composite foreign keys; Argon2id passwords, rotating refresh tokens with reuse
+detection, TOTP; roles with department scope; plans and limits as data; People and
+Attendance modules; English/Bangla web app; marketing site with pricing; CI with
+security scans; OpenTofu and a deploy pipeline (§7).
+
+**Done when** (all met)
+- The whole journey above works on phone and desktop, in both languages.
+- A test calls every API route that takes an ID with another workspace's IDs, and every
+  call is refused.
+- 105 API tests at ≥ 85% coverage; browser tests with automated accessibility checks.
+
+**Effort**: 12–18 days. **Status**: done 30 Sep 2026. The live deploy waits on the owner's
+cloud accounts (runbook in `docs/runbooks/deploy.md`).
+
+### M1.5: Marketing kit: **Done**
+
+**Why.** Turn M1 into portfolio and resume material while it is fresh.
+
+**What was made.** README with real screenshots, demo video script, one-page case study,
+resume bullets, LinkedIn post, architecture one-pager (`docs/marketing/`). Every claim
+is about built features and measured numbers.
+
+**Effort**: 3–4 days. **Status**: done.
+
+### M1.6: New design, Next.js, location-based attendance: **In progress**
+
+**Why.** The first UI reused the ResumeX look; the owner wants a design of its own. The
+owner also asked for Next.js and for attendance to be location-based. Doing this now,
+before more screens exist, is the cheapest point.
+
+**For whom.** Everyone who uses the app. Owners who need proof that staff clock in at
+work, not from home.
+
+**What people can do**
+- Use the **Atlas** design (§8): white mode by default, dark mode as an option, and a
+  choice of four accents (Plum by default, Saffron, Garnet, Ink). Each person's choice is
+  remembered on their device.
+- Owners place each branch on the map ("use my current location") and set a radius.
+- Staff can clock in only inside a branch area when location is required. The app
+  explains clearly when location is off, too imprecise or too far ("You're about 420 m
+  from Main branch").
+- Owners choose per workspace: location off, recorded only, or required (default).
+- Managers see, for every shift, whether clock-in and clock-out happened inside the
+  area, and how far away they were.
+
+**What gets built**
+- One **Next.js** app (App Router, TypeScript) for the marketing site and the product,
+  exported as static files to Cloudflare, so hosting stays $0. It replaces the separate
+  React app and the Astro site.
+- Per-page Content Security Policy with script hashes, generated at build time.
+- A new component kit (Radix primitives + Tailwind) and theme tokens.
+- API: branch coordinates and radius, attendance settings, geofence checks. Positions are
+  stored rounded to about 11 m, only at clock-in and clock-out, never tracked in between.
 
 **Done when**
-- A stranger can sign up at the production URL, create a workspace, invite a staff member
-  (with or without email), both clock in and out, and the owner sees the timesheet, in
-  English and in Bangla, on phone and desktop.
-- The cross-tenant suite passes for 100% of endpoints and tables. All M1 ASVS items in
-  §4.1–4.5 are checked off with evidence.
-- Coverage gates met. Zero high/critical findings in scans.
-- Measured infra cost at idle is $0 (plus domain).
+- Every M1 screen exists in the new app, in both modes and all four accents, with no
+  serious accessibility findings.
+- The browser tests pass against the static build with its real security headers.
+- Location tests cover inside, outside, imprecise, missing, unplaced branches and each
+  mode. (Done: 11 tests.)
 
-### M1.5: Marketing kit (as requested, after M1 exists), ~3–4 days
+**Effort**: 8–12 days. **Status**: API side done; web app being ported.
 
-Polished README with real screenshots/GIFs, landing page polish, demo video script,
-one-page case study, honest quantified resume bullets (from measured numbers: test
-counts, coverage, isolation suite size, cold start and p95 from k6, cost at idle),
-LinkedIn post, architecture one-pager. Only built features are claimed.
+### M2: Leave, payroll and data rights
 
-### M2: Leave + Payroll, ~15–20 days
+**Why.** After attendance, time off and pay are the next things every employer handles
+every month. They are also where mistakes cost real money, so they come before anything
+else is added.
 
-Leave types, balances, approvals. Payroll with the Bangladesh preset (basic/house
-rent/medical/conveyance, overtime from attendance, two festival bonuses, deductions,
-advances, tax deducted at source with **versioned, editable tax tables**), payroll run as a
-background job (draft → review → finalize → lock), payslip PDFs in English and Bangla,
-bank/wallet transfer sheet, custom roles (basic), workspace and personal data export.
-**Done when** a 500-employee sample workspace runs payroll in < 1 minute with every
-payroll edge case in §5.3 passing, and payslips render Bangla names correctly.
+**For whom.** Offices, agencies and factories with salaried staff, starting with
+Bangladesh.
 
-### M3: Shop pack (tea-stall ready), ~15–20 days
+**What people can do**
+- **Leave**: request time off (full or half days) and see what's left. Managers approve
+  or reject, with no self-approval. Owners set leave types (Bangladesh Labour Act defaults
+  such as casual, sick, earned and maternity; editable), holidays per branch and weekly
+  days off. Also: a team leave calendar, balances with yearly or monthly accrual,
+  carry-over and manual adjustments.
+- **Payroll**: set each person's salary structure (basic, house rent, medical,
+  conveyance). Run payroll as draft → review → finalize → lock, with overtime from
+  attendance, unpaid leave from Leave, two festival bonuses, advances and loans, and tax
+  deducted at source from versioned tax tables. Download payslips as PDF in English and
+  Bangla, and a bank or mobile-wallet transfer sheet.
+- **Data rights**: owners export the whole workspace. Each person exports their own
+  data. Workspace deletion has a grace period. Old audit entries are purged by plan.
+- **Admin safety**: owners can require two-step verification for admins.
 
-Catalog, **POS** (installable web app, receipts, cash drawer, shift close, returns),
-**Customers & dues** (baki khata, statements, WhatsApp reminder links), **Expenses**
-(photo receipts, categories, petty cash), device PIN for cashiers, Simple mode
-throughout. Queued offline sales (short connection drops) with idempotent sync.
-**Done when** a real small-shop owner (Q8) can run a day of sales and dues on a phone
+**What gets built.** Leave and Payroll modules; payroll as a background job; PDF
+rendering with Bangla shaping; export and deletion jobs; nightly encrypted backups to R2.
+New modules follow the AI-ready service pattern (§3.7) from the start.
+
+**Done when**
+- Every leave and payroll edge case in §5.3 has a passing test.
+- A 500-person sample workspace runs payroll in under a minute.
+- Payslips render Bangla names correctly (checked by a visual test).
+- An export can be restored into an empty workspace.
+
+**Effort**: 15–20 days.
+
+### M3: Work and knowledge
+
+**Why.** A 30-person agency runs on tasks, announcements and shared documents as much as
+on HR. Having them in the same place as people and attendance is what turns separate
+tools into one "operating system for the company". These records are also what the AI
+layer (M6–M7) needs to be useful, so the foundations for it are laid here.
+
+**For whom.** Agencies, offices and teams of 10–100 people.
+
+**What people can do**
+- **Tasks and projects**: create projects, assign tasks with due dates and priorities,
+  use comments and checklists, view a board or list, and see "my work" on the home screen.
+- **Announcements**: post to everyone, a branch or a department, and see who has read
+  each one.
+- **Documents and policies**: upload handbooks, SOPs and policies, and choose who can see
+  each (everyone, some roles, some departments). Keep versions. Ask people to
+  acknowledge a policy.
+- **Approvals**: one approvals inbox for leave, time fixes, expenses and purchases, with
+  single-step or multi-step chains by plan.
+- **Notifications**: an in-app notification center and email digests.
+- **Onboarding checklists**: new joiners get a checklist of tasks and documents to read.
+
+**What gets built**
+- The modules above.
+- A general **domain events** stream: the existing outbox, extended to every important
+  change. Automations and the weekly brief will read it.
+- **AI-ready foundations, with no AI yet** (§3.7):
+  - Business logic moves out of routes into typed service functions.
+  - A **capability registry** describes each read or write capability with its input
+    and output schemas and the permission it needs.
+  - A **context builder** turns a request into tenant, user, role, permissions,
+    department scope, branch, language and time zone.
+  - The REST API and later the AI both call the same capabilities.
+- Documents store their visibility metadata (tenant, roles, departments), ready for
+  permission-aware search.
+
+**Done when**
+- A 30-person sample agency can run a week of work entirely in the product: tasks,
+  announcements, a policy acknowledged by everyone, and leave approved through the inbox.
+- A test proves every capability enforces the same permission and department scope as
+  its REST route.
+
+**Effort**: 15–20 days.
+
+### M4: Pilot release
+
+**Why.** Real companies will show what matters faster than more building. Offer 3–5
+companies a free month: "We'll set up your company for free for a month; let's see if it
+replaces some of your current tools." Watch how they use it.
+
+**For whom.** The first pilot companies: 20–100 person agencies in Bangladesh, found
+through the owner's network (open question Q8).
+
+**What people can do**
+- Import people, departments and leave balances from a spreadsheet, with a preview and
+  clear errors.
+- See dashboards: attendance rate, lateness, leave taken, overdue tasks, headcount by
+  department. Save reports and get them by email on a schedule.
+- Get help in the app: a help center, and contact support from any screen.
+
+**What gets built**
+- Reporting views (aggregates that later also serve the AI).
+- The import tool.
+- The **live deploy** on the owner's accounts (runbook), a status page and uptime checks.
+- A backup restore drill, and product analytics without personal data.
+- A feedback channel and a pilot playbook: setup call, week-1 check-in, week-4 review.
+
+**Done when**
+- At least three companies have used the product for two weeks with their real staff.
+- Every pilot's top three problems are either fixed or written down with a decision.
+- A restore from backup has been tested.
+
+**Effort**: 8–12 days, plus the pilot weeks, which run in parallel with M5.
+
+### M5: Billing with Paddle
+
+**Why.** Pilots that find value should be able to pay without talking to anyone. Billing
+comes before the AI because AI has a running cost per use, so it has to sit on paid
+plans.
+
+**For whom.** Pilot companies turning into customers; every new sign-up after that.
+
+**What people can do.** Choose a plan and pay by card or other methods through Paddle
+(monthly or yearly, with regional prices). Get invoices, upgrade or downgrade, and
+cancel. Failed payments get reminders and a grace period, then read-only mode, never
+lost data.
+
+**What gets built.** Everything in §6: checkout, signed webhooks, provisioning, dunning,
+reconciliation job, sandbox test plan, Paddle domain review, go-live.
+
+**Done when**: every subscription lifecycle path passes in the sandbox, and a week of
+test subscriptions shows zero reconciliation mismatches.
+
+**Effort**: 8–12 days.
+
+### M6: AI copilot (read-only)
+
+**Why.** This is where the product becomes more than "Zoho for small teams". An owner
+can ask a question instead of clicking through five screens. The answer comes from the
+company's own data, only what that person is allowed to see, with sources. It is
+read-only first, so trust is earned before the AI can change anything.
+
+**For whom.** Owners, managers and HR on paid plans. Staff get the self-service parts
+("How many leave days do I have left?").
+
+**What people can do**
+- **Ask my company**: "Who was absent more than twice this month?", "How many days of
+  leave do I have left?", "What's outstanding across projects?". The same question gives
+  each person a different, correctly scoped answer: staff see their own data, managers
+  their department, HR the whole company.
+- **Policy Q&A**: "What's our work-from-home policy?" gets an answer with links to the
+  exact document passages. If the documents don't say, the answer says so.
+- **Search**: one box that finds people, tasks, documents and records by meaning, not
+  only by exact words.
+- **Company brief**: a weekly summary for owners and managers (joiners, leave, attendance
+  rate, overdue tasks, "needs attention"). Every line links to the data behind it.
+
+**What gets built**
+- The AI layer in §3.7: provider port, tool router over the M3 capabilities, and
+  permission-aware retrieval with pgvector in the same Postgres, under the same row-level
+  security.
+- Answers must cite their sources.
+- Guardrails: retrieved text is treated as data, never as instructions.
+- Per-workspace monthly AI allowance by plan, a cost dashboard, and an evaluation suite
+  of known questions with expected answers.
+
+**Done when**
+- The evaluation suite passes: correct answers, correct refusals, and no answer ever
+  contains data outside the asker's scope. There is a dedicated cross-tenant and
+  cross-department leakage test, like the M1 isolation test.
+- AI is off until the owner turns it on and accepts the AI terms.
+- AI cost per active workspace is measured and fits within the plan price.
+
+**Effort**: 12–16 days.
+
+### M7: AI actions and automation
+
+**Why.** Once people trust the answers, let the AI save them work, always with a person
+confirming.
+
+**For whom.** Owners, managers and HR on Growth and above.
+
+**What people can do**
+- **Actions with confirmation**: "Create a task for Sarah to finish the onboarding
+  documents by Friday", "Remind everyone whose onboarding isn't complete". The AI shows
+  exactly what it will do; nothing happens until the person confirms.
+- **Automations in plain language**: "Every Monday at 9, remind people with overdue
+  tasks." The AI turns this into an automation the person reviews and switches on.
+  Automations can also be built by hand in the same editor.
+- **Early-warning signals**: for example "attendance in Team A dropped 18% this month",
+  "Project X has an elevated risk of missing its deadline", or "these three people have
+  an unusually heavy workload". These help managers decide; they never judge anyone
+  automatically.
+
+**What gets built**
+- **Write capabilities** with a propose → confirm → execute flow. Execution runs through
+  the same permission checks as the API, and each action is recorded in the audit log as
+  "via AI" with the conversation it came from.
+- A **workflow engine**: triggers (schedule, domain event), conditions, and actions
+  (notify, create task, request approval). Workflow definitions are JSON checked against
+  a schema, and run through Cloud Scheduler and Cloud Tasks.
+- Signals: simple statistics first (trends, outliers against the team's own history),
+  explained in words. Individual-level signals can be switched off by the workspace, and
+  people are told they exist.
+
+**Done when**
+- No AI-initiated change can happen without a confirmation, and a test proves it.
+- Automations are rate-limited, can be paused, and show a run history.
+- Signals show why they fired, and can be dismissed.
+
+**Effort**: 15–20 days.
+
+### M8: Shop pack
+
+**Why.** The product is meant to work from a tea stall up. Small shops need selling and
+dues more than HR, and Simple mode (§8.7) is designed for them.
+
+**For whom.** Tea stalls, small shops, restaurants and cafés.
+
+**What people can do**
+- **Point of sale**: sell from a phone or tablet (an installable web app) with big
+  buttons, receipts, a cash drawer, shift close and returns. Short connection drops are
+  queued and synced later.
+- **Customers and dues** ("baki khata"): who owes what, collecting payments, statements,
+  and reminder links to share on WhatsApp.
+- **Expenses**: record spending with a photo of the receipt, categories and petty cash.
+- **Cashier PINs**: cashiers sign in with a device PIN.
+
+**What gets built.** Catalog, POS, Customers, Expenses modules; idempotent offline sync;
+the capabilities for AI questions such as "What were yesterday's sales?".
+
+**Done when**: a real small-shop owner can run a day of sales and dues on a phone
 without help.
 
-### M4: Inventory + Accounting, ~20–25 days
+**Effort**: 15–20 days.
 
-Stock ledger, purchases and suppliers, transfers, counts, low-stock alerts, weighted
-average cost. Double-entry ledger with automatic postings from sales, expenses, payroll
-and purchases (with backfill for workspaces that turn it on later). Cash book, P&L,
-balance sheet, trial balance, period close. **Done when** property tests prove the
-ledger always balances and stock always reconciles across 10k random operations.
+### M9: Inventory and accounting
 
-### M5: Reports, dashboards, approvals, tasks, ~10–14 days
+**Why.** Growing shops and companies need stock and books. Both sit on top of sales,
+purchases, expenses and payroll, so they come after those exist.
 
-Dashboards across modules, saved and scheduled reports, XLSX/PDF export, an approvals
-engine used by leave, expenses and purchases, the Tasks module, a notification center
-with email digests.
+**For whom.** Retail with branches, restaurants, factories, and any company that wants
+its books in one place.
 
-### M6: Billing with Paddle, ~8–12 days
+**What people can do**
+- **Inventory**: stock by branch, purchases and suppliers, transfers, stock counts,
+  low-stock alerts and weighted average cost.
+- **Accounting**: books that fill themselves from sales, expenses, payroll and purchases.
+  Cash book, profit and loss, balance sheet, trial balance and period close.
 
-Everything in §6: checkout, webhooks, provisioning, renewals, dunning, suspension,
-cancellation and retention, reconciliation, sandbox test plan, Paddle domain review,
-go-live. **Done when** every lifecycle path passes in the sandbox and the reconciliation
-job shows zero mismatches over a week of test subscriptions.
+**What gets built.** A stock movement ledger and a double-entry ledger with automatic
+postings, including backfill for workspaces that turn accounting on later.
 
-### M7: Enterprise, ~20–30 days
+**Done when**: property tests prove that the ledger always balances and stock always
+reconciles across 10,000 random operations.
 
-SSO (OIDC, then SAML), SCIM, passkeys, field-level custom roles, IP allowlist, API keys
-and outbound webhooks (with SSRF guard), audit export, dedicated-database routing and
-tenant move job, time-partitioned big tables, read replica for reports, k6 at
-enterprise size (10k employees).
+**Effort**: 20–25 days.
 
-### M8: Launch hardening, ~7–10 days
+### M10: Enterprise
 
-Full ASVS L2 self-assessment signed off, ZAP full scan, dependency and permission
-review, restore drill, incident runbooks, status page, final legal pages.
+**Why.** Large companies need central sign-in, automatic user provisioning, integrations
+and stronger isolation, and some need their data to never leave their environment.
 
-**Total**: roughly 125–170 focused days for the full suite. **M1 is the first resume
-milestone**. M1–M3 make a complete product for small businesses. M4–M8 make it complete
-for larger companies.
+**For whom.** Companies with hundreds to thousands of employees; regulated customers.
+
+**What people can do**
+- Sign in with the company's identity provider (OIDC, then SAML). Users are created and
+  removed automatically (SCIM). Passkeys.
+- Field-level custom roles and an IP allowlist.
+- API keys and signed outbound webhooks. Audit log export.
+- A dedicated database.
+- **Bring their own AI model** (their own provider account, or a private model in their
+  environment).
+
+**What gets built.** Identity integrations, API keys with scoped permissions, a webhook
+delivery service with SSRF protection, tenant-to-database routing and a move job,
+time-partitioned big tables, a read replica for reports, and AI provider selection per
+workspace. Load tests at 10,000 employees.
+
+**Effort**: 20–30 days.
+
+### M11: Launch hardening
+
+**Why.** Before marketing broadly, everything should hold up to an outside review.
+
+**What gets built.** Full ASVS L2 self-assessment signed off with evidence, a full ZAP
+scan, a dependency and permission review, an AI red-team pass (prompt injection, data
+leakage, over-broad actions), a restore drill, incident runbooks, a public status page
+and final legal pages reviewed by a lawyer (Q7).
+
+**Effort**: 7–10 days.
 
 ---
 
@@ -961,7 +1448,8 @@ not all at once, and some parts cost money or time that the budget does not cove
 | "Immutable" audit log | Tamper-evident (hash chain, DB permissions, external anchor), not legally notarized. State it that way. |
 | $0 at zero tenants | $0 compute and data. **The domain (~$12/yr) is the one fixed cost.** |
 | $50/month cap at 100+ tenants | Achievable to about 100 small tenants. Beyond that, costs scale with revenue, and the cap should rise with it. |
-| Payments | Deferred to M6 (owner decision). Local gateways (bKash/SSLCommerz) are a separate decision (Q4). |
+| Payments | Deferred to M5 (owner decision). Local gateways (bKash/SSLCommerz) are a separate decision (Q4). |
+| AI | Built on the capability layer (M3), read-only first (M6), actions and automation after (M7). Paid plans only, with a monthly allowance, so AI cost scales with revenue. No fine-tuning or self-hosted models until an enterprise customer pays for it (M10). |
 
 ---
 
@@ -978,6 +1466,10 @@ not all at once, and some parts cost money or time that the budget does not cove
 | Scope too large for one developer | Slow finish | Strict milestone order, each shippable. Cuts in §10 |
 | Vendor free-tier changes (Neon, Cloud Run, Cloudflare) | Cost increase | Ports for storage/email/DB DSN. Budget alerts. Costs re-checked each milestone |
 | A Bangla rendering bug in PDFs | Bad payslips | Visual tests of Bangla PDFs in CI |
+| AI answer leaks data across people or companies | Critical: loss of trust | AI only calls capabilities that enforce the same checks as the API; retrieval under RLS; leakage probes in the M6 evaluation suite |
+| AI takes an unwanted action | Harm, loss of trust | Propose → confirm → execute; nothing written without a person's confirmation; audit entries marked `via: ai` |
+| AI cost grows faster than revenue | Budget | AI only on paid plans, monthly allowance per workspace, small models by default, caching, budget alerts |
+| Location check-in fooled or unfair | Wrong records, staff complaints | Distance and accuracy are shown to managers; clock-out never blocked; "record only" mode; positions stored rounded, only at clock events |
 
 ### Questions for the owner
 
@@ -990,7 +1482,7 @@ prices (§2.4). Module order: build all of them, in the order of §9. Still open
    This session cannot push tags.
 2. *(answered)*
 3. *(answered)*
-4. **Local payments.** Should a bKash/SSLCommerz option be planned after M6? It needs a
+4. **Local payments.** Should a bKash/SSLCommerz option be planned after M5? It needs a
    trade licence and business bank account in Bangladesh.
 5. **Paddle account.** Will this use the same Paddle account as ResumeX, or a new one?
 6. *(answered: all modules, in the §9 order)*

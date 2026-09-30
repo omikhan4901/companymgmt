@@ -31,11 +31,6 @@ accounts to go live (see `runbooks/deploy.md`).
 - Push the `legacy-nsu-327` tag in the legacy repo (command in the plan, §11 Q1).
 - Cloud accounts for deployment (runbook).
 - Legal review of the privacy policy and terms (plan Q7).
-- UI redesign and stack (asked 2026-09-30): the first UI looked too much like ResumeX.
-  Pick a direction in `docs/design/directions/` (A Graphite, B Shift, C Atlas, or A for
-  managers + B for staff phones) and confirm the stack: Next.js for web + site (proposed),
-  keeping FastAPI (proposed) or rewriting the API in NestJS. M2 is paused until then,
-  because both answers change what gets built next.
 
 ## Decisions made while building
 
@@ -56,9 +51,20 @@ README with real screenshots (demo data from `api/scripts/demo_seed.py`), and in
 `docs/marketing/`: demo video script, case study, resume bullets, LinkedIn post,
 architecture one-pager. Only built features and measured numbers.
 
-## Next: redesign, then M2
+## M1.6: in progress (new design, Next.js, location-based attendance)
 
-- Rebuild the web app and marketing site in Next.js with the chosen design.
+- Done: location-checked clock-in on the API (branch geofences, settings off / record /
+  require, 11 tests; 116 API tests, 90.5% coverage).
+- Done: Atlas design chosen (white default, dark option, accents Plum / Saffron / Garnet /
+  Ink); theme tokens and switching in the new app.
+- In progress: one Next.js app (`web-next/`, replacing `web/` and `site/` when it reaches
+  parity), static export with per-page CSP hashes.
+
+## Next
+
+The roadmap was reordered on 30 Sep 2026 for the first market (20–100 person agencies)
+and the AI layer. See `IMPLEMENTATION_PLAN.md` §9: M2 leave, payroll and data rights; M3
+work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 
 - M2: Leave, Payroll (Bangladesh preset), workspace/personal export and deletion,
   nightly encrypted backups, audit retention, MFA policy for admins.
@@ -67,3 +73,4 @@ architecture one-pager. Only built features and measured numbers.
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
 - 2026-09-30: Owner asked for a new design and a Next.js/NestJS stack. Three design directions drawn (`docs/design/directions/`); M2 Leave paused pending the choice.
+- 2026-09-30: Atlas chosen (C, white default, four accents). Location-based attendance on the API. Plan rewritten: every milestone explained, AI-ready architecture (§3.7), first market (§2.0), roadmap reordered.
