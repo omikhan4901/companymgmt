@@ -3,7 +3,7 @@ import { App, Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Tabs }
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { type Dayjs } from "dayjs";
 import { ClipboardList, Download, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
@@ -341,6 +341,13 @@ function TimesheetTab() {
   const [month, setMonth] = useState<Dayjs>(dayjs());
   const key = month.format("YYYY-MM");
   const sheet = useQuery({ queryKey: ["attendance", "timesheet", key], queryFn: () => api<Timesheet>("/v1/attendance/timesheet", { query: { month: key } }) });
+  const tableRef = useRef<HTMLDivElement>(null);
+  // In the current month, open scrolled to the most recent days.
+  useEffect(() => {
+    if (!sheet.data || !month.isSame(dayjs(), "month")) return;
+    const el = tableRef.current?.querySelector<HTMLElement>(".ant-table-content, .ant-table-body");
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [sheet.data, month]);
   const [range, setRange] = useState<[Dayjs, Dayjs]>([month.startOf("month"), month.endOf("month")]);
   const { message } = App.useApp();
   const days = useMemo(() => {
@@ -388,7 +395,9 @@ function TimesheetTab() {
           </span>
         ) : null}
       </div>
-      <DataTable<Row> rowKey="employee_id" size="small" columns={columns} dataSource={sheet.data?.rows ?? []} loading={sheet.isPending} pagination={false} scroll={{ x: 400 + days.length * 52 }} bordered />
+      <div ref={tableRef}>
+      <DataTable<Row> rowKey="employee_id" size="small" columns={columns} dataSource={sheet.data?.rows ?? []} loading={sheet.isPending} pagination={false} scroll={{ x: 400 + days.length * 52 }} bordered aria-label={t("attendance.tabs.timesheet")} />
+      </div>
     </>
   );
 }
