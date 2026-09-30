@@ -11,7 +11,10 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 - Work on and push to `main` only. Small conventional commits (`feat:`, `fix:`, `test:`,
   `docs:`, `chore:`, `refactor:`).
 - **Run `scripts/check.sh` before every push.** Push only when it passes. Never leave
-  `main` broken.
+  `main` broken. Gate the commit/push on the script's own exit code
+  (`./scripts/check.sh > log; [ $? -eq 0 ] && git push`), never on a pipe into `grep`.
+- Never `pkill -f`/`pgrep -f` a pattern that appears in your own command line (it kills the
+  shell). Stop local servers with a small script file that matches by PID.
 - Never commit secrets. Every variable goes in `.env.example` with no value.
 - This session cannot push git tags.
 
