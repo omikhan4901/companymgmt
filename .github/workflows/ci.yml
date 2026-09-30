@@ -57,7 +57,7 @@ jobs:
         run: E2E=1 scripts/check.sh
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: web/playwright-report
