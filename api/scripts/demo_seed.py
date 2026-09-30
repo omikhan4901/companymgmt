@@ -114,9 +114,15 @@ def main() -> None:
         headers=h,
     ).json()
     workspace_code = staff["workspace_code"]
-    s = c.post("/v1/auth/login", json={"workspace": workspace_code, "username": "nadia", "password": PASSWORD})
+    s = c.post(
+        "/v1/auth/login", json={"workspace": workspace_code, "username": "nadia", "password": PASSWORD}
+    )
     sh = {"authorization": f"Bearer {s.json()['access_token']}"}
-    c.post("/v1/auth/password/change", json={"current_password": PASSWORD, "new_password": PASSWORD + "!"}, headers=sh)
+    c.post(
+        "/v1/auth/password/change",
+        json={"current_password": PASSWORD, "new_password": PASSWORD + "!"},
+        headers=sh,
+    )
     yesterday = datetime(today.year, today.month, today.day, 9, 0, tzinfo=DHAKA) - timedelta(days=1)
     c.post(
         "/v1/attendance/corrections",
