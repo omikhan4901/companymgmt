@@ -7,7 +7,8 @@ const tones = {
   error: { box: "bg-danger-soft text-danger-text", icon: XCircle },
   warn: { box: "bg-warn-soft text-warn-text", icon: AlertTriangle },
   success: { box: "bg-success-soft text-success-text", icon: CheckCircle2 },
-  info: { box: "bg-accent-soft text-accent-soft-text", icon: Info },
+  // Neutral, not the accent: with a red or amber accent, info must not look like an error.
+  info: { box: "border border-border bg-surface text-text [&>svg]:text-muted", icon: Info },
 } as const;
 
 /** An inline message. Errors are announced to screen readers. */

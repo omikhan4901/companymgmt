@@ -24,6 +24,7 @@ const types = {
 
 function parseHeaders() {
   const rules = [];
+  if (!existsSync(join(root, "_headers"))) return rules;
   let current = null;
   for (const line of readFileSync(join(root, "_headers"), "utf8").split("\n")) {
     if (!line.trim()) continue;
@@ -37,7 +38,18 @@ function parseHeaders() {
   }
   return rules;
 }
-const rules = parseHeaders();
+// Re-read after each build: the per-page script hashes change with the pages.
+let rules = [];
+let rulesMtime = 0;
+function currentRules() {
+  const file = join(root, "_headers");
+  const mtime = existsSync(file) ? statSync(file).mtimeMs : 0;
+  if (mtime !== rulesMtime) {
+    rules = parseHeaders();
+    rulesMtime = mtime;
+  }
+  return rules;
+}
 
 function matches(pattern, path) {
   if (pattern.endsWith("*")) return path.startsWith(pattern.slice(0, -1));
@@ -81,7 +93,7 @@ http
       route = "/404";
     }
     const headers = { "content-type": types[extname(file)] ?? "application/octet-stream" };
-    for (const rule of rules) {
+    for (const rule of currentRules()) {
       if (matches(rule.pattern, route) || matches(rule.pattern, url.pathname)) {
         for (const [name, value] of rule.headers) headers[name] = value;
       }

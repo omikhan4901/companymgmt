@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "./client";
-import type { AttendanceStatus, Branch, Correction, Department, Plan, Present, Role } from "./types";
+import type { AttendanceSettings, AttendanceStatus, Branch, Correction, Department, Plan, Present, Role, Timesheet } from "./types";
 
 export const keys = {
   status: ["attendance", "status"] as const,
@@ -70,4 +70,16 @@ export function departmentOptions(departments: Department[] | undefined): { valu
   };
   walk(null, 0);
   return out;
+}
+
+export function useTimesheet(month: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.timesheet(month),
+    queryFn: () => api<Timesheet>("/v1/attendance/timesheet", { query: { month } }),
+    enabled,
+  });
+}
+
+export function useAttendanceSettings(enabled = true) {
+  return useQuery({ queryKey: ["attendance", "settings"], queryFn: () => api<AttendanceSettings>("/v1/attendance/settings"), enabled });
 }
