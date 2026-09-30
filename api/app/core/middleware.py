@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import json
 import secrets
 import time
@@ -43,6 +44,7 @@ class RequestContextMiddleware:
         self.app = app
         settings = get_settings()
         self.trust_proxy = settings.trust_proxy_headers
+        self.proxy_token = settings.proxy_token.get_secret_value().encode()
         self.hsts = settings.is_production_like
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -52,7 +54,16 @@ class RequestContextMiddleware:
         headers = {k.decode().lower(): v.decode("latin-1") for k, v in scope.get("headers", [])}
         request_id = secrets.token_hex(8)
         ip = scope.get("client", (None,))[0] if scope.get("client") else None
-        if self.trust_proxy and headers.get("x-forwarded-for"):
+        if self.proxy_token:
+            via_proxy = hmac.compare_digest(headers.get("x-cm-proxy-token", "").encode(), self.proxy_token)
+            if via_proxy:
+                ip = headers.get("x-cm-client-ip") or ip
+            elif scope.get("path", "").startswith("/v1/"):
+                await self._reject(
+                    send, 403, "direct_access", "Use the web address, not the API address.", request_id
+                )
+                return
+        elif self.trust_proxy and headers.get("x-forwarded-for"):
             # Cloud Run / Cloudflare append the real client; take the left-most entry.
             ip = headers["x-forwarded-for"].split(",")[0].strip()
         context.bind(

@@ -41,6 +41,7 @@ locals {
     "field-encryption-keys",
     "smtp-url",
     "internal-token",
+    "proxy-token",
   ]
 }
 

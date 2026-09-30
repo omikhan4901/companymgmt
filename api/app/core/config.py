@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     db_pool_size: int = 5
     db_max_overflow: int = 5
 
-    web_base_url: str = "http://localhost:5173"
-    cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=lambda: ["http://localhost:5173"])
+    web_base_url: str = "http://localhost:3000"
+    cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=lambda: ["http://localhost:3000"])
 
     # Ed25519 keys in PEM. Generated per process in dev/test when empty.
     jwt_private_key: SecretStr = SecretStr("")
@@ -61,6 +61,12 @@ class Settings(BaseSettings):
     internal_token: SecretStr = SecretStr("")
 
     trust_proxy_headers: bool = False
+    # Shared with the Cloudflare Pages Function that serves /v1 on the web origin. When
+    # set, /v1 requests must come through that proxy (header X-CM-Proxy-Token), and the
+    # client IP comes from the X-CM-Client-IP it adds (Cloudflare's CF-Connecting-IP), so
+    # nobody can dodge per-IP rate limits by calling the API directly with a forged
+    # X-Forwarded-For.
+    proxy_token: SecretStr = SecretStr("")
     sentry_dsn: SecretStr = SecretStr("")
 
     @field_validator("cors_origins", mode="before")
