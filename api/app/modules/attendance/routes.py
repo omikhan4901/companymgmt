@@ -338,151 +338,21 @@ async def list_corrections(
     status: Literal["pending", "approved", "rejected", "cancelled", "all"] = "pending",
     mine: bool = False,
 ) -> list[CorrectionOut]:
-    query = select(AttendanceCorrection, Employee.full_name).join(
-        Employee,
-        and_(
-            Employee.tenant_id == AttendanceCorrection.tenant_id,
-            Employee.id == AttendanceCorrection.employee_id,
-        ),
-    )
-    if mine or not ctx.can(access.APPROVE):
-        employee = await _me(ctx)
-        query = query.where(AttendanceCorrection.employee_id == employee.id)
-    else:
-        scope = await scope_departments(ctx)
-        if scope is not None:
-            query = query.where(Employee.department_id.in_(scope))
-    if status != "all":
-        query = query.where(AttendanceCorrection.status == status)
-    rows = (await ctx.db.execute(query.order_by(AttendanceCorrection.created_at.desc()).limit(500))).all()
-    return [correction_out(c, name) for c, name in rows]
-
-
-async def _pending_correction(ctx: Ctx, correction_id: uuid.UUID) -> tuple[AttendanceCorrection, Employee]:
-    correction = await ctx.db.scalar(
-        select(AttendanceCorrection).where(AttendanceCorrection.id == correction_id).with_for_update()
-    )
-    if correction is None:
-        raise NotFound()
-    employee = await _scoped_employee(ctx, correction.employee_id)
-    if correction.status != "pending":
-        raise Conflict("This request was already decided.", code="already_decided")
-    return correction, employee
+    return await service.list_corrections(ctx, status=status, mine=mine)
 
 
 @router.post("/corrections/{correction_id}/approve", response_model=CorrectionOut)
 async def approve_correction(
     correction_id: uuid.UUID, body: DecisionIn, ctx: Ctx = Depends(allow(access.APPROVE, module=MODULE))
 ) -> CorrectionOut:
-    correction, employee = await _pending_correction(ctx, correction_id)
-    if correction.requested_by == ctx.user.id and not ctx.is_owner:
-        raise Forbidden("Someone else has to approve your own request.", code="self_approval")
-    record = None
-    if correction.record_id is not None:
-        record = await ctx.db.scalar(
-            select(AttendanceRecord).where(AttendanceRecord.id == correction.record_id).with_for_update()
-        )
-    if correction.kind == "add":
-        assert correction.proposed_clock_in_at
-        assert correction.proposed_clock_out_at
-        branch_id = await default_branch(ctx.db, employee)
-        record = AttendanceRecord(
-            employee_id=employee.id,
-            branch_id=branch_id,
-            business_date=await business_date_for(ctx.db, branch_id, correction.proposed_clock_in_at),
-            clock_in_at=correction.proposed_clock_in_at,
-            clock_out_at=correction.proposed_clock_out_at,
-            minutes=minutes_between(correction.proposed_clock_in_at, correction.proposed_clock_out_at),
-            status="closed",
-            source="correction",
-            note=correction.reason[:500],
-            created_by=ctx.user.id,
-        )
-        ctx.db.add(record)
-        await save(ctx.db, record)
-        correction.record_id = record.id
-    elif correction.kind == "change":
-        if record is None:
-            raise Conflict("The record no longer exists.", code="record_gone")
-        assert correction.proposed_clock_in_at
-        assert correction.proposed_clock_out_at
-        record.clock_in_at = correction.proposed_clock_in_at
-        record.clock_out_at = correction.proposed_clock_out_at
-        record.business_date = await business_date_for(ctx.db, record.branch_id, record.clock_in_at)
-        record.minutes = minutes_between(record.clock_in_at, record.clock_out_at)
-        record.status = "closed"
-        await save(ctx.db, record)
-    elif record is not None:
-        await ctx.db.delete(record)
-        correction.record_id = None
-    correction.status = "approved"
-    correction.decided_by = ctx.user.id
-    correction.decided_at = utcnow()
-    correction.decision_note = body.note
-    await ctx.db.flush()
-    await audit.record(
-        ctx.db,
-        "attendance.correction_approved",
-        target_type="attendance_correction",
-        target_id=correction.id,
-        data={
-            "kind": correction.kind,
-            "employee": employee.full_name,
-            "clock_in_at": correction.proposed_clock_in_at,
-            "clock_out_at": correction.proposed_clock_out_at,
-        },
-    )
-    await events.emit(
-        ctx.db,
-        "attendance.correction_approved",
-        subject_type="attendance_correction",
-        subject_id=correction.id,
-        data={
-            "employee_id": employee.id,
-            "employee_name": employee.full_name,
-            "department_id": employee.department_id,
-            "membership_id": employee.membership_id,
-            "kind": correction.kind,
-            "status": correction.status,
-        },
-    )
-    await ctx.db.commit()
-    return correction_out(correction, employee.full_name)
+    return await service.approve_correction(ctx, correction_id, body.note)
 
 
 @router.post("/corrections/{correction_id}/reject", response_model=CorrectionOut)
 async def reject_correction(
     correction_id: uuid.UUID, body: DecisionIn, ctx: Ctx = Depends(allow(access.APPROVE, module=MODULE))
 ) -> CorrectionOut:
-    correction, employee = await _pending_correction(ctx, correction_id)
-    correction.status = "rejected"
-    correction.decided_by = ctx.user.id
-    correction.decided_at = utcnow()
-    correction.decision_note = body.note
-    await ctx.db.flush()
-    await audit.record(
-        ctx.db,
-        "attendance.correction_rejected",
-        target_type="attendance_correction",
-        target_id=correction.id,
-        data={"employee": employee.full_name, "note": body.note},
-    )
-    await events.emit(
-        ctx.db,
-        "attendance.correction_rejected",
-        subject_type="attendance_correction",
-        subject_id=correction.id,
-        data={
-            "employee_id": employee.id,
-            "employee_name": employee.full_name,
-            "department_id": employee.department_id,
-            "membership_id": employee.membership_id,
-            "kind": correction.kind,
-            "status": correction.status,
-        },
-    )
-    await ctx.db.commit()
-    return correction_out(correction, employee.full_name)
+    return await service.reject_correction(ctx, correction_id, body.note)
 
 
 @router.post("/corrections/{correction_id}/cancel", response_model=CorrectionOut)
