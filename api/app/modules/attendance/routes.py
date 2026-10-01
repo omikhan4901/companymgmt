@@ -19,6 +19,7 @@ from app.core import audit
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound
 from app.core.http import check_if_match, decode_cursor, encode_cursor, set_etag
 from app.core.schema import In, Note, Out, Page
+from app.core.spreadsheet import safe_cell
 from app.core.time import today, utcnow
 from app.modules.attendance import access, geo
 from app.modules.attendance.models import AttendanceCorrection, AttendanceRecord, AttendanceSettings
@@ -919,14 +920,6 @@ async def timesheet(
     )
 
 
-def _csv_safe(value: object) -> str:
-    """Stop spreadsheet apps from running cell contents as formulas."""
-    text = "" if value is None else str(value)
-    if text and text[0] in ("=", "+", "-", "@", "\t", "\r"):
-        return "'" + text
-    return text
-
-
 @router.get("/export.csv")
 async def export_csv(
     start: date = Query(alias="from"),
@@ -970,7 +963,7 @@ async def export_csv(
     for r, e in rows:
         writer.writerow(
             [
-                _csv_safe(v)
+                safe_cell(v)
                 for v in (
                     r.business_date.isoformat(),
                     e.full_name,
