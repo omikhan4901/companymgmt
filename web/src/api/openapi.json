@@ -641,6 +641,75 @@
     "title": "CalendarEntry",
     "type": "object"
    },
+   "ChecklistIn": {
+    "additionalProperties": false,
+    "properties": {
+     "text": {
+      "maxLength": 300,
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "ChecklistIn",
+    "type": "object"
+   },
+   "ChecklistItemOut": {
+    "properties": {
+     "done": {
+      "title": "Done",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "text",
+     "done"
+    ],
+    "title": "ChecklistItemOut",
+    "type": "object"
+   },
+   "ChecklistPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "done": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Done"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     }
+    },
+    "title": "ChecklistPatch",
+    "type": "object"
+   },
    "ClockIn": {
     "additionalProperties": false,
     "properties": {
@@ -736,6 +805,63 @@
      "code"
     ],
     "title": "CodeIn",
+    "type": "object"
+   },
+   "CommentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "body": {
+      "maxLength": 5000,
+      "title": "Body",
+      "type": "string"
+     }
+    },
+    "required": [
+     "body"
+    ],
+    "title": "CommentIn",
+    "type": "object"
+   },
+   "CommentOut": {
+    "properties": {
+     "author_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Author Name"
+     },
+     "body": {
+      "title": "Body",
+      "type": "string"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "mine": {
+      "title": "Mine",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "id",
+     "author_name",
+     "mine",
+     "body",
+     "created_at"
+    ],
+    "title": "CommentOut",
     "type": "object"
    },
    "CorrectionIn": {
@@ -3130,6 +3256,37 @@
     "title": "ModulesIn",
     "type": "object"
    },
+   "MoveIn": {
+    "additionalProperties": false,
+    "properties": {
+     "after_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "After Id"
+     },
+     "status": {
+      "enum": [
+       "todo",
+       "doing",
+       "done"
+      ],
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "status"
+    ],
+    "title": "MoveIn",
+    "type": "object"
+   },
    "NotificationOut": {
     "properties": {
      "actor_name": {
@@ -3816,6 +3973,25 @@
     "title": "PersonBalances",
     "type": "object"
    },
+   "PersonRef": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name"
+    ],
+    "title": "PersonRef",
+    "type": "object"
+   },
    "PlanOut": {
     "properties": {
      "features": {
@@ -4037,6 +4213,274 @@
      }
     },
     "title": "ProfileIn",
+    "type": "object"
+   },
+   "ProjectIn": {
+    "additionalProperties": false,
+    "properties": {
+     "color": {
+      "default": "#6d28d9",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "title": "Color",
+      "type": "string"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "member_ids": {
+      "items": {
+       "format": "uuid",
+       "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Member Ids",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "ProjectIn",
+    "type": "object"
+   },
+   "ProjectOut": {
+    "properties": {
+     "can_manage": {
+      "title": "Can Manage",
+      "type": "boolean"
+     },
+     "color": {
+      "title": "Color",
+      "type": "string"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "done_tasks": {
+      "title": "Done Tasks",
+      "type": "integer"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "members": {
+      "items": {
+       "$ref": "#/components/schemas/PersonRef"
+      },
+      "title": "Members",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "open_tasks": {
+      "title": "Open Tasks",
+      "type": "integer"
+     },
+     "overdue_tasks": {
+      "title": "Overdue Tasks",
+      "type": "integer"
+     },
+     "status": {
+      "enum": [
+       "active",
+       "archived"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "description",
+     "department_id",
+     "members",
+     "status",
+     "color",
+     "due_date",
+     "open_tasks",
+     "done_tasks",
+     "overdue_tasks",
+     "can_manage",
+     "version"
+    ],
+    "title": "ProjectOut",
+    "type": "object"
+   },
+   "ProjectPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "color": {
+      "anyOf": [
+       {
+        "pattern": "^#[0-9a-fA-F]{6}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Color"
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "member_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 500,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Member Ids"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "enum": [
+         "active",
+         "archived"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     }
+    },
+    "title": "ProjectPatch",
     "type": "object"
    },
    "PublicPlan": {
@@ -6131,6 +6575,544 @@
      "tenant_id"
     ],
     "title": "SwitchIn",
+    "type": "object"
+   },
+   "TaskDetail": {
+    "properties": {
+     "assignee": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/PersonRef"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "can_delete": {
+      "title": "Can Delete",
+      "type": "boolean"
+     },
+     "checklist": {
+      "items": {
+       "$ref": "#/components/schemas/ChecklistItemOut"
+      },
+      "title": "Checklist",
+      "type": "array"
+     },
+     "checklist_done": {
+      "title": "Checklist Done",
+      "type": "integer"
+     },
+     "checklist_total": {
+      "title": "Checklist Total",
+      "type": "integer"
+     },
+     "comments": {
+      "title": "Comments",
+      "type": "integer"
+     },
+     "completed_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Completed At"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By Name"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "overdue": {
+      "title": "Overdue",
+      "type": "boolean"
+     },
+     "position": {
+      "title": "Position",
+      "type": "number"
+     },
+     "priority": {
+      "enum": [
+       "low",
+       "normal",
+       "high",
+       "urgent"
+      ],
+      "title": "Priority",
+      "type": "string"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "status": {
+      "enum": [
+       "todo",
+       "doing",
+       "done"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "description",
+     "project_id",
+     "project_name",
+     "status",
+     "priority",
+     "assignee",
+     "due_date",
+     "overdue",
+     "position",
+     "completed_at",
+     "created_at",
+     "created_by_name",
+     "checklist_done",
+     "checklist_total",
+     "comments",
+     "can_delete",
+     "version",
+     "checklist"
+    ],
+    "title": "TaskDetail",
+    "type": "object"
+   },
+   "TaskIn": {
+    "additionalProperties": false,
+    "properties": {
+     "assignee_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Assignee Id"
+     },
+     "checklist": {
+      "items": {
+       "maxLength": 300,
+       "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Checklist",
+      "type": "array"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "priority": {
+      "default": "normal",
+      "enum": [
+       "low",
+       "normal",
+       "high",
+       "urgent"
+      ],
+      "title": "Priority",
+      "type": "string"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "status": {
+      "default": "todo",
+      "enum": [
+       "todo",
+       "doing",
+       "done"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "title": {
+      "maxLength": 200,
+      "title": "Title",
+      "type": "string"
+     },
+     "unassigned": {
+      "default": false,
+      "title": "Unassigned",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "TaskIn",
+    "type": "object"
+   },
+   "TaskOut": {
+    "properties": {
+     "assignee": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/PersonRef"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "can_delete": {
+      "title": "Can Delete",
+      "type": "boolean"
+     },
+     "checklist_done": {
+      "title": "Checklist Done",
+      "type": "integer"
+     },
+     "checklist_total": {
+      "title": "Checklist Total",
+      "type": "integer"
+     },
+     "comments": {
+      "title": "Comments",
+      "type": "integer"
+     },
+     "completed_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Completed At"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By Name"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "overdue": {
+      "title": "Overdue",
+      "type": "boolean"
+     },
+     "position": {
+      "title": "Position",
+      "type": "number"
+     },
+     "priority": {
+      "enum": [
+       "low",
+       "normal",
+       "high",
+       "urgent"
+      ],
+      "title": "Priority",
+      "type": "string"
+     },
+     "project_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Id"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "status": {
+      "enum": [
+       "todo",
+       "doing",
+       "done"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "description",
+     "project_id",
+     "project_name",
+     "status",
+     "priority",
+     "assignee",
+     "due_date",
+     "overdue",
+     "position",
+     "completed_at",
+     "created_at",
+     "created_by_name",
+     "checklist_done",
+     "checklist_total",
+     "comments",
+     "can_delete",
+     "version"
+    ],
+    "title": "TaskOut",
+    "type": "object"
+   },
+   "TaskPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "assignee_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Assignee Id"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "no_due_date": {
+      "default": false,
+      "title": "No Due Date",
+      "type": "boolean"
+     },
+     "priority": {
+      "anyOf": [
+       {
+        "enum": [
+         "low",
+         "normal",
+         "high",
+         "urgent"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Priority"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "enum": [
+         "todo",
+         "doing",
+         "done"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     },
+     "unassigned": {
+      "default": false,
+      "title": "Unassigned",
+      "type": "boolean"
+     }
+    },
+    "title": "TaskPatch",
     "type": "object"
    },
    "TaxSlab-Input": {
@@ -11793,6 +12775,191 @@
     ]
    }
   },
+  "/v1/projects": {
+   "get": {
+    "operationId": "list_projects_v1_projects_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "active",
+       "enum": [
+        "active",
+        "archived",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ProjectOut"
+         },
+         "title": "Response List Projects V1 Projects Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Projects",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "post": {
+    "operationId": "create_project_v1_projects_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Project",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/projects/{project_id}": {
+   "get": {
+    "operationId": "get_project_v1_projects__project_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Project",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "patch": {
+    "operationId": "update_project_v1_projects__project_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Project",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
   "/v1/roles": {
    "get": {
     "operationId": "list_roles_v1_roles_get",
@@ -11941,6 +13108,682 @@
     "summary": "Update Role",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/tasks": {
+   "get": {
+    "operationId": "list_tasks_v1_tasks_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "project_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Project Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "mine",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Mine",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "assignee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Assignee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "default": "all",
+       "enum": [
+        "todo",
+        "doing",
+        "done",
+        "open",
+        "all"
+       ],
+       "title": "Status",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "due_before",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Due Before"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 500,
+       "maximum": 1000,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TaskOut"
+         },
+         "title": "Response List Tasks V1 Tasks Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Tasks",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "post": {
+    "operationId": "create_task_v1_tasks_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TaskIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaskDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Task",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/my-work": {
+   "get": {
+    "operationId": "my_work_v1_tasks_my_work_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TaskOut"
+         },
+         "title": "Response My Work V1 Tasks My Work Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Work",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}": {
+   "delete": {
+    "operationId": "delete_task_v1_tasks__task_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Task",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "get": {
+    "operationId": "get_task_v1_tasks__task_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaskDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Task",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "patch": {
+    "operationId": "update_task_v1_tasks__task_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TaskPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaskDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Task",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}/checklist": {
+   "post": {
+    "operationId": "add_item_v1_tasks__task_id__checklist_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ChecklistIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChecklistItemOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Item",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}/checklist/{item_id}": {
+   "delete": {
+    "operationId": "delete_item_v1_tasks__task_id__checklist__item_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Item",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "patch": {
+    "operationId": "update_item_v1_tasks__task_id__checklist__item_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ChecklistPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChecklistItemOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Item",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}/comments": {
+   "get": {
+    "operationId": "list_comments_v1_tasks__task_id__comments_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CommentOut"
+         },
+         "title": "Response List Comments V1 Tasks  Task Id  Comments Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Comments",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "post": {
+    "operationId": "add_comment_v1_tasks__task_id__comments_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CommentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CommentOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Comment",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}/comments/{comment_id}": {
+   "delete": {
+    "operationId": "delete_comment_v1_tasks__task_id__comments__comment_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "comment_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Comment Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Comment",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/tasks/{task_id}/move": {
+   "post": {
+    "operationId": "move_task_v1_tasks__task_id__move_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "task_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Task Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MoveIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaskOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Move Task",
+    "tags": [
+     "tasks"
     ]
    }
   },
