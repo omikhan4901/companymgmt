@@ -173,7 +173,7 @@ class StartIn(In):
     start_date: date | None = None
 
 
-class RunOut(Out):
+class OnboardingRunOut(Out):
     id: uuid.UUID
     employee_id: uuid.UUID
     employee_name: str

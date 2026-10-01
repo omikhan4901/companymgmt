@@ -21,10 +21,10 @@ from app.modules.tasks.schemas import (
     CommentIn,
     CommentOut,
     MoveIn,
+    OnboardingRunOut,
     ProjectIn,
     ProjectOut,
     ProjectPatch,
-    RunOut,
     StartIn,
     TaskDetail,
     TaskIn,
@@ -199,11 +199,13 @@ async def delete_template(
     return Response(status_code=204)
 
 
-@router.get("/onboarding/runs", response_model=list[RunOut])
-async def list_runs(ctx: Ctx = Self, mine: bool = False) -> list[RunOut]:
+@router.get("/onboarding/runs", response_model=list[OnboardingRunOut])
+async def list_runs(ctx: Ctx = Self, mine: bool = False) -> list[OnboardingRunOut]:
     return await onboarding.runs(ctx, mine=mine)
 
 
-@router.post("/onboarding/runs", response_model=RunOut, status_code=201)
-async def start_run(body: StartIn, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))) -> RunOut:
+@router.post("/onboarding/runs", response_model=OnboardingRunOut, status_code=201)
+async def start_run(
+    body: StartIn, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))
+) -> OnboardingRunOut:
     return await onboarding.start(ctx, body.employee_id, body.template_id, body.start_date)

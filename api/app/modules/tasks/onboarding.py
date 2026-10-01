@@ -25,7 +25,7 @@ from app.modules.platform.models import Membership, Role, Tenant, User
 from app.modules.tasks import access
 from app.modules.tasks.models import OnboardingRun, OnboardingTemplate, Task
 from app.modules.tasks.schemas import (
-    RunOut,
+    OnboardingRunOut,
     TemplateIn,
     TemplateOut,
 )
@@ -186,7 +186,9 @@ async def _start(
     return run
 
 
-async def start(ctx: Ctx, employee_id: uuid.UUID, template_id: uuid.UUID, start_date: date | None) -> RunOut:
+async def start(
+    ctx: Ctx, employee_id: uuid.UUID, template_id: uuid.UUID, start_date: date | None
+) -> OnboardingRunOut:
     ctx.require(access.MANAGE)
     template = await ctx.db.get(OnboardingTemplate, template_id)
     employee = await ctx.db.get(Employee, employee_id)
@@ -207,7 +209,7 @@ async def start(ctx: Ctx, employee_id: uuid.UUID, template_id: uuid.UUID, start_
     return (await _runs_out(ctx.db, [run], today(ctx.tenant.timezone)))[0]
 
 
-async def _runs_out(db: AsyncSession, runs: list[OnboardingRun], now: date) -> list[RunOut]:
+async def _runs_out(db: AsyncSession, runs: list[OnboardingRun], now: date) -> list[OnboardingRunOut]:
     if not runs:
         return []
     ids = [r.id for r in runs]
@@ -235,7 +237,7 @@ async def _runs_out(db: AsyncSession, runs: list[OnboardingRun], now: date) -> l
     for r in runs:
         total, done, overdue = counts.get(r.id, (0, 0, 0))
         out.append(
-            RunOut(
+            OnboardingRunOut(
                 id=r.id,
                 employee_id=r.employee_id,
                 employee_name=names.get(r.employee_id, ""),
@@ -249,7 +251,7 @@ async def _runs_out(db: AsyncSession, runs: list[OnboardingRun], now: date) -> l
     return out
 
 
-async def runs(ctx: Ctx, *, mine: bool = False) -> list[RunOut]:
+async def runs(ctx: Ctx, *, mine: bool = False) -> list[OnboardingRunOut]:
     """Checklists in progress: your own, or (for managers) everyone's in scope."""
     assert ctx.tenant is not None
     assert ctx.membership is not None

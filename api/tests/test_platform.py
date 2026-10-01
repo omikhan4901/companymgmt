@@ -234,3 +234,12 @@ async def test_rate_limit_window() -> None:
     assert 0 < retry <= 60
     await ratelimit.reset(rule, "k")
     assert await ratelimit.peek(rule, "k") == 0
+
+
+def test_every_schema_has_its_own_name() -> None:
+    """Two models with the same class name get mangled names in the contract, which
+    breaks the web types. Name them apart instead."""
+    from app.main import app
+
+    names = app.openapi()["components"]["schemas"]
+    assert [n for n in names if "__" in n] == []
