@@ -134,8 +134,15 @@ architecture one-pager. Only built features and measured numbers.
   notifications); nobody decides their own requests there. Request notifications open
   it, and "Waiting for you" on home uses it. Multi-step chains (by plan) wait for
   expenses and purchases, which will be the first kinds that need them.
-- Next: documents and policies, the
-  approvals inbox, onboarding checklists, then a 30-person sample agency week.
+- **M3.7 onboarding checklists: done.** Owners and admins write checklists of items for
+  the new joiner or their manager, each due some days after the first day, optionally
+  pointing at a document. Starting one (by hand, or by itself for everyone who joins)
+  turns it into ordinary tasks, so items show up in My work and in notifications; the
+  manager item goes to whoever runs the joiner's department. Acknowledging the document
+  ticks its item off. Managers see who is being onboarded and how far along; joiners
+  get a "Your first days" card on home. Found on the way: a second `RunOut` model
+  mangled the payroll type names in the contract; a test now keeps schema names unique.
+- Next: a 30-person sample agency week (seed and browser journeys), then M3 review.
 
 ## Log
 
@@ -153,3 +160,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: README remade. M3.4 announcements with read receipts: API, feed, composer, receipts, browser journey.
 - 2026-10-01: M3.5 documents and policies with acknowledgements; large workspace imports fixed.
 - 2026-10-01: M3.6 approvals inbox for leave and time fixes; time-fix decisions moved into the attendance service.
+- 2026-10-01: M3.7 onboarding checklists: templates, runs as tasks, automatic start on joining, document items tick off on acknowledgement.

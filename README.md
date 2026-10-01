@@ -9,8 +9,8 @@ location, built so a permission-aware AI assistant can sit on top of it later.
 
 > **Status:** Milestones 1 and 2 are built and tested (accounts, people, attendance,
 > leave, payroll, data rights), and Milestone 3 is under way: the foundations for AI,
-> notifications, tasks and projects, announcements, documents and policies, and the approvals inbox are done;
-> onboarding checklists and a sample agency week come next. It isn't live yet; deployment is
+> notifications, tasks and projects, announcements, documents and policies, the approvals inbox
+> and onboarding checklists are done; a sample agency week comes next. It isn't live yet; deployment is
 > scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
 > [Roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap) · [progress](docs/PROGRESS.md).
 
@@ -50,6 +50,11 @@ location, built so a permission-aware AI assistant can sit on top of it later.
   who reads each (everyone, some roles, some departments), keep every version, and ask
   people to acknowledge the policies that matter ("acknowledged by 12 of 30"). Uploads
   are checked by their content and always download as files.
+- **Onboarding checklists.** Write down a new joiner's first days once: items for them
+  and for their manager, due some days after they start, some pointing at a policy to
+  read. Start it for someone (or let it start by itself when anyone joins); the items
+  become tasks in their My work, reading the policy ticks its item off, and managers see
+  how far along each joiner is.
 - **One approvals inbox.** Leave and time-fix requests from a manager's own departments,
   oldest first, approved or turned down (with a note) in one place.
 - **Notifications.** A bell in the header tells people what needs them and what was decided:
@@ -166,16 +171,16 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
   payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
   export, import, deletion and audit retention, plans, notifications and the daily
-  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), and capability
+  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, and capability
   parity with the API.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
   the branch; staff ask for leave and the owner approves it (and hears about it from the
   bell); the owner runs payroll and staff download their payslip; a manager plans a project
-  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; an owner exports, imports, deletes and
+  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; an owner exports, imports, deletes and
   restores a workspace; forms keep what was typed on a slow connection; dark mode and
-  accents. 14 scenarios, each on desktop and phone. **axe WCAG 2.2 AA** checks, a
+  accents. 15 scenarios, each on desktop and phone. **axe WCAG 2.2 AA** checks, a
   no-sideways-scrolling check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in
