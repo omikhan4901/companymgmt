@@ -58,7 +58,22 @@ async def agency(client: httpx.AsyncClient) -> dict[str, Any]:
         json={"leave_type_id": casual, "start_date": str(start), "end_date": str(start + timedelta(days=1))},
     )
     await cook.post("/v1/attendance/clock-in", json={})
+    await owner.put("/v1/workspace/modules", json={"modules": ["attendance", "leave", "payroll", "tasks"]})
+    project = (
+        await owner.post(
+            "/v1/projects", json={"name": "Menu", "department_id": kitchen["id"], "member_ids": [ids["Cook"]]}
+        )
+    ).json()
+    task = (
+        await owner.post(
+            "/v1/tasks", json={"title": "Prices", "project_id": project["id"], "assignee_id": ids["Cook"]}
+        )
+    ).json()
+    todo = (await seller.post("/v1/tasks", json={"title": "Call client"})).json()
     return {
+        "project_id": project["id"],
+        "task_id": task["id"],
+        "todo_id": todo["id"],
         "owner": owner,
         "manager": manager,
         "cook": cook,
@@ -76,8 +91,8 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("people.search", "/v1/people", {}),
         ("people.search", "/v1/people", {"q": "Cook"}),
         ("people.search", "/v1/people", {"department_id": a["kitchen"], "status": "all"}),
-        ("people.get", f"/v1/people/{a['cook_id']}", {}),
-        ("people.get", f"/v1/people/{a['seller_id']}", {}),
+        ("people.get", f"/v1/people/{a['cook_id']}", {"employee_id": a["cook_id"]}),
+        ("people.get", f"/v1/people/{a['seller_id']}", {"employee_id": a["seller_id"]}),
         ("attendance.my_status", "/v1/attendance/status", {}),
         ("attendance.present", "/v1/attendance/present", {}),
         ("attendance.timesheet", "/v1/attendance/timesheet", {"month": MONTH}),
@@ -93,14 +108,21 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("payroll.my_payslips", "/v1/payroll/payslips", {}),
         ("payroll.runs", "/v1/payroll/runs", {}),
         ("notifications.inbox", "/v1/notifications", {}),
+        ("tasks.my_work", "/v1/tasks/my-work", {}),
+        ("tasks.projects", "/v1/projects", {}),
+        ("tasks.list", "/v1/tasks", {}),
+        ("tasks.list", "/v1/tasks", {"project_id": a["project_id"], "status": "open"}),
+        ("tasks.get", f"/v1/tasks/{a['task_id']}", {"task_id": a["task_id"]}),
+        ("tasks.get", f"/v1/tasks/{a['todo_id']}", {"task_id": a["todo_id"]}),
         ("notifications.inbox", "/v1/notifications", {"unread": True, "limit": 1}),
     ]
     covered = set()
     for who in ("owner", "manager", "cook"):
         account: Account = a[who]
         for name, path, params in reads:
-            if name == "people.get":
-                cap = await invoke(account, name, {"employee_id": path.rsplit("/", 1)[1]})
+            if "{" in REGISTRY[name].route:  # type: ignore[operator]
+                # Path parameters: the capability takes them as input, REST in the path.
+                cap = await invoke(account, name, params)
                 rest = await account.get(path)
                 assert cap.status_code == rest.status_code, (who, name, rest.text, cap.text)
                 if rest.status_code == 200:

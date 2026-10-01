@@ -16,6 +16,11 @@ from app.modules.notifications.service import holders, notify, user_of, users_of
 LEAVE = "/app/leave"
 ATTENDANCE = "/app/attendance"
 PAYROLL = "/app/payroll"
+TASKS = "/app/tasks"
+
+
+def _user(value: object) -> uuid.UUID | None:
+    return uuid.UUID(str(value)) if value else None
 
 
 async def _deciders(db: AsyncSession, event: events.Event, permission: str) -> list[uuid.UUID]:
@@ -70,3 +75,38 @@ async def payroll_finalized(db: AsyncSession, event: events.Event) -> None:
     # the run's totals are not theirs to see.
     people = await users_of(db, event.data.get("membership_ids") or [])
     await notify(db, event, people, link=PAYROLL, data={"period": event.data.get("period")})
+
+
+@events.on("task.assigned")
+async def task_assigned(db: AsyncSession, event: events.Event) -> None:
+    person = await user_of(db, event.data.get("assignee_membership_id"))
+    await notify(db, event, [person], link=f"{TASKS}?task={event.subject_id}")
+
+
+@events.on("task.commented")
+async def task_commented(db: AsyncSession, event: events.Event) -> None:
+    # The person doing it and the person who asked for it.
+    people = [
+        await user_of(db, event.data.get("assignee_membership_id")),
+        _user(event.data.get("creator_user_id")),
+    ]
+    await notify(db, event, people, link=f"{TASKS}?task={event.subject_id}")
+
+
+@events.on("task.completed")
+async def task_completed(db: AsyncSession, event: events.Event) -> None:
+    await notify(
+        db, event, [_user(event.data.get("creator_user_id"))], link=f"{TASKS}?task={event.subject_id}"
+    )
+
+
+@events.on("project.members_added")
+async def project_joined(db: AsyncSession, event: events.Event) -> None:
+    people = await users_of(db, event.data.get("membership_ids") or [])
+    await notify(
+        db,
+        event,
+        people,
+        link=f"{TASKS}?project={event.subject_id}",
+        data={"project_name": event.data.get("project_name")},
+    )

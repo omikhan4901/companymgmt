@@ -54,7 +54,7 @@ MODULES: dict[str, Module] = {
         Module("expenses", "Expenses", available=False),
         Module("inventory", "Inventory", available=False),
         Module("accounting", "Accounting", available=False),
-        Module("tasks", "Tasks", requires=("people",), available=False),
+        Module("tasks", "Tasks & projects", requires=("people",)),
     )
 }
 
@@ -106,6 +106,8 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "leave.approve",
             "payroll.self",
             "payroll.view",
+            "tasks.self",
+            "tasks.manage",
         ),
     ),
     BuiltinRole(
@@ -123,19 +125,20 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "payroll.view",
             "payroll.manage",
             "payroll.run",
+            "tasks.self",
         ),
     ),
     BuiltinRole(
         "cashier",
         "Cashier",
         "Sells and clocks in. No access to other people's data.",
-        ("attendance.self", "leave.self", "payroll.self"),
+        ("attendance.self", "leave.self", "payroll.self", "tasks.self"),
     ),
     BuiltinRole(
         "employee",
         "Employee",
         "Clocks in, asks for leave and sees their own records.",
-        ("attendance.self", "leave.self", "payroll.self"),
+        ("attendance.self", "leave.self", "payroll.self", "tasks.self"),
     ),
 )
 

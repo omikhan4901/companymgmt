@@ -288,6 +288,21 @@ async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncCli
     run = (await source.post("/v1/payroll/runs", json={"period": f"{first:%Y-%m}"})).json()
     await source.post(f"/v1/payroll/runs/{run['id']}/submit")
     await source.post(f"/v1/payroll/runs/{run['id']}/finalize")
+    tasks_on = {"modules": ["attendance", "leave", "payroll", "tasks"]}
+    await source.put("/v1/workspace/modules", json=tasks_on)
+    menu = (await source.post("/v1/projects", json={"name": "Menu", "member_ids": [cook["id"]]})).json()
+    task = (
+        await source.post(
+            "/v1/tasks",
+            json={
+                "title": "Prices",
+                "project_id": menu["id"],
+                "assignee_id": cook["id"],
+                "checklist": ["Tea"],
+            },
+        )
+    ).json()
+    await source.post(f"/v1/tasks/{task['id']}/comments", json={"body": "By Friday"})
     export = (await source.get("/v1/privacy/workspace-export")).content
 
     target = await signup(client, business="New Shop", email_addr=new_owner_email)
@@ -314,6 +329,12 @@ async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncCli
     slip = (await target.get(f"/v1/payroll/runs/{runs[0]['id']}")).json()["payslips"][0]
     assert slip["employee_id"] == new_cook["id"]
     assert (await target.get(f"/v1/payroll/payslips/{slip['id']}/pdf")).status_code == 200
+    await target.put("/v1/workspace/modules", json=tasks_on)
+    [project] = (await target.get("/v1/projects")).json()
+    assert [m["id"] for m in project["members"]] == [new_cook["id"]]
+    [moved] = (await target.get("/v1/tasks", params={"project_id": project["id"]})).json()
+    assert moved["assignee"]["id"] == new_cook["id"]
+    assert (moved["checklist_total"], moved["comments"]) == (1, 1)
     assert (await target.get("/v1/audit/verify")).json()["ok"] is True
     # The source workspace is untouched.
     assert (await source.get(f"/v1/people/{cook['id']}")).status_code == 200

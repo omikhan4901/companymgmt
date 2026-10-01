@@ -1,7 +1,7 @@
 """Restore a workspace export into a new, empty workspace.
 
-Business records come across: branches, departments, people, attendance, leave and
-payroll. Logins, roles, invitations and the audit log don't: they belong to the old
+Business records come across: branches, departments, people, attendance, leave,
+payroll, and tasks and projects. Logins, roles, invitations and the audit log don't: they belong to the old
 workspace, and the owner invites people again. Every record gets a new id (the old
 workspace may still exist on this server), references are rewritten to match, and
 encrypted fields are encrypted again for their new rows.
@@ -18,7 +18,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Table, delete, func, insert, select
+from sqlalchemy import ARRAY, Table, delete, func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
@@ -33,6 +33,7 @@ from app.modules.people.service import employee_for_membership
 from app.modules.platform.deps import Ctx
 from app.modules.platform.models import Branch
 from app.modules.privacy.service import FORMAT, VERSION, tenant_tables
+from app.modules.tasks.models import Project, Task
 
 MAX_UPLOAD = 50 * 1024 * 1024
 MAX_UNPACKED = 500 * 1024 * 1024
@@ -57,6 +58,10 @@ IMPORTED = {
     "payroll_runs",
     "payslips",
     "payroll_items",
+    "projects",
+    "tasks",
+    "task_checklist_items",
+    "task_comments",
 }
 # Settings the new workspace was given when its modules were switched on; replaced.
 SEEDED = ("leave_types", "leave_policies", "payroll_settings", "attendance_settings")
@@ -93,7 +98,16 @@ def _read(body: bytes) -> dict[str, list[dict[str, Any]]]:
 
 async def _check_empty(db: AsyncSession, own: Employee | None) -> None:
     """Only into a workspace with no business records yet (besides the owner's profile)."""
-    for model in (AttendanceRecord, LeaveRequest, PayrollRun, SalaryStructure, Loan, Department):
+    for model in (
+        AttendanceRecord,
+        LeaveRequest,
+        PayrollRun,
+        SalaryStructure,
+        Loan,
+        Department,
+        Project,
+        Task,
+    ):
         if await db.scalar(select(func.count()).select_from(model)):
             raise Conflict(
                 "Import only into a new workspace with nothing in it yet.", code="import_not_empty"
@@ -206,6 +220,9 @@ def _typed(table: Table, row: dict[str, Any]) -> dict[str, Any]:
             continue
         if python_type is uuid.UUID:
             out[key] = uuid.UUID(str(value))
+        elif isinstance(column.type, ARRAY) and isinstance(value, list):
+            item = column.type.item_type.python_type
+            out[key] = [uuid.UUID(str(v)) if item is uuid.UUID else v for v in value]
         elif python_type.__name__ in ("date", "datetime", "Decimal") and isinstance(value, str):
             out[key] = _parse(python_type, value)
         else:
