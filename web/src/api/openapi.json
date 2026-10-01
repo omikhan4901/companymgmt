@@ -9961,6 +9961,61 @@
     ]
    }
   },
+  "/v1/payroll/payslips/{payslip_id}/pdf": {
+   "get": {
+    "operationId": "payslip_pdf_v1_payroll_payslips__payslip_id__pdf_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "payslip_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Payslip Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "lang",
+      "required": false,
+      "schema": {
+       "default": "en",
+       "enum": [
+        "en",
+        "bn"
+       ],
+       "title": "Lang",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Payslip Pdf",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
   "/v1/payroll/runs": {
    "get": {
     "operationId": "runs_v1_payroll_runs_get",

@@ -1179,6 +1179,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/payroll/payslips/{payslip_id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Payslip Pdf */
+        get: operations["payslip_pdf_v1_payroll_payslips__payslip_id__pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/payroll/runs": {
         parameters: {
             query?: never;
@@ -6137,6 +6154,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PayslipOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payslip_pdf_v1_payroll_payslips__payslip_id__pdf_get: {
+        parameters: {
+            query?: {
+                lang?: "en" | "bn";
+            };
+            header?: never;
+            path: {
+                payslip_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
