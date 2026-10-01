@@ -2115,6 +2115,26 @@
     "title": "InviteOut",
     "type": "object"
    },
+   "InvokeIn": {
+    "properties": {
+     "input": {
+      "additionalProperties": true,
+      "title": "Input",
+      "type": "object"
+     },
+     "name": {
+      "maxLength": 80,
+      "pattern": "^[a-z_]+\\.[a-z_]+$",
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "InvokeIn",
+    "type": "object"
+   },
    "ItemIn": {
     "additionalProperties": false,
     "properties": {
@@ -4415,6 +4435,154 @@
     "title": "RecoveryCodesOut",
     "type": "object"
    },
+   "RequestContext": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "country": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Country"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "employee_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Id"
+     },
+     "language": {
+      "title": "Language",
+      "type": "string"
+     },
+     "modules": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Modules",
+      "type": "array"
+     },
+     "permissions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Permissions",
+      "type": "array"
+     },
+     "role_key": {
+      "title": "Role Key",
+      "type": "string"
+     },
+     "role_name": {
+      "title": "Role Name",
+      "type": "string"
+     },
+     "scope": {
+      "title": "Scope",
+      "type": "string"
+     },
+     "scope_department_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Ids"
+     },
+     "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+     },
+     "timezone": {
+      "title": "Timezone",
+      "type": "string"
+     },
+     "today": {
+      "format": "date",
+      "title": "Today",
+      "type": "string"
+     },
+     "user_id": {
+      "format": "uuid",
+      "title": "User Id",
+      "type": "string"
+     },
+     "user_name": {
+      "title": "User Name",
+      "type": "string"
+     },
+     "workspace": {
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "tenant_id",
+     "workspace",
+     "country",
+     "currency",
+     "timezone",
+     "today",
+     "language",
+     "user_id",
+     "user_name",
+     "role_key",
+     "role_name",
+     "permissions",
+     "modules",
+     "scope",
+     "scope_department_ids",
+     "employee_id",
+     "department",
+     "branch_id"
+    ],
+    "title": "RequestContext",
+    "type": "object"
+   },
    "RequestIn": {
     "additionalProperties": false,
     "properties": {
@@ -6472,6 +6640,94 @@
     "summary": "Readyz",
     "tags": [
      "ops"
+    ]
+   }
+  },
+  "/v1/ai/capabilities": {
+   "get": {
+    "operationId": "capabilities_v1_ai_capabilities_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "additionalProperties": true,
+          "type": "object"
+         },
+         "title": "Response Capabilities V1 Ai Capabilities Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Capabilities",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/capabilities/invoke": {
+   "post": {
+    "operationId": "run_v1_ai_capabilities_invoke_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/InvokeIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "title": "Response Run V1 Ai Capabilities Invoke Post"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Run",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/context": {
+   "get": {
+    "operationId": "context_v1_ai_context_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RequestContext"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Context",
+    "tags": [
+     "ai"
     ]
    }
   },

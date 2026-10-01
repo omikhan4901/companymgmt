@@ -38,6 +38,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ai/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Capabilities */
+        get: operations["capabilities_v1_ai_capabilities_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/capabilities/invoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run */
+        post: operations["run_v1_ai_capabilities_invoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Context */
+        get: operations["context_v1_ai_context_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/attendance/clock-in": {
         parameters: {
             query?: never;
@@ -2310,6 +2361,15 @@ export interface components {
              */
             role_id: string;
         };
+        /** InvokeIn */
+        InvokeIn: {
+            /** Input */
+            input?: {
+                [key: string]: unknown;
+            };
+            /** Name */
+            name: string;
+        };
         /** ItemIn */
         ItemIn: {
             /** Amount */
@@ -3087,6 +3147,54 @@ export interface components {
             /** Recovery Codes */
             recovery_codes: string[];
         };
+        /** RequestContext */
+        RequestContext: {
+            /** Branch Id */
+            branch_id: string | null;
+            /** Country */
+            country: string | null;
+            /** Currency */
+            currency: string;
+            /** Department */
+            department: string | null;
+            /** Employee Id */
+            employee_id: string | null;
+            /** Language */
+            language: string;
+            /** Modules */
+            modules: string[];
+            /** Permissions */
+            permissions: string[];
+            /** Role Key */
+            role_key: string;
+            /** Role Name */
+            role_name: string;
+            /** Scope */
+            scope: string;
+            /** Scope Department Ids */
+            scope_department_ids: string[] | null;
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Timezone */
+            timezone: string;
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /** Workspace */
+            workspace: string;
+        };
         /** RequestIn */
         RequestIn: {
             /** Employee Id */
@@ -3851,6 +3959,81 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    capabilities_v1_ai_capabilities_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    run_v1_ai_capabilities_invoke_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvokeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    context_v1_ai_context_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestContext"];
                 };
             };
         };
