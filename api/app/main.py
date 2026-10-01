@@ -21,6 +21,7 @@ from app.modules.announcements.routes import router as announcements_router
 from app.modules.approvals.routes import router as approvals_router
 from app.modules.attendance.routes import router as attendance_router
 from app.modules.documents.routes import router as documents_router
+from app.modules.imports.routes import router as imports_router
 from app.modules.leave.routes import router as leave_router
 from app.modules.notifications.routes import internal_router as notifications_internal_router
 from app.modules.notifications.routes import router as notifications_router
@@ -40,6 +41,7 @@ ROUTERS = (
     auth_router,
     plans_router,
     workspace_router,
+    imports_router,
     people_router,
     attendance_router,
     leave_router,
