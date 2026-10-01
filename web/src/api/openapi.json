@@ -986,6 +986,11 @@
       "title": "Membership Id",
       "type": "string"
      },
+     "mfa_setup_required": {
+      "default": false,
+      "title": "Mfa Setup Required",
+      "type": "boolean"
+     },
      "name": {
       "title": "Name",
       "type": "string"
@@ -999,6 +1004,11 @@
      },
      "plan": {
       "$ref": "#/components/schemas/PlanOut"
+     },
+     "require_admin_mfa": {
+      "default": false,
+      "title": "Require Admin Mfa",
+      "type": "boolean"
      },
      "role": {
       "title": "Role",
@@ -1105,6 +1115,47 @@
      }
     },
     "title": "DecisionIn",
+    "type": "object"
+   },
+   "DeleteWorkspaceIn": {
+    "additionalProperties": false,
+    "properties": {
+     "confirm_name": {
+      "maxLength": 200,
+      "title": "Confirm Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "confirm_name"
+    ],
+    "title": "DeleteWorkspaceIn",
+    "type": "object"
+   },
+   "DeletionOut": {
+    "properties": {
+     "purge_after": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Purge After"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "status",
+     "purge_after"
+    ],
+    "title": "DeletionOut",
     "type": "object"
    },
    "DepartmentIn": {
@@ -6160,6 +6211,17 @@
       ],
       "title": "Name"
      },
+     "require_admin_mfa": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Require Admin Mfa"
+     },
      "timezone": {
       "anyOf": [
        {
@@ -6248,6 +6310,10 @@
       "title": "Name",
       "type": "string"
      },
+     "require_admin_mfa": {
+      "title": "Require Admin Mfa",
+      "type": "boolean"
+     },
      "slug": {
       "title": "Slug",
       "type": "string"
@@ -6277,6 +6343,7 @@
      "locale",
      "week_start",
      "fiscal_year_start_month",
+     "require_admin_mfa",
      "created_at"
     ],
     "title": "WorkspaceOut",
@@ -11060,6 +11127,44 @@
     ]
    }
   },
+  "/v1/privacy/my-data": {
+   "get": {
+    "operationId": "my_data_v1_privacy_my_data_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Data",
+    "tags": [
+     "privacy"
+    ]
+   }
+  },
+  "/v1/privacy/workspace-export": {
+   "get": {
+    "operationId": "workspace_export_v1_privacy_workspace_export_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Workspace Export",
+    "tags": [
+     "privacy"
+    ]
+   }
+  },
   "/v1/roles": {
    "get": {
     "operationId": "list_roles_v1_roles_get",
@@ -11271,6 +11376,47 @@
     ]
    }
   },
+  "/v1/workspace/delete": {
+   "post": {
+    "operationId": "delete_workspace_v1_workspace_delete_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DeleteWorkspaceIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DeletionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Workspace",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
   "/v1/workspace/modules": {
    "put": {
     "operationId": "set_modules_v1_workspace_modules_put",
@@ -11311,6 +11457,27 @@
      }
     },
     "summary": "Set Modules",
+    "tags": [
+     "workspace"
+    ]
+   }
+  },
+  "/v1/workspace/restore": {
+   "post": {
+    "operationId": "restore_workspace_v1_workspace_restore_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DeletionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Restore Workspace",
     "tags": [
      "workspace"
     ]

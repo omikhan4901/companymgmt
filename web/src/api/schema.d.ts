@@ -1509,6 +1509,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/privacy/my-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Data */
+        get: operations["my_data_v1_privacy_my_data_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/privacy/workspace-export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Workspace Export */
+        get: operations["workspace_export_v1_privacy_workspace_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/roles": {
         parameters: {
             query?: never;
@@ -1563,6 +1597,23 @@ export interface paths {
         patch: operations["update_workspace_v1_workspace_patch"];
         trace?: never;
     };
+    "/v1/workspace/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete Workspace */
+        post: operations["delete_workspace_v1_workspace_delete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/workspace/modules": {
         parameters: {
             query?: never;
@@ -1574,6 +1625,23 @@ export interface paths {
         /** Set Modules */
         put: operations["set_modules_v1_workspace_modules_put"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspace/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore Workspace */
+        post: operations["restore_workspace_v1_workspace_restore_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1897,11 +1965,21 @@ export interface components {
              * Format: uuid
              */
             membership_id: string;
+            /**
+             * Mfa Setup Required
+             * @default false
+             */
+            mfa_setup_required: boolean;
             /** Name */
             name: string;
             /** Permissions */
             permissions: string[];
             plan: components["schemas"]["PlanOut"];
+            /**
+             * Require Admin Mfa
+             * @default false
+             */
+            require_admin_mfa: boolean;
             /** Role */
             role: string;
             /** Role Key */
@@ -1935,6 +2013,18 @@ export interface components {
         DecisionIn: {
             /** Note */
             note?: string | null;
+        };
+        /** DeleteWorkspaceIn */
+        DeleteWorkspaceIn: {
+            /** Confirm Name */
+            confirm_name: string;
+        };
+        /** DeletionOut */
+        DeletionOut: {
+            /** Purge After */
+            purge_after: string | null;
+            /** Status */
+            status: string;
         };
         /** DepartmentIn */
         DepartmentIn: {
@@ -3619,6 +3709,8 @@ export interface components {
             locale?: ("en" | "bn") | null;
             /** Name */
             name?: string | null;
+            /** Require Admin Mfa */
+            require_admin_mfa?: boolean | null;
             /** Timezone */
             timezone?: string | null;
             /** Ui Mode */
@@ -3650,6 +3742,8 @@ export interface components {
             locale: string;
             /** Name */
             name: string;
+            /** Require Admin Mfa */
+            require_admin_mfa: boolean;
             /** Slug */
             slug: string;
             /** Timezone */
@@ -6927,6 +7021,46 @@ export interface operations {
             };
         };
     };
+    my_data_v1_privacy_my_data_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    workspace_export_v1_privacy_workspace_export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     list_roles_v1_roles_get: {
         parameters: {
             query?: never;
@@ -7097,6 +7231,39 @@ export interface operations {
             };
         };
     };
+    delete_workspace_v1_workspace_delete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteWorkspaceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     set_modules_v1_workspace_modules_put: {
         parameters: {
             query?: never;
@@ -7126,6 +7293,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_workspace_v1_workspace_restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionOut"];
                 };
             };
         };
