@@ -37,6 +37,8 @@ function Profile() {
   const { me, reload } = useSession();
   const { register, handleSubmit, setError, formState } = useForm<{ name: string; locale: Lang }>({
     values: { name: me?.name ?? "", locale: (me?.locale as Lang) ?? "en" },
+    // Data that arrives late fills the form without wiping what the person already typed.
+    resetOptions: { keepDirtyValues: true },
   });
   const save = useMutation({
     mutationFn: (v: { name: string; locale: Lang }) => api("/v1/auth/me", { method: "PATCH", body: { name: v.name.trim(), locale: v.locale } }),

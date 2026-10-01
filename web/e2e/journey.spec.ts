@@ -146,3 +146,21 @@ test("marketing pages are accessible and keep their security policy", async ({ p
   }
   expect(csp).toEqual([]);
 });
+
+test("typing before a form's data loads keeps what was typed", async ({ page }, info) => {
+  await signUp(page, { business: `Slow Net ${info.project.name}` });
+  // Roles arrive late, as on a slow connection.
+  await page.route("**/v1/roles", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  await page.goto("/app/team");
+  await page.getByRole("button", { name: "Add staff without email" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Name", { exact: true }).fill("Late Loader");
+  await dialog.getByLabel("Username", { exact: true }).fill(`late${Date.now() % 100000}`);
+  await page.waitForResponse("**/v1/roles");
+  await expect(dialog.getByLabel("Name", { exact: true })).toHaveValue("Late Loader");
+  await dialog.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(dialog.getByText("Staff account created")).toBeVisible();
+});

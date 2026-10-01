@@ -41,6 +41,8 @@ export default function InvitePage() {
   });
   const { register, handleSubmit, setError: setFieldError, formState } = useForm<{ name: string; password: string }>({
     values: { name: lookup.data?.name ?? "", password: "" },
+    // Data that arrives late fills the form without wiping what the person already typed.
+    resetOptions: { keepDirtyValues: true },
   });
 
   const accept = async (values?: { name: string; password: string }) => {

@@ -82,6 +82,8 @@ function InviteDialog({ onClose }: { onClose: () => void }) {
   const employee = roles.data?.find((r) => r.key === "employee")?.id ?? "";
   const { register, handleSubmit, setError, formState } = useForm<AccessValues & { email: string; name: string }>({
     values: { email: "", name: "", role_id: employee, scope_department_id: "" },
+    // Data that arrives late fills the form without wiping what the person already typed.
+    resetOptions: { keepDirtyValues: true },
   });
   const send = useMutation({
     mutationFn: (v: AccessValues & { email: string; name: string }) => api<Invite>("/v1/invites", { body: { email: v.email.trim(), name: v.name.trim() || undefined, ...accessBody(v) } }),
@@ -131,6 +133,8 @@ function StaffDialog({ onClose }: { onClose: () => void }) {
   type Values = AccessValues & { name: string; username: string; password: string };
   const { register, handleSubmit, setError, formState } = useForm<Values>({
     values: { name: "", username: "", password: "", role_id: employee, scope_department_id: "" },
+    // Data that arrives late fills the form without wiping what the person already typed.
+    resetOptions: { keepDirtyValues: true },
   });
   const add = useMutation({
     mutationFn: (v: Values) =>
