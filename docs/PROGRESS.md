@@ -121,6 +121,13 @@ architecture one-pager. Only built features and measured numbers.
   the teams under them; pinned first; managers post only to their own departments. Read
   receipts ("read by 12 of 30", with who hasn't) for the author and admins; posts count as
   read when shown; the audience is notified; "Latest news" on the home screen.
+- **M3.5 documents and policies: done.** Documents for everyone, some roles or some
+  departments (the visibility is stored with each document, ready for permission-aware
+  search); versions kept in Postgres, up to 10 MB each, checked by their content and
+  always downloaded as attachments; policies can ask people to acknowledge each version,
+  with an "acknowledged by 12 of 30" report and a "To read" card on home. Files come
+  across in workspace exports. Found and fixed on the way: workspace imports over 1 MB
+  were refused by the request size limit.
 - Next: documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
@@ -138,3 +145,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.2 notifications done (in-app and daily email digest). CI caught forms wiping typed input when data loaded late; fixed with a browser test.
 - 2026-10-01: M3.3 tasks and projects: API, board, task panel, My work, browser journey on desktop and phone.
 - 2026-10-01: README remade. M3.4 announcements with read receipts: API, feed, composer, receipts, browser journey.
+- 2026-10-01: M3.5 documents and policies with acknowledgements; large workspace imports fixed.
