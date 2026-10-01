@@ -61,6 +61,16 @@ _T: dict[str, dict[str, tuple[str, str]]] = {
             "প্রিয় {name},\n\nআপনার CompanyMgmt অ্যাকাউন্টে দুই-ধাপের যাচাই এইমাত্র {state}। এটি আপনি না করে থাকলে এখনই পাসওয়ার্ড রিসেট করুন: {link}",
         ),
     },
+    "deletion_scheduled": {
+        "en": (
+            "{workspace} will be deleted on {date}",
+            "Hi {name},\n\nYou asked to delete {workspace} on CompanyMgmt. Nobody can use it now, and on {date} everything in it is deleted for good. We'll email you a deletion certificate then.\n\nChanged your mind? Sign in and restore it before that date: {link}",
+        ),
+        "bn": (
+            "{date} তারিখে {workspace} মুছে ফেলা হবে",
+            "প্রিয় {name},\n\nআপনি CompanyMgmt-এ {workspace} মুছে ফেলতে বলেছেন। এখন আর কেউ এটি ব্যবহার করতে পারবেন না, এবং {date} তারিখে এর সবকিছু স্থায়ীভাবে মুছে যাবে। তখন আমরা আপনাকে একটি মুছে ফেলার সনদ ইমেইল করব।\n\nমত বদলেছেন? ওই তারিখের আগে সাইন ইন করে এটি ফিরিয়ে আনুন: {link}",
+        ),
+    },
     "token_reuse": {
         "en": (
             "We signed you out for safety",

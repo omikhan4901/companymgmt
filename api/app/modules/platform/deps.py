@@ -34,6 +34,9 @@ from app.modules.platform.models import (
 )
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+# A deleted workspace can be restored by its owner for this long, then it's purged.
+DELETION_GRACE = timedelta(days=30)
+ADMIN_ROLES = ("owner", "admin")
 LAST_SEEN_EVERY = timedelta(minutes=5)
 
 
@@ -165,7 +168,11 @@ async def _bind_workspace(ctx: Ctx) -> None:
     if tenant is None:
         raise Unauthorized(code="session_ended")
     if tenant.status == "deleting":
-        raise Gone("This workspace is being deleted.", code="workspace_deleted")
+        raise Gone(
+            "This workspace is scheduled for deletion.",
+            code="workspace_deleted",
+            extra={"purge_after": ((tenant.deletion_requested_at or now_utc()) + DELETION_GRACE).isoformat()},
+        )
     await set_tenant(ctx.db, tenant_id, ctx.user.id)
     row = (
         await ctx.db.execute(
@@ -185,6 +192,22 @@ async def _bind_workspace(ctx: Ctx) -> None:
     info = context.current()
     info.tenant_id = tenant_id
     info.membership_id = membership.id
+
+
+def now_utc() -> datetime:
+    return datetime.now(UTC)
+
+
+def needs_mfa(ctx: Ctx) -> bool:
+    """An owner or admin without two-step verification, in a workspace that requires it."""
+    return bool(
+        ctx.tenant is not None
+        and ctx.tenant.require_admin_mfa
+        and ctx.role is not None
+        and ctx.role.is_builtin
+        and ctx.role.key in ADMIN_ROLES
+        and ctx.user.totp_enabled_at is None
+    )
 
 
 # ---- Dependencies used by routes -------------------------------------------------------
@@ -238,10 +261,45 @@ def allow(permission: str | None, *, module: str | None = None) -> Callable[...,
                 "This workspace is read-only. You can still view and export your data.",
                 code="workspace_read_only",
             )
+        if needs_mfa(ctx):
+            raise Forbidden(
+                "This workspace asks owners and admins to turn on two-step verification first.",
+                code="mfa_setup_required",
+            )
         if permission is not None:
             ctx.require(permission)
         return ctx
 
     dep._access = "workspace"  # type: ignore[attr-defined]
     dep._permission = permission  # type: ignore[attr-defined]
+    return dep
+
+
+def owner_of_deleted_workspace() -> Callable[..., Awaitable[Ctx]]:
+    """The owner of the workspace this session points at, while it waits to be purged
+    (every other route refuses a workspace scheduled for deletion)."""
+
+    async def dep(request: Request, db: AsyncSession = Depends(get_db)) -> Ctx:
+        ctx = await _authenticate(request, db)
+        tenant = await db.get(Tenant, ctx.session.tenant_id) if ctx.session.tenant_id else None
+        if tenant is None or tenant.status != "deleting":
+            raise Forbidden("This workspace isn't scheduled for deletion.", code="not_deleting")
+        await set_tenant(db, tenant.id, ctx.user.id)
+        row = (
+            await db.execute(
+                select(Membership, Role)
+                .join(Role, (Role.tenant_id == Membership.tenant_id) & (Role.id == Membership.role_id))
+                .where(Membership.user_id == ctx.user.id, Membership.status == "active")
+            )
+        ).first()
+        if row is None or not (row[1].is_builtin and row[1].key == "owner"):
+            raise Forbidden("Only the owner can restore this workspace.")
+        ctx.tenant, ctx.membership, ctx.role = tenant, row[0], row[1]
+        info = context.current()
+        info.tenant_id = tenant.id
+        info.membership_id = row[0].id
+        return ctx
+
+    dep._access = "workspace"  # type: ignore[attr-defined]
+    dep._permission = catalog.WORKSPACE_DELETE  # type: ignore[attr-defined]
     return dep

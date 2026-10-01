@@ -11,7 +11,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
-from pydantic import EmailStr, Field, StringConstraints, field_validator
+from pydantic import BaseModel, EmailStr, Field, StringConstraints, field_validator
 from sqlalchemy import Select, func, literal, select, tuple_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,9 +31,10 @@ from app.modules.platform.catalog import (
     MEMBERS_MANAGE,
     MEMBERS_VIEW,
     ROLES_MANAGE,
+    WORKSPACE_DELETE,
     WORKSPACE_MANAGE,
 )
-from app.modules.platform.deps import Ctx, allow, public
+from app.modules.platform.deps import DELETION_GRACE, Ctx, allow, owner_of_deleted_workspace, public
 from app.modules.platform.models import (
     AuthSession,
     Branch,
@@ -44,7 +45,12 @@ from app.modules.platform.models import (
     Tenant,
     User,
 )
-from app.modules.platform.routes_auth import TokenOut, _set_refresh_cookie, commit_and_dispatch
+from app.modules.platform.routes_auth import (
+    TokenOut,
+    _set_refresh_cookie,
+    commit_and_dispatch,
+    require_recent_auth,
+)
 from app.modules.platform.tokens import log_event, now, revoke_user_sessions, start_session
 
 router = APIRouter(prefix="/v1", tags=["workspace"])
@@ -68,6 +74,7 @@ class WorkspaceOut(Out):
     locale: str
     week_start: int
     fiscal_year_start_month: int
+    require_admin_mfa: bool
     created_at: datetime
 
 
@@ -80,6 +87,7 @@ class WorkspaceIn(In):
     locale: Literal["en", "bn"] | None = None
     week_start: int | None = Field(default=None, ge=0, le=6)
     fiscal_year_start_month: int | None = Field(default=None, ge=1, le=12)
+    require_admin_mfa: bool | None = None
 
 
 class ModulesIn(In):
@@ -98,6 +106,15 @@ async def update_workspace(body: WorkspaceIn, ctx: Ctx = Depends(allow(WORKSPACE
     changes = body.model_dump(exclude_unset=True, exclude_none=True)
     if "timezone" in changes:
         workspaces.valid_timezone(changes["timezone"])
+    if changes.get("require_admin_mfa") and ctx.user.totp_enabled_at is None:
+        # Otherwise the person turning it on would lock themselves out.
+        raise Invalid(
+            "Turn on two-step verification for your own account first.",
+            code="mfa_required_first",
+            errors=[
+                {"field": "require_admin_mfa", "message": "Turn on two-step verification for yourself first."}
+            ],
+        )
     before = {k: getattr(tenant, k) for k in changes}
     await ctx.db.execute(update(Tenant).where(Tenant.id == tenant.id).values(**changes))
     await audit.record(
@@ -155,6 +172,77 @@ async def set_modules(body: ModulesIn, ctx: Ctx = Depends(allow(WORKSPACE_MANAGE
     )
     await ctx.db.commit()
     return wanted
+
+
+# ---- Deleting and restoring the workspace ---------------------------------------------
+
+
+class DeleteWorkspaceIn(In):
+    # The workspace name, typed again, so nobody deletes the wrong one by accident.
+    confirm_name: Annotated[str, StringConstraints(max_length=200)]
+
+
+class DeletionOut(BaseModel):
+    status: str
+    purge_after: datetime | None
+
+
+@router.post("/workspace/delete", response_model=DeletionOut)
+async def delete_workspace(
+    body: DeleteWorkspaceIn, ctx: Ctx = Depends(allow(WORKSPACE_DELETE))
+) -> DeletionOut:
+    require_recent_auth(ctx)
+    tenant = ctx.tenant
+    assert tenant is not None
+    if body.confirm_name.strip().casefold() != tenant.name.strip().casefold():
+        raise Invalid(errors=[{"field": "confirm_name", "message": "Type the workspace name exactly."}])
+    requested = now()
+    await ctx.db.execute(
+        update(Tenant)
+        .where(Tenant.id == tenant.id)
+        .values(status="deleting", deletion_requested_at=requested, deletion_contact=ctx.user.email)
+    )
+    purge_after = requested + DELETION_GRACE
+    await audit.record(
+        ctx.db,
+        "workspace.deletion_requested",
+        target_type="workspace",
+        target_id=tenant.id,
+        data={"name": tenant.name, "purge_after": purge_after},
+    )
+    if ctx.user.email:
+        emails.send(
+            ctx.db,
+            "deletion_scheduled",
+            ctx.user.email,
+            ctx.user.locale or tenant.locale,
+            name=ctx.user.name,
+            workspace=tenant.name,
+            date=purge_after.date().isoformat(),
+            link=emails.link("/login"),
+        )
+    await commit_and_dispatch(ctx.db)
+    return DeletionOut(status="deleting", purge_after=purge_after)
+
+
+@router.post("/workspace/restore", response_model=DeletionOut)
+async def restore_workspace(ctx: Ctx = Depends(owner_of_deleted_workspace())) -> DeletionOut:
+    require_recent_auth(ctx)
+    assert ctx.tenant is not None
+    await ctx.db.execute(
+        update(Tenant)
+        .where(Tenant.id == ctx.tenant.id)
+        .values(status="active", deletion_requested_at=None, deletion_contact=None)
+    )
+    await audit.record(
+        ctx.db,
+        "workspace.restored",
+        target_type="workspace",
+        target_id=ctx.tenant.id,
+        data={"name": ctx.tenant.name},
+    )
+    await ctx.db.commit()
+    return DeletionOut(status="active", purge_after=None)
 
 
 # ---- Roles ------------------------------------------------------------------------------
@@ -974,6 +1062,15 @@ async def update_branch(
         await _unique_branch_name(ctx, changes["name"], exclude=branch.id)
     if "timezone" in changes:
         workspaces.valid_timezone(changes["timezone"])
+    if changes.get("require_admin_mfa") and ctx.user.totp_enabled_at is None:
+        # Otherwise the person turning it on would lock themselves out.
+        raise Invalid(
+            "Turn on two-step verification for your own account first.",
+            code="mfa_required_first",
+            errors=[
+                {"field": "require_admin_mfa", "message": "Turn on two-step verification for yourself first."}
+            ],
+        )
     if changes.get("is_active") is True and not branch.is_active:
         assert ctx.entitlements is not None
         limit = ctx.entitlements.plan.max_branches

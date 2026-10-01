@@ -84,6 +84,7 @@ forbidden_modules = ["app.modules"]
 name = "Modules only depend on the modules below them"
 type = "layers"
 layers = [
+    "app.modules.privacy",
     "app.modules.payroll",
     "app.modules.attendance | app.modules.leave",
     "app.modules.people",

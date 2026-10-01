@@ -25,6 +25,7 @@ from app.modules.platform.internal import router as internal_router
 from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
 from app.modules.platform.routes_workspace import router as workspace_router
+from app.modules.privacy.routes import router as privacy_router
 
 log = logging.getLogger("app")
 
@@ -36,6 +37,7 @@ ROUTERS = (
     attendance_router,
     leave_router,
     payroll_router,
+    privacy_router,
     internal_router,
 )
 ops_router = APIRouter(tags=["ops"])

@@ -15,7 +15,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import BigInteger, String, Text, UniqueConstraint, select, text
+from sqlalchemy import BigInteger, String, Text, UniqueConstraint, func, select, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -53,6 +53,20 @@ class AuditEvent(TenantScoped, Base):
     prev_hash: Mapped[str] = mapped_column(String(64))
     hash: Mapped[str] = mapped_column(String(64))
     note: Mapped[str | None] = mapped_column(Text)
+
+
+class AuditAnchor(TenantScoped, Base):
+    """Written when old audit entries are purged under the plan's retention: the last
+    purged entry's seq and hash, so the remaining chain still verifies from there."""
+
+    __tablename__ = "audit_anchors"
+    __table_args__ = (UniqueConstraint("tenant_id", "seq"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid7)
+    seq: Mapped[int] = mapped_column(BigInteger)
+    hash: Mapped[str] = mapped_column(String(64))
+    purged_rows: Mapped[int] = mapped_column(BigInteger)
+    purged_at: Mapped[datetime]
 
 
 def redact(data: Any) -> Any:
@@ -126,6 +140,17 @@ async def record(
             .limit(1)
         )
     ).first()
+    if last is None:
+        # Every entry may have been purged under the retention policy: carry on from the
+        # anchor so the chain stays continuous, rather than starting again.
+        last = (
+            await db.execute(
+                select(AuditAnchor.seq, AuditAnchor.hash)
+                .where(AuditAnchor.tenant_id == tenant_id)
+                .order_by(AuditAnchor.seq.desc())
+                .limit(1)
+            )
+        ).first()
     prev_seq, prev_hash = (last[0], last[1]) if last else (0, GENESIS)
     event = AuditEvent(
         id=uuid7(),
@@ -151,10 +176,21 @@ async def record(
 
 
 async def verify_chain(db: AsyncSession) -> tuple[bool, int | None]:
-    """Recompute the current tenant's chain. Returns (ok, first bad seq)."""
+    """Recompute the current tenant's chain. Returns (ok, first bad seq).
+
+    If old entries were purged under the retention policy, the chain starts from the
+    anchor recorded for the last purged entry."""
     tenant_id = current_tenant(db)
     prev = GENESIS
     expected_seq = 1
+    first = await db.scalar(select(func.min(AuditEvent.seq)).where(AuditEvent.tenant_id == tenant_id))
+    if first is not None and first > 1:
+        anchor = await db.scalar(
+            select(AuditAnchor).where(AuditAnchor.tenant_id == tenant_id, AuditAnchor.seq == first - 1)
+        )
+        if anchor is None:
+            return False, int(first)
+        prev, expected_seq = anchor.hash, int(first)
     rows = await db.stream_scalars(
         select(AuditEvent).where(AuditEvent.tenant_id == tenant_id).order_by(AuditEvent.seq)
     )

@@ -76,6 +76,10 @@ class Tenant(IdMixin, TimestampMixin, Base):
     fiscal_year_start_month: Mapped[int] = mapped_column(SmallInteger, default=1)
     status: Mapped[str] = mapped_column(String(10), default="active")
     deletion_requested_at: Mapped[datetime | None]
+    # Who asked, so the deletion certificate can reach them after everything else is gone.
+    deletion_contact: Mapped[str | None] = mapped_column(String(254))
+    # Owners and admins must use two-step verification.
+    require_admin_mfa: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class Subscription(IdMixin, TenantScoped, TimestampMixin, Base):

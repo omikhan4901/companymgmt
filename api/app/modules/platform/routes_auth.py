@@ -20,7 +20,7 @@ from app.core.schema import In, Out, ShortName
 from app.core.security import crypto, passwords, totp
 from app.core.security.tokens import hash_secret, new_secret
 from app.modules.platform import catalog, emails, workspaces
-from app.modules.platform.deps import Ctx, public, signed_in
+from app.modules.platform.deps import Ctx, needs_mfa, public, signed_in
 from app.modules.platform.models import (
     AuthChallenge,
     AuthSession,
@@ -199,6 +199,9 @@ class CurrentWorkspace(Out):
     plan: PlanOut
     membership_id: uuid.UUID
     scope_department_id: uuid.UUID | None
+    require_admin_mfa: bool = False
+    # This person must turn on two-step verification before using the workspace.
+    mfa_setup_required: bool = False
 
 
 class MeOut(Out):
@@ -576,6 +579,8 @@ async def me(ctx: Ctx = Depends(signed_in())) -> MeOut:
             permissions=sorted(ctx.permissions),
             membership_id=ctx.membership.id,
             scope_department_id=ctx.membership.scope_department_id,
+            require_admin_mfa=ctx.tenant.require_admin_mfa,
+            mfa_setup_required=needs_mfa(ctx),
             plan=PlanOut(
                 key=ent.plan.key,
                 name=ent.plan.name,
