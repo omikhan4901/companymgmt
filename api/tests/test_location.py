@@ -191,6 +191,8 @@ async def test_unplaced_branches_do_not_block_anyone(client: httpx.AsyncClient) 
     assert settings == {
         "location_mode": "require",
         "max_accuracy_m": 100,
+        "day_starts_at": "09:00:00",
+        "late_after_minutes": 15,
         "branches_total": 1,
         "branches_located": 0,
     }
