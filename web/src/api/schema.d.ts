@@ -2106,6 +2106,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/reports/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Subscription */
+        get: operations["get_subscription_v1_reports_subscription_get"];
+        /** Save Subscription */
+        put: operations["save_subscription_v1_reports_subscription_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/roles": {
         parameters: {
             query?: never;
@@ -5047,6 +5065,32 @@ export interface components {
             rate: number;
             /** Tax Free Override */
             tax_free_override: number | null;
+        };
+        /** SubscriptionIn */
+        SubscriptionIn: {
+            /** Department Id */
+            department_id?: string | null;
+            /**
+             * Monthly
+             * @default false
+             */
+            monthly: boolean;
+            /**
+             * Weekly
+             * @default false
+             */
+            weekly: boolean;
+        };
+        /** SubscriptionOut */
+        SubscriptionOut: {
+            /** Department Id */
+            department_id: string | null;
+            /** Has Email */
+            has_email: boolean;
+            /** Monthly */
+            monthly: boolean;
+            /** Weekly */
+            weekly: boolean;
         };
         /** SwitchIn */
         SwitchIn: {
@@ -10055,6 +10099,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OverviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_subscription_v1_reports_subscription_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+        };
+    };
+    save_subscription_v1_reports_subscription_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
                 };
             };
             /** @description Validation Error */

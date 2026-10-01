@@ -832,6 +832,11 @@ const en = {
     times_other: "{{formatted}} times",
     tasks_one: "{{formatted}} task",
     tasks_other: "{{formatted}} tasks",
+    emailTitle: "Get this report by email",
+    emailSub: "Last week's on the first day of each week, last month's on the 1st. For the department chosen above.",
+    noEmail: "Your account has no email address, so reports can't be emailed to you.",
+    weekly: "Every week",
+    monthly: "Every month",
   },
   lateness: {
     title: "Working hours",

@@ -23,6 +23,10 @@ test("an owner sets working hours and reads the reports", async ({ page }, info)
   await expect(page.getByRole("heading", { name: "Attendance by day" })).toBeVisible();
   await page.getByLabel("Period").selectOption({ label: "Last month" });
   await expect(page.getByText("Nobody took leave in this period.")).toBeVisible();
+  await page.getByRole("switch", { name: "Every week" }).click();
+  await expect(page.getByRole("switch", { name: "Every week" })).toBeChecked();
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "Every week" })).toBeChecked();
   await expectAccessible(page, "reports");
   expect(csp).toEqual([]);
 });

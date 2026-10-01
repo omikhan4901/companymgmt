@@ -8217,6 +8217,71 @@
     "title": "StructureOut",
     "type": "object"
    },
+   "SubscriptionIn": {
+    "additionalProperties": false,
+    "properties": {
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "monthly": {
+      "default": false,
+      "title": "Monthly",
+      "type": "boolean"
+     },
+     "weekly": {
+      "default": false,
+      "title": "Weekly",
+      "type": "boolean"
+     }
+    },
+    "title": "SubscriptionIn",
+    "type": "object"
+   },
+   "SubscriptionOut": {
+    "properties": {
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "has_email": {
+      "title": "Has Email",
+      "type": "boolean"
+     },
+     "monthly": {
+      "title": "Monthly",
+      "type": "boolean"
+     },
+     "weekly": {
+      "title": "Weekly",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "weekly",
+     "monthly",
+     "department_id",
+     "has_email"
+    ],
+    "title": "SubscriptionOut",
+    "type": "object"
+   },
    "SwitchIn": {
     "additionalProperties": false,
     "properties": {
@@ -16155,6 +16220,66 @@
      }
     },
     "summary": "Overview",
+    "tags": [
+     "reports"
+    ]
+   }
+  },
+  "/v1/reports/subscription": {
+   "get": {
+    "operationId": "get_subscription_v1_reports_subscription_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SubscriptionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Subscription",
+    "tags": [
+     "reports"
+    ]
+   },
+   "put": {
+    "operationId": "save_subscription_v1_reports_subscription_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SubscriptionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SubscriptionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Subscription",
     "tags": [
      "reports"
     ]

@@ -1,18 +1,20 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 import { api } from "@/api/client";
 import { departmentOptions, useDepartments } from "@/api/hooks";
-import type { Overview } from "@/api/types";
+import type { Overview, ReportSubscription } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { BarChart, type Bar } from "@/components/bar-chart";
 import { PageHeader } from "@/components/page";
 import { Card, CardHeader, EmptyState } from "@/components/ui/card";
+import { Switch } from "@/components/ui/choice";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -148,6 +150,36 @@ function Report({ data }: { data: Overview }) {
   );
 }
 
+/** Get this report by email every week or month (for the department chosen above). */
+function EmailMe({ department }: { department: string }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const sub = useQuery({ queryKey: ["reports", "subscription"], queryFn: () => api<ReportSubscription>("/v1/reports/subscription") });
+  const save = useMutation({
+    mutationFn: (body: { weekly: boolean; monthly: boolean }) => api<ReportSubscription>("/v1/reports/subscription", { method: "PUT", body: { ...body, department_id: department || null } }),
+    onSuccess: (saved) => {
+      queryClient.setQueryData(["reports", "subscription"], saved);
+      toast.success(t("common.saved"));
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  if (!sub.data) return null;
+  const s = sub.data;
+  return (
+    <Card>
+      <CardHeader title={t("reports.emailTitle")} sub={s.has_email ? t("reports.emailSub") : t("reports.noEmail")} />
+      <div className="flex flex-wrap gap-6 p-5 pt-4">
+        {(["weekly", "monthly"] as const).map((f) => (
+          <label key={f} className="flex items-center gap-3 text-sm">
+            <Switch checked={s[f]} disabled={!s.has_email || save.isPending} onCheckedChange={(on) => save.mutate({ weekly: s.weekly, monthly: s.monthly, [f]: on })} aria-label={t(`reports.${f}`)} />
+            {t(`reports.${f}`)}
+          </label>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 export default function ReportsPage() {
   const { t } = useTranslation();
   const { can } = useSession();
@@ -197,7 +229,10 @@ export default function ReportsPage() {
           <Spinner />
         </div>
       ) : report.data ? (
-        <Report data={report.data} />
+        <div className="flex flex-col gap-5">
+          <Report data={report.data} />
+          <EmailMe department={department} />
+        </div>
       ) : (
         <EmptyState icon={<BarChart3 />} title={errorMessage(report.error)} />
       )}

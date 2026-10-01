@@ -75,3 +75,4 @@ export type DocAcks = S["AcksOut"];
 export type ApprovalItem = S["ApprovalItem"];
 export type ImportResult = S["ImportOut"];
 export type Overview = S["OverviewOut"];
+export type ReportSubscription = S["SubscriptionOut"];
