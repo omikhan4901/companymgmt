@@ -28,6 +28,7 @@ from app.core.time import utcnow
 from app.models_registry import metadata
 from app.modules.attendance.models import AttendanceCorrection, AttendanceRecord
 from app.modules.leave.models import LeaveAdjustment, LeaveRequest, LeaveType
+from app.modules.notifications.models import Notification
 from app.modules.payroll.models import PayrollRun, Payslip, SalaryStructure
 from app.modules.people.models import Employee
 from app.modules.people.service import employee_for_membership
@@ -244,6 +245,7 @@ async def my_data(ctx: Ctx) -> tuple[bytes, str]:
             Payslip, and_(Payslip.employee_id == me.id, Payslip.run_id.in_(published))
         )
     out["audit_events_by_me"] = await rows(AuditEvent, AuditEvent.actor_user_id == user.id)
+    out["notifications"] = await rows(Notification, Notification.user_id == user.id)
     out["memberships_elsewhere"] = len(
         list(await db.scalars(select(Membership.id).where(Membership.user_id == user.id)))
     )

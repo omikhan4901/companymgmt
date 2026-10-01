@@ -33,6 +33,7 @@ log = logging.getLogger("app.jobs.maintenance")
 
 # Global tables that point at a workspace or a user and must be cleaned up with it.
 SESSION_CHILDREN = ("refresh_tokens",)
+NOTIFICATIONS_KEPT = timedelta(days=180)
 USER_CHILDREN = ("auth_challenges", "recovery_codes", "email_tokens", "auth_events")
 
 
@@ -166,11 +167,15 @@ def _retention_days(conn: psycopg.Connection, now: datetime) -> int | None:
 
 def apply_audit_retention(conn: psycopg.Connection, now: datetime) -> dict[str, int]:
     """Delete audit entries older than each workspace's plan allows, keeping an anchor.
-    The domain event log follows the same retention."""
+    The domain event log follows the same retention; notifications go after six months."""
     purged: dict[str, int] = {}
     for (tenant_id,) in conn.execute("SELECT id FROM tenants WHERE status = 'active'").fetchall():
         with conn.transaction():
             _bind(conn, tenant_id)
+            conn.execute(
+                "DELETE FROM notifications WHERE tenant_id = %s AND created_at < %s",
+                (tenant_id, now - NOTIFICATIONS_KEPT),
+            )
             days = _retention_days(conn, now)
             if days is None:
                 continue

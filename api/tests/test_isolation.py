@@ -186,6 +186,7 @@ async def _resources(owner: Account) -> dict[str, str]:
         json={"leave_type_id": ids["leave_type_id"], "start_date": str(day), "end_date": str(day)},
     )
     ids["request_id"] = leave.json()["id"]
+    ids["notification_id"] = (await owner.get("/v1/notifications")).json()["items"][0]["id"]
     salary = await owner.post(
         "/v1/payroll/salaries",
         json={"employee_id": ids["employee_id"], "effective_from": "2024-01-01", "basic": 1_000_000},

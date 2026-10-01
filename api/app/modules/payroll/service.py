@@ -770,7 +770,20 @@ async def finalize(ctx: Ctx, run_id: uuid.UUID) -> RunDetail:
         "payroll.finalized",
         subject_type="payroll_run",
         subject_id=run.id,
-        data={"period": run.period, "headcount": run.headcount, "net": run.net, "currency": run.currency},
+        data={
+            "period": run.period,
+            "headcount": run.headcount,
+            "net": run.net,
+            "currency": run.currency,
+            # Whose payslips are now ready (members only; people without a login can't be told).
+            "membership_ids": list(
+                await ctx.db.scalars(
+                    select(Employee.membership_id).where(
+                        Employee.id.in_([s.employee_id for s in slips]), Employee.membership_id.is_not(None)
+                    )
+                )
+            ),
+        },
     )
     await ctx.db.commit()
     return await run_detail(ctx, run.id)

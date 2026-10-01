@@ -18,6 +18,7 @@ from app.core.security.tokens import _keys
 from app.jobs import maintenance
 from tests.conftest import owner_dsn
 from tests.helpers import Account, add_staff, invite_and_join, signup
+from tests.test_leave import sunday_in_march
 
 
 async def enable_mfa(account: Account) -> None:
@@ -221,6 +222,12 @@ async def test_people_export_their_own_data(client: httpx.AsyncClient) -> None:
     _, other = await add_staff(owner, name="Other")
     await staff.post("/v1/attendance/clock-in", json={})
     await other.post("/v1/attendance/clock-in", json={})
+    kinds = {k["name"]: k["id"] for k in (await staff.get("/v1/leave/types")).json()}
+    day = str(sunday_in_march())
+    body = {"leave_type_id": kinds["Unpaid leave"], "start_date": day, "end_date": day}
+    asked = await staff.post("/v1/leave/requests", json=body)
+    assert asked.status_code == 201, asked.text
+    await owner.post(f"/v1/leave/requests/{asked.json()['id']}/reject", json={})
     response = await staff.get("/v1/privacy/my-data")
     assert response.status_code == 200, response.text
     data = response.json()
@@ -230,6 +237,7 @@ async def test_people_export_their_own_data(client: httpx.AsyncClient) -> None:
     assert data["attendance"][0]["employee_id"] == data["profile"]["id"]
     assert "Other" not in json.dumps(data)
     assert data["payslips"] == []
+    assert [n["kind"] for n in data["notifications"]] == ["leave.rejected"]
 
 
 async def test_me_explains_a_workspace_pending_deletion(client: httpx.AsyncClient) -> None:

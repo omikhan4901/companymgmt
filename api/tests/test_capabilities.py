@@ -92,6 +92,8 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("leave.calendar", "/v1/leave/calendar", window),
         ("payroll.my_payslips", "/v1/payroll/payslips", {}),
         ("payroll.runs", "/v1/payroll/runs", {}),
+        ("notifications.inbox", "/v1/notifications", {}),
+        ("notifications.inbox", "/v1/notifications", {"unread": True, "limit": 1}),
     ]
     covered = set()
     for who in ("owner", "manager", "cook"):
