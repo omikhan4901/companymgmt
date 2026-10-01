@@ -1,7 +1,7 @@
 # API image for Cloud Run. Build from the repo root: docker build -f api/Dockerfile .
 # (The repo root is the context so the image could include shared files later.)
 
-FROM mirror.gcr.io/library/python:3.12-slim-bookworm AS build
+FROM mirror.gcr.io/library/python:3.14-slim-bookworm AS build
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never PIP_DISABLE_PIP_VERSION_CHECK=1
 RUN pip install --no-cache-dir "uv==0.8.17"
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY api/app ./app
 COPY api/migrations ./migrations
 COPY api/alembic.ini ./
 
-FROM mirror.gcr.io/library/python:3.12-slim-bookworm AS runtime
+FROM mirror.gcr.io/library/python:3.14-slim-bookworm AS runtime
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PATH="/app/.venv/bin:$PATH" PORT=8080 \
     ENV=prod TRUST_PROXY_HEADERS=true
 # Pango and HarfBuzz for payslip PDFs (WeasyPrint); fonts ship with the app.
