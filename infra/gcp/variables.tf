@@ -26,3 +26,9 @@ variable "monthly_budget_usd" {
   type        = number
   default     = 50
 }
+
+variable "time_zone" {
+  description = "Time zone for the nightly jobs' schedule"
+  type        = string
+  default     = "Asia/Dhaka"
+}

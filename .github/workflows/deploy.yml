@@ -53,6 +53,25 @@ jobs:
             --set-secrets MIGRATIONS_DATABASE_URL=migrations-database-url:latest,DATABASE_URL=database-url:latest,JWT_PRIVATE_KEY=jwt-private-key:latest,FIELD_ENCRYPTION_KEYS=field-encryption-keys:latest,SMTP_URL=smtp-url:latest \
             --max-retries 0 --task-timeout 600
           gcloud run jobs execute companymgmt-migrate --region "$REGION" --wait
+      - name: Deploy the nightly maintenance job (purges, audit retention)
+        run: |
+          gcloud run jobs deploy companymgmt-maintenance --region "$REGION" --image "$DIGEST" \
+            --service-account "${{ vars.GCP_RUNTIME_SA }}" \
+            --command python --args=-m,app.jobs.maintenance \
+            --set-env-vars ENV=prod,APP_DB_ROLE=cm_app \
+            --set-secrets MIGRATIONS_DATABASE_URL=migrations-database-url:latest,DATABASE_URL=database-url:latest,JWT_PRIVATE_KEY=jwt-private-key:latest,FIELD_ENCRYPTION_KEYS=field-encryption-keys:latest \
+            --max-retries 1 --task-timeout 1800
+      - name: Build and deploy the nightly backup job
+        if: vars.BACKUP_AGE_RECIPIENT != ''
+        run: |
+          backup="${REGION}-docker.pkg.dev/${PROJECT}/companymgmt/backup:${GITHUB_SHA}"
+          docker build -f infra/backup/Dockerfile -t "$backup" infra/backup
+          docker push "$backup"
+          gcloud run jobs deploy companymgmt-backup --region "$REGION" --image "$backup" \
+            --service-account "${{ vars.GCP_RUNTIME_SA }}" \
+            --set-env-vars "AGE_RECIPIENT=${{ vars.BACKUP_AGE_RECIPIENT }},BACKUP_DEST=r2:${{ vars.R2_BACKUP_BUCKET }}/db,KEEP_DAYS=30,RCLONE_CONFIG_R2_TYPE=s3,RCLONE_CONFIG_R2_PROVIDER=Cloudflare,RCLONE_CONFIG_R2_ENDPOINT=${{ vars.R2_ENDPOINT }},RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true" \
+            --set-secrets BACKUP_DATABASE_URL=backup-database-url:latest,RCLONE_CONFIG_R2_ACCESS_KEY_ID=r2-access-key-id:latest,RCLONE_CONFIG_R2_SECRET_ACCESS_KEY=r2-secret-access-key:latest \
+            --max-retries 1 --task-timeout 3600
       - name: Deploy the API
         run: |
           gcloud run deploy companymgmt-api --region "$REGION" --image "$DIGEST" \

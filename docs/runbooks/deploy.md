@@ -29,8 +29,18 @@ domain later.
    ```sql
    CREATE ROLE cm_owner LOGIN PASSWORD 'OWNER-PASSWORD-HERE';
    CREATE ROLE cm_app LOGIN NOBYPASSRLS PASSWORD 'APP-PASSWORD-HERE';
+   -- Reads everything for the nightly backup; can change nothing.
+   CREATE ROLE cm_backup LOGIN BYPASSRLS PASSWORD 'BACKUP-PASSWORD-HERE';
    GRANT cm_app TO cm_owner;
    CREATE DATABASE companymgmt OWNER cm_owner;
+   ```
+
+   Then switch the SQL Editor to database `companymgmt` and run:
+
+   ```sql
+   GRANT USAGE ON SCHEMA public TO cm_backup;
+   ALTER DEFAULT PRIVILEGES FOR ROLE cm_owner IN SCHEMA public GRANT SELECT ON TABLES TO cm_backup;
+   ALTER DEFAULT PRIVILEGES FOR ROLE cm_owner IN SCHEMA public GRANT SELECT ON SEQUENCES TO cm_backup;
    ```
 
    Create `cm_app` with SQL like this, not in the Roles screen: roles made in the Neon
@@ -42,6 +52,8 @@ domain later.
      **migrations URL**.
    - Change each so it starts with `postgresql+psycopg://` and ends with
      `?sslmode=verify-full&sslrootcert=system`.
+   - With **Connection pooling OFF**, copy the address for role `cm_backup` → the
+     **backup URL**. Keep it starting with `postgresql://` (it's used by `pg_dump`).
 
 ## 2. Google Cloud
 
@@ -85,6 +97,7 @@ domain later.
    gcloud secrets versions add field-encryption-keys --data-file=-   # e.g. {"k1": "…"}
    gcloud secrets versions add internal-token --data-file=-
    gcloud secrets versions add smtp-url --data-file=-                # see step 4
+   gcloud secrets versions add backup-database-url --data-file=-     # the backup URL
    ```
 
    **Back up `field-encryption-keys` somewhere safe** (a password manager). Without it,
@@ -116,6 +129,21 @@ domain later.
    then `gcloud secrets versions add turnstile-secret --data-file=-`, and add
    `TURNSTILE_SECRET=turnstile-secret:latest` to `--set-secrets` in `deploy.yml`.
 
+7. **Backups (R2)**: **R2 → Create bucket** `companymgmt-backups` (location: Asia
+   Pacific). Then **R2 → Manage API tokens → Create API token**: *Object Read & Write*,
+   only that bucket. Note the *Access Key ID*, *Secret Access Key* and the *S3 endpoint*
+   (`https://<account-id>.r2.cloudflarestorage.com`), and add the keys to Google:
+
+   ```bash
+   gcloud secrets versions add r2-access-key-id --data-file=-
+   gcloud secrets versions add r2-secret-access-key --data-file=-
+   ```
+
+   Make the backup encryption key **on your own computer** (`age-keygen -o backup-key.txt`,
+   from <https://age-encryption.org>). The line starting `age1…` is the public key: it goes
+   into GitHub (step 5). The file itself is the only way to read a backup: keep it in a
+   password manager and on paper, never in the cloud account.
+
 ## 4. Email
 
 Any SMTP service works. With Resend: sign up, **Domains → Add domain** and add the DNS
@@ -141,6 +169,9 @@ Actions**:
 | Variable | `MAIL_FROM` | `CompanyMgmt <no-reply@yourdomain>` |
 | Variable | `TURNSTILE_SITE_KEY` | optional, from step 3.6 |
 | Secret | `CLOUDFLARE_API_TOKEN` | from step 3.4 |
+| Variable | `BACKUP_AGE_RECIPIENT` | the `age1…` public key from step 3.7 |
+| Variable | `R2_BACKUP_BUCKET` | `companymgmt-backups` |
+| Variable | `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
 | Variable | `DEPLOY_ENABLED` | `true` (last) |
 
 ## 6. First deploy
@@ -164,7 +195,18 @@ Actions**:
      --headers "X-Internal-Token=$TOKEN"
    ```
 
-3. Check: open the web app, sign up, confirm the email arrives, clock in on your phone.
+3. The nightly jobs (`companymgmt-maintenance` purges deleted workspaces and old audit
+   entries; `companymgmt-backup` writes the encrypted dump) are scheduled by OpenTofu.
+   Run each once now to check them:
+
+   ```bash
+   gcloud run jobs execute companymgmt-maintenance --region asia-southeast1 --wait
+   gcloud run jobs execute companymgmt-backup --region asia-southeast1 --wait
+   ```
+
+   The backup's log ends with `{"backup": "companymgmt-….dump.age", …}`, and the file
+   appears in the R2 bucket under `db/`.
+4. Check: open the web app, sign up, confirm the email arrives, clock in on your phone.
 
 ## Custom domain (later)
 

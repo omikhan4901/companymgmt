@@ -113,3 +113,15 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "1"
+      - name: Build backup image and check its tools
+        run: |
+          docker build -f infra/backup/Dockerfile -t companymgmt-backup:${{ github.sha }} infra/backup
+          docker run --rm --entrypoint sh companymgmt-backup:${{ github.sha }} -c \
+            'pg_dump --version && age --version && rclone version | head -1 && bash -n /usr/local/bin/backup.sh'
+      - name: Scan backup image (Trivy)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: companymgmt-backup:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"

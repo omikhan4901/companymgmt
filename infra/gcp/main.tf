@@ -42,6 +42,10 @@ locals {
     "smtp-url",
     "internal-token",
     "proxy-token",
+    # Nightly backup: the cm_backup role's address, and Cloudflare R2 keys.
+    "backup-database-url",
+    "r2-access-key-id",
+    "r2-secret-access-key",
   ]
 }
 
@@ -187,3 +191,43 @@ resource "google_billing_budget" "monthly" {
 }
 
 data "google_project" "this" {}
+
+# ---- Nightly jobs ---------------------------------------------------------------------
+# Cloud Scheduler starts two Cloud Run Jobs that the deploy workflow creates:
+#   companymgmt-maintenance  purges deleted workspaces and old audit entries
+#   companymgmt-backup       pg_dump | age → Cloudflare R2, kept 30 days
+
+resource "google_service_account" "scheduler" {
+  account_id   = "companymgmt-scheduler"
+  display_name = "CompanyMgmt starts its nightly jobs"
+}
+
+# Allowed to start Cloud Run jobs, nothing else.
+resource "google_project_iam_member" "scheduler_runs_jobs" {
+  project = var.project
+  role    = "roles/run.invoker"
+  member  = "serviceAccount:${google_service_account.scheduler.email}"
+}
+
+resource "google_cloud_scheduler_job" "nightly" {
+  for_each = {
+    "companymgmt-maintenance" = "23 3 * * *"
+    "companymgmt-backup"      = "47 3 * * *"
+  }
+  name             = each.key
+  schedule         = each.value
+  time_zone        = var.time_zone
+  attempt_deadline = "320s"
+  retry_config {
+    retry_count = 1
+  }
+  http_target {
+    http_method = "POST"
+    uri         = "https://run.googleapis.com/v2/projects/${var.project}/locations/${var.region}/jobs/${each.key}:run"
+    oauth_token {
+      service_account_email = google_service_account.scheduler.email
+      scope                 = "https://www.googleapis.com/auth/cloud-platform"
+    }
+  }
+  depends_on = [google_project_service.apis]
+}
