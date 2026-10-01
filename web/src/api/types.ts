@@ -65,3 +65,5 @@ export type Task = S["TaskOut"];
 export type TaskDetail = S["TaskDetail"];
 export type ChecklistItem = S["ChecklistItemOut"];
 export type TaskComment = S["CommentOut"];
+export type Announcement = S["AnnouncementOut"];
+export type Receipts = S["ReceiptsOut"];

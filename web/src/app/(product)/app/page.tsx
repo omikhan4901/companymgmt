@@ -13,6 +13,7 @@ import { useAttendanceSettings, useAway, useCorrections, useDepartments, useLeav
 import type { AttendanceRecord, Employee, Page } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { ClockCard } from "@/components/attendance/clock-card";
+import { useFeed } from "@/components/announcements/data";
 import { useMyWork } from "@/components/tasks/data";
 import { TaskRow } from "@/components/tasks/shared";
 import { BarChart, type Bar } from "@/components/bar-chart";
@@ -24,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { intlLocale } from "@/i18n";
 import { errorMessage } from "@/lib/errors";
-import { formatDateTime, formatDay, formatDuration, formatNumber, formatTime, todayIn } from "@/lib/format";
+import { formatAgo, formatDateTime, formatDay, formatDuration, formatNumber, formatTime, todayIn } from "@/lib/format";
 import { addDays, daysBetween, startOfWeek } from "@/lib/week";
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -166,6 +167,41 @@ function AwayCard({ className }: { className?: string }) {
           ))}
         </ul>
       </div>
+    </Card>
+  );
+}
+
+function NewsCard({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  const feed = useFeed();
+  const latest = (feed.data ?? []).slice(0, 2);
+  if (feed.data && latest.length === 0) return null;
+  return (
+    <Card className={className}>
+      <CardHeader
+        title={t("news.latest")}
+        action={
+          <Link href="/app/announcements" className="text-sm font-medium text-accent-soft-text hover:underline">
+            {t("news.seeAll")}
+          </Link>
+        }
+      />
+      <ul className="flex flex-col gap-3 px-5 pb-5 pt-2">
+        {latest.map((post) => (
+          <li key={post.id}>
+            <Link href={`/app/announcements?post=${post.id}`} className="block rounded-xl border border-border p-3 hover:bg-surface-2">
+              <span className="flex items-center gap-2 text-sm font-semibold">
+                {post.title}
+                {!post.read && <Badge tone="accent">{t("news.new")}</Badge>}
+              </span>
+              <span className="mt-1 line-clamp-2 block text-sm text-muted">{post.body}</span>
+              <span className="mt-1.5 block text-xs text-muted">
+                {post.author_name} · {formatAgo(post.published_at)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 }
@@ -389,6 +425,7 @@ export default function HomePage() {
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
         {manager && can("attendance.approve") && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
+        {hasModule("announcements") && can("announcements.read") && <NewsCard className="md:col-span-2" />}
         {hasModule("tasks") && can("tasks.self") && <MyWorkCard className="md:col-span-2" />}
         {hasModule("leave") && can("leave.self") && <AwayCard className="md:col-span-2" />}
         <Checklist className="md:col-span-2" />
