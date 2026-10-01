@@ -104,12 +104,13 @@ architecture one-pager. Only built features and measured numbers.
   in-transaction and outbox subscribers. A parity test proves every read capability
   answers (and refuses) exactly like its REST route for an owner, a scoped manager and an
   employee.
-- **M3.2 notifications: in-app center done.** Requests go to the people who can decide
-  them in that person's department scope; decisions go back to the person; nobody hears
-  about their own actions; payslip notices leave out run totals. Bell with unread count in
-  the header (English and Bangla), kept six months, included in "my data". Email digests
-  next.
-- Next: email digests, tasks and projects, announcements, documents and policies, the
+- **M3.2 notifications: done.** Requests go to the people who can decide them in that
+  person's department scope; decisions go back to the person; nobody hears about their
+  own actions; payslip notices leave out run totals. Bell with unread count in the header
+  (English and Bangla), kept six months, included in "my data". A daily email lists what
+  each person hasn't read (once, in their language, an hour's grace, can be turned off on
+  the account page; staff without email never get one).
+- Next: tasks and projects, announcements, documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
 ## Log
@@ -123,3 +124,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M2 Payroll pushed: API, pay maths with Hypothesis invariants, 500 people in ~1 s, payslip PDFs (WeasyPrint, bundled Bangla fonts), web screens, browser journey.
 - 2026-10-01: M2 done: data rights (exports and import, deletion with a 30-day restore and signed certificate, audit retention with anchors, admin two-step policy), nightly maintenance and encrypted backup jobs.
 - 2026-10-01: M3.1 pushed: capability registry, AI context, domain events. M3.2 in-app notifications.
+- 2026-10-01: M3.2 notifications done (in-app and daily email digest). CI caught forms wiping typed input when data loaded late; fixed with a browser test.
