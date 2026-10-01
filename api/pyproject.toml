@@ -47,7 +47,7 @@ ignore = ["S101", "RUF012", "B008"]
 "tests/**" = ["S105", "S106", "S311", "DTZ001"]
 "migrations/**" = ["E501", "C408"]
 "app/modules/platform/emails.py" = ["E501", "RUF001"]
-"scripts/demo_seed.py" = ["S105", "S311"]
+"scripts/{demo_seed,agency_week}.py" = ["S105", "S311"]
 
 [tool.mypy]
 python_version = "3.12"

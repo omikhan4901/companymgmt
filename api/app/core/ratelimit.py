@@ -35,7 +35,7 @@ class Rule:
 
 
 # Named rules, so limits are easy to find and tune.
-LOGIN_IP = Rule("login-ip", 30, 300)
+LOGIN_IP = Rule("login-ip", get_settings().login_limit_per_ip, 300)
 LOGIN_ACCOUNT = Rule("login-account", 10, 900)
 SIGNUP_IP = Rule("signup-ip", get_settings().signup_limit_per_hour, 3600)
 RESET_IP = Rule("reset-ip", 10, 3600)

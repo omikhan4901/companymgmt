@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     step_up_minutes: int = 5
     # New workspaces per IP address per hour (raised only for end-to-end test runs).
     signup_limit_per_hour: int = 10
+    # Sign-ins per IP address per five minutes (raised only for end-to-end test runs, which
+    # sign thirty people in from one address).
+    login_limit_per_ip: int = 30
 
     # {"key id": "base64 32-byte key"}; the active id encrypts, all ids decrypt.
     field_encryption_keys: SecretStr = SecretStr("")
