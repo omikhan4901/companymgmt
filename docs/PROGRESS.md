@@ -94,12 +94,23 @@ architecture one-pager. Only built features and measured numbers.
 - Numbers: 168 API tests (92% coverage), 22 web unit tests, 9 browser scenarios × desktop
   and phone with axe, sideways-scroll and CSP checks on every page.
 
-## Next
+## M3: in progress (work and knowledge)
 
-M3: work and knowledge, with the AI-ready foundations (`IMPLEMENTATION_PLAN.md` §9):
-tasks and projects, announcements, documents and policies, an approvals inbox,
-notifications, onboarding checklists; business logic moved into services, a capability
-registry and a context builder, domain events.
+- **M3.1 foundations: done.** People and attendance reads moved into services; a
+  capability registry (typed reads over people, attendance, leave, payroll and
+  notifications, each with its permission and module) listed and invoked under `/v1/ai`,
+  with writes refused until propose-and-confirm (M7); a context builder (`/v1/ai/context`);
+  an append-only domain event log written in the same transaction as each change, with
+  in-transaction and outbox subscribers. A parity test proves every read capability
+  answers (and refuses) exactly like its REST route for an owner, a scoped manager and an
+  employee.
+- **M3.2 notifications: in-app center done.** Requests go to the people who can decide
+  them in that person's department scope; decisions go back to the person; nobody hears
+  about their own actions; payslip notices leave out run totals. Bell with unread count in
+  the header (English and Bangla), kept six months, included in "my data". Email digests
+  next.
+- Next: email digests, tasks and projects, announcements, documents and policies, the
+  approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
 ## Log
 
@@ -111,3 +122,4 @@ registry and a context builder, domain events.
 - 2026-10-01: M2 Leave web screens: ask with a live day count, approve, month calendar, balances, settings. Demo seed includes leave.
 - 2026-10-01: M2 Payroll pushed: API, pay maths with Hypothesis invariants, 500 people in ~1 s, payslip PDFs (WeasyPrint, bundled Bangla fonts), web screens, browser journey.
 - 2026-10-01: M2 done: data rights (exports and import, deletion with a 30-day restore and signed certificate, audit retention with anchors, admin two-step policy), nightly maintenance and encrypted backup jobs.
+- 2026-10-01: M3.1 pushed: capability registry, AI context, domain events. M3.2 in-app notifications.
