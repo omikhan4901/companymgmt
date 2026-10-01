@@ -30,6 +30,12 @@ checked against each branch's location.
   someone is away, not why). Balances handle mid-year joiners, monthly accrual and
   carry-over; the work week and public holidays don't count. Bangladesh workspaces start
   near the Labour Act 2006 (casual, sick, earned, maternity), Friday off.
+- **Payroll.** Salaries (basic, house rent, medical, conveyance; monthly, hourly or daily)
+  paid by cash, bank or bKash-style wallets. Each month is a pay run: draft → approval →
+  finalized → paid, built from attendance (overtime), unpaid leave, festival bonuses,
+  advances and one-off items. Whoever prepares it can't finalize it. Payslips download as
+  PDF in English or Bangla; a transfer sheet lists who to pay where. Salary tax is an
+  editable table, off until the owner checks it.
 - **People and departments.** Profiles, a department tree and branches. Managers see only
   their own part of the tree.
 - **Staff without email.** Add a cashier with a username; they sign in with the workspace
@@ -46,6 +52,7 @@ checked against each branch's location.
 | ![Attendance records with where each clock-in happened](docs/screenshots/attendance-records.png) | ![Placing a branch on the map](docs/screenshots/branch-location.png) |
 | ![Monthly timesheet](docs/screenshots/timesheet.png) | ![Home in dark mode with the Saffron accent](docs/screenshots/home-dark.png) |
 | ![Who is away this month](docs/screenshots/leave-calendar.png) | ![Leave requests waiting for approval](docs/screenshots/leave-requests.png) |
+| ![A finalized pay run](docs/screenshots/payroll-run.png) | ![A payslip PDF in Bangla](docs/screenshots/payslip-pdf-bangla.png) |
 
 <p align="center">
   <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
@@ -103,12 +110,14 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **135 API tests**, 91% line and branch coverage (CI gate: 85%), all against a real
-  Postgres: auth, isolation, workspaces, people, attendance, location checks, leave, plans.
+- **159 API tests**, 92% line and branch coverage (CI gate: 85%), all against a real
+  Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
+  payroll (pay maths checked with Hypothesis; 500 people run in about a second), plans.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
-  the branch; staff ask for leave and the owner approves it; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
+  the branch; staff ask for leave and the owner approves it; the owner runs payroll and staff
+  download their payslip; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
   check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in

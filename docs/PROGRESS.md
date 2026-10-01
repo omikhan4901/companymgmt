@@ -78,8 +78,13 @@ work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
   monthly accrual and carry-over, approvals, team calendar, adjustments) and web screens
   (my leave, requests, calendar, team balances, settings, "Away today" on home), in
   English and Bangla, with a browser journey on desktop and phone.
-- M2 then: Payroll (Bangladesh preset), payslip PDFs, workspace/personal export and
-  deletion, nightly encrypted backups, audit retention, MFA policy for admins.
+- M2 Payroll: done. Salaries, advances, pay runs (draft → review → finalized → paid,
+  four-eyes, step-up to finalize), overtime from attendance, unpaid leave, festival
+  bonuses, carry-forward of shortfalls, transfer sheet, payslip PDFs in English and
+  Bangla. Salary tax: editable table, off by default; **owner to verify the Bangladesh
+  2025-26 slabs** (the official sources couldn't be reached from the build machine).
+- M2 then: workspace/personal export and deletion, nightly encrypted backups, audit
+  retention, MFA policy for admins.
 
 ## Log
 
@@ -89,3 +94,4 @@ work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 - 2026-10-01: M1.6 done: Next.js app with Atlas themes replaces web/ and site/; location-checked clock-in in the UI; /v1 served through a same-origin Pages Function.
 - 2026-10-01: M2 Leave API pushed: Bangladesh defaults near the Labour Act 2006, balances checked again on approval, colleagues see who is away but not why. 135 API tests.
 - 2026-10-01: M2 Leave web screens: ask with a live day count, approve, month calendar, balances, settings. Demo seed includes leave.
+- 2026-10-01: M2 Payroll pushed: API, pay maths with Hypothesis invariants, 500 people in ~1 s, payslip PDFs (WeasyPrint, bundled Bangla fonts), web screens, browser journey.
