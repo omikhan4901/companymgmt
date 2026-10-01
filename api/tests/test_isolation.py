@@ -185,6 +185,31 @@ async def _resources(owner: Account) -> dict[str, str]:
         json={"leave_type_id": ids["leave_type_id"], "start_date": str(day), "end_date": str(day)},
     )
     ids["request_id"] = leave.json()["id"]
+    salary = await owner.post(
+        "/v1/payroll/salaries",
+        json={"employee_id": ids["employee_id"], "effective_from": "2024-01-01", "basic": 1_000_000},
+    )
+    assert salary.status_code == 201, salary.text
+    loan = await owner.post(
+        "/v1/payroll/loans",
+        json={
+            "employee_id": ids["employee_id"],
+            "label": "Advance",
+            "principal": 100_000,
+            "installment": 50_000,
+            "start_period": "2026-01",
+        },
+    )
+    ids["loan_id"] = loan.json()["id"]
+    first = start.date().replace(day=1) - timedelta(days=1)
+    run = (await owner.post("/v1/payroll/runs", json={"period": f"{first:%Y-%m}"})).json()
+    ids["run_id"] = run["id"]
+    ids["payslip_id"] = run["payslips"][0]["id"]
+    item = await owner.post(
+        f"/v1/payroll/runs/{run['id']}/items",
+        json={"employee_id": ids["employee_id"], "kind": "earning", "label": "Bonus", "amount": 100},
+    )
+    ids["item_id"] = item.json()["id"]
     sessions = (await staff_account.get("/v1/auth/sessions")).json()
     ids["session_id"] = sessions[0]["id"]
     assert all(ids.values()), ids
