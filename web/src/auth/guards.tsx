@@ -12,6 +12,8 @@ function redirectFor(pathname: string, me: ReturnType<typeof useSession>["me"]):
   if (!me) return null;
   if (me.must_change_password && pathname !== "/change-password") return "/change-password";
   if (!me.workspace && !pathname.startsWith("/app/account")) return "/app/account";
+  // Owners and admins must turn on two-step verification first, if the workspace says so.
+  if (me.workspace?.mfa_setup_required && !pathname.startsWith("/app/account")) return "/app/account";
   return null;
 }
 

@@ -14,6 +14,7 @@ import { keys } from "@/api/hooks";
 import type { Session } from "@/api/types";
 import { useSession } from "@/auth/session";
 import { PageHeader } from "@/components/page";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
@@ -27,6 +28,7 @@ import { cn } from "@/lib/cn";
 import { applyFieldErrors, errorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
 import { ACCENT_SWATCH, ACCENTS, MODES, useTheme, type Accent, type Mode } from "@/lib/theme";
+import { MyData, PendingDeletion } from "@/components/privacy";
 import { useStepUp } from "@/components/step-up";
 
 
@@ -343,9 +345,16 @@ function Sessions() {
 
 export default function AccountPage() {
   const { t } = useTranslation();
+  const { workspace } = useSession();
   return (
     <>
       <PageHeader title={t("account.title")} />
+      <PendingDeletion />
+      {workspace?.mfa_setup_required && (
+        <Alert tone="warn" className="mb-4">
+          {t("privacy.mfaRequired")}
+        </Alert>
+      )}
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-4">
           <Profile />
@@ -355,6 +364,7 @@ export default function AccountPage() {
         <div className="flex min-w-0 flex-col gap-4">
           <TwoStep />
           <Sessions />
+          {workspace && <MyData />}
         </div>
       </div>
     </>

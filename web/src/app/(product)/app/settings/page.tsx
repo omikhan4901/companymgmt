@@ -22,6 +22,7 @@ import { Choice, ChoiceGroup, Switch } from "@/components/ui/choice";
 import { Field } from "@/components/ui/field";
 import { Input, Select } from "@/components/ui/input";
 import { Table, Td, Th } from "@/components/ui/table";
+import { WorkspaceData } from "@/components/privacy";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { intlLocale } from "@/i18n";
 import { applyFieldErrors, errorMessage } from "@/lib/errors";
@@ -389,6 +390,12 @@ export default function SettingsPage() {
     { key: "branches", label: t("settings.tabs.branches"), content: <Branches />, show: can("branches.manage") },
     { key: "plan", label: t("settings.tabs.plan"), content: <PlanTab />, show: can("workspace.manage") },
     { key: "audit", label: t("settings.tabs.audit"), content: <Audit />, show: can("audit.view") },
+    {
+      key: "data",
+      label: t("privacy.tab"),
+      content: <WorkspaceData />,
+      show: can("workspace.manage") || can("workspace.export") || can("workspace.delete"),
+    },
   ].filter((x) => x.show);
   const [active, setActive] = useTab(tabs.map((x) => x.key));
   if (!tabs.length) return <EmptyState icon={<SettingsIcon />} title={t("common.notAllowed")} />;
@@ -396,7 +403,7 @@ export default function SettingsPage() {
     <>
       <PageHeader title={t("settings.title")} />
       <Tabs value={active} onValueChange={setActive}>
-        <TabsList className="mb-5 w-fit">
+        <TabsList className="mb-5 w-fit max-w-full overflow-x-auto">
           {tabs.map((x) => (
             <TabsTrigger key={x.key} value={x.key}>
               {x.label}

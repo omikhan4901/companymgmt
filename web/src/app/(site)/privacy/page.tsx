@@ -36,10 +36,10 @@ export default function Page() {
     <p>Data is stored with our hosting providers (Google Cloud, Neon and Cloudflare) in Singapore and encrypted in transit and at rest. We don&apos;t sell data or use it for advertising.</p>
 
     <h2>How long</h2>
-    <p>Workspace data is kept while the workspace exists. Self-service workspace deletion is coming soon; until then, the owner can ask us by email and we erase the workspace within 30 days, with backups expiring within 35 days after that.</p>
+    <p>Workspace data is kept while the workspace exists. The owner can delete the workspace in Settings: nobody can use it from that moment, the owner can restore it for 30 days, and then every record is erased and the owner gets a signed deletion certificate by email. Encrypted backups that still hold it expire within 35 days after that. Audit log entries are kept for as long as the workspace&apos;s plan says (30 days to several years), then removed.</p>
 
     <h2>Your rights</h2>
-    <p>You can see and correct your account data in the app, sign out other devices, and ask us for a copy of your data or for deletion. If your data is in a business&apos;s workspace, ask that business first; we help them respond. This policy is written with Bangladesh's Personal Data Protection Act 2026 and GDPR-style rights in mind.</p>
+    <p>You can see and correct your account data in the app, sign out other devices, and download a copy of what a workspace holds about you from your account page. Owners can export the whole workspace. You can also ask us for a copy of your data or for deletion. If your data is in a business&apos;s workspace, ask that business first; we help them respond. This policy is written with Bangladesh's Personal Data Protection Act 2026 and GDPR-style rights in mind.</p>
 
     <h2>Changes</h2>
     <p>We&apos;ll post changes here and tell workspace owners by email about important ones.</p>
