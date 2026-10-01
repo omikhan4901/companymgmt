@@ -10,6 +10,12 @@ export function uniqueEmail(prefix = "owner"): string {
 
 /** WCAG 2.2 AA checks on the current page (serious and critical findings fail), plus no sideways scrolling. */
 export async function expectAccessible(page: Page, label: string): Promise<void> {
+  // Check what people see once things settle, not a toast or dialog halfway through fading in.
+  await page.waitForFunction(
+    () => document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity),
+    undefined,
+    { timeout: 5000 },
+  );
   const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
   expect(scroll, `${label}: page is wider than the screen`).toBeLessThanOrEqual(client);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();

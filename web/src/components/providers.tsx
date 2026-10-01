@@ -13,7 +13,27 @@ import { ThemeProvider, useTheme } from "@/lib/theme";
 
 function ThemedToaster() {
   const { resolved } = useTheme();
-  return <Toaster theme={resolved} position="top-center" richColors closeButton />;
+  // Atlas status colours (checked for WCAG AA in both modes), not sonner's own.
+  return (
+    <Toaster
+      theme={resolved}
+      position="top-center"
+      closeButton
+      // Stacked toasts stay fully readable instead of fading behind the newest one.
+      expand
+      visibleToasts={3}
+      toastOptions={{
+        classNames: {
+          toast: "!rounded-xl !border-border !bg-surface !text-text !shadow-lg",
+          success: "!border-success-soft !bg-success-soft !text-success-text",
+          error: "!border-danger-soft !bg-danger-soft !text-danger-text",
+          warning: "!border-warn-soft !bg-warn-soft !text-warn-text",
+          description: "!text-current",
+          closeButton: "!border-border !bg-surface !text-text",
+        },
+      }}
+    />
+  );
 }
 
 /**
