@@ -98,5 +98,13 @@ test("a 30-person agency finishes its week in the product", async ({ page, brows
   await page.goto("/app/tasks?tab=onboarding");
   await expect(page.getByText("Mitu Chowdhury")).toBeVisible();
   await expect(page.getByText("1 of 3 done")).toBeVisible();
+
+  // The week in numbers.
+  await page.goto("/app/reports");
+  await page.getByLabel("Period").selectOption({ label: "This week" });
+  await expect(page.getByText("0 joined · 0 left").locator("xpath=..").getByText("30", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Late most often" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "People by department" }).getByText("Design")).toBeVisible();
+  await expectAccessible(page, "agency: reports");
   expect(csp).toEqual([]);
 });

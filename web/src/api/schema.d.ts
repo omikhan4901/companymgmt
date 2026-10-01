@@ -2089,6 +2089,23 @@ export interface paths {
         patch: operations["update_project_v1_projects__project_id__patch"];
         trace?: never;
     };
+    "/v1/reports/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_v1_reports_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/roles": {
         parameters: {
             query?: never;
@@ -2544,6 +2561,39 @@ export interface components {
             /** Items */
             items: components["schemas"]["ApprovalItem"][];
         };
+        /** AttendanceDay */
+        AttendanceDay: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Expected */
+            expected: number;
+            /** Late */
+            late: number;
+            /** Present */
+            present: number;
+        };
+        /** AttendanceSummary */
+        AttendanceSummary: {
+            /** Average Minutes */
+            average_minutes: number | null;
+            /** Days */
+            days: components["schemas"]["AttendanceDay"][];
+            /** Expected */
+            expected: number;
+            /** Late */
+            late: number;
+            /** Most Late */
+            most_late: components["schemas"]["PersonCount"][];
+            /** Present */
+            present: number;
+            /** Rate */
+            rate: number | null;
+            /** Working Days */
+            working_days: number;
+        };
         /** AudienceRef */
         AudienceRef: {
             /**
@@ -2953,6 +3003,15 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** DepartmentCount */
+        DepartmentCount: {
+            /** Department Id */
+            department_id: string | null;
+            /** Name */
+            name: string | null;
+            /** People */
+            people: number;
+        };
         /** DepartmentIn */
         DepartmentIn: {
             /** Name */
@@ -3266,6 +3325,17 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** Headcount */
+        Headcount: {
+            /** Active */
+            active: number;
+            /** By Department */
+            by_department: components["schemas"]["DepartmentCount"][];
+            /** Joined */
+            joined: number;
+            /** Left */
+            left: number;
+        };
         /** HolidayIn */
         HolidayIn: {
             /** Branch Id */
@@ -3427,6 +3497,31 @@ export interface components {
              * Format: uuid
              */
             run_id: string;
+        };
+        /** LeaveByType */
+        LeaveByType: {
+            /** Color */
+            color: string;
+            /** Days */
+            days: number;
+            /**
+             * Leave Type Id
+             * Format: uuid
+             */
+            leave_type_id: string;
+            /** Name */
+            name: string;
+        };
+        /** LeaveSummary */
+        LeaveSummary: {
+            /** Away Today */
+            away_today: number;
+            /** By Type */
+            by_type: components["schemas"]["LeaveByType"][];
+            /** Days Taken */
+            days_taken: number;
+            /** Pending */
+            pending: number;
         };
         /** LeaveTypeIn */
         LeaveTypeIn: {
@@ -3801,6 +3896,25 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** OverviewOut */
+        OverviewOut: {
+            attendance: components["schemas"]["AttendanceSummary"] | null;
+            /** Department Id */
+            department_id: string | null;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            headcount: components["schemas"]["Headcount"];
+            leave: components["schemas"]["LeaveSummary"] | null;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            tasks: components["schemas"]["TaskSummary"] | null;
+        };
         /** Page[AuditOut] */
         Page_AuditOut_: {
             /** Items */
@@ -4027,6 +4141,18 @@ export interface components {
             employee_name: string;
             /** Year */
             year: number;
+        };
+        /** PersonCount */
+        PersonCount: {
+            /** Count */
+            count: number;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Name */
+            name: string;
         };
         /** PersonRef */
         PersonRef: {
@@ -4655,6 +4781,10 @@ export interface components {
         };
         /** SettingsIn */
         SettingsIn: {
+            /** Day Starts At */
+            day_starts_at?: string | null;
+            /** Late After Minutes */
+            late_after_minutes?: number | null;
             /**
              * Location Mode
              * @enum {string}
@@ -4672,6 +4802,13 @@ export interface components {
             branches_located: number;
             /** Branches Total */
             branches_total: number;
+            /**
+             * Day Starts At
+             * Format: time
+             */
+            day_starts_at: string;
+            /** Late After Minutes */
+            late_after_minutes: number;
             /**
              * Location Mode
              * @enum {string}
@@ -5095,6 +5232,17 @@ export interface components {
              * @default false
              */
             unassigned: boolean;
+        };
+        /** TaskSummary */
+        TaskSummary: {
+            /** Done */
+            done: number;
+            /** Most Overdue */
+            most_overdue: components["schemas"]["PersonCount"][];
+            /** Open */
+            open: number;
+            /** Overdue */
+            overdue: number;
         };
         /** TaxSlab */
         "TaxSlab-Input": {
@@ -9874,6 +10022,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_v1_reports_overview_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                department_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
                 };
             };
             /** @description Validation Error */

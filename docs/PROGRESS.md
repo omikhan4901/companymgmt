@@ -169,7 +169,15 @@ architecture one-pager. Only built features and measured numbers.
   the plan's people limit. A template lists the workspace's own leave types. Found on
   the way: the template's formula guard (`'+880…`) made phone numbers fail on the way
   back in; leading apostrophes are now read as spreadsheets mean them.
-- Next: dashboards and reports, then in-app help and the pilot playbook.
+- **M4.2 reports: the dashboard is done.** A Reports page (and the `reports.overview`
+  capability) for any period and department: people by department, joiners and leavers,
+  attendance rate (present ÷ expected, where expected skips days off, holidays and
+  approved leave), late arrivals against a new "working day starts at" setting with a
+  grace period, leave taken by type, and open and overdue tasks, with who is late or
+  overdue most. Managers see their own departments. Found on the way: a month of day
+  labels made the chart wider than a phone; the agency seed counted Saturday as a
+  working day. Still to do in M4.2: saved reports sent by email on a schedule.
+- Next: scheduled report emails, then in-app help and the pilot playbook.
 
 ## Log
 
@@ -190,3 +198,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.7 onboarding checklists: templates, runs as tasks, automatic start on joining, document items tick off on acknowledgement.
 - 2026-10-01: M3.8 a 30-person agency's week, played through the API and finished in the browser. M3 done.
 - 2026-10-01: M4.1 spreadsheet import of people, departments and leave balances, with a preview.
+- 2026-10-01: M4.2 reports dashboard and lateness settings.

@@ -638,6 +638,103 @@
     "title": "ApprovalsOut",
     "type": "object"
    },
+   "AttendanceDay": {
+    "properties": {
+     "day": {
+      "format": "date",
+      "title": "Day",
+      "type": "string"
+     },
+     "expected": {
+      "title": "Expected",
+      "type": "integer"
+     },
+     "late": {
+      "title": "Late",
+      "type": "integer"
+     },
+     "present": {
+      "title": "Present",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "day",
+     "expected",
+     "present",
+     "late"
+    ],
+    "title": "AttendanceDay",
+    "type": "object"
+   },
+   "AttendanceSummary": {
+    "properties": {
+     "average_minutes": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Average Minutes"
+     },
+     "days": {
+      "items": {
+       "$ref": "#/components/schemas/AttendanceDay"
+      },
+      "title": "Days",
+      "type": "array"
+     },
+     "expected": {
+      "title": "Expected",
+      "type": "integer"
+     },
+     "late": {
+      "title": "Late",
+      "type": "integer"
+     },
+     "most_late": {
+      "items": {
+       "$ref": "#/components/schemas/PersonCount"
+      },
+      "title": "Most Late",
+      "type": "array"
+     },
+     "present": {
+      "title": "Present",
+      "type": "integer"
+     },
+     "rate": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Rate"
+     },
+     "working_days": {
+      "title": "Working Days",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "working_days",
+     "expected",
+     "present",
+     "rate",
+     "late",
+     "average_minutes",
+     "days",
+     "most_late"
+    ],
+    "title": "AttendanceSummary",
+    "type": "object"
+   },
    "AudienceRef": {
     "properties": {
      "id": {
@@ -1885,6 +1982,44 @@
     "title": "DeletionOut",
     "type": "object"
    },
+   "DepartmentCount": {
+    "properties": {
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "people": {
+      "title": "People",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "department_id",
+     "name",
+     "people"
+    ],
+    "title": "DepartmentCount",
+    "type": "object"
+   },
    "DepartmentIn": {
     "additionalProperties": false,
     "properties": {
@@ -3084,6 +3219,37 @@
     "title": "HTTPValidationError",
     "type": "object"
    },
+   "Headcount": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "integer"
+     },
+     "by_department": {
+      "items": {
+       "$ref": "#/components/schemas/DepartmentCount"
+      },
+      "title": "By Department",
+      "type": "array"
+     },
+     "joined": {
+      "title": "Joined",
+      "type": "integer"
+     },
+     "left": {
+      "title": "Left",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "active",
+     "joined",
+     "left",
+     "by_department"
+    ],
+    "title": "Headcount",
+    "type": "object"
+   },
    "HolidayIn": {
     "additionalProperties": false,
     "properties": {
@@ -3471,6 +3637,66 @@
      "amount"
     ],
     "title": "ItemOut",
+    "type": "object"
+   },
+   "LeaveByType": {
+    "properties": {
+     "color": {
+      "title": "Color",
+      "type": "string"
+     },
+     "days": {
+      "title": "Days",
+      "type": "number"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "leave_type_id",
+     "name",
+     "color",
+     "days"
+    ],
+    "title": "LeaveByType",
+    "type": "object"
+   },
+   "LeaveSummary": {
+    "properties": {
+     "away_today": {
+      "title": "Away Today",
+      "type": "integer"
+     },
+     "by_type": {
+      "items": {
+       "$ref": "#/components/schemas/LeaveByType"
+      },
+      "title": "By Type",
+      "type": "array"
+     },
+     "days_taken": {
+      "title": "Days Taken",
+      "type": "number"
+     },
+     "pending": {
+      "title": "Pending",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "days_taken",
+     "by_type",
+     "away_today",
+     "pending"
+    ],
+    "title": "LeaveSummary",
     "type": "object"
    },
    "LeaveTypeIn": {
@@ -4530,6 +4756,76 @@
     "title": "OnboardingRunOut",
     "type": "object"
    },
+   "OverviewOut": {
+    "properties": {
+     "attendance": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/AttendanceSummary"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "headcount": {
+      "$ref": "#/components/schemas/Headcount"
+     },
+     "leave": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/LeaveSummary"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     },
+     "tasks": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/TaskSummary"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "required": [
+     "start",
+     "end",
+     "department_id",
+     "headcount",
+     "attendance",
+     "leave",
+     "tasks"
+    ],
+    "title": "OverviewOut",
+    "type": "object"
+   },
    "Page_AuditOut_": {
     "properties": {
      "items": {
@@ -5122,6 +5418,30 @@
      "balances"
     ],
     "title": "PersonBalances",
+    "type": "object"
+   },
+   "PersonCount": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "name",
+     "count"
+    ],
+    "title": "PersonCount",
     "type": "object"
    },
    "PersonRef": {
@@ -7232,6 +7552,31 @@
    "SettingsIn": {
     "additionalProperties": false,
     "properties": {
+     "day_starts_at": {
+      "anyOf": [
+       {
+        "format": "time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Day Starts At"
+     },
+     "late_after_minutes": {
+      "anyOf": [
+       {
+        "maximum": 240.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Late After Minutes"
+     },
      "location_mode": {
       "enum": [
        "off",
@@ -7265,6 +7610,15 @@
       "title": "Branches Total",
       "type": "integer"
      },
+     "day_starts_at": {
+      "format": "time",
+      "title": "Day Starts At",
+      "type": "string"
+     },
+     "late_after_minutes": {
+      "title": "Late After Minutes",
+      "type": "integer"
+     },
      "location_mode": {
       "enum": [
        "off",
@@ -7282,6 +7636,8 @@
     "required": [
      "location_mode",
      "max_accuracy_m",
+     "day_starts_at",
+     "late_after_minutes",
      "branches_total",
      "branches_located"
     ],
@@ -8446,6 +8802,37 @@
      }
     },
     "title": "TaskPatch",
+    "type": "object"
+   },
+   "TaskSummary": {
+    "properties": {
+     "done": {
+      "title": "Done",
+      "type": "integer"
+     },
+     "most_overdue": {
+      "items": {
+       "$ref": "#/components/schemas/PersonCount"
+      },
+      "title": "Most Overdue",
+      "type": "array"
+     },
+     "open": {
+      "title": "Open",
+      "type": "integer"
+     },
+     "overdue": {
+      "title": "Overdue",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "open",
+     "overdue",
+     "done",
+     "most_overdue"
+    ],
+    "title": "TaskSummary",
     "type": "object"
    },
    "TaxSlab-Input": {
@@ -15700,6 +16087,76 @@
     "summary": "Update Project",
     "tags": [
      "tasks"
+    ]
+   }
+  },
+  "/v1/reports/overview": {
+   "get": {
+    "operationId": "overview_v1_reports_overview_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "department_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Department Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OverviewOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Overview",
+    "tags": [
+     "reports"
     ]
    }
   },

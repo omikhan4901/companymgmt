@@ -236,14 +236,54 @@ function LocationCheck() {
   );
 }
 
+function Lateness() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const settings = useAttendanceSettings();
+  const save = useMutation({
+    mutationFn: (body: { day_starts_at?: string; late_after_minutes?: number }) =>
+      api("/v1/attendance/settings", { method: "PUT", body: { location_mode: settings.data?.location_mode, max_accuracy_m: settings.data?.max_accuracy_m, ...body } }),
+    onSuccess: () => {
+      toast.success(t("common.saved"));
+      void queryClient.invalidateQueries({ queryKey: ["attendance"] });
+      void queryClient.invalidateQueries({ queryKey: ["reports"] });
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const [starts, setStarts] = useState("");
+  const current = settings.data?.day_starts_at.slice(0, 5) ?? "";
+  useEffect(() => setStarts(current), [current]);
+  if (!settings.data) return null;
+  return (
+    <Card>
+      <CardHeader title={t("lateness.title")} sub={t("lateness.sub")} />
+      <div className="grid gap-4 p-5 pt-4 sm:grid-cols-2">
+        <Field label={t("lateness.startsAt")}>
+          <Input type="time" value={starts} onChange={(e) => setStarts(e.target.value)} onBlur={() => starts && starts !== current && save.mutate({ day_starts_at: starts })} />
+        </Field>
+        <Field label={t("lateness.grace")} help={t("lateness.graceHelp")}>
+          <Select value={String(settings.data.late_after_minutes)} onChange={(e) => save.mutate({ late_after_minutes: Number(e.target.value) })}>
+            {[0, 5, 10, 15, 20, 30, 45, 60].map((m) => (
+              <option key={m} value={m}>
+                {t("lateness.minutes", { count: m, formatted: formatNumber(m) })}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
+    </Card>
+  );
+}
+
 function Branches() {
   const { t } = useTranslation();
-  const { can } = useSession();
+  const { can, hasModule } = useSession();
   const branches = useBranches();
   const [editing, setEditing] = useState<Branch | "new" | null>(null);
   return (
     <div className="flex max-w-3xl flex-col gap-5">
       {can("workspace.manage") && <LocationCheck />}
+      {can("workspace.manage") && hasModule("attendance") && <Lateness />}
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">{t("settings.tabs.branches")}</h2>
         <Button variant="primary" onClick={() => setEditing("new")}>

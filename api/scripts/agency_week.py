@@ -233,6 +233,8 @@ async def play_week(
     owner = Person(OWNER, "owner", "", client, response.json()["access_token"])
     owner.employee_id = str((await owner.get("/v1/leave/balances"))["employee_id"])
 
+    # Like most Dhaka agencies: Friday and Saturday off.
+    await owner.call("PUT", "/v1/leave/policy", json={"weekly_off": sorted(d + 1 for d in WEEKEND)})
     departments = {
         name: (await owner.post("/v1/departments", json={"name": name}))["id"]
         for name in ("Client service", "Design", "Tech", "Operations")
@@ -360,7 +362,9 @@ async def play_week(
                 continue
             if rng.random() < 0.04:
                 continue
-            start = at(day, rng.choice([8, 9, 9, 10]), rng.randint(0, 40))
+            # Most arrive between 8:30 and 9:20; the day starts at 9:00, late after 9:15.
+            early = rng.random() < 0.4
+            start = at(day, 8 if early else 9, rng.randint(30, 59) if early else rng.randint(0, 20))
             end = None if day == today else at(day, rng.choice([17, 18, 18, 19]), rng.randint(0, 50))
             body: dict[str, Any] = {"employee_id": person.employee_id, "clock_in_at": start}
             if end:

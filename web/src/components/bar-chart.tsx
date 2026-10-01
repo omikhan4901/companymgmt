@@ -23,6 +23,8 @@ export interface Bar {
 export function BarChart({ bars, label, height = 160 }: { bars: Bar[]; label: string; height?: number }) {
   const [hover, setHover] = useState<string | null>(null);
   const max = Math.max(1, ...bars.map((b) => b.value));
+  // Up to a week: every day. Longer: every other day, or fewer, counting back from the last.
+  const step = bars.length <= 7 ? 1 : Math.max(2, Math.ceil(bars.length / 10));
   const active = bars.find((b) => b.key === hover);
   return (
     <figure className="flex flex-col gap-2">
@@ -47,10 +49,11 @@ export function BarChart({ bars, label, height = 160 }: { bars: Bar[]; label: st
           </div>
         ))}
       </div>
-      <div className="flex gap-[2px] text-[11px] text-muted" aria-hidden="true">
+      <div className="flex gap-[2px] overflow-hidden text-[11px] text-muted" aria-hidden="true">
         {bars.map((b, i) => (
-          <span key={b.key} className="flex-1 text-center tabular-nums">
-            {i % 2 === bars.length % 2 || bars.length <= 7 ? b.label : ""}
+          // min-w-0 lets a month of labels fit a phone; only every `step`th one is written.
+          <span key={b.key} className="min-w-0 flex-1 whitespace-nowrap text-center tabular-nums">
+            {(bars.length - 1 - i) % step === 0 ? b.label : ""}
           </span>
         ))}
       </div>
