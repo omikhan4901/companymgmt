@@ -116,12 +116,13 @@ async def test_database_level_isolation(client: httpx.AsyncClient) -> None:
             assert conn.execute(f"SELECT count(*) FROM {table}").fetchone() == (0,), table  # noqa: S608
 
 
-def test_audit_log_is_append_only_for_the_app(owner_sql: psycopg.Connection) -> None:
+@pytest.mark.parametrize(("table", "column"), [("audit_events", "action"), ("domain_events", "name")])
+def test_logs_are_append_only_for_the_app(owner_sql: psycopg.Connection, table: str, column: str) -> None:
     with psycopg.connect(app_dsn()) as conn:
         for statement in (
-            "UPDATE audit_events SET action = 'x'",
-            "DELETE FROM audit_events",
-            "TRUNCATE audit_events",
+            f"UPDATE {table} SET {column} = 'x'",  # noqa: S608
+            f"DELETE FROM {table}",  # noqa: S608
+            f"TRUNCATE {table}",
         ):
             with pytest.raises(psycopg.errors.InsufficientPrivilege):
                 conn.execute(statement)

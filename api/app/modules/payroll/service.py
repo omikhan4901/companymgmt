@@ -24,7 +24,7 @@ from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import audit
+from app.core import audit, events
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound
 from app.core.security import crypto
 from app.core.spreadsheet import safe_cell
@@ -689,6 +689,13 @@ async def submit(ctx: Ctx, run_id: uuid.UUID) -> RunDetail:
         target_id=run.id,
         data={"period": run.period, "net": run.net},
     )
+    await events.emit(
+        ctx.db,
+        "payroll.submitted",
+        subject_type="payroll_run",
+        subject_id=run.id,
+        data={"period": run.period, "headcount": run.headcount, "net": run.net, "currency": run.currency},
+    )
     await ctx.db.commit()
     return await run_detail(ctx, run.id)
 
@@ -757,6 +764,13 @@ async def finalize(ctx: Ctx, run_id: uuid.UUID) -> RunDetail:
         target_type="payroll_run",
         target_id=run.id,
         data={"period": run.period, "headcount": run.headcount, "gross": run.gross, "net": run.net},
+    )
+    await events.emit(
+        ctx.db,
+        "payroll.finalized",
+        subject_type="payroll_run",
+        subject_id=run.id,
+        data={"period": run.period, "headcount": run.headcount, "net": run.net, "currency": run.currency},
     )
     await ctx.db.commit()
     return await run_detail(ctx, run.id)

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import calendar
 import csv
 import io
 import uuid
@@ -11,18 +10,35 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import and_, func, literal, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import audit
+from app.core import audit, events
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound
 from app.core.http import check_if_match, decode_cursor, encode_cursor, set_etag
-from app.core.schema import In, Note, Out, Page
+from app.core.schema import Page
 from app.core.spreadsheet import safe_cell
-from app.core.time import today, utcnow
-from app.modules.attendance import access, geo
+from app.core.time import utcnow
+from app.modules.attendance import access, geo, service
 from app.modules.attendance.models import AttendanceCorrection, AttendanceRecord, AttendanceSettings
+from app.modules.attendance.schemas import (
+    ClockIn,
+    ClockOut,
+    CorrectionIn,
+    CorrectionOut,
+    DecisionIn,
+    GeoIn,
+    PresentOut,
+    RecordIn,
+    RecordOut,
+    RecordPatch,
+    SettingsIn,
+    SettingsOut,
+    StatusOut,
+    TimesheetOut,
+    correction_out,
+    record_out,
+)
 from app.modules.attendance.service import (
     MAX_SHIFT,
     business_date_for,
@@ -32,7 +48,11 @@ from app.modules.attendance.service import (
     save,
     validate_times,
 )
-from app.modules.people.access import in_scope, scope_departments
+from app.modules.attendance.service import me as _me
+from app.modules.attendance.service import open_record as _open_record
+from app.modules.attendance.service import scoped_employee as _scoped_employee
+from app.modules.attendance.service import settings as _settings
+from app.modules.people.access import scope_departments
 from app.modules.people.models import Employee
 from app.modules.people.service import employee_for_membership
 from app.modules.platform.catalog import WORKSPACE_MANAGE
@@ -43,189 +63,6 @@ register_hooks()
 
 router = APIRouter(prefix="/v1/attendance", tags=["attendance"])
 MODULE = "attendance"
-
-
-class RecordOut(Out):
-    id: uuid.UUID
-    employee_id: uuid.UUID
-    employee_name: str | None = None
-    branch_id: uuid.UUID | None
-    business_date: date
-    clock_in_at: datetime
-    clock_out_at: datetime | None
-    minutes: int | None
-    status: str
-    source: str
-    note: str | None
-    in_geo: str | None = None
-    in_distance_m: int | None = None
-    in_accuracy_m: int | None = None
-    in_latitude: float | None = None
-    in_longitude: float | None = None
-    out_geo: str | None = None
-    out_distance_m: int | None = None
-    out_accuracy_m: int | None = None
-    out_latitude: float | None = None
-    out_longitude: float | None = None
-    version: int
-
-
-class StatusOut(Out):
-    employee_id: uuid.UUID
-    employee_name: str
-    open_record: RecordOut | None
-    today_minutes: int
-    forgot_clock_out: bool
-    location_mode: str
-
-
-class GeoIn(In):
-    """A position from the device (browser Geolocation API)."""
-
-    latitude: float = Field(ge=-90, le=90)
-    longitude: float = Field(ge=-180, le=180)
-    accuracy_m: float = Field(ge=0, le=100_000)
-
-
-class ClockIn(In):
-    branch_id: uuid.UUID | None = None
-    note: Note | None = None
-    client_time: datetime | None = None
-    location: GeoIn | None = None
-
-
-class ClockOut(In):
-    note: Note | None = None
-    location: GeoIn | None = None
-
-
-class SettingsOut(BaseModel):
-    location_mode: Literal["off", "record", "require"]
-    max_accuracy_m: int
-    branches_total: int
-    branches_located: int
-
-
-class SettingsIn(In):
-    location_mode: Literal["off", "record", "require"]
-    max_accuracy_m: int = Field(default=100, ge=10, le=1000)
-
-
-class RecordIn(In):
-    employee_id: uuid.UUID
-    clock_in_at: datetime
-    clock_out_at: datetime | None = None
-    branch_id: uuid.UUID | None = None
-    note: Note | None = None
-
-
-class RecordPatch(In):
-    clock_in_at: datetime | None = None
-    clock_out_at: datetime | None = None
-    note: Note | None = None
-
-
-class CorrectionIn(In):
-    kind: Literal["add", "change", "remove"]
-    record_id: uuid.UUID | None = None
-    clock_in_at: datetime | None = None
-    clock_out_at: datetime | None = None
-    reason: Annotated[str, StringConstraints(min_length=3, max_length=500, strip_whitespace=True)]
-
-
-class CorrectionOut(Out):
-    id: uuid.UUID
-    employee_id: uuid.UUID
-    employee_name: str | None = None
-    record_id: uuid.UUID | None
-    kind: str
-    proposed_clock_in_at: datetime | None
-    proposed_clock_out_at: datetime | None
-    reason: str
-    status: str
-    requested_by: uuid.UUID | None
-    decided_by: uuid.UUID | None
-    decided_at: datetime | None
-    decision_note: str | None
-    created_at: datetime
-    version: int
-
-
-class DecisionIn(In):
-    note: Annotated[str, StringConstraints(max_length=500)] | None = None
-
-
-class DayOut(Out):
-    date: date
-    minutes: int
-    records: int
-    needs_review: int
-
-
-class TimesheetRow(Out):
-    employee_id: uuid.UUID
-    employee_name: str
-    days: list[DayOut]
-    total_minutes: int
-    days_present: int
-
-
-class TimesheetOut(Out):
-    month: str
-    start: date
-    end: date
-    rows: list[TimesheetRow]
-
-
-class PresentOut(Out):
-    employee_id: uuid.UUID
-    employee_name: str
-    clock_in_at: datetime
-    branch_id: uuid.UUID | None
-
-
-def _record_out(r: AttendanceRecord, name: str | None = None) -> RecordOut:
-    out = RecordOut.model_validate(r)
-    out.employee_name = name
-    return out
-
-
-def _correction_out(c: AttendanceCorrection, name: str | None = None) -> CorrectionOut:
-    out = CorrectionOut.model_validate(c)
-    out.employee_name = name
-    return out
-
-
-async def _me(ctx: Ctx) -> Employee:
-    assert ctx.membership is not None
-    employee = await employee_for_membership(ctx.db, ctx.membership.id)
-    if employee is None or employee.status != "active":
-        raise Forbidden("You don't have an active profile in this workspace.", code="no_profile")
-    return employee
-
-
-async def _open_record(
-    db: AsyncSession, employee_id: uuid.UUID, *, lock: bool = False
-) -> AttendanceRecord | None:
-    query = select(AttendanceRecord).where(
-        AttendanceRecord.employee_id == employee_id, AttendanceRecord.clock_out_at.is_(None)
-    )
-    if lock:
-        query = query.with_for_update()
-    return await db.scalar(query)
-
-
-async def _scoped_employee(ctx: Ctx, employee_id: uuid.UUID) -> Employee:
-    employee = await ctx.db.get(Employee, employee_id)
-    if employee is None or not await in_scope(ctx, employee.department_id):
-        raise NotFound()
-    return employee
-
-
-async def _settings(db: AsyncSession) -> AttendanceSettings:
-    """The workspace's attendance settings (defaults until someone changes them)."""
-    row = await db.scalar(select(AttendanceSettings))
-    return row or AttendanceSettings(location_mode="require", max_accuracy_m=100)
 
 
 async def _sites(db: AsyncSession, only: uuid.UUID | None = None) -> list[geo.Site]:
@@ -254,28 +91,6 @@ def _store(record: AttendanceRecord, prefix: str, point: geo.Point | None, resul
 # ---- Self service -----------------------------------------------------------------------
 
 
-@router.get("/status", response_model=StatusOut)
-async def my_status(ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> StatusOut:
-    employee = await _me(ctx)
-    record = await _open_record(ctx.db, employee.id)
-    assert ctx.tenant is not None
-    day = today(ctx.tenant.timezone)
-    worked = await ctx.db.scalar(
-        select(func.coalesce(func.sum(AttendanceRecord.minutes), 0)).where(
-            AttendanceRecord.employee_id == employee.id, AttendanceRecord.business_date == day
-        )
-    )
-    forgot = record is not None and utcnow() - record.clock_in_at > MAX_SHIFT
-    return StatusOut(
-        employee_id=employee.id,
-        employee_name=employee.preferred_name or employee.full_name,
-        open_record=_record_out(record) if record else None,
-        today_minutes=int(worked or 0),
-        forgot_clock_out=forgot,
-        location_mode=(await _settings(ctx.db)).location_mode,
-    )
-
-
 @router.post("/clock-in", response_model=RecordOut, status_code=201)
 async def clock_in(body: ClockIn, ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> RecordOut:
     employee = await _me(ctx)
@@ -284,7 +99,7 @@ async def clock_in(body: ClockIn, ctx: Ctx = Depends(allow(access.SELF, module=M
         raise Conflict(
             "You're already clocked in.",
             code="already_clocked_in",
-            extra={"record": _record_out(existing).model_dump(mode="json")},
+            extra={"record": record_out(existing).model_dump(mode="json")},
         )
     branch_id = body.branch_id or await default_branch(ctx.db, employee)
     if body.branch_id is not None:
@@ -323,7 +138,7 @@ async def clock_in(body: ClockIn, ctx: Ctx = Depends(allow(access.SELF, module=M
     ctx.db.add(record)
     await save(ctx.db, record)
     await ctx.db.commit()
-    return _record_out(record)
+    return record_out(record)
 
 
 async def _enforce(
@@ -367,7 +182,7 @@ async def clock_out(body: ClockOut, ctx: Ctx = Depends(allow(access.SELF, module
         raise Conflict(
             "You were clocked in for more than a day. Tell us when you left instead.",
             code="forgot_clock_out",
-            extra={"record": _record_out(record).model_dump(mode="json")},
+            extra={"record": record_out(record).model_dump(mode="json")},
         )
     if now <= record.clock_in_at:
         now = record.clock_in_at + timedelta(seconds=1)
@@ -385,7 +200,7 @@ async def clock_out(body: ClockOut, ctx: Ctx = Depends(allow(access.SELF, module
         record.note = record.note[:500]
     await save(ctx.db, record)
     await ctx.db.commit()
-    return _record_out(record)
+    return record_out(record)
 
 
 # ---- Settings ---------------------------------------------------------------------------
@@ -499,8 +314,22 @@ async def request_correction(
         target_id=correction.id,
         data={"kind": body.kind, "record_id": correction.record_id, "reason": body.reason},
     )
+    await events.emit(
+        ctx.db,
+        "attendance.correction_requested",
+        subject_type="attendance_correction",
+        subject_id=correction.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "kind": correction.kind,
+            "status": correction.status,
+        },
+    )
     await ctx.db.commit()
-    return _correction_out(correction, employee.full_name)
+    return correction_out(correction, employee.full_name)
 
 
 @router.get("/corrections", response_model=list[CorrectionOut])
@@ -526,7 +355,7 @@ async def list_corrections(
     if status != "all":
         query = query.where(AttendanceCorrection.status == status)
     rows = (await ctx.db.execute(query.order_by(AttendanceCorrection.created_at.desc()).limit(500))).all()
-    return [_correction_out(c, name) for c, name in rows]
+    return [correction_out(c, name) for c, name in rows]
 
 
 async def _pending_correction(ctx: Ctx, correction_id: uuid.UUID) -> tuple[AttendanceCorrection, Employee]:
@@ -603,8 +432,22 @@ async def approve_correction(
             "clock_out_at": correction.proposed_clock_out_at,
         },
     )
+    await events.emit(
+        ctx.db,
+        "attendance.correction_approved",
+        subject_type="attendance_correction",
+        subject_id=correction.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "kind": correction.kind,
+            "status": correction.status,
+        },
+    )
     await ctx.db.commit()
-    return _correction_out(correction, employee.full_name)
+    return correction_out(correction, employee.full_name)
 
 
 @router.post("/corrections/{correction_id}/reject", response_model=CorrectionOut)
@@ -624,8 +467,22 @@ async def reject_correction(
         target_id=correction.id,
         data={"employee": employee.full_name, "note": body.note},
     )
+    await events.emit(
+        ctx.db,
+        "attendance.correction_rejected",
+        subject_type="attendance_correction",
+        subject_id=correction.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "kind": correction.kind,
+            "status": correction.status,
+        },
+    )
     await ctx.db.commit()
-    return _correction_out(correction, employee.full_name)
+    return correction_out(correction, employee.full_name)
 
 
 @router.post("/corrections/{correction_id}/cancel", response_model=CorrectionOut)
@@ -645,7 +502,7 @@ async def cancel_correction(
     correction.status = "cancelled"
     correction.decided_at = utcnow()
     await ctx.db.commit()
-    return _correction_out(correction, employee.full_name)
+    return correction_out(correction, employee.full_name)
 
 
 # ---- Records (managers) -----------------------------------------------------------------
@@ -701,7 +558,7 @@ async def list_records(
             query.order_by(AttendanceRecord.clock_in_at.desc(), AttendanceRecord.id.desc()).limit(limit + 1)
         )
     ).all()
-    items = [_record_out(r, name) for r, name in rows[:limit]]
+    items = [record_out(r, name) for r, name in rows[:limit]]
     next_cursor = (
         encode_cursor({"t": items[-1].clock_in_at.isoformat(), "id": items[-1].id})
         if len(rows) > limit
@@ -743,7 +600,7 @@ async def add_record(body: RecordIn, ctx: Ctx = Depends(allow(access.MANAGE, mod
         },
     )
     await ctx.db.commit()
-    return _record_out(record, employee.full_name)
+    return record_out(record, employee.full_name)
 
 
 async def _scoped_record(ctx: Ctx, record_id: uuid.UUID) -> tuple[AttendanceRecord, Employee]:
@@ -790,7 +647,7 @@ async def edit_record(
     )
     await ctx.db.commit()
     set_etag(response, record.version)
-    return _record_out(record, employee.full_name)
+    return record_out(record, employee.full_name)
 
 
 @router.delete("/records/{record_id}", status_code=204)
@@ -816,96 +673,14 @@ async def delete_record(
 # ---- Overviews --------------------------------------------------------------------------
 
 
+@router.get("/status", response_model=StatusOut)
+async def my_status(ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> StatusOut:
+    return await service.status(ctx)
+
+
 @router.get("/present", response_model=list[PresentOut])
 async def present_now(ctx: Ctx = Depends(allow(access.VIEW, module=MODULE))) -> list[PresentOut]:
-    query = (
-        select(AttendanceRecord, Employee)
-        .join(
-            Employee,
-            and_(
-                Employee.tenant_id == AttendanceRecord.tenant_id, Employee.id == AttendanceRecord.employee_id
-            ),
-        )
-        .where(AttendanceRecord.clock_out_at.is_(None))
-    )
-    scope = await scope_departments(ctx)
-    if scope is not None:
-        query = query.where(Employee.department_id.in_(scope))
-    rows = (await ctx.db.execute(query.order_by(AttendanceRecord.clock_in_at))).all()
-    return [
-        PresentOut(
-            employee_id=e.id,
-            employee_name=e.preferred_name or e.full_name,
-            clock_in_at=r.clock_in_at,
-            branch_id=r.branch_id,
-        )
-        for r, e in rows
-    ]
-
-
-def _month_range(month: str) -> tuple[date, date]:
-    try:
-        year, mon = (int(x) for x in month.split("-"))
-        start = date(year, mon, 1)
-    except ValueError as exc:
-        raise Invalid(errors=[{"field": "month", "message": "Use YYYY-MM."}]) from exc
-    return start, date(year, mon, calendar.monthrange(year, mon)[1])
-
-
-async def _timesheet_rows(
-    ctx: Ctx, start: date, end: date, employee_id: uuid.UUID | None
-) -> list[TimesheetRow]:
-    employees_query = select(Employee).where(Employee.status != "left")
-    if not ctx.can(access.VIEW):
-        employees_query = select(Employee).where(Employee.id == (await _me(ctx)).id)
-    else:
-        scope = await scope_departments(ctx)
-        if scope is not None:
-            employees_query = employees_query.where(Employee.department_id.in_(scope))
-        if employee_id:
-            employees_query = employees_query.where(Employee.id == employee_id)
-    employees = (await ctx.db.scalars(employees_query.order_by(func.lower(Employee.full_name)))).all()
-    ids = [e.id for e in employees]
-    totals: dict[tuple[uuid.UUID, date], tuple[int, int, int]] = {}
-    if ids:
-        rows = await ctx.db.execute(
-            select(
-                AttendanceRecord.employee_id,
-                AttendanceRecord.business_date,
-                func.coalesce(func.sum(AttendanceRecord.minutes), 0),
-                func.count(),
-                func.count().filter(AttendanceRecord.status == "auto_closed"),
-            )
-            .where(
-                AttendanceRecord.employee_id.in_(ids),
-                AttendanceRecord.business_date >= start,
-                AttendanceRecord.business_date <= end,
-            )
-            .group_by(AttendanceRecord.employee_id, AttendanceRecord.business_date)
-        )
-        for emp, day, minutes, count, review in rows:
-            totals[(emp, day)] = (int(minutes or 0), int(count or 0), int(review or 0))
-    result = []
-    for e in employees:
-        days = [
-            DayOut(
-                date=d,
-                minutes=totals[(e.id, d)][0],
-                records=totals[(e.id, d)][1],
-                needs_review=totals[(e.id, d)][2],
-            )
-            for d in sorted(day for (emp, day) in totals if emp == e.id)
-        ]
-        result.append(
-            TimesheetRow(
-                employee_id=e.id,
-                employee_name=e.full_name,
-                days=days,
-                total_minutes=sum(d.minutes for d in days),
-                days_present=sum(1 for d in days if d.records),
-            )
-        )
-    return result
+    return await service.present(ctx)
 
 
 @router.get("/timesheet", response_model=TimesheetOut)
@@ -914,10 +689,7 @@ async def timesheet(
     employee_id: uuid.UUID | None = None,
     ctx: Ctx = Depends(allow(access.SELF, module=MODULE)),
 ) -> TimesheetOut:
-    start, end = _month_range(month)
-    return TimesheetOut(
-        month=month, start=start, end=end, rows=await _timesheet_rows(ctx, start, end, employee_id)
-    )
+    return await service.timesheet(ctx, month, employee_id)
 
 
 @router.get("/export.csv")

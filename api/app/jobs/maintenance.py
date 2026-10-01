@@ -165,7 +165,8 @@ def _retention_days(conn: psycopg.Connection, now: datetime) -> int | None:
 
 
 def apply_audit_retention(conn: psycopg.Connection, now: datetime) -> dict[str, int]:
-    """Delete audit entries older than each workspace's plan allows, keeping an anchor."""
+    """Delete audit entries older than each workspace's plan allows, keeping an anchor.
+    The domain event log follows the same retention."""
     purged: dict[str, int] = {}
     for (tenant_id,) in conn.execute("SELECT id FROM tenants WHERE status = 'active'").fetchall():
         with conn.transaction():
@@ -173,10 +174,14 @@ def apply_audit_retention(conn: psycopg.Connection, now: datetime) -> dict[str, 
             days = _retention_days(conn, now)
             if days is None:
                 continue
+            cutoff = now - timedelta(days=days)
+            conn.execute(
+                "DELETE FROM domain_events WHERE tenant_id = %s AND occurred_at < %s", (tenant_id, cutoff)
+            )
             last = conn.execute(
                 "SELECT seq, hash FROM audit_events WHERE tenant_id = %s AND occurred_at < %s"
                 " ORDER BY seq DESC LIMIT 1",
-                (tenant_id, now - timedelta(days=days)),
+                (tenant_id, cutoff),
             ).fetchone()
             if last is None:
                 continue

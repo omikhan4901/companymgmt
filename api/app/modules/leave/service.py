@@ -13,7 +13,7 @@ from sqlalchemy import and_, extract, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import audit
+from app.core import audit, events
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound, PreconditionFailed
 from app.core.time import today, utcnow
 from app.modules.leave import access, defaults
@@ -547,6 +547,23 @@ async def create_request(ctx: Ctx, body: RequestIn) -> RequestOut:
         target_id=row.id,
         data=_audit_data(row, employee, kind),
     )
+    await events.emit(
+        ctx.db,
+        "leave.requested",
+        subject_type="leave_request",
+        subject_id=row.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "type": kind.name,
+            "start_date": row.start_date,
+            "end_date": row.end_date,
+            "days": row.days,
+            "status": row.status,
+        },
+    )
     await ctx.db.commit()
     return _out(row, employee.full_name, kind.name)
 
@@ -666,6 +683,23 @@ async def approve(ctx: Ctx, request_id: uuid.UUID, note: str | None) -> RequestO
         target_id=row.id,
         data=_audit_data(row, employee, kind),
     )
+    await events.emit(
+        ctx.db,
+        "leave.approved",
+        subject_type="leave_request",
+        subject_id=row.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "type": kind.name,
+            "start_date": row.start_date,
+            "end_date": row.end_date,
+            "days": row.days,
+            "status": row.status,
+        },
+    )
     await ctx.db.commit()
     return _out(row, employee.full_name, kind.name)
 
@@ -680,6 +714,23 @@ async def reject(ctx: Ctx, request_id: uuid.UUID, note: str | None) -> RequestOu
         target_type="leave_request",
         target_id=row.id,
         data={**_audit_data(row, employee, kind), "note": note},
+    )
+    await events.emit(
+        ctx.db,
+        "leave.rejected",
+        subject_type="leave_request",
+        subject_id=row.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "type": kind.name,
+            "start_date": row.start_date,
+            "end_date": row.end_date,
+            "days": row.days,
+            "status": row.status,
+        },
     )
     await ctx.db.commit()
     return _out(row, employee.full_name, kind.name)
@@ -706,6 +757,23 @@ async def cancel(ctx: Ctx, request_id: uuid.UUID, note: str | None) -> RequestOu
         target_type="leave_request",
         target_id=row.id,
         data={**_audit_data(row, employee, kind), "by_owner_of_request": is_own},
+    )
+    await events.emit(
+        ctx.db,
+        "leave.cancelled",
+        subject_type="leave_request",
+        subject_id=row.id,
+        data={
+            "employee_id": employee.id,
+            "employee_name": employee.full_name,
+            "department_id": employee.department_id,
+            "membership_id": employee.membership_id,
+            "type": kind.name,
+            "start_date": row.start_date,
+            "end_date": row.end_date,
+            "days": row.days,
+            "status": row.status,
+        },
     )
     await ctx.db.commit()
     return _out(row, employee.full_name, kind.name)
