@@ -194,6 +194,27 @@ async def _bind_workspace(ctx: Ctx) -> None:
     info.membership_id = membership.id
 
 
+async def member_ctx(db: AsyncSession, tenant: Tenant, membership: Membership) -> Ctx:
+    """A context for scheduled work done for a member, outside any request: the same
+    permissions, department scope and modules they would have in the app. The session is
+    a stand-in that is never saved."""
+    await set_tenant(db, tenant.id, membership.user_id)
+    user = await db.get(User, membership.user_id)
+    role = await db.scalar(select(Role).where(Role.id == membership.role_id))
+    assert user is not None
+    assert role is not None
+    return Ctx(
+        db=db,
+        user=user,
+        session=AuthSession(user_id=user.id, tenant_id=tenant.id),
+        tenant=tenant,
+        membership=membership,
+        role=role,
+        permissions=catalog.resolve(role.key, role.is_builtin, list(role.permissions or [])),
+        entitlements=await load_entitlements(db, tenant.id),
+    )
+
+
 def now_utc() -> datetime:
     return datetime.now(UTC)
 

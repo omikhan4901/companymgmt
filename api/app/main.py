@@ -33,6 +33,7 @@ from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
 from app.modules.platform.routes_workspace import router as workspace_router
 from app.modules.privacy.routes import router as privacy_router
+from app.modules.reports.routes import internal_router as reports_internal_router
 from app.modules.reports.routes import router as reports_router
 from app.modules.tasks.routes import router as tasks_router
 
@@ -57,6 +58,7 @@ ROUTERS = (
     ai_router,
     internal_router,
     notifications_internal_router,
+    reports_internal_router,
 )
 ops_router = APIRouter(tags=["ops"])
 

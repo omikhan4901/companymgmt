@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import date
 
-from app.core.schema import Out
+from app.core.schema import In, Out
 
 
 class DepartmentCount(Out):
@@ -77,3 +77,17 @@ class OverviewOut(Out):
     attendance: AttendanceSummary | None
     leave: LeaveSummary | None
     tasks: TaskSummary | None
+
+
+class SubscriptionIn(In):
+    weekly: bool = False
+    monthly: bool = False
+    department_id: uuid.UUID | None = None
+
+
+class SubscriptionOut(Out):
+    weekly: bool
+    monthly: bool
+    department_id: uuid.UUID | None
+    # Staff accounts have no email address to send to.
+    has_email: bool

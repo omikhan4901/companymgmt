@@ -10,6 +10,7 @@ from app.modules.notifications import models as notifications_models  # noqa: F4
 from app.modules.payroll import models as payroll_models  # noqa: F401
 from app.modules.people import models as people_models  # noqa: F401
 from app.modules.platform import models as platform_models  # noqa: F401
+from app.modules.reports import models as reports_models  # noqa: F401
 from app.modules.tasks import models as tasks_models  # noqa: F401
 
 metadata = Base.metadata
