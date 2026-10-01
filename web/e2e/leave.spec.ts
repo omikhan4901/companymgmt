@@ -1,6 +1,6 @@
-import { expect, test, type Browser } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-import { addStaff, expectAccessible, PASSWORD, signUp, watchCsp } from "./helpers";
+import { addStaff, expectAccessible, signUp, staffSignIn, watchCsp } from "./helpers";
 
 /** A working day about two weeks ahead in Dhaka (Friday is the default day off). */
 function workingDayAhead(days = 14): string {
@@ -9,23 +9,6 @@ function workingDayAhead(days = 14): string {
   day.setUTCDate(day.getUTCDate() + days);
   if (day.getUTCDay() === 5) day.setUTCDate(day.getUTCDate() + 1);
   return day.toISOString().slice(0, 10);
-}
-
-async function staffSignIn(browser: Browser, code: string, username: string, temp: string) {
-  const context = await browser.newContext({ baseURL: "http://localhost:3000", locale: "en-GB", timezoneId: "Asia/Dhaka" });
-  const staff = await context.newPage();
-  await staff.goto("/login");
-  await staff.getByText("Staff sign-in (no email)").click();
-  await staff.getByLabel("Workspace code").fill(code);
-  await staff.getByLabel("Username").fill(username);
-  await staff.getByLabel(/^Password$/).fill(temp);
-  await staff.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(staff).toHaveURL(/change-password/);
-  await staff.getByLabel("Current password").fill(temp);
-  await staff.getByLabel("New password").fill(PASSWORD);
-  await staff.getByRole("button", { name: "Save" }).click();
-  await expect(staff.getByRole("heading", { name: /Hi/ })).toBeVisible();
-  return { context, staff };
 }
 
 test("staff ask for leave and the owner approves it", async ({ page, browser }, info) => {

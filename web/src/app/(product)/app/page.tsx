@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Check, CheckCircle2, Circle, Mail, MapPin, Sparkles, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -12,6 +13,8 @@ import { useAttendanceSettings, useAway, useCorrections, useDepartments, useLeav
 import type { AttendanceRecord, Employee, Page } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { ClockCard } from "@/components/attendance/clock-card";
+import { useMyWork } from "@/components/tasks/data";
+import { TaskRow } from "@/components/tasks/shared";
 import { BarChart, type Bar } from "@/components/bar-chart";
 import { PageHeader } from "@/components/page";
 import { Alert } from "@/components/ui/alert";
@@ -160,6 +163,39 @@ function AwayCard({ className }: { className?: string }) {
               <span className="min-w-0 flex-1 truncate text-sm font-medium">{p.employee_name}</span>
               <span className="shrink-0 text-sm text-muted">{p.leave_type_name ?? t("leave.away")}</span>
             </li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  );
+}
+
+function MyWorkCard({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const work = useMyWork();
+  const open = (id: string) => router.push(`/app/tasks?task=${id}`);
+  const list = work.data ?? [];
+  return (
+    <Card className={className}>
+      <CardHeader
+        title={t("tasks.tabs.mine")}
+        action={
+          <Link href="/app/tasks" className="text-sm font-medium text-accent-soft-text hover:underline">
+            {t("nav.tasks")}
+            {list.length > 0 && (
+              <Badge tone="accent" className="ml-2">
+                {formatNumber(list.length)}
+              </Badge>
+            )}
+          </Link>
+        }
+      />
+      <div className="px-2 pb-3 pt-1">
+        {work.data && list.length === 0 && <p className="px-3 py-4 text-sm text-muted">{t("tasks.nothingToDoBody")}</p>}
+        <ul className="flex flex-col">
+          {list.slice(0, 6).map((task) => (
+            <TaskRow key={task.id} task={task} onOpen={open} />
           ))}
         </ul>
       </div>
@@ -353,6 +389,7 @@ export default function HomePage() {
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
         {manager && can("attendance.approve") && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
+        {hasModule("tasks") && can("tasks.self") && <MyWorkCard className="md:col-span-2" />}
         {hasModule("leave") && can("leave.self") && <AwayCard className="md:col-span-2" />}
         <Checklist className="md:col-span-2" />
       </div>

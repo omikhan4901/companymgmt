@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Page } from "@playwright/test";
+import { expect, type Browser, type Page } from "@playwright/test";
 
 export const PASSWORD = "a long and happy passphrase";
 export const SHOP = { latitude: 23.7386, longitude: 90.3958, accuracy: 15 };
@@ -68,4 +68,22 @@ export async function addStaff(page: Page, name: string, username: string) {
   const temp = (await dialog.getByTestId("temporary-password").locator("code").innerText()).trim();
   await dialog.getByRole("button", { name: "Done" }).click();
   return { code, temp };
+}
+
+/** Signs a new staff account in on its own phone and sets a real password. */
+export async function staffSignIn(browser: Browser, code: string, username: string, temp: string) {
+  const context = await browser.newContext({ baseURL: "http://localhost:3000", locale: "en-GB", timezoneId: "Asia/Dhaka" });
+  const staff = await context.newPage();
+  await staff.goto("/login");
+  await staff.getByText("Staff sign-in (no email)").click();
+  await staff.getByLabel("Workspace code").fill(code);
+  await staff.getByLabel("Username").fill(username);
+  await staff.getByLabel(/^Password$/).fill(temp);
+  await staff.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(staff).toHaveURL(/change-password/);
+  await staff.getByLabel("Current password").fill(temp);
+  await staff.getByLabel("New password").fill(PASSWORD);
+  await staff.getByRole("button", { name: "Save" }).click();
+  await expect(staff.getByRole("heading", { name: /Hi/ })).toBeVisible();
+  return { context, staff };
 }
