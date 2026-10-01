@@ -42,9 +42,9 @@ jobs:
           cache: npm
           cache-dependency-path: |
             web/package-lock.json
-      - name: Databases and roles
+      - name: Databases, roles and PDF libraries
         run: |
-          sudo apt-get update -q && sudo apt-get install -yq postgresql-client
+          sudo apt-get update -q && sudo apt-get install -yq postgresql-client libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
           scripts/dev-db.sh
       - name: Install
         run: |

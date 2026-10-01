@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -9,9 +10,11 @@ from zoneinfo import ZoneInfo
 
 import httpx
 import psycopg
+from pypdf import PdfReader
 
 from app.core.time import today
-from app.modules.payroll import calc
+from app.modules.payroll import calc, pdf
+from app.modules.payroll.schemas import PayslipOut
 from tests.helpers import Account, add_staff, invite_and_join, signup
 
 TK = 100
@@ -385,3 +388,92 @@ async def test_five_hundred_people_in_seconds(
         overtime
     }
     assert elapsed < 60, elapsed
+
+
+def pdf_fonts_and_text(data: bytes) -> tuple[set[str], str]:
+    reader = PdfReader(io.BytesIO(data))
+    page = reader.pages[0]
+    fonts = {str(f["/BaseFont"]).split("+")[-1] for f in page["/Resources"]["/Font"].values()}
+    return fonts, page.extract_text()
+
+
+async def test_payslip_pdfs_in_english_and_bangla(client: httpx.AsyncClient) -> None:
+    owner = await signup(client)
+    _, staff = await add_staff(owner, name="মোঃ আব্দুল করিম")
+    await set_salary(
+        owner, await employee_id(staff), payment_method="wallet", provider="bKash", account="01712345678"
+    )
+    run = (await owner.post("/v1/payroll/runs", json={"period": last_month()})).json()
+    slip = slip_for(run, "মোঃ আব্দুল করিম")
+    # Not published yet: the person can't download it.
+    assert (await staff.get(f"/v1/payroll/payslips/{slip['id']}/pdf")).status_code == 404
+    await owner.post(f"/v1/payroll/runs/{run['id']}/submit")
+    await owner.post(f"/v1/payroll/runs/{run['id']}/finalize")
+
+    english = await staff.get(f"/v1/payroll/payslips/{slip['id']}/pdf")
+    assert english.status_code == 200
+    assert english.headers["content-type"] == "application/pdf"
+    assert english.headers["cache-control"] == "no-store"
+    assert english.content.startswith(b"%PDF")
+    fonts, text = pdf_fonts_and_text(english.content)
+    # Only the fonts that ship with the app, so Bangla is shaped the same everywhere.
+    assert fonts <= {
+        "IBM-Plex-Sans",
+        "IBM-Plex-Sans-Semi-Bold",
+        "Noto-Sans-Bengali",
+        "Noto-Sans-Bengali-Semi-Bold",
+    }
+    assert "Noto-Sans-Bengali" in fonts
+    assert "Payslip" in text
+    assert "Net pay" in text
+    assert "··5678" in text
+
+    bangla = await staff.get(f"/v1/payroll/payslips/{slip['id']}/pdf", params={"lang": "bn"})
+    fonts, text = pdf_fonts_and_text(bangla.content)
+    assert "Noto-Sans-Bengali-Semi-Bold" in fonts
+    assert "৳" in text
+    assert any("\u09e6" <= ch <= "\u09ef" for ch in text)  # Bangla digits
+    assert (
+        await staff.get(f"/v1/payroll/payslips/{slip['id']}/pdf", params={"lang": "fr"})
+    ).status_code == 422
+
+
+def test_amounts_use_lakh_grouping_and_bangla_digits() -> None:
+    assert pdf.amount(123_456_789_00, "BDT", "en") == "৳12,34,56,789"
+    assert pdf.amount(123_456_789_50, "BDT", "bn") == "৳১২,৩৪,৫৬,৭৮৯.৫০"
+    assert pdf.amount(1_234_567_89, "USD", "en") == "$1,234,567.89"
+    assert pdf.amount(500, "JPY", "en") == "JPY 500"
+    assert pdf.month_name("2026-09", "bn") == "সেপ্টেম্বর ২০২৬"
+    html = pdf.render_html(
+        PayslipOut.model_validate(
+            {
+                "id": "01900000-0000-7000-8000-000000000001",
+                "run_id": "01900000-0000-7000-8000-000000000002",
+                "period": "2026-09",
+                "currency": "BDT",
+                "employee_id": "01900000-0000-7000-8000-000000000003",
+                "employee_name": "<script>alert(1)</script>",
+                "employee_code": None,
+                "department_name": None,
+                "job_title": None,
+                "pay_rule": "monthly",
+                "days_in_period": 30,
+                "payable_days": 30,
+                "unpaid_leave_days": 0,
+                "worked_minutes": 0,
+                "overtime_minutes": 0,
+                "lines": [],
+                "gross": 0,
+                "deductions": 0,
+                "net": 0,
+                "carried_forward": 0,
+                "payment_method": "cash",
+                "provider": None,
+                "account_last4": None,
+            }
+        ),
+        company="A & B <Ltd>",
+        lang="en",
+    )
+    assert "<script>" not in html
+    assert "A &amp; B &lt;Ltd&gt;" in html

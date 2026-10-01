@@ -6,6 +6,7 @@ Each route only checks who may call it and hands over to `service`.
 from __future__ import annotations
 
 import uuid
+from typing import Literal
 
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import StreamingResponse
@@ -182,6 +183,20 @@ async def transfer_sheet(
 @router.get("/payslips", response_model=list[PayslipOut])
 async def my_payslips(ctx: Ctx = Depends(allow(access.SELF, module=MODULE))) -> list[PayslipOut]:
     return await service.my_payslips(ctx)
+
+
+@router.get("/payslips/{payslip_id}/pdf")
+async def payslip_pdf(
+    payslip_id: uuid.UUID,
+    lang: Literal["en", "bn"] = "en",
+    ctx: Ctx = Depends(allow(access.SELF, module=MODULE)),
+) -> Response:
+    body, filename = await service.payslip_pdf(ctx, payslip_id, lang)
+    return Response(
+        body,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"', "Cache-Control": "no-store"},
+    )
 
 
 @router.get("/payslips/{payslip_id}", response_model=PayslipOut)

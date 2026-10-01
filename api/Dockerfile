@@ -14,6 +14,10 @@ COPY api/alembic.ini ./
 FROM mirror.gcr.io/library/python:3.12-slim-bookworm AS runtime
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PATH="/app/.venv/bin:$PATH" PORT=8080 \
     ENV=prod TRUST_PROXY_HEADERS=true
+# Pango and HarfBuzz for payslip PDFs (WeasyPrint); fonts ship with the app.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --no-create-home app
 WORKDIR /app
 COPY --from=build --chown=app:app /app /app

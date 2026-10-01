@@ -19,6 +19,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any
 
+import anyio
 from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,7 +32,7 @@ from app.core.time import today, utcnow
 from app.modules.attendance.models import AttendanceRecord
 from app.modules.leave.models import LeaveRequest, LeaveType
 from app.modules.leave.service import count_days
-from app.modules.payroll import access, calc, defaults
+from app.modules.payroll import access, calc, defaults, pdf
 from app.modules.payroll.models import Loan, PayItem, PayrollRun, PayrollSettings, Payslip, SalaryStructure
 from app.modules.payroll.schemas import (
     ItemIn,
@@ -871,6 +872,15 @@ async def payslip(ctx: Ctx, payslip_id: uuid.UUID) -> PayslipOut:
     if not (own or preparer or viewer):
         raise NotFound()
     return _payslip_out(slip, run)
+
+
+async def payslip_pdf(ctx: Ctx, payslip_id: uuid.UUID, lang: str) -> tuple[bytes, str]:
+    slip = await payslip(ctx, payslip_id)
+    assert ctx.tenant is not None
+    company = ctx.tenant.name
+    body = await anyio.to_thread.run_sync(lambda: pdf.render_pdf(slip, company=company, lang=lang))
+    code = slip.employee_code or str(slip.employee_id)[:8]
+    return body, f"payslip-{slip.period}-{code}-{lang}.pdf"
 
 
 # ---- Switching the module on ------------------------------------------------------------
