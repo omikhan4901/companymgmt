@@ -210,6 +210,35 @@ def needs_mfa(ctx: Ctx) -> bool:
     )
 
 
+def check_access(ctx: Ctx, permission: str | None, *, module: str | None, writing: bool) -> None:
+    """Everything a workspace call must pass: the module is on (and writable on this plan),
+    the workspace isn't read-only, two-step verification when required, the permission.
+    Shared by REST routes and capabilities, so both enforce exactly the same rules."""
+    assert ctx.entitlements is not None
+    if module is not None:
+        if module in ctx.entitlements.locked_modules:
+            if writing:
+                raise PaymentRequired(
+                    "Your plan has more modules switched on than it includes. "
+                    "This one is read-only until you upgrade or switch another off.",
+                    code="module_over_limit",
+                )
+        elif module not in ctx.entitlements.modules:
+            raise PaymentRequired("This module is switched off.", code="module_off")
+    if writing and ctx.entitlements.read_only:
+        raise PaymentRequired(
+            "This workspace is read-only. You can still view and export your data.",
+            code="workspace_read_only",
+        )
+    if needs_mfa(ctx):
+        raise Forbidden(
+            "This workspace asks owners and admins to turn on two-step verification first.",
+            code="mfa_setup_required",
+        )
+    if permission is not None:
+        ctx.require(permission)
+
+
 # ---- Dependencies used by routes -------------------------------------------------------
 
 Dep = Callable[..., Awaitable[Ctx | None]]
@@ -254,30 +283,7 @@ def allow(permission: str | None, *, module: str | None = None) -> Callable[...,
         if ctx.user.must_change_password:
             raise Forbidden("Please set a new password first.", code="password_change_required")
         await _bind_workspace(ctx)
-        assert ctx.entitlements is not None
-        writing = request.method not in SAFE_METHODS
-        if module is not None:
-            if module in ctx.entitlements.locked_modules:
-                if writing:
-                    raise PaymentRequired(
-                        "Your plan has more modules switched on than it includes. "
-                        "This one is read-only until you upgrade or switch another off.",
-                        code="module_over_limit",
-                    )
-            elif module not in ctx.entitlements.modules:
-                raise PaymentRequired("This module is switched off.", code="module_off")
-        if writing and ctx.entitlements.read_only:
-            raise PaymentRequired(
-                "This workspace is read-only. You can still view and export your data.",
-                code="workspace_read_only",
-            )
-        if needs_mfa(ctx):
-            raise Forbidden(
-                "This workspace asks owners and admins to turn on two-step verification first.",
-                code="mfa_setup_required",
-            )
-        if permission is not None:
-            ctx.require(permission)
+        check_access(ctx, permission, module=module, writing=request.method not in SAFE_METHODS)
         return ctx
 
     dep._access = "workspace"  # type: ignore[attr-defined]

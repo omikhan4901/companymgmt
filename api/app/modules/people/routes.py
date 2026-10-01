@@ -3,21 +3,20 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
-from pydantic import EmailStr, StringConstraints, model_validator
-from sqlalchemy import func, literal, or_, select, tuple_
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound
-from app.core.http import check_if_match, decode_cursor, encode_cursor, set_etag
+from app.core.http import check_if_match, set_etag
 from app.core.ids import uuid7
-from app.core.schema import In, Name, Out, Page, ShortName
+from app.core.schema import Page
 from app.core.security import crypto
 from app.core.time import today
+from app.modules.people import service
 from app.modules.people.access import (
     DEPARTMENTS_MANAGE,
     PEOPLE_MANAGE,
@@ -26,8 +25,23 @@ from app.modules.people.access import (
     in_scope,
     scope_departments,
 )
-from app.modules.people.models import EMPLOYMENT_TYPES, Department, Employee
-from app.modules.people.service import check_people_limit, employee_for_membership, register_hooks
+from app.modules.people.models import Department, Employee
+from app.modules.people.schemas import (
+    DepartmentIn,
+    DepartmentOut,
+    DepartmentPatch,
+    EmployeeIn,
+    EmployeeOut,
+    EmployeePatch,
+    employee_out,
+    nid_context,
+)
+from app.modules.people.service import (
+    check_people_limit,
+    employee_for_membership,
+    register_hooks,
+    visible_employee,
+)
 from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.models import Branch, Membership
 
@@ -35,30 +49,7 @@ register_hooks()
 
 router = APIRouter(prefix="/v1", tags=["people"])
 
-EmploymentType = Literal["full_time", "part_time", "contract", "intern", "daily"]
-assert set(EMPLOYMENT_TYPES) == {"full_time", "part_time", "contract", "intern", "daily"}
-
-
 # ---- Departments ------------------------------------------------------------------------
-
-
-class DepartmentOut(Out):
-    id: uuid.UUID
-    name: str
-    parent_id: uuid.UUID | None
-    people: int
-    version: int
-
-
-class DepartmentIn(In):
-    name: ShortName
-    parent_id: uuid.UUID | None = None
-
-
-class DepartmentPatch(In):
-    name: ShortName | None = None
-    parent_id: uuid.UUID | None = None
-    move_to_top: bool = False
 
 
 async def _department_counts(db: AsyncSession) -> dict[uuid.UUID, int]:
@@ -224,126 +215,6 @@ async def delete_department(
 # ---- People -----------------------------------------------------------------------------
 
 
-class EmployeeOut(Out):
-    id: uuid.UUID
-    membership_id: uuid.UUID | None
-    employee_code: str | None
-    full_name: str
-    preferred_name: str | None
-    email: str | None
-    phone: str | None
-    department_id: uuid.UUID | None
-    branch_id: uuid.UUID | None
-    job_title: str | None
-    employment_type: str
-    status: str
-    joined_on: date | None
-    left_on: date | None
-    date_of_birth: date | None
-    national_id_last4: str | None
-    notes: str | None
-    created_at: datetime
-    version: int
-
-
-Code = Annotated[str, StringConstraints(max_length=40, strip_whitespace=True)]
-Phone = Annotated[str, StringConstraints(max_length=40, pattern=r"^[0-9+()\-\s.]{3,40}$")]
-NationalId = Annotated[str, StringConstraints(max_length=40, strip_whitespace=True)]
-Title = Annotated[str, StringConstraints(max_length=120, strip_whitespace=True)]
-Notes = Annotated[str, StringConstraints(max_length=5000)]
-
-
-class EmployeeIn(In):
-    full_name: Name
-    preferred_name: ShortName | None = None
-    employee_code: Code | None = None
-    email: EmailStr | None = None
-    phone: Phone | None = None
-    department_id: uuid.UUID | None = None
-    branch_id: uuid.UUID | None = None
-    job_title: Title | None = None
-    employment_type: EmploymentType = "full_time"
-    joined_on: date | None = None
-    date_of_birth: date | None = None
-    national_id: NationalId | None = None
-    notes: Notes | None = None
-
-    @model_validator(mode="after")
-    def _dates(self) -> EmployeeIn:
-        if self.date_of_birth and self.date_of_birth > today("Pacific/Kiritimati"):
-            raise ValueError("Date of birth can't be in the future.")
-        if self.date_of_birth and self.date_of_birth.year < 1900:
-            raise ValueError("Check the date of birth.")
-        return self
-
-
-class EmployeePatch(In):
-    full_name: Name | None = None
-    preferred_name: ShortName | None = None
-    employee_code: Code | None = None
-    email: EmailStr | None = None
-    phone: Phone | None = None
-    department_id: uuid.UUID | None = None
-    branch_id: uuid.UUID | None = None
-    job_title: Title | None = None
-    employment_type: EmploymentType | None = None
-    status: Literal["active", "inactive", "left"] | None = None
-    joined_on: date | None = None
-    left_on: date | None = None
-    date_of_birth: date | None = None
-    national_id: NationalId | None = None
-    notes: Notes | None = None
-    clear: list[
-        Literal[
-            "department_id",
-            "branch_id",
-            "employee_code",
-            "email",
-            "phone",
-            "job_title",
-            "preferred_name",
-            "left_on",
-            "date_of_birth",
-            "national_id",
-            "notes",
-        ]
-    ] = []
-
-
-def _nid_context(employee_id: uuid.UUID) -> str:
-    return f"employee:{employee_id}:national_id"
-
-
-def _out(e: Employee) -> EmployeeOut:
-    last4 = None
-    if e.national_id_enc:
-        try:
-            last4 = crypto.decrypt(e.national_id_enc, context=_nid_context(e.id))[-4:]
-        except (ValueError, KeyError):
-            last4 = None
-    return EmployeeOut(
-        id=e.id,
-        membership_id=e.membership_id,
-        employee_code=e.employee_code,
-        full_name=e.full_name,
-        preferred_name=e.preferred_name,
-        email=e.email,
-        phone=e.phone,
-        department_id=e.department_id,
-        branch_id=e.branch_id,
-        job_title=e.job_title,
-        employment_type=e.employment_type,
-        status=e.status,
-        joined_on=e.joined_on,
-        left_on=e.left_on,
-        date_of_birth=e.date_of_birth,
-        national_id_last4=last4,
-        notes=e.notes,
-        created_at=e.created_at,
-        version=e.version,
-    )
-
-
 async def _validate_refs(ctx: Ctx, department_id: uuid.UUID | None, branch_id: uuid.UUID | None) -> None:
     if department_id is not None:
         await _existing_department(ctx.db, department_id, "department_id")
@@ -377,41 +248,9 @@ async def list_people(
     cursor: str | None = None,
     limit: int = Query(default=50, ge=1, le=200),
 ) -> Page[EmployeeOut]:
-    query = select(Employee)
-    scope = await scope_departments(ctx)
-    if scope is not None:
-        query = query.where(Employee.department_id.in_(scope))
-    if status != "all":
-        query = query.where(Employee.status == status)
-    if department_id:
-        query = query.where(Employee.department_id == department_id)
-    if branch_id:
-        query = query.where(Employee.branch_id == branch_id)
-    if q:
-        like = f"%{q.strip().lower().replace('%', r'\%').replace('_', r'\_')}%"
-        query = query.where(
-            or_(
-                func.lower(Employee.full_name).like(like),
-                func.lower(Employee.preferred_name).like(like),
-                func.lower(Employee.employee_code).like(like),
-                func.lower(Employee.email).like(like),
-                Employee.phone.like(like),
-            )
-        )
-    after = decode_cursor(cursor)
-    if after:
-        query = query.where(
-            tuple_(func.lower(Employee.full_name), Employee.id)
-            > tuple_(literal(str(after["n"])), literal(uuid.UUID(str(after["id"]))))
-        )
-    rows = (
-        await ctx.db.scalars(query.order_by(func.lower(Employee.full_name), Employee.id).limit(limit + 1))
-    ).all()
-    items = [_out(e) for e in rows[:limit]]
-    next_cursor = (
-        encode_cursor({"n": items[-1].full_name.lower(), "id": items[-1].id}) if len(rows) > limit else None
+    return await service.search_people(
+        ctx, q=q, department_id=department_id, branch_id=branch_id, status=status, cursor=cursor, limit=limit
     )
-    return Page(items=items, next_cursor=next_cursor)
 
 
 @router.get("/people/me", response_model=EmployeeOut)
@@ -420,37 +259,16 @@ async def my_profile(ctx: Ctx = Depends(allow(None, module="people"))) -> Employ
     employee = await employee_for_membership(ctx.db, ctx.membership.id)
     if employee is None:
         raise NotFound("You don't have a profile in this workspace yet.")
-    return _out(employee)
-
-
-async def _visible_employee(ctx: Ctx, employee_id: uuid.UUID, *, lock: bool = False) -> Employee:
-    query = select(Employee).where(Employee.id == employee_id)
-    if lock:
-        query = query.with_for_update()
-    employee = await ctx.db.scalar(query)
-    if employee is None or not await in_scope(ctx, employee.department_id):
-        raise NotFound()
-    return employee
+    return employee_out(employee)
 
 
 @router.get("/people/{employee_id}", response_model=EmployeeOut)
 async def get_person(
     employee_id: uuid.UUID, response: Response, ctx: Ctx = Depends(allow(None, module="people"))
 ) -> EmployeeOut:
-    own = ctx.membership is not None and await ctx.db.scalar(
-        select(func.count())
-        .select_from(Employee)
-        .where(Employee.id == employee_id, Employee.membership_id == ctx.membership.id)
-    )
-    if not own:
-        ctx.require(PEOPLE_VIEW)
-        employee = await _visible_employee(ctx, employee_id)
-    else:
-        found = await ctx.db.get(Employee, employee_id)
-        assert found is not None
-        employee = found
+    employee = await service.get_person(ctx, employee_id)
     set_etag(response, employee.version)
-    return _out(employee)
+    return employee_out(employee)
 
 
 @router.post("/people", response_model=EmployeeOut, status_code=201)
@@ -463,7 +281,7 @@ async def create_person(
     data = body.model_dump(exclude={"national_id"})
     employee = Employee(id=uuid7(), **data)
     if body.national_id:
-        employee.national_id_enc = crypto.encrypt(body.national_id, context=_nid_context(employee.id))
+        employee.national_id_enc = crypto.encrypt(body.national_id, context=nid_context(employee.id))
     employee.email = body.email.lower() if body.email else None
     ctx.db.add(employee)
     await ctx.db.flush()
@@ -476,7 +294,7 @@ async def create_person(
     )
     await ctx.db.commit()
     set_etag(response, employee.version)
-    return _out(employee)
+    return employee_out(employee)
 
 
 @router.patch("/people/{employee_id}", response_model=EmployeeOut)
@@ -487,7 +305,7 @@ async def update_person(
     response: Response,
     ctx: Ctx = Depends(allow(PEOPLE_MANAGE, module="people")),
 ) -> EmployeeOut:
-    employee = await _visible_employee(ctx, employee_id, lock=True)
+    employee = await visible_employee(ctx, employee_id, lock=True)
     check_if_match(request, employee.version)
     changes = body.model_dump(exclude_unset=True, exclude_none=True, exclude={"clear", "national_id"})
     for field in body.clear:
@@ -515,7 +333,7 @@ async def update_person(
     for key, value in changes.items():
         setattr(employee, key, value)
     if body.national_id:
-        employee.national_id_enc = crypto.encrypt(body.national_id, context=_nid_context(employee.id))
+        employee.national_id_enc = crypto.encrypt(body.national_id, context=nid_context(employee.id))
     await ctx.db.flush()
     after = {k: v for k, v in changes.items() if k != "national_id_enc"}
     if body.national_id or "national_id_enc" in changes:
@@ -529,4 +347,4 @@ async def update_person(
     )
     await ctx.db.commit()
     set_etag(response, employee.version)
-    return _out(employee)
+    return employee_out(employee)
