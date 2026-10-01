@@ -51,6 +51,10 @@ location, built so a permission-aware AI assistant can sit on top of it later.
   who reads each (everyone, some roles, some departments), keep every version, and ask
   people to acknowledge the policies that matter ("acknowledged by 12 of 30"). Uploads
   are checked by their content and always download as files.
+- **Import from a spreadsheet.** Bring the whole team in from a CSV (English or Bangla
+  headers): people, departments and the leave days each person has left. Every row is
+  checked first, with problems explained line by line; nothing is saved until the file
+  is clean.
 - **Onboarding checklists.** Write down a new joiner's first days once: items for them
   and for their manager, due some days after they start, some pointing at a policy to
   read. Start it for someone (or let it start by itself when anyone joins); the items
@@ -169,20 +173,20 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **208 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
+- **223 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
   payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
   export, import, deletion and audit retention, plans, notifications and the daily
-  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, a 30-person agency's week, and capability
+  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, a 30-person agency's week, spreadsheet import, and capability
   parity with the API.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
   the branch; staff ask for leave and the owner approves it (and hears about it from the
   bell); the owner runs payroll and staff download their payslip; a manager plans a project
-  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; a 30-person agency's week is played through the API and finished in the browser (the last acknowledgement, the last approval); an owner exports, imports, deletes and
+  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; a 30-person agency's week is played through the API and finished in the browser (the last acknowledgement, the last approval); an owner imports the team from a spreadsheet, fixing the file first; an owner exports, imports, deletes and
   restores a workspace; forms keep what was typed on a slow connection; dark mode and
-  accents. 16 scenarios on desktop and phone (the agency week on desktop only, as seeding thirty people takes a while). **axe WCAG 2.2 AA** checks, a
+  accents. 17 scenarios on desktop and phone (the agency week on desktop only, as seeding thirty people takes a while). **axe WCAG 2.2 AA** checks, a
   no-sideways-scrolling check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in

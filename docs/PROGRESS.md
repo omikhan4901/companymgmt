@@ -156,7 +156,20 @@ architecture one-pager. Only built features and measured numbers.
   and capability parity with the REST routes is tested. Deferred on purpose: approval
   chains with several steps, which arrive with expenses and purchases.
 - Next: M4, the pilot release. Deployment waits on the owner's cloud accounts (see
-  "Blocked on the owner").
+  "Blocked on the owner"); everything else in M4 is being built meanwhile.
+
+## M4: in progress (pilot release)
+
+- **M4.1 spreadsheet import: done.** Owners and admins bring a company in from a CSV:
+  people (matched to existing profiles by code, then email, and updated), departments
+  from paths like "Design / Motion", and the days of leave each person has left this
+  year (recorded as adjustments, so balances stay explainable). Headers can be English
+  or Bangla, dates day-first (Bangla digits too). A preview lists every row's problems
+  in plain words before anything is saved; the import is all or nothing and respects
+  the plan's people limit. A template lists the workspace's own leave types. Found on
+  the way: the template's formula guard (`'+880…`) made phone numbers fail on the way
+  back in; leading apostrophes are now read as spreadsheets mean them.
+- Next: dashboards and reports, then in-app help and the pilot playbook.
 
 ## Log
 
@@ -176,3 +189,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.6 approvals inbox for leave and time fixes; time-fix decisions moved into the attendance service.
 - 2026-10-01: M3.7 onboarding checklists: templates, runs as tasks, automatic start on joining, document items tick off on acknowledgement.
 - 2026-10-01: M3.8 a 30-person agency's week, played through the API and finished in the browser. M3 done.
+- 2026-10-01: M4.1 spreadsheet import of people, departments and leave balances, with a preview.

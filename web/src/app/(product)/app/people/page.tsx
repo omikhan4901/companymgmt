@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, FolderTree, KeyRound, Plus, Search, UsersRound } from "lucide-react";
+import { ChevronRight, FileUp, FolderTree, KeyRound, Plus, Search, UsersRound } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { departmentOptions, useBranches, useDepartments } from "@/api/hooks";
 import type { Department, Employee, Page } from "@/api/types";
 import { useSession } from "@/auth/session";
 import { PageHeader } from "@/components/page";
+import { ImportDialog } from "@/components/people/import-dialog";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -204,7 +205,8 @@ const statusTone = { active: "success", inactive: "neutral", left: "warn" } as c
 
 function PeopleList() {
   const { t } = useTranslation();
-  const { can } = useSession();
+  const { can, workspace } = useSession();
+  const [importing, setImporting] = useState(false);
   const [q, setQ] = useState("");
   const query = useDeferredValue(q.trim());
   const [department, setDepartment] = useState("");
@@ -250,12 +252,19 @@ function PeopleList() {
             ))}
           </Select>
         </Field>
+        {manage && !workspace?.scope_department_id && (
+          <Button className="sm:ml-auto" onClick={() => setImporting(true)}>
+            <FileUp aria-hidden="true" />
+            {t("importer.open")}
+          </Button>
+        )}
         {manage && (
-          <Button variant="primary" className="sm:ml-auto" onClick={() => setEditing("new")}>
+          <Button variant="primary" className={workspace?.scope_department_id ? "sm:ml-auto" : undefined} onClick={() => setEditing("new")}>
             <Plus aria-hidden="true" />
             {t("people.add")}
           </Button>
         )}
+        {importing && <ImportDialog onClose={() => setImporting(false)} />}
       </div>
 
       {people.data && rows.length === 0 ? (

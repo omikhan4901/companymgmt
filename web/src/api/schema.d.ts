@@ -1893,6 +1893,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/people/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import People
+         * @description Body: the CSV file itself. Without `commit`, nothing is saved.
+         */
+        post: operations["import_people_v1_people_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Template */
+        get: operations["template_v1_people_import_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/people/me": {
         parameters: {
             query?: never;
@@ -2670,6 +2707,13 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** CellError */
+        CellError: {
+            /** Column */
+            column: string;
+            /** Message */
+            message: string;
+        };
         /** ChecklistIn */
         ChecklistIn: {
             /** Text */
@@ -2714,6 +2758,15 @@ export interface components {
         CodeIn: {
             /** Code */
             code: string;
+        };
+        /** ColumnOut */
+        ColumnOut: {
+            /** Field */
+            field: string | null;
+            /** Header */
+            header: string;
+            /** Leave Type */
+            leave_type?: string | null;
         };
         /** CommentIn */
         CommentIn: {
@@ -3241,6 +3294,25 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /** ImportOut */
+        ImportOut: {
+            /** Columns */
+            columns: components["schemas"]["ColumnOut"][];
+            /** Committed */
+            committed: boolean;
+            /** Create */
+            create: number;
+            /** Errors */
+            errors: number;
+            /** New Departments */
+            new_departments: string[];
+            /** Rows */
+            rows: components["schemas"]["RowOut"][];
+            /** Unchanged */
+            unchanged: number;
+            /** Update */
+            update: number;
         };
         /** InboxOut */
         InboxOut: {
@@ -4441,6 +4513,22 @@ export interface components {
             name?: string | null;
             /** Permissions */
             permissions?: string[] | null;
+        };
+        /** RowOut */
+        RowOut: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "create" | "update" | "unchanged" | "error";
+            /** Changes */
+            changes: string[];
+            /** Errors */
+            errors: components["schemas"]["CellError"][];
+            /** Line */
+            line: number;
+            /** Name */
+            name: string;
         };
         /** RunDetail */
         RunDetail: {
@@ -9407,6 +9495,66 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["EmployeeOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_people_v1_people_import_post: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    template_v1_people_import_template_get: {
+        parameters: {
+            query?: {
+                lang?: "en" | "bn";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

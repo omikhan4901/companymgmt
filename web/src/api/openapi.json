@@ -1147,6 +1147,24 @@
     "title": "CalendarEntry",
     "type": "object"
    },
+   "CellError": {
+    "properties": {
+     "column": {
+      "title": "Column",
+      "type": "string"
+     },
+     "message": {
+      "title": "Message",
+      "type": "string"
+     }
+    },
+    "required": [
+     "column",
+     "message"
+    ],
+    "title": "CellError",
+    "type": "object"
+   },
    "ChecklistIn": {
     "additionalProperties": false,
     "properties": {
@@ -1311,6 +1329,42 @@
      "code"
     ],
     "title": "CodeIn",
+    "type": "object"
+   },
+   "ColumnOut": {
+    "properties": {
+     "field": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Field"
+     },
+     "header": {
+      "title": "Header",
+      "type": "string"
+     },
+     "leave_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Leave Type"
+     }
+    },
+    "required": [
+     "header",
+     "field"
+    ],
+    "title": "ColumnOut",
     "type": "object"
    },
    "CommentIn": {
@@ -3099,6 +3153,63 @@
      "branch_id"
     ],
     "title": "HolidayOut",
+    "type": "object"
+   },
+   "ImportOut": {
+    "properties": {
+     "columns": {
+      "items": {
+       "$ref": "#/components/schemas/ColumnOut"
+      },
+      "title": "Columns",
+      "type": "array"
+     },
+     "committed": {
+      "title": "Committed",
+      "type": "boolean"
+     },
+     "create": {
+      "title": "Create",
+      "type": "integer"
+     },
+     "errors": {
+      "title": "Errors",
+      "type": "integer"
+     },
+     "new_departments": {
+      "items": {
+       "type": "string"
+      },
+      "title": "New Departments",
+      "type": "array"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/RowOut"
+      },
+      "title": "Rows",
+      "type": "array"
+     },
+     "unchanged": {
+      "title": "Unchanged",
+      "type": "integer"
+     },
+     "update": {
+      "title": "Update",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "committed",
+     "columns",
+     "rows",
+     "create",
+     "update",
+     "unchanged",
+     "errors",
+     "new_departments"
+    ],
+    "title": "ImportOut",
     "type": "object"
    },
    "InboxOut": {
@@ -6646,6 +6757,51 @@
      }
     },
     "title": "RolePatch",
+    "type": "object"
+   },
+   "RowOut": {
+    "properties": {
+     "action": {
+      "enum": [
+       "create",
+       "update",
+       "unchanged",
+       "error"
+      ],
+      "title": "Action",
+      "type": "string"
+     },
+     "changes": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Changes",
+      "type": "array"
+     },
+     "errors": {
+      "items": {
+       "$ref": "#/components/schemas/CellError"
+      },
+      "title": "Errors",
+      "type": "array"
+     },
+     "line": {
+      "title": "Line",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "line",
+     "name",
+     "action",
+     "changes",
+     "errors"
+    ],
+    "title": "RowOut",
     "type": "object"
    },
    "RunDetail": {
@@ -15041,6 +15197,90 @@
      }
     },
     "summary": "Create Person",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/people/import": {
+   "post": {
+    "description": "Body: the CSV file itself. Without `commit`, nothing is saved.",
+    "operationId": "import_people_v1_people_import_post",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "commit",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Commit",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ImportOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Import People",
+    "tags": [
+     "people"
+    ]
+   }
+  },
+  "/v1/people/import/template": {
+   "get": {
+    "operationId": "template_v1_people_import_template_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "lang",
+      "required": false,
+      "schema": {
+       "default": "en",
+       "enum": [
+        "en",
+        "bn"
+       ],
+       "title": "Lang",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Template",
     "tags": [
      "people"
     ]

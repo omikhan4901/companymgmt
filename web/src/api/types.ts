@@ -73,3 +73,4 @@ export type Doc = S["DocumentOut"];
 export type DocDetail = S["DocumentDetail"];
 export type DocAcks = S["AcksOut"];
 export type ApprovalItem = S["ApprovalItem"];
+export type ImportResult = S["ImportOut"];
