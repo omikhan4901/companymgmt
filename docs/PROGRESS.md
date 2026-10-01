@@ -117,15 +117,11 @@ architecture one-pager. Only built features and measured numbers.
   projects, managers run projects in their departments, and assignment, comments,
   completion and joining a project notify the people involved. Edits made in quick
   succession are queued so none is lost to a version clash.
-- **M3.4 announcements: designed, next to build.** Module `announcements`; tables
-  `announcements` (title, body, audience everyone/branches/departments with ids, pinned,
-  published_at, author, edited_at, version) and `announcement_reads` (post, user, read_at).
-  Permissions `announcements.read` (everyone) and `announcements.post` (scoped: managers
-  post only to departments in their scope). Departments include everything below them.
-  Receipts count people who can sign in; only the author and unscoped posters see them.
-  Publishing emits `announcement.published` with the audience's membership ids, and the
-  notifications module tells them. Feed: pinned first, then newest; unread count.
-- Then: documents and policies, the
+- **M3.4 announcements: done.** Posts to everyone, some branches, or some departments and
+  the teams under them; pinned first; managers post only to their own departments. Read
+  receipts ("read by 12 of 30", with who hasn't) for the author and admins; posts count as
+  read when shown; the audience is notified; "Latest news" on the home screen.
+- Next: documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
 ## Log
@@ -141,3 +137,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.1 pushed: capability registry, AI context, domain events. M3.2 in-app notifications.
 - 2026-10-01: M3.2 notifications done (in-app and daily email digest). CI caught forms wiping typed input when data loaded late; fixed with a browser test.
 - 2026-10-01: M3.3 tasks and projects: API, board, task panel, My work, browser journey on desktop and phone.
+- 2026-10-01: README remade. M3.4 announcements with read receipts: API, feed, composer, receipts, browser journey.
