@@ -128,6 +128,12 @@ architecture one-pager. Only built features and measured numbers.
   with an "acknowledged by 12 of 30" report and a "To read" card on home. Files come
   across in workspace exports. Found and fixed on the way: workspace imports over 1 MB
   were refused by the request size limit.
+- **M3.6 approvals inbox: done for leave and time fixes.** One inbox lists everything
+  waiting on a person's decision, oldest first, using each module's own permission,
+  department scope and module switch; decisions go back to the module (same rules, same
+  notifications); nobody decides their own requests there. Request notifications open
+  it, and "Waiting for you" on home uses it. Multi-step chains (by plan) wait for
+  expenses and purchases, which will be the first kinds that need them.
 - Next: documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
@@ -146,3 +152,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.3 tasks and projects: API, board, task panel, My work, browser journey on desktop and phone.
 - 2026-10-01: README remade. M3.4 announcements with read receipts: API, feed, composer, receipts, browser journey.
 - 2026-10-01: M3.5 documents and policies with acknowledgements; large workspace imports fixed.
+- 2026-10-01: M3.6 approvals inbox for leave and time fixes; time-fix decisions moved into the attendance service.
