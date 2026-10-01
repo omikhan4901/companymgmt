@@ -76,6 +76,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "task_commented": "{actor} commented on {title}",
         "task_completed": "{actor} finished {title}",
         "project_members_added": "{actor} added you to {project}",
+        "announcement_published": "{actor} posted: {title}",
         "other": "Something changed",
     },
     "bn": {
@@ -93,6 +94,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "task_commented": "{actor} {title}-এ মন্তব্য করেছেন",
         "task_completed": "{actor} {title} শেষ করেছেন",
         "project_members_added": "{actor} আপনাকে {project} প্রকল্পে যোগ করেছেন",
+        "announcement_published": "{actor} ঘোষণা দিয়েছেন: {title}",
         "other": "কিছু পরিবর্তন হয়েছে",
     },
 }

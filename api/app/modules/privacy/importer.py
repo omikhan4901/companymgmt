@@ -1,8 +1,9 @@
 """Restore a workspace export into a new, empty workspace.
 
 Business records come across: branches, departments, people, attendance, leave,
-payroll, and tasks and projects. Logins, roles, invitations and the audit log don't: they belong to the old
-workspace, and the owner invites people again. Every record gets a new id (the old
+payroll, tasks and projects, and announcements (not who has read them). Logins, roles,
+invitations and the audit log don't: they belong to the old workspace, and the owner
+invites people again. Every record gets a new id (the old
 workspace may still exist on this server), references are rewritten to match, and
 encrypted fields are encrypted again for their new rows.
 """
@@ -62,6 +63,7 @@ IMPORTED = {
     "tasks",
     "task_checklist_items",
     "task_comments",
+    "announcements",
 }
 # Settings the new workspace was given when its modules were switched on; replaced.
 SEEDED = ("leave_types", "leave_policies", "payroll_settings", "attendance_settings")

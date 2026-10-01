@@ -72,6 +72,7 @@ def test_permissions_referenced_by_roles_exist() -> None:
         "leave.self",
         "payroll.self",
         "tasks.self",
+        "announcements.read",
     }
     # Custom roles never get owner-only or unknown permissions.
     assert catalog.resolve("custom-x", False, ["billing.manage", "nope", "people.view"]) == {"people.view"}

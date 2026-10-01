@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.modules.announcements import capabilities as _announcements  # noqa: F401
 from app.modules.attendance import capabilities as _attendance  # noqa: F401
 from app.modules.leave import capabilities as _leave  # noqa: F401
 from app.modules.notifications import capabilities as _notifications  # noqa: F401

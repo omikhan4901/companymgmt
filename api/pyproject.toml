@@ -92,7 +92,7 @@ type = "layers"
 layers = [
     "app.modules.privacy",
     "app.modules.payroll",
-    "app.modules.attendance | app.modules.leave | app.modules.notifications | app.modules.tasks",
+    "app.modules.announcements | app.modules.attendance | app.modules.leave | app.modules.notifications | app.modules.tasks",
     "app.modules.people",
     "app.modules.platform",
 ]

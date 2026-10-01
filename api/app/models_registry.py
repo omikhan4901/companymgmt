@@ -2,6 +2,7 @@
 
 from app.core import audit, events, outbox, ratelimit  # noqa: F401
 from app.core.models import Base
+from app.modules.announcements import models as announcements_models  # noqa: F401
 from app.modules.attendance import models as attendance_models  # noqa: F401
 from app.modules.leave import models as leave_models  # noqa: F401
 from app.modules.notifications import models as notifications_models  # noqa: F401

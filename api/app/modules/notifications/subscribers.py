@@ -17,6 +17,7 @@ LEAVE = "/app/leave"
 ATTENDANCE = "/app/attendance"
 PAYROLL = "/app/payroll"
 TASKS = "/app/tasks"
+ANNOUNCEMENTS = "/app/announcements"
 
 
 def _user(value: object) -> uuid.UUID | None:
@@ -109,4 +110,16 @@ async def project_joined(db: AsyncSession, event: events.Event) -> None:
         people,
         link=f"{TASKS}?project={event.subject_id}",
         data={"project_name": event.data.get("project_name")},
+    )
+
+
+@events.on("announcement.published")
+async def announced(db: AsyncSession, event: events.Event) -> None:
+    people = await users_of(db, event.data.get("membership_ids") or [])
+    await notify(
+        db,
+        event,
+        people,
+        link=f"{ANNOUNCEMENTS}?post={event.subject_id}",
+        data={"title": event.data.get("title")},
     )

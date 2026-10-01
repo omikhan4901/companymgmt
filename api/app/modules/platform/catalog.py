@@ -55,6 +55,7 @@ MODULES: dict[str, Module] = {
         Module("inventory", "Inventory", available=False),
         Module("accounting", "Accounting", available=False),
         Module("tasks", "Tasks & projects", requires=("people",)),
+        Module("announcements", "Announcements", requires=("people",)),
     )
 }
 
@@ -63,7 +64,7 @@ BUSINESS_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
     "shop": ("simple", ("attendance", "sales", "customers", "expenses")),
     "restaurant": ("simple", ("attendance", "sales", "inventory", "expenses")),
     "retail": ("standard", ("attendance", "sales", "customers", "inventory", "expenses")),
-    "office": ("standard", ("attendance", "leave", "payroll", "expenses", "tasks")),
+    "office": ("standard", ("attendance", "leave", "payroll", "expenses", "tasks", "announcements")),
     "factory": ("advanced", ("attendance", "leave", "payroll", "inventory", "expenses", "accounting")),
     "other": ("standard", ("attendance",)),
 }
@@ -108,6 +109,8 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "payroll.view",
             "tasks.self",
             "tasks.manage",
+            "announcements.read",
+            "announcements.post",
         ),
     ),
     BuiltinRole(
@@ -126,19 +129,20 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "payroll.manage",
             "payroll.run",
             "tasks.self",
+            "announcements.read",
         ),
     ),
     BuiltinRole(
         "cashier",
         "Cashier",
         "Sells and clocks in. No access to other people's data.",
-        ("attendance.self", "leave.self", "payroll.self", "tasks.self"),
+        ("attendance.self", "leave.self", "payroll.self", "tasks.self", "announcements.read"),
     ),
     BuiltinRole(
         "employee",
         "Employee",
         "Clocks in, asks for leave and sees their own records.",
-        ("attendance.self", "leave.self", "payroll.self", "tasks.self"),
+        ("attendance.self", "leave.self", "payroll.self", "tasks.self", "announcements.read"),
     ),
 )
 

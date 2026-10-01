@@ -151,6 +151,263 @@
     "title": "AdjustmentOut",
     "type": "object"
    },
+   "AnnouncementIn": {
+    "additionalProperties": false,
+    "properties": {
+     "audience": {
+      "default": "everyone",
+      "enum": [
+       "everyone",
+       "branches",
+       "departments"
+      ],
+      "title": "Audience",
+      "type": "string"
+     },
+     "audience_ids": {
+      "items": {
+       "format": "uuid",
+       "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Audience Ids",
+      "type": "array"
+     },
+     "body": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Body",
+      "type": "string"
+     },
+     "pinned": {
+      "default": false,
+      "title": "Pinned",
+      "type": "boolean"
+     },
+     "title": {
+      "maxLength": 200,
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title",
+     "body"
+    ],
+    "title": "AnnouncementIn",
+    "type": "object"
+   },
+   "AnnouncementOut": {
+    "properties": {
+     "audience": {
+      "enum": [
+       "everyone",
+       "branches",
+       "departments"
+      ],
+      "title": "Audience",
+      "type": "string"
+     },
+     "audience_names": {
+      "items": {
+       "$ref": "#/components/schemas/AudienceRef"
+      },
+      "title": "Audience Names",
+      "type": "array"
+     },
+     "author_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Author Name"
+     },
+     "body": {
+      "title": "Body",
+      "type": "string"
+     },
+     "can_edit": {
+      "title": "Can Edit",
+      "type": "boolean"
+     },
+     "edited_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Edited At"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "pinned": {
+      "title": "Pinned",
+      "type": "boolean"
+     },
+     "published_at": {
+      "format": "date-time",
+      "title": "Published At",
+      "type": "string"
+     },
+     "reach": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reach"
+     },
+     "read": {
+      "title": "Read",
+      "type": "boolean"
+     },
+     "read_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Read Count"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "body",
+     "audience",
+     "audience_names",
+     "pinned",
+     "published_at",
+     "edited_at",
+     "author_name",
+     "read",
+     "reach",
+     "read_count",
+     "can_edit",
+     "version"
+    ],
+    "title": "AnnouncementOut",
+    "type": "object"
+   },
+   "AnnouncementPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "audience": {
+      "anyOf": [
+       {
+        "enum": [
+         "everyone",
+         "branches",
+         "departments"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Audience"
+     },
+     "audience_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Audience Ids"
+     },
+     "body": {
+      "anyOf": [
+       {
+        "maxLength": 20000,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Body"
+     },
+     "pinned": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Pinned"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     }
+    },
+    "title": "AnnouncementPatch",
+    "type": "object"
+   },
+   "AudienceRef": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name"
+    ],
+    "title": "AudienceRef",
+    "type": "object"
+   },
    "AuditOut": {
     "properties": {
      "action": {
@@ -4686,6 +4943,76 @@
     "title": "ReauthIn",
     "type": "object"
    },
+   "ReceiptOut": {
+    "properties": {
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "read_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Read At"
+     }
+    },
+    "required": [
+     "employee_id",
+     "name",
+     "department",
+     "read_at"
+    ],
+    "title": "ReceiptOut",
+    "type": "object"
+   },
+   "ReceiptsOut": {
+    "properties": {
+     "people": {
+      "items": {
+       "$ref": "#/components/schemas/ReceiptOut"
+      },
+      "title": "People",
+      "type": "array"
+     },
+     "read": {
+      "title": "Read",
+      "type": "integer"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "total",
+     "read",
+     "people"
+    ],
+    "title": "ReceiptsOut",
+    "type": "object"
+   },
    "RecordIn": {
     "additionalProperties": false,
     "properties": {
@@ -7864,6 +8191,322 @@
     "summary": "Context",
     "tags": [
      "ai"
+    ]
+   }
+  },
+  "/v1/announcements": {
+   "get": {
+    "operationId": "feed_v1_announcements_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 30,
+       "maximum": 100,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AnnouncementOut"
+         },
+         "title": "Response Feed V1 Announcements Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Feed",
+    "tags": [
+     "announcements"
+    ]
+   },
+   "post": {
+    "operationId": "create_v1_announcements_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnnouncementIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnnouncementOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create",
+    "tags": [
+     "announcements"
+    ]
+   }
+  },
+  "/v1/announcements/unread": {
+   "get": {
+    "operationId": "unread_v1_announcements_unread_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UnreadOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Unread",
+    "tags": [
+     "announcements"
+    ]
+   }
+  },
+  "/v1/announcements/{announcement_id}": {
+   "delete": {
+    "operationId": "remove_v1_announcements__announcement_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "announcement_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Announcement Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove",
+    "tags": [
+     "announcements"
+    ]
+   },
+   "get": {
+    "operationId": "get_v1_announcements__announcement_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "announcement_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Announcement Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnnouncementOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get",
+    "tags": [
+     "announcements"
+    ]
+   },
+   "patch": {
+    "operationId": "update_v1_announcements__announcement_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "announcement_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Announcement Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnnouncementPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnnouncementOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update",
+    "tags": [
+     "announcements"
+    ]
+   }
+  },
+  "/v1/announcements/{announcement_id}/read": {
+   "post": {
+    "operationId": "mark_read_v1_announcements__announcement_id__read_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "announcement_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Announcement Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Mark Read",
+    "tags": [
+     "announcements"
+    ]
+   }
+  },
+  "/v1/announcements/{announcement_id}/receipts": {
+   "get": {
+    "operationId": "receipts_v1_announcements__announcement_id__receipts_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "announcement_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Announcement Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ReceiptsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Receipts",
+    "tags": [
+     "announcements"
     ]
    }
   },

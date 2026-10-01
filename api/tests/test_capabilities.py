@@ -58,7 +58,10 @@ async def agency(client: httpx.AsyncClient) -> dict[str, Any]:
         json={"leave_type_id": casual, "start_date": str(start), "end_date": str(start + timedelta(days=1))},
     )
     await cook.post("/v1/attendance/clock-in", json={})
-    await owner.put("/v1/workspace/modules", json={"modules": ["attendance", "leave", "payroll", "tasks"]})
+    await owner.put(
+        "/v1/workspace/modules",
+        json={"modules": ["attendance", "leave", "payroll", "tasks", "announcements"]},
+    )
     project = (
         await owner.post(
             "/v1/projects", json={"name": "Menu", "department_id": kitchen["id"], "member_ids": [ids["Cook"]]}
@@ -69,6 +72,16 @@ async def agency(client: httpx.AsyncClient) -> dict[str, Any]:
             "/v1/tasks", json={"title": "Prices", "project_id": project["id"], "assignee_id": ids["Cook"]}
         )
     ).json()
+    await owner.post("/v1/announcements", json={"title": "Eid", "body": "Closed on Eid."})
+    await owner.post(
+        "/v1/announcements",
+        json={
+            "title": "Menu",
+            "body": "New menu.",
+            "audience": "departments",
+            "audience_ids": [kitchen["id"]],
+        },
+    )
     todo = (await seller.post("/v1/tasks", json={"title": "Call client"})).json()
     return {
         "project_id": project["id"],
@@ -109,6 +122,8 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("payroll.runs", "/v1/payroll/runs", {}),
         ("notifications.inbox", "/v1/notifications", {}),
         ("tasks.my_work", "/v1/tasks/my-work", {}),
+        ("announcements.feed", "/v1/announcements", {}),
+        ("announcements.feed", "/v1/announcements", {"limit": 1}),
         ("tasks.projects", "/v1/projects", {}),
         ("tasks.list", "/v1/tasks", {}),
         ("tasks.list", "/v1/tasks", {"project_id": a["project_id"], "status": "open"}),
