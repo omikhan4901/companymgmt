@@ -30,7 +30,7 @@ class ApprovalItem(Out):
     clock_out_at: datetime | None = None
 
 
-class InboxOut(Out):
+class ApprovalsOut(Out):
     items: list[ApprovalItem]
 
 

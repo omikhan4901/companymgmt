@@ -7,15 +7,15 @@ import uuid
 from fastapi import APIRouter, Depends
 
 from app.modules.approvals import service
-from app.modules.approvals.schemas import CountOut, DecisionIn, DecisionOut, InboxOut, Kind
+from app.modules.approvals.schemas import ApprovalsOut, CountOut, DecisionIn, DecisionOut, Kind
 from app.modules.platform.deps import Ctx, allow
 
 router = APIRouter(prefix="/v1/approvals", tags=["approvals"])
 
 
-@router.get("", response_model=InboxOut)
-async def inbox(ctx: Ctx = Depends(allow(None))) -> InboxOut:
-    return InboxOut(items=await service.pending(ctx))
+@router.get("", response_model=ApprovalsOut)
+async def inbox(ctx: Ctx = Depends(allow(None))) -> ApprovalsOut:
+    return ApprovalsOut(items=await service.pending(ctx))
 
 
 @router.get("/count", response_model=CountOut)
