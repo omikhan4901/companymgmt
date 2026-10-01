@@ -37,6 +37,11 @@ export function DueLabel({ task, className }: { task: Pick<Task, "due_date" | "o
   );
 }
 
+export function OnboardingBadge() {
+  const { t } = useTranslation();
+  return <Badge tone="accent">{t("onboarding.badge")}</Badge>;
+}
+
 /** Small counts shown on cards and rows: checklist progress and comments. */
 export function TaskMeta({ task }: { task: Task }) {
   const { t } = useTranslation();
@@ -78,6 +83,7 @@ export function TaskRow({ task, onOpen, showProject = true }: { task: Task; onOp
             <DueLabel task={task} />
             <TaskMeta task={task} />
             <PriorityBadge priority={task.priority} />
+            {task.onboarding && <OnboardingBadge />}
           </span>
         </span>
         {task.assignee && <Avatar name={task.assignee.name} className="size-7 text-[11px]" />}

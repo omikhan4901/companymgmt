@@ -4368,6 +4368,57 @@
     "title": "NotificationOut",
     "type": "object"
    },
+   "OnboardingRunOut": {
+    "properties": {
+     "done": {
+      "title": "Done",
+      "type": "integer"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "overdue": {
+      "title": "Overdue",
+      "type": "integer"
+     },
+     "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+     },
+     "template_name": {
+      "title": "Template Name",
+      "type": "string"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "employee_name",
+     "template_name",
+     "start_date",
+     "total",
+     "done",
+     "overdue"
+    ],
+    "title": "OnboardingRunOut",
+    "type": "object"
+   },
    "Page_AuditOut_": {
     "properties": {
      "items": {
@@ -7278,6 +7329,39 @@
     "title": "StaffOut",
     "type": "object"
    },
+   "StartIn": {
+    "additionalProperties": false,
+    "properties": {
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "template_id": {
+      "format": "uuid",
+      "title": "Template Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "template_id"
+    ],
+    "title": "StartIn",
+    "type": "object"
+   },
    "StatusOut": {
     "properties": {
      "employee_id": {
@@ -7710,6 +7794,18 @@
       ],
       "title": "Description"
      },
+     "document_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     },
      "due_date": {
       "anyOf": [
        {
@@ -7726,6 +7822,11 @@
       "format": "uuid",
       "title": "Id",
       "type": "string"
+     },
+     "onboarding": {
+      "default": false,
+      "title": "Onboarding",
+      "type": "boolean"
      },
      "overdue": {
       "title": "Overdue",
@@ -7976,6 +8077,18 @@
       ],
       "title": "Description"
      },
+     "document_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     },
      "due_date": {
       "anyOf": [
        {
@@ -7992,6 +8105,11 @@
       "format": "uuid",
       "title": "Id",
       "type": "string"
+     },
+     "onboarding": {
+      "default": false,
+      "title": "Onboarding",
+      "type": "boolean"
      },
      "overdue": {
       "title": "Overdue",
@@ -8358,6 +8476,127 @@
      "temporary_password"
     ],
     "title": "TempPasswordOut",
+    "type": "object"
+   },
+   "TemplateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "automatic": {
+      "default": false,
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/TemplateItem"
+      },
+      "maxItems": 50,
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "TemplateIn",
+    "type": "object"
+   },
+   "TemplateItem": {
+    "additionalProperties": false,
+    "properties": {
+     "document_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Document Id"
+     },
+     "due_days": {
+      "default": 0,
+      "maximum": 365.0,
+      "minimum": 0.0,
+      "title": "Due Days",
+      "type": "integer"
+     },
+     "notes": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Notes"
+     },
+     "title": {
+      "maxLength": 200,
+      "title": "Title",
+      "type": "string"
+     },
+     "who": {
+      "default": "joiner",
+      "enum": [
+       "joiner",
+       "manager"
+      ],
+      "title": "Who",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "TemplateItem",
+    "type": "object"
+   },
+   "TemplateOut": {
+    "properties": {
+     "automatic": {
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "items": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "automatic",
+     "items",
+     "version"
+    ],
+    "title": "TemplateOut",
     "type": "object"
    },
    "TimesheetOut": {
@@ -13419,6 +13658,243 @@
     "summary": "Read",
     "tags": [
      "notifications"
+    ]
+   }
+  },
+  "/v1/onboarding/runs": {
+   "get": {
+    "operationId": "list_runs_v1_onboarding_runs_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "mine",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Mine",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/OnboardingRunOut"
+         },
+         "title": "Response List Runs V1 Onboarding Runs Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Runs",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "post": {
+    "operationId": "start_run_v1_onboarding_runs_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StartIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OnboardingRunOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Start Run",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/onboarding/templates": {
+   "get": {
+    "operationId": "list_templates_v1_onboarding_templates_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TemplateOut"
+         },
+         "title": "Response List Templates V1 Onboarding Templates Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Templates",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "post": {
+    "operationId": "create_template_v1_onboarding_templates_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TemplateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TemplateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Template",
+    "tags": [
+     "tasks"
+    ]
+   }
+  },
+  "/v1/onboarding/templates/{template_id}": {
+   "delete": {
+    "operationId": "delete_template_v1_onboarding_templates__template_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "template_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Template Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Template",
+    "tags": [
+     "tasks"
+    ]
+   },
+   "put": {
+    "operationId": "update_template_v1_onboarding_templates__template_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "template_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Template Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TemplateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TemplateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Template",
+    "tags": [
+     "tasks"
     ]
    }
   },

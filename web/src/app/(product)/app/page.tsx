@@ -17,6 +17,7 @@ import { useFeed } from "@/components/announcements/data";
 import { ApprovalRow, useApprovals } from "@/components/approvals/approvals";
 import { useToAcknowledge } from "@/components/documents/data";
 import { useMyWork } from "@/components/tasks/data";
+import { RunProgress, useRuns } from "@/components/tasks/onboarding";
 import { TaskRow } from "@/components/tasks/shared";
 import { BarChart, type Bar } from "@/components/bar-chart";
 import { PageHeader } from "@/components/page";
@@ -195,6 +196,35 @@ function ToReadCard({ className }: { className?: string }) {
               {d.title}
               <Badge tone="warn">{t("docs.toAcknowledge")}</Badge>
             </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+/** A joiner's own checklist, while it's still in progress. */
+function FirstDaysCard({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  const runs = useRuns(true);
+  const open = (runs.data ?? []).filter((r) => r.done < r.total);
+  if (!open.length) return null;
+  return (
+    <Card className={className}>
+      <CardHeader
+        title={t("onboarding.firstDays")}
+        sub={t("onboarding.firstDaysBody")}
+        action={
+          <Link href="/app/tasks" className="text-sm font-medium text-accent-soft-text hover:underline">
+            {t("tasks.tabs.mine")}
+          </Link>
+        }
+      />
+      <ul className="flex flex-col gap-3 px-5 pb-5 pt-3">
+        {open.map((run) => (
+          <li key={run.id} className="flex flex-col gap-2">
+            <span className="text-sm font-medium">{run.template_name}</span>
+            <RunProgress run={run} />
           </li>
         ))}
       </ul>
@@ -443,6 +473,7 @@ export default function HomePage() {
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
         {(can("leave.approve") || can("attendance.approve")) && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
+        {hasModule("tasks") && can("tasks.self") && <FirstDaysCard className="md:col-span-2" />}
         {hasModule("documents") && can("documents.read") && <ToReadCard className="md:col-span-2" />}
         {hasModule("announcements") && can("announcements.read") && <NewsCard className="md:col-span-2" />}
         {hasModule("tasks") && can("tasks.self") && <MyWorkCard className="md:col-span-2" />}

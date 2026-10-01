@@ -1509,6 +1509,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/onboarding/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_v1_onboarding_runs_get"];
+        put?: never;
+        /** Start Run */
+        post: operations["start_run_v1_onboarding_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/onboarding/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Templates */
+        get: operations["list_templates_v1_onboarding_templates_get"];
+        put?: never;
+        /** Create Template */
+        post: operations["create_template_v1_onboarding_templates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/onboarding/templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Template */
+        put: operations["update_template_v1_onboarding_templates__template_id__put"];
+        post?: never;
+        /** Delete Template */
+        delete: operations["delete_template_v1_onboarding_templates__template_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/payroll/loans": {
         parameters: {
             query?: never;
@@ -3647,6 +3701,34 @@ export interface components {
             /** Subject Type */
             subject_type: string | null;
         };
+        /** OnboardingRunOut */
+        OnboardingRunOut: {
+            /** Done */
+            done: number;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Employee Name */
+            employee_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Overdue */
+            overdue: number;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /** Template Name */
+            template_name: string;
+            /** Total */
+            total: number;
+        };
         /** Page[AuditOut] */
         Page_AuditOut_: {
             /** Items */
@@ -4572,6 +4654,21 @@ export interface components {
             /** Workspace Code */
             workspace_code: string;
         };
+        /** StartIn */
+        StartIn: {
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+        };
         /** StatusOut */
         StatusOut: {
             /**
@@ -4758,6 +4855,8 @@ export interface components {
             created_by_name: string | null;
             /** Description */
             description: string | null;
+            /** Document Id */
+            document_id?: string | null;
             /** Due Date */
             due_date: string | null;
             /**
@@ -4765,6 +4864,11 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Onboarding
+             * @default false
+             */
+            onboarding: boolean;
             /** Overdue */
             overdue: boolean;
             /** Position */
@@ -4842,6 +4946,8 @@ export interface components {
             created_by_name: string | null;
             /** Description */
             description: string | null;
+            /** Document Id */
+            document_id?: string | null;
             /** Due Date */
             due_date: string | null;
             /**
@@ -4849,6 +4955,11 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Onboarding
+             * @default false
+             */
+            onboarding: boolean;
             /** Overdue */
             overdue: boolean;
             /** Position */
@@ -4969,6 +5080,56 @@ export interface components {
         TempPasswordOut: {
             /** Temporary Password */
             temporary_password: string;
+        };
+        /** TemplateIn */
+        TemplateIn: {
+            /**
+             * Automatic
+             * @default false
+             */
+            automatic: boolean;
+            /** Items */
+            items?: components["schemas"]["TemplateItem"][];
+            /** Name */
+            name: string;
+        };
+        /** TemplateItem */
+        TemplateItem: {
+            /** Document Id */
+            document_id?: string | null;
+            /**
+             * Due Days
+             * @default 0
+             */
+            due_days: number;
+            /** Notes */
+            notes?: string | null;
+            /** Title */
+            title: string;
+            /**
+             * Who
+             * @default joiner
+             * @enum {string}
+             */
+            who: "joiner" | "manager";
+        };
+        /** TemplateOut */
+        TemplateOut: {
+            /** Automatic */
+            automatic: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** Name */
+            name: string;
+            /** Version */
+            version: number;
         };
         /** TimesheetOut */
         TimesheetOut: {
@@ -8273,6 +8434,187 @@ export interface operations {
             header?: never;
             path: {
                 notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs_v1_onboarding_runs_get: {
+        parameters: {
+            query?: {
+                mine?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingRunOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_run_v1_onboarding_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_templates_v1_onboarding_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"][];
+                };
+            };
+        };
+    };
+    create_template_v1_onboarding_templates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_template_v1_onboarding_templates__template_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_template_v1_onboarding_templates__template_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
             };
             cookie?: never;
         };

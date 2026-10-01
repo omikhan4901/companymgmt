@@ -12,6 +12,7 @@ import { PageHeader } from "@/components/page";
 import { Board } from "@/components/tasks/board";
 import { useMyWork, useProject, useProjects, useTasks } from "@/components/tasks/data";
 import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
+import { OnboardingTab } from "@/components/tasks/onboarding";
 import { ProjectDialog } from "@/components/tasks/project-dialog";
 import { TaskRow } from "@/components/tasks/shared";
 import { TaskSheet } from "@/components/tasks/task-sheet";
@@ -246,7 +247,7 @@ export default function TasksPage() {
   const [taskId, setTask] = useParam("task");
   const [newTask, setNewTask] = useState(false);
   const [newProject, setNewProject] = useState(false);
-  const tabs = ["mine", "projects"];
+  const tabs = can("tasks.manage") ? ["mine", "projects", "onboarding"] : ["mine", "projects"];
   const [active, setActive] = useTab(tabs);
 
   if (!hasModule("tasks") || !can("tasks.self")) return <EmptyState icon={<ListChecks />} title={t("common.notAllowed")} />;
@@ -283,9 +284,11 @@ export default function TasksPage() {
         <TabsList className="mb-5 w-fit max-w-full overflow-x-auto">
           <TabsTrigger value="mine">{t("tasks.tabs.mine")}</TabsTrigger>
           <TabsTrigger value="projects">{t("tasks.tabs.projects")}</TabsTrigger>
+          {can("tasks.manage") && <TabsTrigger value="onboarding">{t("tasks.tabs.onboarding")}</TabsTrigger>}
         </TabsList>
         <TabsContent value="mine">{active === "mine" && <MyWork onOpen={setTask} onNew={() => setNewTask(true)} />}</TabsContent>
         <TabsContent value="projects">{active === "projects" && <Projects onOpen={setProject} onNew={() => setNewProject(true)} />}</TabsContent>
+        {can("tasks.manage") && <TabsContent value="onboarding">{active === "onboarding" && <OnboardingTab />}</TabsContent>}
       </Tabs>
       {newTask && <NewTaskDialog onClose={() => setNewTask(false)} onCreated={setTask} />}
       {newProject && <ProjectDialog onClose={() => setNewProject(false)} onSaved={(p) => setProject(p.id)} />}

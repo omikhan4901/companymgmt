@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Send, Trash2, X } from "lucide-react";
+import { FileText, Send, Trash2, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -284,6 +285,18 @@ function Body({ task, onClose }: { task: TaskDetail; onClose: () => void }) {
             onBlur={() => description !== (task.description ?? "") && save.mutate({ description: description.trim() || null })}
           />
         </Field>
+        {task.document_id && (
+          <Link
+            href={`/app/documents?doc=${task.document_id}`}
+            className="flex items-center gap-3 rounded-xl border border-border bg-accent-soft/40 px-4 py-3 text-sm hover:bg-accent-soft"
+          >
+            <FileText className="size-5 shrink-0 text-accent-soft-text" aria-hidden="true" />
+            <span className="flex flex-col gap-0.5">
+              <span className="font-medium">{t("onboarding.openDocument")}</span>
+              <span className="text-xs text-muted">{t("onboarding.openDocumentHelp")}</span>
+            </span>
+          </Link>
+        )}
         {task.project_name && (
           <p className="text-sm text-muted">
             {t("tasks.inProject")} <span className="font-medium text-text">{task.project_name}</span>
