@@ -8,25 +8,28 @@ from datetime import datetime, timedelta
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Cookie, Depends, Request, Response
-from pydantic import EmailStr, Field, StringConstraints, model_validator
+from pydantic import BaseModel, EmailStr, Field, StringConstraints, model_validator
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import captcha, context, outbox, ratelimit
 from app.core.config import get_settings
-from app.core.db import get_db
+from app.core.db import get_db, set_tenant
 from app.core.errors import Forbidden, Invalid, NotFound, TooManyRequests, Unauthorized
 from app.core.schema import In, Out, ShortName
 from app.core.security import crypto, passwords, totp
 from app.core.security.tokens import hash_secret, new_secret
+from app.core.time import utcnow
 from app.modules.platform import catalog, emails, workspaces
-from app.modules.platform.deps import Ctx, needs_mfa, public, signed_in
+from app.modules.platform.deps import DELETION_GRACE, Ctx, needs_mfa, public, signed_in
 from app.modules.platform.models import (
     AuthChallenge,
     AuthSession,
     EmailToken,
+    Membership,
     Plan,
     RecoveryCode,
+    Role,
     Tenant,
     User,
 )
@@ -204,6 +207,13 @@ class CurrentWorkspace(Out):
     mfa_setup_required: bool = False
 
 
+class PendingDeletion(BaseModel):
+    workspace_id: uuid.UUID
+    name: str
+    purge_after: datetime
+    can_restore: bool
+
+
 class MeOut(Out):
     id: uuid.UUID
     name: str
@@ -215,6 +225,8 @@ class MeOut(Out):
     must_change_password: bool
     workspaces: list[WorkspaceRef]
     workspace: CurrentWorkspace | None
+    # The workspace this session points at is scheduled for deletion.
+    pending_deletion: PendingDeletion | None = None
 
 
 # ---- Helpers ---------------------------------------------------------------------------
@@ -556,8 +568,27 @@ async def switch_workspace(body: SwitchIn, ctx: Ctx = Depends(signed_in())) -> T
     return TokenOut(access_token=access, expires_at=expires)
 
 
+async def _pending_deletion(ctx: Ctx) -> PendingDeletion | None:
+    tenant_id = ctx.cache.get("pending_deletion")
+    tenant = await ctx.db.get(Tenant, tenant_id) if tenant_id else None
+    if tenant is None:
+        return None
+    await set_tenant(ctx.db, tenant.id, ctx.user.id)
+    role = await ctx.db.scalar(
+        select(Role)
+        .join(Membership, (Membership.tenant_id == Role.tenant_id) & (Membership.role_id == Role.id))
+        .where(Membership.user_id == ctx.user.id, Membership.status == "active")
+    )
+    return PendingDeletion(
+        workspace_id=tenant.id,
+        name=tenant.name,
+        purge_after=(tenant.deletion_requested_at or utcnow()) + DELETION_GRACE,
+        can_restore=role is not None and role.is_builtin and role.key == "owner",
+    )
+
+
 @router.get("/me", response_model=MeOut)
-async def me(ctx: Ctx = Depends(signed_in())) -> MeOut:
+async def me(ctx: Ctx = Depends(signed_in(allow_deleted_workspace=True))) -> MeOut:
     user = ctx.user
     current = None
     if ctx.tenant and ctx.membership and ctx.role and ctx.entitlements:
@@ -605,6 +636,7 @@ async def me(ctx: Ctx = Depends(signed_in())) -> MeOut:
         must_change_password=user.must_change_password,
         workspaces=[WorkspaceRef(**w) for w in await workspaces.user_workspaces(ctx.db, user.id)],
         workspace=current,
+        pending_deletion=await _pending_deletion(ctx),
     )
 
 

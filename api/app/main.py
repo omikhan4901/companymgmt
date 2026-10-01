@@ -85,7 +85,7 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["authorization", "content-type", "x-cm-client", "if-match", "idempotency-key"],
-        expose_headers=["etag", "x-request-id", "retry-after"],
+        expose_headers=["etag", "x-request-id", "retry-after", "content-disposition"],
         max_age=600,
     )
     app.add_middleware(RequestContextMiddleware)

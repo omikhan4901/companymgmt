@@ -229,3 +229,15 @@ async def test_people_export_their_own_data(client: httpx.AsyncClient) -> None:
     assert data["attendance"][0]["employee_id"] == data["profile"]["id"]
     assert "Other" not in json.dumps(data)
     assert data["payslips"] == []
+
+
+async def test_me_explains_a_workspace_pending_deletion(client: httpx.AsyncClient) -> None:
+    owner = await signup(client, business="Soon Gone")
+    admin = await invite_and_join(owner, role="admin")
+    assert (await owner.post("/v1/workspace/delete", json={"confirm_name": "Soon Gone"})).status_code == 200
+    me = (await owner.get("/v1/auth/me")).json()
+    assert me["workspace"] is None
+    assert me["pending_deletion"]["name"] == "Soon Gone"
+    assert me["pending_deletion"]["can_restore"] is True
+    other = (await admin.get("/v1/auth/me")).json()
+    assert other["pending_deletion"]["can_restore"] is False

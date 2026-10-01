@@ -223,13 +223,23 @@ def public() -> Callable[[], Awaitable[None]]:
     return dep
 
 
-def signed_in(*, allow_password_change: bool = True) -> Callable[..., Awaitable[Ctx]]:
+def signed_in(
+    *, allow_password_change: bool = True, allow_deleted_workspace: bool = False
+) -> Callable[..., Awaitable[Ctx]]:
+    """`allow_deleted_workspace`: a session pointing at a workspace scheduled for deletion
+    still works, without the workspace (so people can see what happened and restore it)."""
+
     async def dep(request: Request, db: AsyncSession = Depends(get_db)) -> Ctx:
         ctx = await _authenticate(request, db)
         if ctx.user.must_change_password and not allow_password_change:
             raise Forbidden("Please set a new password first.", code="password_change_required")
         if ctx.session.tenant_id is not None:
-            await _bind_workspace(ctx)
+            try:
+                await _bind_workspace(ctx)
+            except Gone:
+                if not allow_deleted_workspace:
+                    raise
+                ctx.cache["pending_deletion"] = ctx.session.tenant_id
         return ctx
 
     dep._access = "signed_in"  # type: ignore[attr-defined]
