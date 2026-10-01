@@ -12,10 +12,16 @@ import type {
   LeavePolicy,
   LeaveRequest,
   LeaveType,
+  Loan,
+  PayRun,
+  PayRunDetail,
+  PayrollSettings,
+  Payslip,
   PersonBalances,
   Plan,
   Present,
   Role,
+  SalaryStructure,
   Timesheet,
 } from "./types";
 
@@ -136,4 +142,34 @@ export function useLeaveRequests(filters: { status?: string; mine?: boolean; emp
 
 export function useAway(from: string, to: string, enabled = true) {
   return useQuery({ queryKey: ["leave", "calendar", from, to], queryFn: () => api<AwayEntry[]>("/v1/leave/calendar", { query: { from, to } }), enabled });
+}
+
+// ---- Payroll -------------------------------------------------------------------------
+
+export function useMyPayslips(enabled = true) {
+  return useQuery({ queryKey: ["payroll", "payslips"], queryFn: () => api<Payslip[]>("/v1/payroll/payslips"), enabled });
+}
+
+export function usePayRuns(enabled = true) {
+  return useQuery({ queryKey: ["payroll", "runs"], queryFn: () => api<PayRun[]>("/v1/payroll/runs"), enabled });
+}
+
+export function usePayRun(id: string | null) {
+  return useQuery({ queryKey: ["payroll", "runs", id], queryFn: () => api<PayRunDetail>(`/v1/payroll/runs/${id}`), enabled: !!id });
+}
+
+export function useSalaries(enabled = true) {
+  return useQuery({ queryKey: ["payroll", "salaries"], queryFn: () => api<SalaryStructure[]>("/v1/payroll/salaries"), enabled });
+}
+
+export function useLoans(includeClosed = false, enabled = true) {
+  return useQuery({
+    queryKey: ["payroll", "loans", includeClosed],
+    queryFn: () => api<Loan[]>("/v1/payroll/loans", { query: { include_closed: includeClosed } }),
+    enabled,
+  });
+}
+
+export function usePayrollSettings(enabled = true) {
+  return useQuery({ queryKey: ["payroll", "settings"], queryFn: () => api<PayrollSettings>("/v1/payroll/settings"), enabled });
 }
