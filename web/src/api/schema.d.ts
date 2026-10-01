@@ -2550,6 +2550,7 @@ export interface components {
             must_change_password: boolean;
             /** Name */
             name: string;
+            pending_deletion?: components["schemas"]["PendingDeletion"] | null;
             /** Username */
             username: string | null;
             workspace: components["schemas"]["CurrentWorkspace"] | null;
@@ -2816,6 +2817,23 @@ export interface components {
             unpaid_leave_days: number;
             /** Worked Minutes */
             worked_minutes: number;
+        };
+        /** PendingDeletion */
+        PendingDeletion: {
+            /** Can Restore */
+            can_restore: boolean;
+            /** Name */
+            name: string;
+            /**
+             * Purge After
+             * Format: date-time
+             */
+            purge_after: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
         };
         /** PermissionOut */
         PermissionOut: {

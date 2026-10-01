@@ -2787,6 +2787,16 @@
       "title": "Name",
       "type": "string"
      },
+     "pending_deletion": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/PendingDeletion"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
      "username": {
       "anyOf": [
        {
@@ -3559,6 +3569,36 @@
      "account_last4"
     ],
     "title": "PayslipOut",
+    "type": "object"
+   },
+   "PendingDeletion": {
+    "properties": {
+     "can_restore": {
+      "title": "Can Restore",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "purge_after": {
+      "format": "date-time",
+      "title": "Purge After",
+      "type": "string"
+     },
+     "workspace_id": {
+      "format": "uuid",
+      "title": "Workspace Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace_id",
+     "name",
+     "purge_after",
+     "can_restore"
+    ],
+    "title": "PendingDeletion",
     "type": "object"
    },
    "PermissionOut": {

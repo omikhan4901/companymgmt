@@ -135,14 +135,21 @@ export async function api<T = unknown>(path: string, options: RequestOptions = {
   return (await response.json()) as T;
 }
 
-/** Download a file from the API (e.g. CSV export) with the current credentials. */
+/** The file name the server suggests in Content-Disposition, if it's a safe one. */
+export function suggestedName(header: string | null): string | null {
+  const match = header?.match(/filename="([^"/\\]+)"/);
+  return match?.[1] ?? null;
+}
+
+/** Download a file from the API (e.g. CSV export) with the current credentials. The
+ * server's file name wins over `filename`, which is the fallback. */
 export async function download(path: string, query: RequestOptions["query"], filename: string): Promise<void> {
   const response = await api<Response>(path, { query, raw: true });
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = filename;
+  link.download = suggestedName(response.headers.get("content-disposition")) ?? filename;
   link.click();
   URL.revokeObjectURL(url);
 }
