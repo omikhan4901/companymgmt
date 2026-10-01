@@ -78,6 +78,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "project_members_added": "{actor} added you to {project}",
         "announcement_published": "{actor} posted: {title}",
         "document_published": "{actor} shared {title}",
+        "document_ack_requested": "{actor} asks you to read and acknowledge {title}",
         "other": "Something changed",
     },
     "bn": {
@@ -97,6 +98,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "project_members_added": "{actor} আপনাকে {project} প্রকল্পে যোগ করেছেন",
         "announcement_published": "{actor} ঘোষণা দিয়েছেন: {title}",
         "document_published": "{actor} {title} শেয়ার করেছেন",
+        "document_ack_requested": "{actor} আপনাকে {title} পড়ে নিশ্চিত করতে বলেছেন",
         "other": "কিছু পরিবর্তন হয়েছে",
     },
 }
@@ -163,6 +165,8 @@ def describe(n: Notification, lang: str, membership_id: uuid.UUID | None) -> str
         "project": data.get("project_name") or "",
     }
     key = n.kind.replace(".", "_")
+    if n.kind == "document.published" and data.get("requires_ack"):
+        key = "document_ack_requested"
     if n.kind == "leave.cancelled":
         key = (
             "leave_cancelled_yours"

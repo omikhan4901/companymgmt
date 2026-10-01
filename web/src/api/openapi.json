@@ -40,6 +40,88 @@
     "title": "AcceptIn",
     "type": "object"
    },
+   "AckPerson": {
+    "properties": {
+     "acked_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Acked At"
+     },
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "name",
+     "department",
+     "acked_at"
+    ],
+    "title": "AckPerson",
+    "type": "object"
+   },
+   "AcksOut": {
+    "properties": {
+     "acknowledged": {
+      "title": "Acknowledged",
+      "type": "integer"
+     },
+     "people": {
+      "items": {
+       "$ref": "#/components/schemas/AckPerson"
+      },
+      "title": "People",
+      "type": "array"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     },
+     "version_number": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Version Number"
+     }
+    },
+    "required": [
+     "version_number",
+     "total",
+     "acknowledged",
+     "people"
+    ],
+    "title": "AcksOut",
+    "type": "object"
+   },
    "AdjustmentIn": {
     "additionalProperties": false,
     "properties": {
@@ -1644,6 +1726,448 @@
      }
     },
     "title": "DepartmentPatch",
+    "type": "object"
+   },
+   "DocumentDetail": {
+    "properties": {
+     "ack_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ack Count"
+     },
+     "acknowledged": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Acknowledged"
+     },
+     "archived": {
+      "title": "Archived",
+      "type": "boolean"
+     },
+     "can_manage": {
+      "title": "Can Manage",
+      "type": "boolean"
+     },
+     "category": {
+      "enum": [
+       "policy",
+       "handbook",
+       "sop",
+       "form",
+       "other"
+      ],
+      "title": "Category",
+      "type": "string"
+     },
+     "current": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/VersionOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "reach": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reach"
+     },
+     "requires_ack": {
+      "title": "Requires Ack",
+      "type": "boolean"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     },
+     "versions": {
+      "items": {
+       "$ref": "#/components/schemas/VersionOut"
+      },
+      "title": "Versions",
+      "type": "array"
+     },
+     "visibility": {
+      "enum": [
+       "everyone",
+       "roles",
+       "departments"
+      ],
+      "title": "Visibility",
+      "type": "string"
+     },
+     "visibility_names": {
+      "items": {
+       "$ref": "#/components/schemas/AudienceRef"
+      },
+      "title": "Visibility Names",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "description",
+     "category",
+     "visibility",
+     "visibility_names",
+     "requires_ack",
+     "archived",
+     "current",
+     "acknowledged",
+     "reach",
+     "ack_count",
+     "can_manage",
+     "updated_at",
+     "version",
+     "versions"
+    ],
+    "title": "DocumentDetail",
+    "type": "object"
+   },
+   "DocumentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "category": {
+      "default": "other",
+      "enum": [
+       "policy",
+       "handbook",
+       "sop",
+       "form",
+       "other"
+      ],
+      "title": "Category",
+      "type": "string"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "requires_ack": {
+      "default": false,
+      "title": "Requires Ack",
+      "type": "boolean"
+     },
+     "title": {
+      "maxLength": 200,
+      "title": "Title",
+      "type": "string"
+     },
+     "visibility": {
+      "default": "everyone",
+      "enum": [
+       "everyone",
+       "roles",
+       "departments"
+      ],
+      "title": "Visibility",
+      "type": "string"
+     },
+     "visibility_ids": {
+      "items": {
+       "format": "uuid",
+       "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Visibility Ids",
+      "type": "array"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "DocumentIn",
+    "type": "object"
+   },
+   "DocumentOut": {
+    "properties": {
+     "ack_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ack Count"
+     },
+     "acknowledged": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Acknowledged"
+     },
+     "archived": {
+      "title": "Archived",
+      "type": "boolean"
+     },
+     "can_manage": {
+      "title": "Can Manage",
+      "type": "boolean"
+     },
+     "category": {
+      "enum": [
+       "policy",
+       "handbook",
+       "sop",
+       "form",
+       "other"
+      ],
+      "title": "Category",
+      "type": "string"
+     },
+     "current": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/VersionOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "reach": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reach"
+     },
+     "requires_ack": {
+      "title": "Requires Ack",
+      "type": "boolean"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     },
+     "visibility": {
+      "enum": [
+       "everyone",
+       "roles",
+       "departments"
+      ],
+      "title": "Visibility",
+      "type": "string"
+     },
+     "visibility_names": {
+      "items": {
+       "$ref": "#/components/schemas/AudienceRef"
+      },
+      "title": "Visibility Names",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "description",
+     "category",
+     "visibility",
+     "visibility_names",
+     "requires_ack",
+     "archived",
+     "current",
+     "acknowledged",
+     "reach",
+     "ack_count",
+     "can_manage",
+     "updated_at",
+     "version"
+    ],
+    "title": "DocumentOut",
+    "type": "object"
+   },
+   "DocumentPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "archived": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Archived"
+     },
+     "category": {
+      "anyOf": [
+       {
+        "enum": [
+         "policy",
+         "handbook",
+         "sop",
+         "form",
+         "other"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "requires_ack": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requires Ack"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     },
+     "visibility": {
+      "anyOf": [
+       {
+        "enum": [
+         "everyone",
+         "roles",
+         "departments"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Visibility"
+     },
+     "visibility_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Visibility Ids"
+     }
+    },
+    "title": "DocumentPatch",
     "type": "object"
    },
    "EmployeeIn": {
@@ -7815,6 +8339,70 @@
     "title": "VerifyOut",
     "type": "object"
    },
+   "VersionOut": {
+    "properties": {
+     "content_type": {
+      "title": "Content Type",
+      "type": "string"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "filename": {
+      "title": "Filename",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "number": {
+      "title": "Number",
+      "type": "integer"
+     },
+     "size": {
+      "title": "Size",
+      "type": "integer"
+     },
+     "uploaded_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Uploaded By Name"
+     }
+    },
+    "required": [
+     "id",
+     "number",
+     "filename",
+     "content_type",
+     "size",
+     "note",
+     "uploaded_by_name",
+     "created_at"
+    ],
+    "title": "VersionOut",
+    "type": "object"
+   },
    "WorkspaceIn": {
     "additionalProperties": false,
     "properties": {
@@ -10399,6 +10987,420 @@
     "summary": "Update Department",
     "tags": [
      "people"
+    ]
+   }
+  },
+  "/v1/documents": {
+   "get": {
+    "operationId": "library_v1_documents_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "archived",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Archived",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/DocumentOut"
+         },
+         "title": "Response Library V1 Documents Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Library",
+    "tags": [
+     "documents"
+    ]
+   },
+   "post": {
+    "operationId": "create_v1_documents_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DocumentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/to-acknowledge": {
+   "get": {
+    "operationId": "to_acknowledge_v1_documents_to_acknowledge_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/DocumentOut"
+         },
+         "title": "Response To Acknowledge V1 Documents To Acknowledge Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "To Acknowledge",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/{document_id}": {
+   "get": {
+    "operationId": "get_v1_documents__document_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get",
+    "tags": [
+     "documents"
+    ]
+   },
+   "patch": {
+    "operationId": "update_v1_documents__document_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DocumentPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/{document_id}/acknowledge": {
+   "post": {
+    "operationId": "acknowledge_v1_documents__document_id__acknowledge_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Acknowledge",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/{document_id}/acknowledgements": {
+   "get": {
+    "operationId": "acknowledgements_v1_documents__document_id__acknowledgements_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AcksOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Acknowledgements",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/{document_id}/versions": {
+   "post": {
+    "description": "Body: the file itself.",
+    "operationId": "upload_v1_documents__document_id__versions_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "filename",
+      "required": true,
+      "schema": {
+       "maxLength": 300,
+       "minLength": 1,
+       "title": "Filename",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "note",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 500,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Note"
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DocumentDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Upload",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
+  "/v1/documents/{document_id}/versions/{version_id}/file": {
+   "get": {
+    "operationId": "download_v1_documents__document_id__versions__version_id__file_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "version_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Version Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Download",
+    "tags": [
+     "documents"
     ]
    }
   },

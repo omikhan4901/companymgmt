@@ -46,6 +46,7 @@ export function useDescribe() {
       project: typeof data.project_name === "string" ? data.project_name : "",
     };
     let key = n.kind.replace(".", "_");
+    if (n.kind === "document.published" && data.requires_ack) key = "document_ack_requested";
     if (n.kind === "leave.cancelled") {
       key = data.membership_id === workspace.membership_id ? "leave_cancelled_yours" : "leave_withdrawn";
     }

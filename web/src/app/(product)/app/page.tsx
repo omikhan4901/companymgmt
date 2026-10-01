@@ -14,6 +14,7 @@ import type { AttendanceRecord, Employee, Page } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { ClockCard } from "@/components/attendance/clock-card";
 import { useFeed } from "@/components/announcements/data";
+import { useToAcknowledge } from "@/components/documents/data";
 import { useMyWork } from "@/components/tasks/data";
 import { TaskRow } from "@/components/tasks/shared";
 import { BarChart, type Bar } from "@/components/bar-chart";
@@ -167,6 +168,35 @@ function AwayCard({ className }: { className?: string }) {
           ))}
         </ul>
       </div>
+    </Card>
+  );
+}
+
+function ToReadCard({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  const pending = useToAcknowledge();
+  const list = pending.data ?? [];
+  if (!list.length) return null;
+  return (
+    <Card className={className}>
+      <CardHeader
+        title={t("docs.toRead")}
+        action={
+          <Link href="/app/documents" className="text-sm font-medium text-accent-soft-text hover:underline">
+            {t("nav.documents")}
+          </Link>
+        }
+      />
+      <ul className="flex flex-col gap-2 px-5 pb-5 pt-2">
+        {list.slice(0, 4).map((d) => (
+          <li key={d.id}>
+            <Link href={`/app/documents?doc=${d.id}`} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 text-sm font-medium hover:bg-surface-2">
+              {d.title}
+              <Badge tone="warn">{t("docs.toAcknowledge")}</Badge>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 }
@@ -425,6 +455,7 @@ export default function HomePage() {
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
         {manager && can("attendance.approve") && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
+        {hasModule("documents") && can("documents.read") && <ToReadCard className="md:col-span-2" />}
         {hasModule("announcements") && can("announcements.read") && <NewsCard className="md:col-span-2" />}
         {hasModule("tasks") && can("tasks.self") && <MyWorkCard className="md:col-span-2" />}
         {hasModule("leave") && can("leave.self") && <AwayCard className="md:col-span-2" />}

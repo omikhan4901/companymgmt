@@ -140,6 +140,16 @@ export async function api<T = unknown>(path: string, options: RequestOptions = {
 
 /** The file name the server suggests in Content-Disposition, if it's a safe one. */
 export function suggestedName(header: string | null): string | null {
+  // Prefer the UTF-8 name (Bangla file names), then the plain one. Never a path.
+  const encoded = header?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+  if (encoded) {
+    try {
+      const name = decodeURIComponent(encoded.trim());
+      if (name && !/[/\\]/.test(name) && name !== "." && name !== "..") return name;
+    } catch {
+      // fall through to the plain name
+    }
+  }
   const match = header?.match(/filename="([^"/\\]+)"/);
   return match?.[1] ?? null;
 }

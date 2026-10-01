@@ -848,6 +848,130 @@ export interface paths {
         patch: operations["update_department_v1_departments__department_id__patch"];
         trace?: never;
     };
+    "/v1/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Library */
+        get: operations["library_v1_documents_get"];
+        put?: never;
+        /** Create */
+        post: operations["create_v1_documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/to-acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** To Acknowledge */
+        get: operations["to_acknowledge_v1_documents_to_acknowledge_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["get_v1_documents__document_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["update_v1_documents__document_id__patch"];
+        trace?: never;
+    };
+    "/v1/documents/{document_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge */
+        post: operations["acknowledge_v1_documents__document_id__acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{document_id}/acknowledgements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Acknowledgements */
+        get: operations["acknowledgements_v1_documents__document_id__acknowledgements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{document_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload
+         * @description Body: the file itself.
+         */
+        post: operations["upload_v1_documents__document_id__versions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{document_id}/versions/{version_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download */
+        get: operations["download_v1_documents__document_id__versions__version_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/invites": {
         parameters: {
             query?: never;
@@ -2065,6 +2189,31 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** AckPerson */
+        AckPerson: {
+            /** Acked At */
+            acked_at: string | null;
+            /** Department */
+            department: string | null;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Name */
+            name: string;
+        };
+        /** AcksOut */
+        AcksOut: {
+            /** Acknowledged */
+            acknowledged: number;
+            /** People */
+            people: components["schemas"]["AckPerson"][];
+            /** Total */
+            total: number;
+            /** Version Number */
+            version_number: number | null;
+        };
         /** AdjustmentIn */
         AdjustmentIn: {
             /** Days */
@@ -2595,6 +2744,139 @@ export interface components {
             name?: string | null;
             /** Parent Id */
             parent_id?: string | null;
+        };
+        /** DocumentDetail */
+        DocumentDetail: {
+            /** Ack Count */
+            ack_count: number | null;
+            /** Acknowledged */
+            acknowledged: boolean | null;
+            /** Archived */
+            archived: boolean;
+            /** Can Manage */
+            can_manage: boolean;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "policy" | "handbook" | "sop" | "form" | "other";
+            current: components["schemas"]["VersionOut"] | null;
+            /** Description */
+            description: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reach */
+            reach: number | null;
+            /** Requires Ack */
+            requires_ack: boolean;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /** Versions */
+            versions: components["schemas"]["VersionOut"][];
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "everyone" | "roles" | "departments";
+            /** Visibility Names */
+            visibility_names: components["schemas"]["AudienceRef"][];
+        };
+        /** DocumentIn */
+        DocumentIn: {
+            /**
+             * Category
+             * @default other
+             * @enum {string}
+             */
+            category: "policy" | "handbook" | "sop" | "form" | "other";
+            /** Description */
+            description?: string | null;
+            /**
+             * Requires Ack
+             * @default false
+             */
+            requires_ack: boolean;
+            /** Title */
+            title: string;
+            /**
+             * Visibility
+             * @default everyone
+             * @enum {string}
+             */
+            visibility: "everyone" | "roles" | "departments";
+            /** Visibility Ids */
+            visibility_ids?: string[];
+        };
+        /** DocumentOut */
+        DocumentOut: {
+            /** Ack Count */
+            ack_count: number | null;
+            /** Acknowledged */
+            acknowledged: boolean | null;
+            /** Archived */
+            archived: boolean;
+            /** Can Manage */
+            can_manage: boolean;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "policy" | "handbook" | "sop" | "form" | "other";
+            current: components["schemas"]["VersionOut"] | null;
+            /** Description */
+            description: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reach */
+            reach: number | null;
+            /** Requires Ack */
+            requires_ack: boolean;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /**
+             * Visibility
+             * @enum {string}
+             */
+            visibility: "everyone" | "roles" | "departments";
+            /** Visibility Names */
+            visibility_names: components["schemas"]["AudienceRef"][];
+        };
+        /** DocumentPatch */
+        DocumentPatch: {
+            /** Archived */
+            archived?: boolean | null;
+            /** Category */
+            category?: ("policy" | "handbook" | "sop" | "form" | "other") | null;
+            /** Description */
+            description?: string | null;
+            /** Requires Ack */
+            requires_ack?: boolean | null;
+            /** Title */
+            title?: string | null;
+            /** Visibility */
+            visibility?: ("everyone" | "roles" | "departments") | null;
+            /** Visibility Ids */
+            visibility_ids?: string[] | null;
         };
         /** EmployeeIn */
         EmployeeIn: {
@@ -4630,6 +4912,31 @@ export interface components {
             /** Ok */
             ok: boolean;
         };
+        /** VersionOut */
+        VersionOut: {
+            /** Content Type */
+            content_type: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Filename */
+            filename: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string | null;
+            /** Number */
+            number: number;
+            /** Size */
+            size: number;
+            /** Uploaded By Name */
+            uploaded_by_name: string | null;
+        };
         /** WorkspaceIn */
         WorkspaceIn: {
             /** Country */
@@ -6406,6 +6713,284 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DepartmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    library_v1_documents_get: {
+        parameters: {
+            query?: {
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_v1_documents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    to_acknowledge_v1_documents_to_acknowledge_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"][];
+                };
+            };
+        };
+    };
+    get_v1_documents__document_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_v1_documents__document_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_v1_documents__document_id__acknowledge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledgements_v1_documents__document_id__acknowledgements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcksOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_v1_documents__document_id__versions_post: {
+        parameters: {
+            query: {
+                filename: string;
+                note?: string | null;
+            };
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_v1_documents__document_id__versions__version_id__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
