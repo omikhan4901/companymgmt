@@ -108,3 +108,16 @@ function zoneOffsetMinutes(date: Date, timeZone: string): number {
   const asUtc = Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, h ?? 0, mi ?? 0);
   return Math.round((asUtc - Math.floor(date.getTime() / 60_000) * 60_000) / 60_000);
 }
+
+/** "5 minutes ago", "yesterday", or a date for anything older than a week. */
+export function formatAgo(iso: string, now: Date = new Date()): string {
+  const then = new Date(iso);
+  const seconds = Math.round((then.getTime() - now.getTime()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(intlLocale(), { numeric: "auto" });
+  const abs = Math.abs(seconds);
+  if (abs < 45) return rtf.format(0, "second");
+  if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+  if (abs < 86_400) return rtf.format(Math.round(seconds / 3600), "hour");
+  if (abs < 7 * 86_400) return rtf.format(Math.round(seconds / 86_400), "day");
+  return new Intl.DateTimeFormat(intlLocale(), { day: "numeric", month: "short", year: "numeric" }).format(then);
+}

@@ -1986,6 +1986,39 @@
     "title": "HolidayOut",
     "type": "object"
    },
+   "InboxOut": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/NotificationOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "next_cursor": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Cursor"
+     },
+     "unread": {
+      "title": "Unread",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "items",
+     "unread",
+     "next_cursor"
+    ],
+    "title": "InboxOut",
+    "type": "object"
+   },
    "InviteIn": {
     "additionalProperties": false,
     "properties": {
@@ -3090,6 +3123,98 @@
      "modules"
     ],
     "title": "ModulesIn",
+    "type": "object"
+   },
+   "NotificationOut": {
+    "properties": {
+     "actor_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Actor Name"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "data": {
+      "additionalProperties": true,
+      "title": "Data",
+      "type": "object"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "read_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Read At"
+     },
+     "subject_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subject Id"
+     },
+     "subject_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subject Type"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "actor_name",
+     "subject_type",
+     "subject_id",
+     "link",
+     "data",
+     "created_at",
+     "read_at"
+    ],
+    "title": "NotificationOut",
     "type": "object"
    },
    "Page_AuditOut_": {
@@ -6285,6 +6410,19 @@
      "expires_at"
     ],
     "title": "TokenOut",
+    "type": "object"
+   },
+   "UnreadOut": {
+    "properties": {
+     "unread": {
+      "title": "Unread",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "unread"
+    ],
+    "title": "UnreadOut",
     "type": "object"
    },
    "ValidationError": {
@@ -10107,6 +10245,155 @@
     "summary": "List Modules",
     "tags": [
      "plans"
+    ]
+   }
+  },
+  "/v1/notifications": {
+   "get": {
+    "operationId": "inbox_v1_notifications_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "unread",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Unread",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "cursor",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Cursor"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 20,
+       "maximum": 100,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/InboxOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Inbox",
+    "tags": [
+     "notifications"
+    ]
+   }
+  },
+  "/v1/notifications/read-all": {
+   "post": {
+    "operationId": "read_all_v1_notifications_read_all_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UnreadOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Read All",
+    "tags": [
+     "notifications"
+    ]
+   }
+  },
+  "/v1/notifications/unread": {
+   "get": {
+    "operationId": "unread_v1_notifications_unread_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UnreadOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Unread",
+    "tags": [
+     "notifications"
+    ]
+   }
+  },
+  "/v1/notifications/{notification_id}/read": {
+   "post": {
+    "operationId": "read_v1_notifications__notification_id__read_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "notification_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Notification Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Read",
+    "tags": [
+     "notifications"
     ]
    }
   },

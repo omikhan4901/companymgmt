@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDay, formatYear, initials, isoToZoned, normalizeDigits, splitMinutes, todayIn, zonedToIso } from "./format";
+import { formatAgo, formatDay, formatYear, initials, isoToZoned, normalizeDigits, splitMinutes, todayIn, zonedToIso } from "./format";
 
 describe("time zones", () => {
   it("converts Dhaka wall time to UTC and back", () => {
@@ -47,5 +47,19 @@ describe("text helpers", () => {
 describe("years", () => {
   it("never shows a thousands separator", () => {
     expect(formatYear(2027)).toBe("2027");
+  });
+});
+
+describe("relative times", () => {
+  const now = new Date("2026-05-10T12:00:00Z");
+  it("says now, minutes, hours and days", () => {
+    expect(formatAgo("2026-05-10T11:59:50Z", now)).toBe("now");
+    expect(formatAgo("2026-05-10T11:55:00Z", now)).toBe("5 minutes ago");
+    expect(formatAgo("2026-05-10T09:00:00Z", now)).toBe("3 hours ago");
+    expect(formatAgo("2026-05-09T12:00:00Z", now)).toBe("yesterday");
+  });
+
+  it("falls back to a date after a week", () => {
+    expect(formatAgo("2026-04-01T12:00:00Z", now)).toContain("2026");
   });
 });

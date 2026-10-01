@@ -58,3 +58,5 @@ export type PayRun = S["RunOut"];
 export type PayRunDetail = S["RunDetail"];
 export type Payslip = S["PayslipOut"];
 export type PayItem = S["ItemOut"];
+export type Notification = S["NotificationOut"];
+export type Inbox = S["InboxOut"];

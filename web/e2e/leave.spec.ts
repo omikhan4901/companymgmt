@@ -61,7 +61,17 @@ test("staff ask for leave and the owner approves it", async ({ page, browser }, 
   await expect(staff.getByRole("tab", { name: "Settings" })).toHaveCount(0);
   await expectAccessible(staff, "leave: calendar (staff)");
 
-  // The owner approves it from the requests tab.
+  // The owner hears about it from the bell, then approves it from the requests tab.
+  await page.goto("/app");
+  const bell = page.getByRole("button", { name: "Notifications, 1 unread" });
+  await expect(bell).toBeVisible();
+  await bell.click();
+  const note = page.getByRole("button", { name: /Nadia Islam asked for Casual leave/ });
+  await expect(note).toBeVisible();
+  await expectAccessible(page, "notifications: open");
+  await note.click();
+  await expect(page).toHaveURL(/\/app\/leave/);
+  await expect(page.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
   await page.goto("/app/leave?tab=requests");
   const card = page.getByRole("listitem").filter({ hasText: "Nadia Islam" });
   await expect(card.getByText("Family wedding")).toBeVisible();
@@ -87,6 +97,10 @@ test("staff ask for leave and the owner approves it", async ({ page, browser }, 
   await staff.goto("/app/leave");
   await expect(staff.getByText("Approved", { exact: true }).first()).toBeVisible();
   await expect(staff.getByText("Used 1")).toBeVisible();
+  await staff.getByRole("button", { name: "Notifications, 1 unread" }).click();
+  await expect(staff.getByText(/approved your Casual leave/)).toBeVisible();
+  await staff.getByRole("button", { name: "Mark all as read" }).click();
+  await expect(staff.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
   expect(staffCsp).toEqual([]);
   await context.close();
   expect(csp).toEqual([]);

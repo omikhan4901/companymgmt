@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 
 import { CommandPalette, useCommandPalette } from "./command-palette";
 import { LogoMark } from "./logo";
+import { NotificationBell } from "./notifications";
 import { isActive, useNavItems } from "./nav-items";
 import { AppearanceMenu, LanguageButton } from "./prefs";
 import { Avatar } from "./ui/avatar";
@@ -159,6 +160,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <LanguageButton signedIn className="hidden sm:inline-flex" />
             <AppearanceMenu className="lg:hidden" />
+            <NotificationBell />
             <UserMenu />
           </div>
         </header>
