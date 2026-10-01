@@ -1,7 +1,7 @@
 # Implementation Plan: Company Management SaaS
 
 Status: **Approved by the owner on 30 September 2026. M1, M1.5, M1.6 and M2 are done;
-M3 is next.** See §9 for every milestone.
+M3 is in progress (AI-ready foundations, notifications, and tasks and projects are done).** See §9 for every milestone.
 Progress is tracked in [`PROGRESS.md`](PROGRESS.md).
 Product name: **CompanyMgmt** (repo `companymgmt`). The owner wants a global product, so
 the name is in plain English. It can be renamed before launch.
@@ -1046,7 +1046,7 @@ The data model and security stay the same the whole way, so no step needs a rewr
 | M1.5 | Marketing kit | README, screenshots, case study, resume bullets | 3–4 d | **Done** |
 | M1.6 | New design, Next.js, location check-in | Atlas design with themes; one Next.js app; geofenced clock-in | 8–12 d | **Done** |
 | M2 | Leave, payroll, data rights | Time off, payslips (Bangladesh preset), export and deletion | 15–20 d | Done |
-| M3 | Work and knowledge | Tasks and projects, announcements, documents and policies, approvals, notifications; AI-ready foundations | 15–20 d | Next |
+| M3 | Work and knowledge | Tasks and projects, announcements, documents and policies, approvals, notifications; AI-ready foundations | 15–20 d | In progress |
 | M4 | Pilot release | Dashboards, spreadsheet import, backups, live deploy, 3–5 free pilot companies | 8–12 d | Planned |
 | M5 | Billing | Paddle checkout, renewals, dunning | 8–12 d | Planned |
 | M6 | AI copilot (read-only) | "Ask my company", policy Q&A with sources, weekly company brief | 12–16 d | Planned |

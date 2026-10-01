@@ -1,16 +1,18 @@
 # CompanyMgmt
 
-**Attendance and team management for every business, from a tea stall with two staff to a
-company with many branches.** Multi-tenant SaaS in English and বাংলা, with clock-ins
-checked against each branch's location.
+**One place to run a company: people, attendance, leave, payroll, tasks and projects, for
+every business from a tea stall with two staff to an agency with many branches.**
+Multi-tenant SaaS in English and বাংলা, with clock-ins checked against each branch's
+location, built so a permission-aware AI assistant can sit on top of it later.
 
 ![Home](docs/screenshots/home.png)
 
-> **Status:** Milestones 1, 1.5 and 1.6 are built and tested. It isn't live yet;
-> deployment is scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
-> Leave and payroll come next, then tasks, announcements and documents, then a
-> permission-aware AI assistant ([roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap),
-> [progress](docs/PROGRESS.md)).
+> **Status:** Milestones 1 and 2 are built and tested (accounts, people, attendance,
+> leave, payroll, data rights), and Milestone 3 is under way: the foundations for AI,
+> notifications, and tasks and projects are done; announcements, documents and policies,
+> an approvals inbox and onboarding checklists come next. It isn't live yet; deployment is
+> scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
+> [Roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap) · [progress](docs/PROGRESS.md).
 
 ## What it does today
 
@@ -36,6 +38,16 @@ checked against each branch's location.
   advances and one-off items. Whoever prepares it can't finalize it. Payslips download as
   PDF in English or Bangla; a transfer sheet lists who to pay where. Salary tax is an
   editable table, off until the owner checks it.
+- **Tasks and projects.** Projects with members and a home department, planned on a board
+  (To do, Doing, Done) with drag and drop and a keyboard-friendly move menu. Tasks have an
+  assignee, due date, priority, checklist and comments. "My work" lists each person's open
+  tasks, overdue first, on its own page and on the home screen. Members work on their
+  projects; managers run the projects of their own departments.
+- **Notifications.** A bell in the header tells people what needs them and what was decided:
+  leave and time-fix requests go to whoever can approve them for that person's department,
+  decisions go back to the person, payslips announce themselves (without the run's totals),
+  and tasks tell their assignee and their creator. Nobody is told about their own actions.
+  A daily email lists what someone hasn't read yet, in their language, and can be turned off.
 - **People and departments.** Profiles, a department tree and branches. Managers see only
   their own part of the tree.
 - **Staff without email.** Add a cashier with a username; they sign in with the workspace
@@ -58,12 +70,15 @@ checked against each branch's location.
 | ![Monthly timesheet](docs/screenshots/timesheet.png) | ![Home in dark mode with the Saffron accent](docs/screenshots/home-dark.png) |
 | ![Who is away this month](docs/screenshots/leave-calendar.png) | ![Leave requests waiting for approval](docs/screenshots/leave-requests.png) |
 | ![A finalized pay run](docs/screenshots/payroll-run.png) | ![A payslip PDF in Bangla](docs/screenshots/payslip-pdf-bangla.png) |
+| ![A project board with tasks to do, in progress and done](docs/screenshots/tasks-board.png) | ![A task with its checklist and comments](docs/screenshots/task-panel.png) |
+| ![The notification list in the header](docs/screenshots/notifications.png) | |
 
 <p align="center">
   <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
   <img src="docs/screenshots/phone-home-bangla.png" width="240" alt="Staff home screen on a phone, in Bangla, clocked in at the branch" />
   <img src="docs/screenshots/phone-attendance-bangla.png" width="240" alt="Attendance on a phone, in Bangla" />
   <img src="docs/screenshots/phone-leave-ask-bangla.png" width="240" alt="Asking for a day of leave on a phone, in Bangla, with the days left shown" />
+  <img src="docs/screenshots/phone-my-work-bangla.png" width="240" alt="My work on a phone, in Bangla: the tasks due this week" />
 </p>
 
 ## How it's built
@@ -86,8 +101,31 @@ flowchart LR
 | Hosting | Cloud Run + Neon + Cloudflare Pages | Everything scales to zero: about $1/month with no customers (the domain) |
 | Infra | OpenTofu, GitHub OIDC → least-privilege service accounts | Reproducible, no long-lived keys |
 
-A modular monolith: `platform` (accounts, workspaces, roles), `people`, `attendance`, with
-module boundaries enforced in CI by import-linter.
+A modular monolith: `platform` (accounts, workspaces, roles, plans), `people`,
+`attendance`, `leave`, `payroll`, `tasks`, `notifications` and `privacy` (exports,
+imports, deletion). Each module only depends on the ones below it, and none depends on the
+AI layer; import-linter enforces both in CI. Business logic lives in typed service
+functions that the routes call.
+
+### Ready for AI, without AI yet
+
+The assistant (Milestones 6–7) will never touch the database. It will see what the person
+asking may see, and nothing else:
+
+- **Capability registry.** Every module describes what it can do as typed capabilities
+  (`people.search`, `leave.balances`, `tasks.my_work`, `payroll.my_payslips`…), each with
+  input and output schemas, the permission and module it needs, and whether it reads or
+  changes data. They are listed and called under `/v1/ai`, as the signed-in person, with
+  the same checks as the API. Capabilities that change data are refused until
+  propose-and-confirm exists.
+- **A test proves it:** every read capability gives exactly the same answer, or the same
+  refusal, as its REST route for an owner, a department-scoped manager and an employee.
+- **Context builder.** One call turns a request into the facts a model needs: workspace,
+  role, permissions, department scope, branch, language, time zone and today's date there.
+- **Domain events.** Important changes (leave decisions, time fixes, payroll, task
+  assignments and comments) are written to an append-only event log in the same
+  transaction as the change. Notifications are built from it now; automations and a weekly
+  brief will read it later.
 
 ### Tenant isolation, three layers
 
@@ -115,20 +153,25 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **168 API tests**, 92% line and branch coverage (CI gate: 85%), all against a real
+- **194 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
   payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
-  export, import, deletion and audit retention, plans.
+  export, import, deletion and audit retention, plans, notifications and the daily
+  digest, domain events, tasks and projects, and capability parity with the API.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
-  the branch; staff ask for leave and the owner approves it; the owner runs payroll and staff
-  download their payslip; an owner exports, imports, deletes and restores a workspace; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
-  check and a CSP-violation check run on every page visited.
+  the branch; staff ask for leave and the owner approves it (and hears about it from the
+  bell); the owner runs payroll and staff download their payslip; a manager plans a project
+  on a board and staff work through their tasks; an owner exports, imports, deletes and
+  restores a workspace; forms keep what was typed on a slow connection; dark mode and
+  accents. 11 scenarios, each on desktop and phone. **axe WCAG 2.2 AA** checks, a
+  no-sideways-scrolling check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in
   [docs/testing/edge-cases.md](docs/testing/edge-cases.md).
-- CI also runs ruff, mypy `--strict`, ESLint, TypeScript, Vitest, a migration drift
+- 24 web unit tests (Vitest) for dates, time zones, money, location and the API client.
+- CI also runs ruff, mypy `--strict`, ESLint, TypeScript, a migration drift
   check, an API contract check, gitleaks, pip-audit, npm audit, Trivy and CodeQL.
 
 ## Run it locally
