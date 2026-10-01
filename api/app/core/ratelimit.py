@@ -12,6 +12,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.config import get_settings
 from app.core.db import open_session
 from app.core.errors import TooManyRequests
 from app.core.models import Base
@@ -36,7 +37,7 @@ class Rule:
 # Named rules, so limits are easy to find and tune.
 LOGIN_IP = Rule("login-ip", 30, 300)
 LOGIN_ACCOUNT = Rule("login-account", 10, 900)
-SIGNUP_IP = Rule("signup-ip", 10, 3600)
+SIGNUP_IP = Rule("signup-ip", get_settings().signup_limit_per_hour, 3600)
 RESET_IP = Rule("reset-ip", 10, 3600)
 RESET_ACCOUNT = Rule("reset-account", 3, 3600)
 MFA_SESSION = Rule("mfa", 10, 900)

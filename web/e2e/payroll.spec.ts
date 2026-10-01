@@ -76,6 +76,6 @@ test("the owner runs payroll and staff download their payslip", async ({ page, b
   await staff.getByText("Net pay").first().click();
   const pdf = staff.waitForEvent("download");
   await staff.getByRole("dialog").getByRole("button", { name: "বাংলায় PDF" }).click();
-  expect((await pdf).suggestedFilename()).toMatch(/payslip-\d{4}-\d{2}-bn\.pdf/);
+  expect((await pdf).suggestedFilename()).toMatch(/^payslip-\d{4}-\d{2}-.+-bn\.pdf$/);
   await context.close();
 });

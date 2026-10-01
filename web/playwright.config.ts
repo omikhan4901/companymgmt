@@ -39,7 +39,7 @@ export default defineConfig({
       url: "http://localhost:8000/healthz",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
-      env: { ENV: "dev", EMAIL_BACKEND: "console", CORS_ORIGINS: WEB, WEB_BASE_URL: WEB, PROXY_TOKEN },
+      env: { ENV: "dev", EMAIL_BACKEND: "console", CORS_ORIGINS: WEB, WEB_BASE_URL: WEB, PROXY_TOKEN, SIGNUP_LIMIT_PER_HOUR: "1000" },
     },
     {
       // The static export must exist (check.sh builds it first).

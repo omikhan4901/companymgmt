@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     # (two tabs refreshing at once), not as theft.
     refresh_reuse_grace_seconds: int = 10
     step_up_minutes: int = 5
+    # New workspaces per IP address per hour (raised only for end-to-end test runs).
+    signup_limit_per_hour: int = 10
 
     # {"key id": "base64 32-byte key"}; the active id encrypts, all ids decrypt.
     field_encryption_keys: SecretStr = SecretStr("")
