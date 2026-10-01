@@ -25,6 +25,11 @@ checked against each branch's location.
   rejects it; everything is recorded. Nobody can approve their own request.
 - **Monthly timesheets** per person per day, with a spreadsheet export that is safe to open
   in Excel (Bangla names intact, formulas neutralised).
+- **Leave.** People ask for leave from their phone and see what's left before they send it.
+  Managers approve in one tap; the team calendar shows who is away (colleagues see that
+  someone is away, not why). Balances handle mid-year joiners, monthly accrual and
+  carry-over; the work week and public holidays don't count. Bangladesh workspaces start
+  near the Labour Act 2006 (casual, sick, earned, maternity), Friday off.
 - **People and departments.** Profiles, a department tree and branches. Managers see only
   their own part of the tree.
 - **Staff without email.** Add a cashier with a username; they sign in with the workspace
@@ -40,11 +45,13 @@ checked against each branch's location.
 |---|---|
 | ![Attendance records with where each clock-in happened](docs/screenshots/attendance-records.png) | ![Placing a branch on the map](docs/screenshots/branch-location.png) |
 | ![Monthly timesheet](docs/screenshots/timesheet.png) | ![Home in dark mode with the Saffron accent](docs/screenshots/home-dark.png) |
+| ![Who is away this month](docs/screenshots/leave-calendar.png) | ![Leave requests waiting for approval](docs/screenshots/leave-requests.png) |
 
 <p align="center">
   <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
   <img src="docs/screenshots/phone-home-bangla.png" width="240" alt="Staff home screen on a phone, in Bangla, clocked in at the branch" />
   <img src="docs/screenshots/phone-attendance-bangla.png" width="240" alt="Attendance on a phone, in Bangla" />
+  <img src="docs/screenshots/phone-leave-ask-bangla.png" width="240" alt="Asking for a day of leave on a phone, in Bangla, with the days left shown" />
 </p>
 
 ## How it's built
@@ -96,12 +103,12 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **116 API tests**, 90% line and branch coverage (CI gate: 85%), all against a real
-  Postgres: auth, isolation, workspaces, people, attendance, location checks, plans.
+- **135 API tests**, 91% line and branch coverage (CI gate: 85%), all against a real
+  Postgres: auth, isolation, workspaces, people, attendance, location checks, leave, plans.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
-  the branch; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
+  the branch; staff ask for leave and the owner approves it; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
   check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in

@@ -74,9 +74,10 @@ The roadmap was reordered on 30 Sep 2026 for the first market (20–100 person a
 and the AI layer. See `IMPLEMENTATION_PLAN.md` §9: M2 leave, payroll and data rights; M3
 work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 
-- M2 Leave: API done (types, work week, holidays, balances with joining-date share,
-  monthly accrual and carry-over, approvals, team calendar, adjustments; 16 tests).
-  Web screens next.
+- M2 Leave: done. API (types, work week, holidays, balances with joining-date share,
+  monthly accrual and carry-over, approvals, team calendar, adjustments) and web screens
+  (my leave, requests, calendar, team balances, settings, "Away today" on home), in
+  English and Bangla, with a browser journey on desktop and phone.
 - M2 then: Payroll (Bangladesh preset), payslip PDFs, workspace/personal export and
   deletion, nightly encrypted backups, audit retention, MFA policy for admins.
 
@@ -87,3 +88,4 @@ work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 - 2026-09-30: Atlas chosen (C, white default, four accents). Location-based attendance on the API. Plan rewritten: every milestone explained, AI-ready architecture (§3.7), first market (§2.0), roadmap reordered.
 - 2026-10-01: M1.6 done: Next.js app with Atlas themes replaces web/ and site/; location-checked clock-in in the UI; /v1 served through a same-origin Pages Function.
 - 2026-10-01: M2 Leave API pushed: Bangladesh defaults near the Labour Act 2006, balances checked again on approval, colleagues see who is away but not why. 135 API tests.
+- 2026-10-01: M2 Leave web screens: ask with a live day count, approve, month calendar, balances, settings. Demo seed includes leave.
