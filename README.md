@@ -7,13 +7,16 @@ location, built so a permission-aware AI assistant can sit on top of it later.
 
 ![Home](docs/screenshots/home.png)
 
-> **Status:** Milestones 1 to 3 are built and tested: accounts, people, attendance,
-> leave, payroll and data rights; then the foundations for AI, notifications, tasks and
-> projects, announcements, documents and policies, the approvals inbox and onboarding
-> checklists. A 30-person sample agency runs a whole week in the product, in a test.
-> Next is the pilot release with 3–5 real companies. It isn't live yet; deployment is
-> scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
-> [Roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap) · [progress](docs/PROGRESS.md).
+> **Status (October 2026): paused at a stable, fully tested point.** Milestones 1 to 3
+> are done: accounts, people, attendance, leave, payroll, data rights, notifications,
+> tasks and projects, announcements, documents and policies, the approvals inbox and
+> onboarding checklists, plus the foundations for AI. From the pilot milestone (M4), the
+> spreadsheet import and reports (with weekly and monthly report emails) are done.
+> A 30-person sample agency runs a whole week in the product, in a test. It isn't live
+> yet: deployment is scripted and waits on cloud accounts. See [Future work](#future-work).
+>
+> **New to the code? Start with the [developer guide](docs/GUIDE.md)**: running it
+> locally, how every part works, and what to learn.
 
 ## What it does today
 
@@ -54,6 +57,7 @@ location, built so a permission-aware AI assistant can sit on top of it later.
 - **Reports.** For any period and department: headcount, attendance rate, late
   arrivals (against your own start time and grace period), leave taken by type, and
   overdue tasks, with who is late or overdue most often. Managers see their own teams.
+  Anyone who can see reports can get them by email every week or every month.
 - **Import from a spreadsheet.** Bring the whole team in from a CSV (English or Bangla
   headers): people, departments and the leave days each person has left. Every row is
   checked first, with problems explained line by line; nothing is saved until the file
@@ -176,7 +180,7 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **227 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
+- **232 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
   payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
   export, import, deletion and audit retention, plans, notifications and the daily
@@ -200,7 +204,10 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ## Run it locally
 
-Requirements: Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 22, PostgreSQL 16.
+Step by step, with what to install and what to do when something goes wrong:
+[developer guide, section 1](docs/GUIDE.md#1-run-it-on-your-computer). The short version,
+on Linux or a Mac with Python 3.12 + [uv](https://docs.astral.sh/uv/), Node 22 and
+PostgreSQL 16 running:
 
 ```bash
 cp .env.example .env
@@ -212,13 +219,55 @@ uv run python -m scripts.agency_week                # optional: a 30-person agen
 cd ../web && npm install && npm run dev             # http://localhost:3000
 ```
 
-Before pushing, run everything CI runs: `scripts/check.sh` (add `E2E=1` for the browser
-tests).
+Then open http://localhost:3000 (the app) and http://localhost:8000/docs (every API
+endpoint). Before pushing, run everything CI runs: `scripts/check.sh` (add `E2E=1` for
+the browser tests).
+
+## Future work
+
+What's left, in the order of the [roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap).
+
+**Needs you first (nothing more can be built for these without your input):**
+- **Go live.** Create the Google Cloud, Neon, Cloudflare and email accounts, then follow
+  the [deploy runbook](docs/runbooks/deploy.md) (about an hour). Schedule the four jobs
+  listed there (outbox, maintenance, notification digest, report emails) and run a
+  restore drill ([restore runbook](docs/runbooks/restore.md)).
+- **Legal review** of the privacy policy and terms before real customers sign up.
+- **Payroll tax:** check the Bangladesh salary tax table (Payroll → Settings) against the
+  current Finance Ordinance with a tax adviser before switching tax deduction on.
+- **Pilot companies:** 3–5 agencies in Bangladesh to use it for a month (plan Q8).
+
+**M4, pilot release (the rest):**
+- In-app help: a short help centre and "contact support" from any screen.
+- Product analytics without personal data, an uptime check and a status page.
+- A pilot playbook (setup call, week-1 check-in, week-4 review) and a feedback channel.
+- Excel (.xlsx) files in the import, not only CSV.
+
+**Later milestones:**
+- **M5 Billing** with Paddle: checkout, renewals, dunning (plans and limits already exist).
+- **M6 AI copilot (read-only):** "ask my company", policy questions answered with
+  sources, a weekly company brief, all through the existing capabilities and always within
+  the asker's permissions.
+- **M7 AI actions and automation:** the AI proposes, a person confirms; plain-language
+  automations; early-warning signals.
+- **M3 leftovers:** approval chains with several steps (they arrive with expenses and
+  purchases, the first requests that need them).
+- **M8 Shop pack** (point of sale, dues/"baki khata", expenses), **M9 inventory and
+  accounting** (stock, purchases, double-entry books), **M10 enterprise** (SSO, SCIM, API
+  keys, a dedicated database, bring-your-own AI model), **M11 launch hardening** (full
+  ASVS L2 sign-off, restore drill, status page).
+
+**Known limits today:** reports are worked out on every request (fine up to a few hundred
+people; larger workspaces will want stored daily totals); lateness uses one start time per
+workspace, not per branch or shift; the weekly days off are one setting per workspace;
+the spreadsheet import reads CSV only; the AI layer is the capability registry only, with
+no model connected yet.
 
 ## Project documents
 
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md): audit of the original university
   project, product scope, architecture, security, testing, billing, costs, roadmap.
+- [Developer guide](docs/GUIDE.md): run it, understand it, change it.
 - [Progress](docs/PROGRESS.md) · [Deploy runbook](docs/runbooks/deploy.md) ·
   [Restore runbook](docs/runbooks/restore.md)
 

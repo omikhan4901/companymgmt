@@ -3,6 +3,7 @@
 Multi-tenant company management SaaS (HR, attendance, payroll, POS, inventory, accounting).
 The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 `docs/PROGRESS.md`. Read both before starting work, and update `PROGRESS.md` as you go.
+`docs/GUIDE.md` explains how everything works (keep it true when you change how things work).
 
 ## Conventions
 
@@ -61,5 +62,5 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 - No inline scripts or `dangerouslySetInnerHTML`: the CSP allows only each page's own
   Next.js scripts by hash. Anything that must run before paint goes in `public/*.js`.
 - Every UI string exists in `web/src/i18n/en.ts` and `bn.ts` (TypeScript checks this).
-- A routine (`trig_01BtkyYxPZW6r7FsBrpM5TLp`) wakes this session every 2 hours so work
-  continues after usage-limit pauses. Disable it when only owner input is left.
+- Work is paused at the owner's request (2026-10-01); the resume routine
+  (`trig_01BtkyYxPZW6r7FsBrpM5TLp`) is disabled. Start again only when the owner asks.

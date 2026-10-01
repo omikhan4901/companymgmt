@@ -158,7 +158,7 @@ architecture one-pager. Only built features and measured numbers.
 - Next: M4, the pilot release. Deployment waits on the owner's cloud accounts (see
   "Blocked on the owner"); everything else in M4 is being built meanwhile.
 
-## M4: in progress (pilot release)
+## M4: partly done (pilot release; paused)
 
 - **M4.1 spreadsheet import: done.** Owners and admins bring a company in from a CSV:
   people (matched to existing profiles by code, then email, and updated), departments
@@ -176,8 +176,18 @@ architecture one-pager. Only built features and measured numbers.
   grace period, leave taken by type, and open and overdue tasks, with who is late or
   overdue most. Managers see their own departments. Found on the way: a month of day
   labels made the chart wider than a phone; the agency seed counted Saturday as a
-  working day. Still to do in M4.2: saved reports sent by email on a schedule.
-- Next: scheduled report emails, then in-app help and the pilot playbook.
+  working day.
+- **M4.2 report emails: done.** Anyone who can see reports gets the overview every week
+  (on the first day of the workspace's week) and/or every month, for a department they
+  choose; a daily job works each report out as the subscriber (`member_ctx`), so it only
+  shows what they could see, and sends it once, in their language.
+- **Hardening before the pause:** people without a joining date now count from when they
+  were added (a new workspace no longer looks absent for the whole year); imports treat
+  "Design" and "design" as one new department.
+- **Paused here at the owner's request (2026-10-01).** Everything above is tested and
+  pushed. What's left is listed under "Future work" in the README. `docs/GUIDE.md` is the
+  developer guide for picking the code up by hand. Next when work resumes: M4.3 in-app
+  help and contact support, then the pilot playbook.
 
 ## Log
 
@@ -199,3 +209,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.8 a 30-person agency's week, played through the API and finished in the browser. M3 done.
 - 2026-10-01: M4.1 spreadsheet import of people, departments and leave balances, with a preview.
 - 2026-10-01: M4.2 reports dashboard and lateness settings.
+- 2026-10-01: M4.2 report emails. Edge-case fixes. Developer guide and final README. Paused.
