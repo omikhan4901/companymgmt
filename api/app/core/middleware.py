@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hmac
 import json
+import re
 import secrets
 import time
 from typing import Any
@@ -15,6 +16,24 @@ from app.core.config import get_settings
 
 MAX_JSON_BYTES = 1_000_000
 MAX_UPLOAD_BYTES = 10_000_000
+
+# Routes that take a file as the raw request body, with their own (larger) limit.
+_UPLOAD_ROUTES: list[tuple[re.Pattern[str], int]] = []
+
+
+def allow_upload(path_pattern: str, limit: int) -> None:
+    """Let POSTs to paths matching `path_pattern` (a full-match regex) carry up to `limit`
+    bytes. The route itself still enforces its exact limit while streaming."""
+    _UPLOAD_ROUTES.append((re.compile(path_pattern), limit))
+
+
+def _body_limit(method: str, path: str, content_type: str) -> int:
+    if method == "POST":
+        for pattern, limit in _UPLOAD_ROUTES:
+            if pattern.fullmatch(path):
+                return limit
+    return MAX_UPLOAD_BYTES if content_type.startswith("multipart/") else MAX_JSON_BYTES
+
 
 _SECURITY_HEADERS = [
     (b"x-content-type-options", b"nosniff"),
@@ -75,7 +94,7 @@ class RequestContextMiddleware:
 
         # Size limits: reject early from Content-Length, and count streamed bytes too.
         content_type = headers.get("content-type", "")
-        limit = MAX_UPLOAD_BYTES if content_type.startswith("multipart/") else MAX_JSON_BYTES
+        limit = _body_limit(scope.get("method", ""), scope.get("path", ""), content_type)
         declared = headers.get("content-length")
         if declared and declared.isdigit() and int(declared) > limit:
             await self._reject(send, 413, "too_large", "The request is too large.", request_id)

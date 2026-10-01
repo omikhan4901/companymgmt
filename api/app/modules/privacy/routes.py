@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Request, Response
 
 from app.core.http import read_body
+from app.core.middleware import allow_upload
 from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.routes_auth import require_recent_auth
 from app.modules.privacy import access, importer, service
@@ -32,6 +33,9 @@ async def my_data(ctx: Ctx = Depends(allow(None))) -> Response:
     require_recent_auth(ctx)
     body, filename = await service.my_data(ctx)
     return _file(body, filename, "application/json")
+
+
+allow_upload(r"/v1/privacy/workspace-import", importer.MAX_UPLOAD)
 
 
 @router.post("/workspace-import")
