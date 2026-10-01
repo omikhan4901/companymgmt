@@ -33,6 +33,7 @@ from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
 from app.modules.platform.routes_workspace import router as workspace_router
 from app.modules.privacy.routes import router as privacy_router
+from app.modules.reports.routes import router as reports_router
 from app.modules.tasks.routes import router as tasks_router
 
 log = logging.getLogger("app")
@@ -51,6 +52,7 @@ ROUTERS = (
     announcements_router,
     documents_router,
     approvals_router,
+    reports_router,
     privacy_router,
     ai_router,
     internal_router,

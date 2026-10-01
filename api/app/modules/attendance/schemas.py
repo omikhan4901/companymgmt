@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, StringConstraints
@@ -69,6 +69,8 @@ class ClockOut(In):
 class SettingsOut(BaseModel):
     location_mode: Literal["off", "record", "require"]
     max_accuracy_m: int
+    day_starts_at: time
+    late_after_minutes: int
     branches_total: int
     branches_located: int
 
@@ -76,6 +78,9 @@ class SettingsOut(BaseModel):
 class SettingsIn(In):
     location_mode: Literal["off", "record", "require"]
     max_accuracy_m: int = Field(default=100, ge=10, le=1000)
+    # Left out: unchanged.
+    day_starts_at: time | None = None
+    late_after_minutes: int | None = Field(default=None, ge=0, le=240)
 
 
 class RecordIn(In):

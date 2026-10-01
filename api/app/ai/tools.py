@@ -14,6 +14,7 @@ from app.modules.payroll import capabilities as _payroll  # noqa: F401
 from app.modules.people import capabilities as _people  # noqa: F401
 from app.modules.platform.capabilities import REGISTRY, visible
 from app.modules.platform.deps import Ctx
+from app.modules.reports import capabilities as _reports  # noqa: F401
 from app.modules.tasks import capabilities as _tasks  # noqa: F401
 
 __all__ = ["REGISTRY", "tool_specs"]

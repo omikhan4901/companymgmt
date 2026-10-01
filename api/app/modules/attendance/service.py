@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import calendar
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 from sqlalchemy import and_, func, select
 from sqlalchemy.exc import IntegrityError
@@ -162,7 +162,9 @@ async def scoped_employee(ctx: Ctx, employee_id: uuid.UUID) -> Employee:
 async def settings(db: AsyncSession) -> AttendanceSettings:
     """The workspace's attendance settings (defaults until someone changes them)."""
     row = await db.scalar(select(AttendanceSettings))
-    return row or AttendanceSettings(location_mode="require", max_accuracy_m=100)
+    return row or AttendanceSettings(
+        location_mode="require", max_accuracy_m=100, day_starts_at=time(9), late_after_minutes=15
+    )
 
 
 async def status(ctx: Ctx) -> StatusOut:

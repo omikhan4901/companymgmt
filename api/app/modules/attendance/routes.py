@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import io
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request, Response
@@ -216,6 +216,8 @@ async def _settings_out(db: AsyncSession, settings: AttendanceSettings) -> Setti
     return SettingsOut(
         location_mode=settings.location_mode,
         max_accuracy_m=settings.max_accuracy_m,
+        day_starts_at=settings.day_starts_at,
+        late_after_minutes=settings.late_after_minutes,
         branches_total=int(total or 0),
         branches_located=int(located or 0),
     )
@@ -231,19 +233,32 @@ async def put_settings(
     body: SettingsIn, ctx: Ctx = Depends(allow(WORKSPACE_MANAGE, module=MODULE))
 ) -> SettingsOut:
     row = await ctx.db.scalar(select(AttendanceSettings).with_for_update())
-    before = {"location_mode": row.location_mode, "max_accuracy_m": row.max_accuracy_m} if row else None
+    before = (
+        {
+            "location_mode": row.location_mode,
+            "max_accuracy_m": row.max_accuracy_m,
+            "day_starts_at": row.day_starts_at.isoformat(timespec="minutes"),
+            "late_after_minutes": row.late_after_minutes,
+        }
+        if row
+        else None
+    )
     if row is None:
-        row = AttendanceSettings(tenant_id=ctx.tenant_id)
+        row = AttendanceSettings(tenant_id=ctx.tenant_id, day_starts_at=time(9), late_after_minutes=15)
         ctx.db.add(row)
     row.location_mode = body.location_mode
     row.max_accuracy_m = body.max_accuracy_m
+    if body.day_starts_at is not None:
+        row.day_starts_at = body.day_starts_at.replace(second=0, microsecond=0, tzinfo=None)
+    if body.late_after_minutes is not None:
+        row.late_after_minutes = body.late_after_minutes
     await ctx.db.flush()
     await audit.record(
         ctx.db,
         "attendance.settings_changed",
         target_type="workspace",
         target_id=ctx.tenant_id,
-        data={"before": before, "after": body.model_dump()},
+        data={"before": before, "after": body.model_dump(mode="json", exclude_none=True)},
     )
     await ctx.db.commit()
     return await _settings_out(ctx.db, row)

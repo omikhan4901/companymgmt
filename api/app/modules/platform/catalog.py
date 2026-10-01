@@ -116,6 +116,7 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "announcements.read",
             "announcements.post",
             "documents.read",
+            "reports.view",
         ),
     ),
     BuiltinRole(

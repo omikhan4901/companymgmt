@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -14,8 +14,10 @@ from sqlalchemy import (
     Index,
     Integer,
     Numeric,
+    SmallInteger,
     String,
     Text,
+    Time,
     UniqueConstraint,
     text,
 )
@@ -41,6 +43,7 @@ class AttendanceSettings(TenantScoped, TimestampMixin, Versioned, Base):
     __table_args__ = (
         CheckConstraint("location_mode IN ('off', 'record', 'require')", name="location_mode"),
         CheckConstraint("max_accuracy_m BETWEEN 10 AND 1000", name="max_accuracy"),
+        CheckConstraint("late_after_minutes BETWEEN 0 AND 240", name="late_after"),
     )
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
@@ -49,6 +52,9 @@ class AttendanceSettings(TenantScoped, TimestampMixin, Versioned, Base):
     location_mode: Mapped[str] = mapped_column(String(10), default="require")
     # Fixes less precise than this (metres) don't count as "inside" when location is required.
     max_accuracy_m: Mapped[int] = mapped_column(Integer, default=100)
+    # When the working day starts, and how many minutes after that a clock-in counts as late.
+    day_starts_at: Mapped[time] = mapped_column(Time, default=time(9), server_default=text("'09:00'"))
+    late_after_minutes: Mapped[int] = mapped_column(SmallInteger, default=15, server_default=text("15"))
 
 
 class AttendanceRecord(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
