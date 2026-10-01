@@ -117,7 +117,15 @@ architecture one-pager. Only built features and measured numbers.
   projects, managers run projects in their departments, and assignment, comments,
   completion and joining a project notify the people involved. Edits made in quick
   succession are queued so none is lost to a version clash.
-- Next: announcements, documents and policies, the
+- **M3.4 announcements: designed, next to build.** Module `announcements`; tables
+  `announcements` (title, body, audience everyone/branches/departments with ids, pinned,
+  published_at, author, edited_at, version) and `announcement_reads` (post, user, read_at).
+  Permissions `announcements.read` (everyone) and `announcements.post` (scoped: managers
+  post only to departments in their scope). Departments include everything below them.
+  Receipts count people who can sign in; only the author and unscoped posters see them.
+  Publishing emits `announcement.published` with the audience's membership ids, and the
+  notifications module tells them. Feed: pinned first, then newest; unread count.
+- Then: documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
 ## Log
