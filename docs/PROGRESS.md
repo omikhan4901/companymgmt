@@ -31,6 +31,8 @@ accounts to go live (see `runbooks/deploy.md`).
 - Push the `legacy-nsu-327` tag in the legacy repo (command in the plan, §11 Q1).
 - Cloud accounts for deployment (runbook).
 - Legal review of the privacy policy and terms (plan Q7).
+- Check the Bangladesh salary tax table (Payroll → Settings) against the Finance
+  Ordinance 2025 with a tax adviser before turning tax deduction on.
 
 ## Decisions made while building
 
@@ -68,23 +70,36 @@ architecture one-pager. Only built features and measured numbers.
   and phone against the production build, each page checked with axe (WCAG 2.2 AA), for
   sideways scrolling and for CSP violations.
 
+## M2: done (leave, payroll, data rights)
+
+- **Leave**: types, work week, holidays, balances (joining-date share, monthly accrual,
+  carry-over), approvals with no self-approval, team calendar that shows who is away but
+  not why, adjustments. Screens in English and Bangla; "Away today" on home.
+- **Payroll**: salaries by effective date (monthly, hourly, daily; cash, bank, wallet),
+  advances, pay runs draft → review → finalized → paid (four-eyes, recent sign-in to
+  finalize), overtime from attendance, unpaid leave, festival bonuses, shortfalls carried
+  as advances, transfer sheet, payslip PDFs in English and Bangla with bundled fonts.
+  Salary tax is an editable table, off by default.
+- **Data rights**: owners export everything (ZIP) and can restore an export into a new
+  workspace; everyone downloads their own data; deleting a workspace has a 30-day
+  restore window, then a purge job and a signed deletion certificate; audit entries
+  follow the plan's retention with anchors that keep the chain verifiable; a workspace
+  can require two-step verification for owners and admins.
+- **Operations**: nightly maintenance and encrypted backup jobs (pg_dump → age → R2,
+  30 days) scheduled by OpenTofu; restore drilled locally.
+- Done-when check: leave and payroll edge cases tested (Hypothesis on pay maths); 500
+  people run payroll in about a second; Bangla payslips checked for the bundled font and
+  text (and looked at); an export restores into an empty workspace (test and browser
+  journey).
+- Numbers: 168 API tests (92% coverage), 22 web unit tests, 9 browser scenarios × desktop
+  and phone with axe, sideways-scroll and CSP checks on every page.
+
 ## Next
 
-The roadmap was reordered on 30 Sep 2026 for the first market (20–100 person agencies)
-and the AI layer. See `IMPLEMENTATION_PLAN.md` §9: M2 leave, payroll and data rights; M3
-work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
-
-- M2 Leave: done. API (types, work week, holidays, balances with joining-date share,
-  monthly accrual and carry-over, approvals, team calendar, adjustments) and web screens
-  (my leave, requests, calendar, team balances, settings, "Away today" on home), in
-  English and Bangla, with a browser journey on desktop and phone.
-- M2 Payroll: done. Salaries, advances, pay runs (draft → review → finalized → paid,
-  four-eyes, step-up to finalize), overtime from attendance, unpaid leave, festival
-  bonuses, carry-forward of shortfalls, transfer sheet, payslip PDFs in English and
-  Bangla. Salary tax: editable table, off by default; **owner to verify the Bangladesh
-  2025-26 slabs** (the official sources couldn't be reached from the build machine).
-- M2 then: workspace/personal export and deletion, nightly encrypted backups, audit
-  retention, MFA policy for admins.
+M3: work and knowledge, with the AI-ready foundations (`IMPLEMENTATION_PLAN.md` §9):
+tasks and projects, announcements, documents and policies, an approvals inbox,
+notifications, onboarding checklists; business logic moved into services, a capability
+registry and a context builder, domain events.
 
 ## Log
 
@@ -95,3 +110,4 @@ work and knowledge with AI-ready foundations; M4 pilots; M5 billing; M6–M7 AI.
 - 2026-10-01: M2 Leave API pushed: Bangladesh defaults near the Labour Act 2006, balances checked again on approval, colleagues see who is away but not why. 135 API tests.
 - 2026-10-01: M2 Leave web screens: ask with a live day count, approve, month calendar, balances, settings. Demo seed includes leave.
 - 2026-10-01: M2 Payroll pushed: API, pay maths with Hypothesis invariants, 500 people in ~1 s, payslip PDFs (WeasyPrint, bundled Bangla fonts), web screens, browser journey.
+- 2026-10-01: M2 done: data rights (exports and import, deletion with a 30-day restore and signed certificate, audit retention with anchors, admin two-step policy), nightly maintenance and encrypted backup jobs.

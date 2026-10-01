@@ -42,8 +42,13 @@ checked against each branch's location.
   code and must choose their own password on first sign-in.
 - **Roles.** Owner, Admin, Manager, Accountant, Cashier, Employee, plus custom roles.
   Nobody can grant a permission they don't hold.
-- **Security you can see.** Two-step verification, a list of signed-in devices, and an
-  audit log with a built-in integrity check.
+- **Security you can see.** Two-step verification (which a workspace can require for
+  owners and admins), a list of signed-in devices, and an audit log with a built-in
+  integrity check.
+- **Your data stays yours.** Owners export everything as a ZIP and can restore it into a
+  new workspace; everyone can download what a workspace holds about them. Deleting a
+  workspace can be undone for 30 days, then everything is erased and the owner gets a
+  signed certificate. Nightly encrypted backups are kept for 30 days.
 - **Your look.** Light by default, dark mode, and four accent colours; every screen
   passes WCAG 2.2 AA checks in both modes.
 
@@ -110,14 +115,15 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **159 API tests**, 92% line and branch coverage (CI gate: 85%), all against a real
+- **168 API tests**, 92% line and branch coverage (CI gate: 85%), all against a real
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
-  payroll (pay maths checked with Hypothesis; 500 people run in about a second), plans.
+  payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
+  export, import, deletion and audit retention, plans.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
   the branch; staff ask for leave and the owner approves it; the owner runs payroll and staff
-  download their payslip; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
+  download their payslip; an owner exports, imports, deletes and restores a workspace; dark mode and accents. **axe WCAG 2.2 AA** checks, a no-sideways-scrolling
   check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in
