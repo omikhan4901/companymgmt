@@ -7,10 +7,11 @@ location, built so a permission-aware AI assistant can sit on top of it later.
 
 ![Home](docs/screenshots/home.png)
 
-> **Status:** Milestones 1 and 2 are built and tested (accounts, people, attendance,
-> leave, payroll, data rights), and Milestone 3 is under way: the foundations for AI,
-> notifications, tasks and projects, announcements, documents and policies, the approvals inbox
-> and onboarding checklists are done; a sample agency week comes next. It isn't live yet; deployment is
+> **Status:** Milestones 1 to 3 are built and tested: accounts, people, attendance,
+> leave, payroll and data rights; then the foundations for AI, notifications, tasks and
+> projects, announcements, documents and policies, the approvals inbox and onboarding
+> checklists. A 30-person sample agency runs a whole week in the product, in a test.
+> Next is the pilot release with 3–5 real companies. It isn't live yet; deployment is
 > scripted and waits on cloud accounts ([deploy runbook](docs/runbooks/deploy.md)).
 > [Roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap) · [progress](docs/PROGRESS.md).
 
@@ -85,7 +86,8 @@ location, built so a permission-aware AI assistant can sit on top of it later.
 | ![Who is away this month](docs/screenshots/leave-calendar.png) | ![Leave requests waiting for approval](docs/screenshots/leave-requests.png) |
 | ![A finalized pay run](docs/screenshots/payroll-run.png) | ![A payslip PDF in Bangla](docs/screenshots/payslip-pdf-bangla.png) |
 | ![A project board with tasks to do, in progress and done](docs/screenshots/tasks-board.png) | ![A task with its checklist and comments](docs/screenshots/task-panel.png) |
-| ![The notification list in the header](docs/screenshots/notifications.png) | |
+| ![The notification list in the header](docs/screenshots/notifications.png) | ![A 30-person agency's campaign board at the end of the week](docs/screenshots/agency-board.png) |
+| ![The code of conduct, acknowledged by 30 of 30](docs/screenshots/policy-acknowledged.png) | |
 
 <p align="center">
   <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
@@ -178,9 +180,9 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
   clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
   the branch; staff ask for leave and the owner approves it (and hears about it from the
   bell); the owner runs payroll and staff download their payslip; a manager plans a project
-  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; an owner exports, imports, deletes and
+  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; a 30-person agency's week is played through the API and finished in the browser (the last acknowledgement, the last approval); an owner exports, imports, deletes and
   restores a workspace; forms keep what was typed on a slow connection; dark mode and
-  accents. 15 scenarios, each on desktop and phone. **axe WCAG 2.2 AA** checks, a
+  accents. 16 scenarios on desktop and phone (the agency week on desktop only, as seeding thirty people takes a while). **axe WCAG 2.2 AA** checks, a
   no-sideways-scrolling check and a CSP-violation check run on every page visited.
 - Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
   Bangla and RTL names, replayed tokens…) are mapped to their tests in
@@ -198,7 +200,8 @@ cp .env.example .env
 scripts/dev-db.sh                                   # local roles and databases
 cd api && uv sync && uv run alembic upgrade head
 uv run uvicorn app.main:app --reload                # http://localhost:8000
-uv run python -m scripts.demo_seed                  # optional: a demo workspace
+uv run python -m scripts.demo_seed                  # optional: a demo tea house
+uv run python -m scripts.agency_week                # optional: a 30-person agency's week
 cd ../web && npm install && npm run dev             # http://localhost:3000
 ```
 

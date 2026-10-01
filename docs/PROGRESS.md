@@ -94,7 +94,7 @@ architecture one-pager. Only built features and measured numbers.
 - Numbers: 168 API tests (92% coverage), 22 web unit tests, 9 browser scenarios × desktop
   and phone with axe, sideways-scroll and CSP checks on every page.
 
-## M3: in progress (work and knowledge)
+## M3: done (work and knowledge)
 
 - **M3.1 foundations: done.** People and attendance reads moved into services; a
   capability registry (typed reads over people, attendance, leave, payroll and
@@ -142,7 +142,21 @@ architecture one-pager. Only built features and measured numbers.
   ticks its item off. Managers see who is being onboarded and how far along; joiners
   get a "Your first days" card on home. Found on the way: a second `RunOut` model
   mangled the payroll type names in the contract; a test now keeps schema names unique.
-- Next: a 30-person sample agency week (seed and browser journeys), then M3 review.
+- **M3.8 a 30-person agency's week: done.** `api/scripts/agency_week.py` plays a week at
+  Nokshi Digital through the real API: an owner, an admin, three managers and their
+  teams clock in and out, plan three client projects on boards and get most of the work
+  done, read the owner's note, acknowledge the code of conduct, ask for leave and a time
+  fix that managers approve from the inbox, and welcome a joiner whose checklist starts
+  by itself. The API test checks the outcome (30 of 30 acknowledged and read, nothing
+  waiting on anyone, the boards and the joiner's progress) in about 20 seconds; the
+  browser test seeds the week, then finishes it in the UI. The per-address sign-in limit
+  became a setting (`LOGIN_LIMIT_PER_IP`, default 30 per 5 minutes), raised only for
+  browser test runs.
+- **M3's "done when" is met:** a 30-person agency runs a week entirely in the product,
+  and capability parity with the REST routes is tested. Deferred on purpose: approval
+  chains with several steps, which arrive with expenses and purchases.
+- Next: M4, the pilot release. Deployment waits on the owner's cloud accounts (see
+  "Blocked on the owner").
 
 ## Log
 
@@ -161,3 +175,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M3.5 documents and policies with acknowledgements; large workspace imports fixed.
 - 2026-10-01: M3.6 approvals inbox for leave and time fixes; time-fix decisions moved into the attendance service.
 - 2026-10-01: M3.7 onboarding checklists: templates, runs as tasks, automatic start on joining, document items tick off on acknowledgement.
+- 2026-10-01: M3.8 a 30-person agency's week, played through the API and finished in the browser. M3 done.
