@@ -182,7 +182,7 @@ Actions**:
    prints the API address. Add it as `API_ORIGIN` in the Pages project's variables
    (step 3.3). No redeploy is needed: the function reads it on each request. From then on
    the API answers `/v1` only through the web address.
-2. Scheduled jobs (retries for emails, daily clean-up):
+2. Scheduled jobs (retries for emails, daily clean-up, the daily email summary):
 
    ```bash
    API=$(gcloud run services describe companymgmt-api --region asia-southeast1 --format 'value(status.url)')
@@ -193,6 +193,10 @@ Actions**:
    gcloud scheduler jobs create http companymgmt-daily --location asia-southeast1 \
      --schedule "17 3 * * *" --uri "$API/internal/maintenance/daily" --http-method POST \
      --headers "X-Internal-Token=$TOKEN"
+   # The daily email summary of unread notifications, at 8:52 in the morning in Dhaka.
+   gcloud scheduler jobs create http companymgmt-digest --location asia-southeast1 \
+     --schedule "52 8 * * *" --time-zone "Asia/Dhaka" --uri "$API/internal/notifications/digest" \
+     --http-method POST --headers "X-Internal-Token=$TOKEN"
    ```
 
 3. The nightly jobs (`companymgmt-maintenance` purges deleted workspaces and old audit

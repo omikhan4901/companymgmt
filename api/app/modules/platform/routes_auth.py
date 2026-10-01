@@ -144,6 +144,7 @@ class CodeIn(In):
 class ProfileIn(In):
     name: ShortName | None = None
     locale: Locale | None = None
+    email_digest: bool | None = None
 
 
 class MfaSetupOut(Out):
@@ -221,6 +222,7 @@ class MeOut(Out):
     username: str | None
     email_verified: bool
     locale: str
+    email_digest: bool
     mfa_enabled: bool
     must_change_password: bool
     workspaces: list[WorkspaceRef]
@@ -632,6 +634,7 @@ async def me(ctx: Ctx = Depends(signed_in(allow_deleted_workspace=True))) -> MeO
         username=user.username,
         email_verified=user.email_verified_at is not None,
         locale=user.locale,
+        email_digest=user.email_digest,
         mfa_enabled=user.totp_enabled_at is not None,
         must_change_password=user.must_change_password,
         workspaces=[WorkspaceRef(**w) for w in await workspaces.user_workspaces(ctx.db, user.id)],
@@ -646,6 +649,8 @@ async def update_profile(body: ProfileIn, ctx: Ctx = Depends(signed_in())) -> No
         ctx.user.name = body.name
     if body.locale is not None:
         ctx.user.locale = body.locale
+    if body.email_digest is not None:
+        ctx.user.email_digest = body.email_digest
     await ctx.db.commit()
 
 

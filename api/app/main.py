@@ -19,6 +19,7 @@ from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.modules.attendance.routes import router as attendance_router
 from app.modules.leave.routes import router as leave_router
+from app.modules.notifications.routes import internal_router as notifications_internal_router
 from app.modules.notifications.routes import router as notifications_router
 from app.modules.payroll.routes import router as payroll_router
 from app.modules.people.routes import router as people_router
@@ -43,6 +44,7 @@ ROUTERS = (
     privacy_router,
     ai_router,
     internal_router,
+    notifications_internal_router,
 )
 ops_router = APIRouter(tags=["ops"])
 

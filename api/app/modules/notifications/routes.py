@@ -7,8 +7,10 @@ import uuid
 from fastapi import APIRouter, Depends, Query, Response
 
 from app.modules.notifications import service, subscribers  # noqa: F401  (registers subscribers)
+from app.modules.notifications.digest import send_digests
 from app.modules.notifications.schemas import InboxOut, UnreadOut
 from app.modules.platform.deps import Ctx, allow
+from app.modules.platform.internal import internal_only
 
 router = APIRouter(prefix="/v1/notifications", tags=["notifications"])
 
@@ -38,3 +40,12 @@ async def read(notification_id: uuid.UUID, ctx: Ctx = Depends(allow(None))) -> R
 async def read_all(ctx: Ctx = Depends(allow(None))) -> UnreadOut:
     await service.mark_all_read(ctx)
     return UnreadOut(unread=0)
+
+
+# Called by Cloud Scheduler once a day with the internal token (see runbooks/deploy.md).
+internal_router = APIRouter(prefix="/internal", tags=["internal"], include_in_schema=False)
+
+
+@internal_router.post("/notifications/digest")
+async def digest(_: None = Depends(internal_only)) -> dict[str, int]:
+    return {"emails": await send_digests()}

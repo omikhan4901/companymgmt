@@ -132,6 +132,8 @@ class User(IdMixin, TimestampMixin, Base):
     password_changed_at: Mapped[datetime | None]
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=False)
     locale: Mapped[str] = mapped_column(String(10), default="en")
+    # A daily email listing unread notifications (only for people with an email address).
+    email_digest: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("true"))
     # Staff accounts without email belong to one workspace and sign in with a username.
     managed_tenant_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("tenants.id"))
     username: Mapped[str | None] = mapped_column(String(40))
