@@ -110,7 +110,14 @@ architecture one-pager. Only built features and measured numbers.
   (English and Bangla), kept six months, included in "my data". A daily email lists what
   each person hasn't read (once, in their language, an hour's grace, can be turned off on
   the account page; staff without email never get one).
-- Next: tasks and projects, announcements, documents and policies, the
+- **M3.3 tasks and projects: done.** Projects with members and a home department; a
+  board (to do, doing, done) with drag and drop and a keyboard-friendly move menu;
+  tasks with assignee, due date, priority, checklist and comments; "My work" grouped by
+  overdue, today, this week and later, also on the home screen. Members work on their
+  projects, managers run projects in their departments, and assignment, comments,
+  completion and joining a project notify the people involved. Edits made in quick
+  succession are queued so none is lost to a version clash.
+- Next: announcements, documents and policies, the
   approvals inbox, onboarding checklists, then a 30-person sample agency week.
 
 ## Log
@@ -125,3 +132,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M2 done: data rights (exports and import, deletion with a 30-day restore and signed certificate, audit retention with anchors, admin two-step policy), nightly maintenance and encrypted backup jobs.
 - 2026-10-01: M3.1 pushed: capability registry, AI context, domain events. M3.2 in-app notifications.
 - 2026-10-01: M3.2 notifications done (in-app and daily email digest). CI caught forms wiping typed input when data loaded late; fixed with a browser test.
+- 2026-10-01: M3.3 tasks and projects: API, board, task panel, My work, browser journey on desktop and phone.
