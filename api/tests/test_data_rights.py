@@ -6,6 +6,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import uuid
 import zipfile
 from datetime import UTC, datetime, timedelta
 
@@ -241,3 +242,87 @@ async def test_me_explains_a_workspace_pending_deletion(client: httpx.AsyncClien
     assert me["pending_deletion"]["can_restore"] is True
     other = (await admin.get("/v1/auth/me")).json()
     assert other["pending_deletion"]["can_restore"] is False
+
+
+async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncClient) -> None:
+    source = await signup(client, business="Old Shop")
+    new_owner_email = f"new-owner-{uuid.uuid4().hex[:6]}@example.com"
+    kitchen = (await source.post("/v1/departments", json={"name": "Kitchen"})).json()
+    cook = (
+        await source.post(
+            "/v1/people",
+            json={"full_name": "Cook", "department_id": kitchen["id"], "national_id": "1990123456789"},
+        )
+    ).json()
+    # The new workspace's owner also worked here: their profile is matched by email.
+    await source.post("/v1/people", json={"full_name": "New Owner (old profile)", "email": new_owner_email})
+    yesterday = datetime.now(UTC) - timedelta(days=1)
+    await source.post(
+        "/v1/attendance/records",
+        json={
+            "employee_id": cook["id"],
+            "clock_in_at": yesterday.isoformat(),
+            "clock_out_at": (yesterday + timedelta(hours=8)).isoformat(),
+        },
+    )
+    await source.post(
+        "/v1/payroll/salaries",
+        json={
+            "employee_id": cook["id"],
+            "effective_from": "2024-01-01",
+            "basic": 2_000_000,
+            "payment_method": "wallet",
+            "provider": "bKash",
+            "account": "01712345678",
+        },
+    )
+    first = datetime.now(UTC).date().replace(day=1) - timedelta(days=1)
+    run = (await source.post("/v1/payroll/runs", json={"period": f"{first:%Y-%m}"})).json()
+    await source.post(f"/v1/payroll/runs/{run['id']}/submit")
+    await source.post(f"/v1/payroll/runs/{run['id']}/finalize")
+    export = (await source.get("/v1/privacy/workspace-export")).content
+
+    target = await signup(client, business="New Shop", email_addr=new_owner_email)
+    upload = {"content": export, "headers": {"content-type": "application/zip"}}
+    imported = await target.post("/v1/privacy/workspace-import", **upload)
+    assert imported.status_code == 200, imported.text
+    counts = imported.json()["imported"]
+    assert counts["departments"] == 1
+    assert counts["attendance_records"] == 1
+    assert counts["payslips"] == 1
+    # Rahim (old owner) and Cook come across; the new owner's old profile is merged.
+    assert counts["employees"] == 2
+
+    people = (await target.get("/v1/people")).json()["items"]
+    names = sorted(p["full_name"] for p in people)
+    assert names == ["Cook", "Rahim Uddin", "Rahim Uddin"]
+    new_cook = next(p for p in people if p["full_name"] == "Cook")
+    assert new_cook["id"] != cook["id"]
+    detail = (await target.get(f"/v1/people/{new_cook['id']}")).json()
+    assert detail["national_id_last4"] == "6789"
+    salaries = (await target.get("/v1/payroll/salaries")).json()
+    assert salaries[0]["account_last4"] == "5678"
+    runs = (await target.get("/v1/payroll/runs")).json()
+    slip = (await target.get(f"/v1/payroll/runs/{runs[0]['id']}")).json()["payslips"][0]
+    assert slip["employee_id"] == new_cook["id"]
+    assert (await target.get(f"/v1/payroll/payslips/{slip['id']}/pdf")).status_code == 200
+    assert (await target.get("/v1/audit/verify")).json()["ok"] is True
+    # The source workspace is untouched.
+    assert (await source.get(f"/v1/people/{cook['id']}")).status_code == 200
+
+    # A second import is refused: the workspace isn't empty any more.
+    again = await target.post("/v1/privacy/workspace-import", **upload)
+    assert again.json()["code"] == "import_not_empty"
+
+
+async def test_imports_refuse_bad_files_and_non_owners(client: httpx.AsyncClient) -> None:
+    owner = await signup(client)
+    admin = await invite_and_join(owner, role="admin")
+    junk = {"content": b"not a zip", "headers": {"content-type": "application/zip"}}
+    assert (await admin.post("/v1/privacy/workspace-import", **junk)).status_code == 403
+    assert (await owner.post("/v1/privacy/workspace-import", **junk)).json()["code"] == "import_format"
+    fake = io.BytesIO()
+    with zipfile.ZipFile(fake, "w") as zf:
+        zf.writestr("manifest.json", json.dumps({"format": "something-else", "version": 1}))
+    other = {"content": fake.getvalue(), "headers": {"content-type": "application/zip"}}
+    assert (await owner.post("/v1/privacy/workspace-import", **other)).json()["code"] == "import_format"
