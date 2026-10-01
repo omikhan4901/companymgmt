@@ -162,6 +162,7 @@ def main() -> None:
         )
 
     seed_leave(c, h, sh, people, today)
+    seed_payroll(c, h, people, today, rng)
 
     print(f"Owner: {args.email} / {PASSWORD}")
     print(f"Staff: workspace {workspace_code}, username nadia / {PASSWORD}!")
@@ -180,7 +181,9 @@ def working_day(start: date, ahead: int) -> date:
 def seed_leave(
     c: httpx.Client, h: dict[str, str], sh: dict[str, str], people: list[dict[str, str]], today: date
 ) -> None:
-    c.put("/v1/workspace/modules", json={"modules": ["attendance", "leave"]}, headers=h).raise_for_status()
+    c.put(
+        "/v1/workspace/modules", json={"modules": ["attendance", "leave", "payroll"]}, headers=h
+    ).raise_for_status()
     kinds = {k["name"]: k["id"] for k in c.get("/v1/leave/types", headers=h).json()}
     holidays = ((f"{today.year}-12-16", "Victory Day"), (f"{today.year + 1}-02-21", "Language Martyrs' Day"))
     for day, name in holidays:
@@ -220,6 +223,48 @@ def seed_leave(
         },
         headers=sh,
     )
+
+
+def seed_payroll(
+    c: httpx.Client, h: dict[str, str], people: list[dict[str, str]], today: date, rng: random.Random
+) -> None:
+    """Salaries for everyone and last month's payroll, finalized."""
+    for person in people:
+        basic = rng.choice([9_000, 10_500, 12_000, 15_000]) * 100
+        wallet = person["job_title"] in ("Rider", "Helper", "Server")
+        c.post(
+            "/v1/payroll/salaries",
+            json={
+                "employee_id": person["id"],
+                "effective_from": "2025-01-01",
+                "basic": basic,
+                "house_rent": basic // 2,
+                "medical": 75_000,
+                "conveyance": 50_000,
+                "overtime": person["job_title"] in ("Cook", "Rider"),
+                "payment_method": "wallet" if wallet else "bank",
+                "provider": "bKash" if wallet else "Dutch-Bangla Bank",
+                "account": f"017{rng.randint(10_000_000, 99_999_999)}"
+                if wallet
+                else str(rng.randint(10**11, 10**12)),
+            },
+            headers=h,
+        ).raise_for_status()
+    c.post(
+        "/v1/payroll/loans",
+        json={
+            "employee_id": people[4]["id"],
+            "label": "Advance for a new phone",
+            "principal": 600_000,
+            "installment": 200_000,
+            "start_period": f"{today.year:04d}-{today.month:02d}",
+        },
+        headers=h,
+    ).raise_for_status()
+    last = today.replace(day=1) - timedelta(days=1)
+    run = c.post("/v1/payroll/runs", json={"period": f"{last:%Y-%m}"}, headers=h).json()
+    c.post(f"/v1/payroll/runs/{run['id']}/submit", headers=h).raise_for_status()
+    c.post(f"/v1/payroll/runs/{run['id']}/finalize", headers=h).raise_for_status()
 
 
 if __name__ == "__main__":
