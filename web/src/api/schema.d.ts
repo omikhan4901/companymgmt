@@ -2692,6 +2692,8 @@ export interface components {
         MeOut: {
             /** Email */
             email: string | null;
+            /** Email Digest */
+            email_digest: boolean;
             /** Email Verified */
             email_verified: boolean;
             /**
@@ -3109,6 +3111,8 @@ export interface components {
         };
         /** ProfileIn */
         ProfileIn: {
+            /** Email Digest */
+            email_digest?: boolean | null;
             /** Locale */
             locale?: ("en" | "bn") | null;
             /** Name */

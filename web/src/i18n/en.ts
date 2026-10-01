@@ -593,6 +593,9 @@ const en = {
     filterAction: "Filter by action",
   },
   account: {
+    digestTitle: "Email summary",
+    digestHelp: "Once a day, if you have notifications you haven't seen, we email you a short list.",
+    digestSwitch: "Email me a daily summary",
     title: "Your account",
     profile: "Profile",
     language: "Language",

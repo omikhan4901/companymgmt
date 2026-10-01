@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Laptop, Monitor, Moon, Palette, ShieldCheck, Smartphone, Sun } from "lucide-react";
+import { Laptop, Mail, Monitor, Moon, Palette, ShieldCheck, Smartphone, Sun } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { RadioGroup } from "radix-ui";
 import { useState, type ReactNode } from "react";
@@ -18,7 +18,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Choice, ChoiceGroup } from "@/components/ui/choice";
+import { Choice, ChoiceGroup, Switch } from "@/components/ui/choice";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input, Select } from "@/components/ui/input";
@@ -69,6 +69,31 @@ function Profile() {
           {t("common.save")}
         </Button>
       </form>
+    </Card>
+  );
+}
+
+function EmailDigest() {
+  const { t } = useTranslation();
+  const { me, reload } = useSession();
+  const save = useMutation({
+    mutationFn: (on: boolean) => api("/v1/auth/me", { method: "PATCH", body: { email_digest: on } }),
+    onSuccess: async () => {
+      await reload();
+      toast.success(t("common.saved"));
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  if (!me?.email) return null;
+  return (
+    <Card>
+      <CardHeader title={t("account.digestTitle")} sub={t("account.digestHelp")} action={<Mail className="size-5 text-muted" aria-hidden="true" />} />
+      <div className="px-5 pb-5 pt-2">
+        <label className="flex items-center justify-between gap-4 text-sm">
+          {t("account.digestSwitch")}
+          <Switch checked={me.email_digest ?? true} disabled={save.isPending} onCheckedChange={(on) => save.mutate(on)} />
+        </label>
+      </div>
     </Card>
   );
 }
@@ -361,6 +386,7 @@ export default function AccountPage() {
         <div className="flex min-w-0 flex-col gap-4">
           <Profile />
           <Appearance />
+          <EmailDigest />
           <PasswordCard />
         </div>
         <div className="flex min-w-0 flex-col gap-4">

@@ -2815,6 +2815,10 @@
       ],
       "title": "Email"
      },
+     "email_digest": {
+      "title": "Email Digest",
+      "type": "boolean"
+     },
      "email_verified": {
       "title": "Email Verified",
       "type": "boolean"
@@ -2886,6 +2890,7 @@
      "username",
      "email_verified",
      "locale",
+     "email_digest",
      "mfa_enabled",
      "must_change_password",
      "workspaces",
@@ -3992,6 +3997,17 @@
    "ProfileIn": {
     "additionalProperties": false,
     "properties": {
+     "email_digest": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email Digest"
+     },
      "locale": {
       "anyOf": [
        {
