@@ -50,3 +50,16 @@ def decode_cursor(cursor: str | None) -> dict[str, Any] | None:
     if not isinstance(data, dict):
         raise Invalid("Bad cursor.", code="bad_cursor")
     return data
+
+
+async def read_body(request: Request, limit: int, *, message: str, code: str) -> bytes:
+    """The request body, refused as soon as it passes `limit` bytes."""
+    if int(request.headers.get("content-length") or 0) > limit:
+        raise Invalid(message, code=code)
+    chunks, size = [], 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            raise Invalid(message, code=code)
+        chunks.append(chunk)
+    return b"".join(chunks)

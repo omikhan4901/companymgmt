@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from app.core.errors import Invalid
+from app.core.http import read_body
 from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.routes_auth import require_recent_auth
 from app.modules.privacy import access, importer, service
@@ -34,23 +34,17 @@ async def my_data(ctx: Ctx = Depends(allow(None))) -> Response:
     return _file(body, filename, "application/json")
 
 
-async def _upload(request: Request) -> bytes:
-    """The request body, refused as soon as it passes the size limit."""
-    if int(request.headers.get("content-length") or 0) > importer.MAX_UPLOAD:
-        raise Invalid("The file is too large.", code="import_too_large")
-    chunks, size = [], 0
-    async for chunk in request.stream():
-        size += len(chunk)
-        if size > importer.MAX_UPLOAD:
-            raise Invalid("The file is too large.", code="import_too_large")
-        chunks.append(chunk)
-    return b"".join(chunks)
-
-
 @router.post("/workspace-import")
 async def workspace_import(
     request: Request, ctx: Ctx = Depends(allow(access.WORKSPACE_IMPORT))
 ) -> dict[str, dict[str, int]]:
     """Body: the export ZIP itself (Content-Type: application/zip)."""
     require_recent_auth(ctx)
-    return {"imported": await importer.import_workspace(ctx, await _upload(request))}
+    return {
+        "imported": await importer.import_workspace(
+            ctx,
+            await read_body(
+                request, importer.MAX_UPLOAD, message="The file is too large.", code="import_too_large"
+            ),
+        )
+    }

@@ -33,7 +33,10 @@ async def subtree(db: AsyncSession, root: uuid.UUID) -> list[uuid.UUID]:
     return [r[0] for r in rows]
 
 
-async def ancestors(db: AsyncSession, department_id: uuid.UUID) -> list[uuid.UUID]:
+async def ancestors(db: AsyncSession, department_id: uuid.UUID | None) -> list[uuid.UUID]:
+    """A department and every department above it (none for no department)."""
+    if department_id is None:
+        return []
     rows = await db.execute(
         text(
             """

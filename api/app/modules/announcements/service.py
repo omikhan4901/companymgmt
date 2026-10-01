@@ -10,7 +10,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Sequence
 
-from sqlalchemy import ColumnElement, and_, delete, func, or_, select, text
+from sqlalchemy import ColumnElement, and_, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +27,7 @@ from app.modules.announcements.schemas import (
     ReceiptOut,
     ReceiptsOut,
 )
-from app.modules.people.access import scope_departments, subtree
+from app.modules.people.access import ancestors, scope_departments, subtree
 from app.modules.people.models import Department, Employee
 from app.modules.people.service import employee_for_membership
 from app.modules.platform import hooks
@@ -41,26 +41,6 @@ async def _me(ctx: Ctx) -> Employee | None:
         ctx.cache["announcements.me"] = await employee_for_membership(ctx.db, ctx.membership.id)
     found: Employee | None = ctx.cache["announcements.me"]
     return found
-
-
-async def _ancestors(db: AsyncSession, department_id: uuid.UUID | None) -> list[uuid.UUID]:
-    """A department and every department above it."""
-    if department_id is None:
-        return []
-    rows = await db.execute(
-        text(
-            """
-            WITH RECURSIVE up AS (
-              SELECT id, parent_id FROM departments WHERE id = :id
-              UNION ALL
-              SELECT d.id, d.parent_id FROM departments d JOIN up ON d.id = up.parent_id
-            )
-            SELECT id FROM up
-            """
-        ),
-        {"id": department_id},
-    )
-    return [r[0] for r in rows]
 
 
 def _unscoped_poster(ctx: Ctx) -> bool:
@@ -80,7 +60,7 @@ async def _visible(ctx: Ctx) -> ColumnElement[bool]:
         conditions.append(
             and_(Announcement.audience == "branches", Announcement.audience_ids.contains([me.branch_id]))
         )
-    above = await _ancestors(ctx.db, me.department_id if me else None)
+    above = await ancestors(ctx.db, me.department_id if me else None)
     if above:
         conditions.append(
             and_(Announcement.audience == "departments", Announcement.audience_ids.overlap(above))
