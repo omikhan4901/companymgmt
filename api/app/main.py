@@ -18,6 +18,7 @@ from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.modules.announcements.routes import router as announcements_router
+from app.modules.approvals.routes import router as approvals_router
 from app.modules.attendance.routes import router as attendance_router
 from app.modules.documents.routes import router as documents_router
 from app.modules.leave.routes import router as leave_router
@@ -47,6 +48,7 @@ ROUTERS = (
     tasks_router,
     announcements_router,
     documents_router,
+    approvals_router,
     privacy_router,
     ai_router,
     internal_router,

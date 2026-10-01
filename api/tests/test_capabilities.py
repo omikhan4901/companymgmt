@@ -132,6 +132,7 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("notifications.inbox", "/v1/notifications", {}),
         ("tasks.my_work", "/v1/tasks/my-work", {}),
         ("announcements.feed", "/v1/announcements", {}),
+        ("approvals.pending", "/v1/approvals", {}),
         ("documents.library", "/v1/documents", {}),
         ("documents.to_acknowledge", "/v1/documents/to-acknowledge", {}),
         ("announcements.feed", "/v1/announcements", {"limit": 1}),

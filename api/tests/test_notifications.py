@@ -60,7 +60,7 @@ async def test_leave_requests_reach_the_approvers_in_scope(client: httpx.AsyncCl
     # The kitchen manager hears about the cook only; the owner about both.
     mine = (await inbox(manager))["items"]
     assert [(n["kind"], n["data"]["employee_name"]) for n in mine] == [("leave.requested", "Cook")]
-    assert mine[0]["link"] == "/app/leave"
+    assert mine[0]["link"] == "/app/approvals"
     assert mine[0]["actor_name"] == "Cook"
     assert {n["data"]["employee_name"] for n in (await inbox(owner))["items"]} == {"Cook", "Seller"}
     # Nobody is told about their own request.

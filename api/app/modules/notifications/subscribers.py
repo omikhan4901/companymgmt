@@ -19,6 +19,8 @@ PAYROLL = "/app/payroll"
 TASKS = "/app/tasks"
 ANNOUNCEMENTS = "/app/announcements"
 DOCUMENTS = "/app/documents"
+# Requests waiting on someone open in the approvals inbox.
+APPROVALS = "/app/approvals"
 
 
 def _user(value: object) -> uuid.UUID | None:
@@ -34,7 +36,10 @@ async def _deciders(db: AsyncSession, event: events.Event, permission: str) -> l
 async def leave_requested(db: AsyncSession, event: events.Event) -> None:
     # Asked on someone's behalf? They hear about it too.
     person = await user_of(db, event.data.get("membership_id"))
-    await notify(db, event, [*await _deciders(db, event, "leave.approve"), person], link=LEAVE)
+    deciders = await _deciders(db, event, "leave.approve")
+    await notify(db, event, deciders, link=APPROVALS)
+    # Asked on someone's behalf: they're told too, and their link is their own leave.
+    await notify(db, event, [p for p in [person] if p not in deciders], link=LEAVE)
 
 
 @events.on("leave.approved")
@@ -57,7 +62,7 @@ async def leave_cancelled(db: AsyncSession, event: events.Event) -> None:
 async def correction_requested(db: AsyncSession, event: events.Event) -> None:
     if event.data.get("status") != "pending":
         return  # applied straight away by someone allowed to
-    await notify(db, event, await _deciders(db, event, "attendance.approve"), link=ATTENDANCE)
+    await notify(db, event, await _deciders(db, event, "attendance.approve"), link=APPROVALS)
 
 
 @events.on("attendance.correction_approved")

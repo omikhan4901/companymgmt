@@ -73,14 +73,14 @@ async def me(ctx: Ctx) -> Employee:
     return employee
 
 
-async def _me_or_none(ctx: Ctx) -> Employee | None:
+async def employee_or_none(ctx: Ctx) -> Employee | None:
     assert ctx.membership is not None
     return await employee_for_membership(ctx.db, ctx.membership.id)
 
 
 async def _person(ctx: Ctx, employee_id: uuid.UUID | None, permission: str) -> Employee:
     """Yourself, or someone in your scope when you hold `permission`."""
-    own = await _me_or_none(ctx)
+    own = await employee_or_none(ctx)
     if employee_id is None or (own is not None and own.id == employee_id):
         return await me(ctx)
     if not ctx.can(permission):
@@ -615,7 +615,7 @@ async def list_requests(
     else:
         scope = await scope_departments(ctx)
         if scope is not None:
-            own_or_none = await _me_or_none(ctx)
+            own_or_none = await employee_or_none(ctx)
             query = query.where(
                 Employee.department_id.in_(scope) | (Employee.id == (own_or_none.id if own_or_none else None))
             )
@@ -738,7 +738,7 @@ async def reject(ctx: Ctx, request_id: uuid.UUID, note: str | None) -> RequestOu
 
 async def cancel(ctx: Ctx, request_id: uuid.UUID, note: str | None) -> RequestOut:
     row, employee, kind = await _locked_request(ctx, request_id)
-    own = await _me_or_none(ctx)
+    own = await employee_or_none(ctx)
     is_own = own is not None and own.id == employee.id
     may_approve = ctx.can(access.APPROVE) and await in_scope(ctx, employee.department_id)
     if not is_own and not may_approve:
@@ -799,7 +799,7 @@ async def calendar(ctx: Ctx, start: date, end: date) -> list[CalendarEntry]:
         )
         .where(LeaveRequest.end_date >= start, LeaveRequest.start_date <= end, LeaveRequest.status.in_(LIVE))
     )
-    own = await _me_or_none(ctx)
+    own = await employee_or_none(ctx)
     full = ctx.can(access.VIEW)
     if full:
         scope = await scope_departments(ctx)

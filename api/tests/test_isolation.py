@@ -186,6 +186,7 @@ async def _resources(owner: Account) -> dict[str, str]:
         json={"leave_type_id": ids["leave_type_id"], "start_date": str(day), "end_date": str(day)},
     )
     ids["request_id"] = leave.json()["id"]
+    ids["kind"], ids["item_id"] = "leave", ids["request_id"]
     ids["notification_id"] = (await owner.get("/v1/notifications")).json()["items"][0]["id"]
     modules = ["attendance", "leave", "payroll", "tasks", "announcements", "documents"]
     await owner.put("/v1/workspace/modules", json={"modules": modules})
