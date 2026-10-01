@@ -85,10 +85,11 @@ async def test_the_overview_adds_up(client: httpx.AsyncClient) -> None:
         (None, 1),
     }
 
-    # Expected: Karim 5 days, Salma 4 (one on leave), the owner 5. Present: 5 + 3.
+    # Expected: Karim 5 days, Salma 4 (one on leave). Present: 5 + 3. The owner joined
+    # today (no joining date, no clock-ins back then), so isn't expected that week.
     att = data["attendance"]
-    assert (att["working_days"], att["expected"], att["present"], att["late"]) == (5, 14, 8, 2)
-    assert att["rate"] == round(8 / 14, 4)
+    assert (att["working_days"], att["expected"], att["present"], att["late"]) == (5, 9, 8, 2)
+    assert att["rate"] == round(8 / 9, 4)
     assert att["average_minutes"] == 480
     assert [d["day"] for d in att["days"]] == [str(d) for d in week() if d.weekday() not in (3, 4)]
     assert att["most_late"] == [{"employee_id": s["karim_id"], "name": "Karim", "count": 2}]
@@ -158,3 +159,13 @@ async def test_managers_see_their_departments_only(client: httpx.AsyncClient) ->
     assert (await report(s["karim"], mon, sun)).status_code == 403
     assert (await report(owner, sun, mon)).status_code == 422
     assert (await report(owner, mon, mon + timedelta(days=400))).status_code == 422
+
+
+async def test_people_without_a_joining_date_count_from_when_they_were_added(
+    client: httpx.AsyncClient,
+) -> None:
+    owner = await signup(client)
+    now = today("Asia/Dhaka")
+    # A whole year, for a workspace made today: only today can count as expected.
+    data = (await report(owner, now.replace(month=1, day=1), now)).json()
+    assert data["attendance"]["expected"] <= 1

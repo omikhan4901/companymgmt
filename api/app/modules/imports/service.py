@@ -301,9 +301,14 @@ async def _changes(
 
 def _out(sheet: parse.Sheet, plans: list[Plan], departments: _Departments, committed: bool) -> ImportOut:
     new: list[tuple[str, ...]] = []
+    seen: set[tuple[str, ...]] = set()  # "Design" and "design" are one department
     for plan in plans:
         if plan.department is not None and not plan.errors:
-            new.extend(p for p in departments.missing(plan.department) if p not in new)
+            for path in departments.missing(plan.department):
+                key = tuple(part.lower() for part in path)
+                if key not in seen:
+                    seen.add(key)
+                    new.append(path)
     return ImportOut(
         committed=committed,
         columns=[ColumnOut(header=c.header, field=c.field, leave_type=c.leave_type) for c in sheet.columns],

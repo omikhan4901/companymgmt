@@ -66,10 +66,10 @@ async def _departments(ctx: Ctx, department_id: uuid.UUID | None) -> list[uuid.U
     return chosen
 
 
-def _employed(person: Employee, day: date) -> bool:
-    return (person.joined_on is None or person.joined_on <= day) and (
-        person.left_on is None or person.left_on >= day
-    )
+def _employed(person: Employee, day: date, since: date | None = None) -> bool:
+    """Whether they worked here on `day`. Without a joining date, `since` stands in for it."""
+    started = person.joined_on or since
+    return (started is None or started <= day) and (person.left_on is None or person.left_on >= day)
 
 
 async def overview(ctx: Ctx, start: date, end: date, department_id: uuid.UUID | None = None) -> OverviewOut:
@@ -189,6 +189,17 @@ async def _attendance(ctx: Ctx, people: list[Employee], start: date, end: date) 
                 first_in[key] = clock_in
             minutes += worked or 0
 
+    # No joining date: count them from when their profile was made, or their first
+    # clock-in if that came earlier (attendance added after the fact), not from the start
+    # of the period. Otherwise a new workspace looks absent for the whole year.
+    since: dict[uuid.UUID, date] = {}
+    for person in people:
+        if person.joined_on is None:
+            since[person.id] = person.created_at.astimezone(zone).date()
+    for (employee_id, day), _ in first_in.items():
+        if employee_id in since and day < since[employee_id]:
+            since[employee_id] = day
+
     days: list[AttendanceDay] = []
     late_by: Counter[uuid.UUID] = Counter()
     present_days = 0
@@ -197,7 +208,7 @@ async def _attendance(ctx: Ctx, people: list[Employee], start: date, end: date) 
         if day.isoweekday() not in weekly:
             expected = present = late = 0
             for person in people:
-                if not _employed(person, day) or (person.id, day) in away:
+                if not _employed(person, day, since.get(person.id)) or (person.id, day) in away:
                     continue
                 if day in holidays[None] or (person.branch_id and day in holidays[person.branch_id]):
                     continue

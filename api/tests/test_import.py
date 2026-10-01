@@ -247,3 +247,15 @@ async def test_the_plan_limit_applies_to_the_whole_file(client: httpx.AsyncClien
     assert response.status_code == 402
     assert response.json()["code"] == "people_limit"
     assert len(await people(owner)) == 1
+
+
+async def test_departments_are_matched_whatever_their_case(client: httpx.AsyncClient) -> None:
+    owner = await signup(client)
+    text = "Name,Department\nKarim,Design / Motion\nSalma,design / motion\nRafiq,DESIGN\n"
+    result = await preview(owner, text)
+    assert result["new_departments"] == ["Design", "Design / Motion"]
+    assert (await send(owner, text, commit=True)).status_code == 200
+    names = sorted(d["name"] for d in (await owner.get("/v1/departments")).json())
+    assert names == ["Design", "Motion"]
+    found = await people(owner)
+    assert found["Karim"]["department_id"] == found["Salma"]["department_id"]
