@@ -29,6 +29,11 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat(intlLocale()).format(value);
 }
 
+/** A year without a thousands separator ("2027", "২০২৭"). */
+export function formatYear(year: number): string {
+  return new Intl.NumberFormat(intlLocale(), { useGrouping: false }).format(year);
+}
+
 export function formatMoney(cents: number, currency: string): string {
   return new Intl.NumberFormat(intlLocale(), { style: "currency", currency, maximumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
 }

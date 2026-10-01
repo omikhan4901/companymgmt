@@ -41,3 +41,12 @@ export interface LoginResult {
 }
 export type AttendanceSettings = S["SettingsOut"];
 export type GeoResult = "inside" | "outside" | "no_fix" | "no_site";
+export type LeaveType = S["LeaveTypeOut"];
+export type LeavePolicy = S["PolicyOut"];
+export type Holiday = S["HolidayOut"];
+export type LeaveBalance = S["BalanceOut"];
+export type PersonBalances = S["PersonBalances"];
+export type LeaveRequest = S["RequestOut"];
+export type LeaveQuote = S["QuoteOut"];
+export type AwayEntry = S["CalendarEntry"];
+export type LeaveAdjustment = S["AdjustmentOut"];

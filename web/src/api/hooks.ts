@@ -1,7 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "./client";
-import type { AttendanceSettings, AttendanceStatus, Branch, Correction, Department, Plan, Present, Role, Timesheet } from "./types";
+import type {
+  AttendanceSettings,
+  AttendanceStatus,
+  AwayEntry,
+  Branch,
+  Correction,
+  Department,
+  Holiday,
+  LeavePolicy,
+  LeaveRequest,
+  LeaveType,
+  PersonBalances,
+  Plan,
+  Present,
+  Role,
+  Timesheet,
+} from "./types";
 
 export const keys = {
   status: ["attendance", "status"] as const,
@@ -82,4 +98,42 @@ export function useTimesheet(month: string, enabled = true) {
 
 export function useAttendanceSettings(enabled = true) {
   return useQuery({ queryKey: ["attendance", "settings"], queryFn: () => api<AttendanceSettings>("/v1/attendance/settings"), enabled });
+}
+
+// ---- Leave ---------------------------------------------------------------------------
+
+export function useLeaveTypes(includeInactive = false, enabled = true) {
+  return useQuery({
+    queryKey: ["leave", "types", includeInactive],
+    queryFn: () => api<LeaveType[]>("/v1/leave/types", { query: { include_inactive: includeInactive } }),
+    enabled,
+  });
+}
+
+export function useLeavePolicy(enabled = true) {
+  return useQuery({ queryKey: ["leave", "policy"], queryFn: () => api<LeavePolicy>("/v1/leave/policy"), enabled });
+}
+
+export function useHolidays(year: number, enabled = true) {
+  return useQuery({ queryKey: ["leave", "holidays", year], queryFn: () => api<Holiday[]>("/v1/leave/holidays", { query: { year } }), enabled });
+}
+
+export function useBalances(year: number, employeeId?: string, enabled = true) {
+  return useQuery({
+    queryKey: ["leave", "balances", year, employeeId ?? "me"],
+    queryFn: () => api<PersonBalances>("/v1/leave/balances", { query: { year, employee_id: employeeId } }),
+    enabled,
+  });
+}
+
+export function useTeamBalances(year: number, enabled = true) {
+  return useQuery({ queryKey: ["leave", "balances", "team", year], queryFn: () => api<PersonBalances[]>("/v1/leave/balances/team", { query: { year } }), enabled });
+}
+
+export function useLeaveRequests(filters: { status?: string; mine?: boolean; employee_id?: string; from?: string; to?: string }, enabled = true) {
+  return useQuery({ queryKey: ["leave", "requests", filters], queryFn: () => api<LeaveRequest[]>("/v1/leave/requests", { query: filters }), enabled });
+}
+
+export function useAway(from: string, to: string, enabled = true) {
+  return useQuery({ queryKey: ["leave", "calendar", from, to], queryFn: () => api<AwayEntry[]>("/v1/leave/calendar", { query: { from, to } }), enabled });
 }

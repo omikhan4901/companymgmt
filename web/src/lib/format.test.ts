@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDay, initials, isoToZoned, normalizeDigits, splitMinutes, todayIn, zonedToIso } from "./format";
+import { formatDay, formatYear, initials, isoToZoned, normalizeDigits, splitMinutes, todayIn, zonedToIso } from "./format";
 
 describe("time zones", () => {
   it("converts Dhaka wall time to UTC and back", () => {
@@ -41,5 +41,11 @@ describe("text helpers", () => {
   it("splits minutes and never goes negative", () => {
     expect(splitMinutes(125)).toEqual({ h: 2, m: 5 });
     expect(splitMinutes(-5)).toEqual({ h: 0, m: 0 });
+  });
+});
+
+describe("years", () => {
+  it("never shows a thousands separator", () => {
+    expect(formatYear(2027)).toBe("2027");
   });
 });

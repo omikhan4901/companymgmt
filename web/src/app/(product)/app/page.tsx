@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { api } from "@/api/client";
-import { useAttendanceSettings, useCorrections, useDepartments, usePresent, useTimesheet } from "@/api/hooks";
+import { useAttendanceSettings, useAway, useCorrections, useDepartments, useLeaveRequests, usePresent, useTimesheet } from "@/api/hooks";
 import type { AttendanceRecord, Employee, Page } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { ClockCard } from "@/components/attendance/clock-card";
@@ -118,6 +118,47 @@ function AtWorkCard({ className }: { className?: string }) {
               <Avatar name={p.employee_name} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">{p.employee_name}</span>
               <span className="shrink-0 text-sm text-muted tabular-nums">{formatTime(p.clock_in_at, timezone)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  );
+}
+
+function AwayCard({ className }: { className?: string }) {
+  const { t } = useTranslation();
+  const { can } = useSession();
+  const { timezone } = useWorkspace();
+  const today = todayIn(timezone);
+  const away = useAway(today, today);
+  const approver = can("leave.approve");
+  const pending = useLeaveRequests({ status: "pending" }, approver);
+  const people = (away.data ?? []).filter((e) => e.status === "approved");
+  const waiting = pending.data?.length ?? 0;
+  return (
+    <Card className={className}>
+      <CardHeader
+        title={t("leave.awayToday")}
+        action={
+          <Link href={approver && waiting ? "/app/leave?tab=requests" : "/app/leave"} className="text-sm font-medium text-accent-soft-text hover:underline">
+            {approver && waiting ? t("leave.tabs.requests") : t("nav.leave")}
+            {approver && waiting > 0 && (
+              <Badge tone="accent" className="ml-2">
+                {formatNumber(waiting)}
+              </Badge>
+            )}
+          </Link>
+        }
+      />
+      <div className="px-5 pb-4 pt-2">
+        {away.data && people.length === 0 && <p className="py-4 text-sm text-muted">{t("leave.nobodyAway")}</p>}
+        <ul className="divide-y divide-border">
+          {people.slice(0, 8).map((p) => (
+            <li key={`${p.employee_id}-${p.start_date}`} className="flex items-center gap-3 py-2.5">
+              <Avatar name={p.employee_name} />
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">{p.employee_name}</span>
+              <span className="shrink-0 text-sm text-muted">{p.leave_type_name ?? t("leave.away")}</span>
             </li>
           ))}
         </ul>
@@ -312,6 +353,7 @@ export default function HomePage() {
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
         {manager && can("attendance.approve") && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
+        {hasModule("leave") && can("leave.self") && <AwayCard className="md:col-span-2" />}
         <Checklist className="md:col-span-2" />
       </div>
     </>

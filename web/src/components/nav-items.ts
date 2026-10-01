@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarClock, Home, Settings, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { CalendarClock, Home, Settings, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/session";
@@ -19,6 +19,7 @@ export function useNavItems(): NavItem[] {
   const items: (NavItem & { show: boolean })[] = [
     { href: "/app", label: t("nav.home"), short: t("nav.homeShort"), icon: Home, show: true },
     { href: "/app/attendance", label: t("nav.attendance"), short: t("nav.attendanceShort"), icon: CalendarClock, show: hasModule("attendance") && can("attendance.self") },
+    { href: "/app/leave", label: t("nav.leave"), short: t("nav.leave"), icon: TreePalm, show: hasModule("leave") && can("leave.self") },
     { href: "/app/people", label: t("nav.people"), short: t("nav.people"), icon: UsersRound, show: can("people.view") },
     { href: "/app/team", label: t("nav.team"), short: t("nav.team"), icon: Users, show: can("members.view") },
     {
