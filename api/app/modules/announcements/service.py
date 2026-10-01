@@ -274,6 +274,8 @@ async def create(ctx: Ctx, body: AnnouncementIn) -> AnnouncementOut:
         target_id=post.id,
         data={"title": post.title, "audience": post.audience},
     )
+    # The author has read their own post.
+    ctx.db.add(AnnouncementRead(announcement_id=post.id, user_id=ctx.user.id, read_at=post.published_at))
     await _publish_event(ctx, post)
     await ctx.db.commit()
     return await get(ctx, post.id)

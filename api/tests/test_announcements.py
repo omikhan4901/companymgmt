@@ -105,6 +105,9 @@ async def test_read_receipts_and_unread_counts(client: httpx.AsyncClient) -> Non
     assert told[0]["data"] == {"title": "New hours"}
     assert told[0]["link"] == f"/app/announcements?post={created['id']}"
     assert (await owner.get("/v1/notifications")).json()["items"] == []
+    # Posting to everyone counts the author as having read it.
+    everyone = (await post(owner, "Office closed")).json()
+    assert (everyone["reach"], everyone["read_count"]) == (4, 1)
 
 
 async def test_editing_and_deleting(client: httpx.AsyncClient) -> None:
