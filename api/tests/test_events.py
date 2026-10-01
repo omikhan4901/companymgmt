@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -16,6 +16,7 @@ from app.core.time import today
 from app.jobs import maintenance
 from tests.conftest import owner_dsn
 from tests.helpers import Account, add_staff, invite_and_join, signup
+from tests.test_leave import sunday_in_march
 
 NEXT = today("Asia/Dhaka").year + 1
 
@@ -41,10 +42,10 @@ def logged(owner_sql: psycopg.Connection, tenant_id: str) -> list[tuple[Any, ...
     ).fetchall()
 
 
-async def ask_leave(account: Account, day: int = 3) -> dict[str, Any]:
+async def ask_leave(account: Account, offset: int = 0) -> dict[str, Any]:
     types = (await account.get("/v1/leave/types")).json()
     casual = next(t["id"] for t in types if t["name"] == "Casual leave")
-    start = str(date(NEXT, 3, day))
+    start = str(sunday_in_march() + timedelta(days=offset))
     response = await account.post(
         "/v1/leave/requests", json={"leave_type_id": casual, "start_date": start, "end_date": start}
     )
@@ -65,7 +66,7 @@ async def test_leave_flow_is_logged(client: httpx.AsyncClient, owner_sql: psycop
     assert (subject_type, subject_id) == ("leave_request", first["id"])
     assert str(actor) == manager.me["id"]
     assert data["employee_name"] == "Rahim"
-    assert data["start_date"] == str(date(NEXT, 3, 3))
+    assert data["start_date"] == str(sunday_in_march())
 
 
 async def test_subscribers_run_in_the_transaction(
@@ -87,7 +88,7 @@ async def test_subscribers_run_in_the_transaction(
         raise RuntimeError("boom")
 
     with pytest.raises(RuntimeError):
-        await ask_leave(owner, day=10)
+        await ask_leave(owner, offset=7)
     assert len((await owner.get("/v1/leave/requests")).json()) == 1
     assert [r[0] for r in logged(owner_sql, owner.tenant_id)] == ["leave.requested"]
 

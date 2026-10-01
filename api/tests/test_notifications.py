@@ -12,6 +12,7 @@ from app.core.time import today
 from app.jobs import maintenance
 from tests.conftest import owner_dsn
 from tests.helpers import Account, add_staff, invite_and_join, signup
+from tests.test_leave import sunday_in_march
 from tests.test_payroll import employee_id, last_month, set_salary
 
 NEXT = today("Asia/Dhaka").year + 1
@@ -28,10 +29,15 @@ async def kinds(account: Account) -> list[str]:
     return [n["kind"] for n in (await inbox(account))["items"]]
 
 
-async def ask_leave(account: Account, day: int, **extra: Any) -> dict[str, Any]:
+def leave_day(offset: int = 0) -> date:
+    """The first Sunday of March next year plus `offset` days (keep it within Sunday to Thursday)."""
+    return sunday_in_march() + timedelta(days=offset)
+
+
+async def ask_leave(account: Account, offset: int = 0, **extra: Any) -> dict[str, Any]:
     types = (await account.get("/v1/leave/types")).json()
     casual = next(t["id"] for t in types if t["name"] == "Casual leave")
-    start = str(date(NEXT, 3, day))
+    start = str(leave_day(offset))
     response = await account.post(
         "/v1/leave/requests",
         json={"leave_type_id": casual, "start_date": start, "end_date": start, **extra},
@@ -49,8 +55,8 @@ async def test_leave_requests_reach_the_approvers_in_scope(client: httpx.AsyncCl
     _, cook = await add_staff(owner, name="Cook", scope_department_id=kitchen["id"])
     _, seller = await add_staff(owner, name="Seller", scope_department_id=sales["id"])
 
-    cooked = await ask_leave(cook, 3)
-    await ask_leave(seller, 4)
+    cooked = await ask_leave(cook)
+    await ask_leave(seller, 1)
     # The kitchen manager hears about the cook only; the owner about both.
     mine = (await inbox(manager))["items"]
     assert [(n["kind"], n["data"]["employee_name"]) for n in mine] == [("leave.requested", "Cook")]
@@ -64,7 +70,7 @@ async def test_leave_requests_reach_the_approvers_in_scope(client: httpx.AsyncCl
     told = (await inbox(cook))["items"]
     assert [n["kind"] for n in told] == ["leave.approved"]
     assert told[0]["actor_name"] == "Member Person"
-    assert told[0]["data"]["start_date"] == f"{NEXT}-03-03"
+    assert told[0]["data"]["start_date"] == str(leave_day())
     assert (await cook.get("/v1/notifications/unread")).json() == {"unread": 1}
     # The manager's own approval doesn't come back to them.
     assert await kinds(manager) == ["leave.requested"]
@@ -73,8 +79,8 @@ async def test_leave_requests_reach_the_approvers_in_scope(client: httpx.AsyncCl
 async def test_cancellations_tell_the_other_side(client: httpx.AsyncClient) -> None:
     owner = await signup(client)
     _, staff = await add_staff(owner, name="Rahim")
-    first = await ask_leave(staff, 3)
-    second = await ask_leave(staff, 10)
+    first = await ask_leave(staff)
+    second = await ask_leave(staff, 7)
     # The person withdraws: the approvers hear.
     assert (await staff.post(f"/v1/leave/requests/{first['id']}/cancel", json={})).status_code == 200
     assert (await kinds(owner))[0] == "leave.cancelled"
@@ -168,7 +174,7 @@ async def test_old_notifications_are_cleared(
 ) -> None:
     owner = await signup(client)
     _, staff = await add_staff(owner, name="Rahim")
-    await ask_leave(staff, 3)
+    await ask_leave(staff)
     soon = datetime.now(UTC) + timedelta(days=30)
     maintenance.apply_audit_retention(psycopg.connect(owner_dsn(), autocommit=True), soon)
     assert len((await inbox(owner))["items"]) == 1
