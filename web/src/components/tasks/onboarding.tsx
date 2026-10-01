@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Pencil, Plus, Rocket, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -69,7 +69,7 @@ export function TemplateDialog({ template, onClose }: { template?: OnboardingTem
   const queryClient = useQueryClient();
   const docs = useLibrary(false, hasModule("documents"));
   const [deleting, setDeleting] = useState(false);
-  const { register, control, handleSubmit, setError, watch, setValue, formState } = useForm<Values>({
+  const { register, control, handleSubmit, setError, setValue, formState } = useForm<Values>({
     defaultValues: {
       name: template?.name ?? "",
       automatic: template?.automatic ?? false,
@@ -77,7 +77,7 @@ export function TemplateDialog({ template, onClose }: { template?: OnboardingTem
     },
   });
   const items = useFieldArray({ control, name: "items" });
-  const automatic = watch("automatic");
+  const automatic = useWatch({ control, name: "automatic" });
   const done = () => {
     void queryClient.invalidateQueries({ queryKey: onboardingKeys.templates });
     onClose();
