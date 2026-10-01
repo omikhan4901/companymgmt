@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from sqlalchemy import text
 
+from app.ai.routes import router as ai_router
 from app.core.config import get_settings
 from app.core.db import dispose_engine, open_session
 from app.core.errors import install_error_handlers
@@ -38,6 +39,7 @@ ROUTERS = (
     leave_router,
     payroll_router,
     privacy_router,
+    ai_router,
     internal_router,
 )
 ops_router = APIRouter(tags=["ops"])

@@ -81,6 +81,12 @@ source_modules = ["app.core"]
 forbidden_modules = ["app.modules"]
 
 [[tool.importlinter.contracts]]
+name = "Modules never depend on the AI layer"
+type = "forbidden"
+source_modules = ["app.modules", "app.core"]
+forbidden_modules = ["app.ai"]
+
+[[tool.importlinter.contracts]]
 name = "Modules only depend on the modules below them"
 type = "layers"
 layers = [
