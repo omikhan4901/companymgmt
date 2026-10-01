@@ -471,6 +471,173 @@
     "title": "AnnouncementPatch",
     "type": "object"
    },
+   "ApprovalItem": {
+    "properties": {
+     "clock_in_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock In At"
+     },
+     "clock_out_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Clock Out At"
+     },
+     "days": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "end_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "End Date"
+     },
+     "fix_kind": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fix Kind"
+     },
+     "half_day": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Half Day"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "leave",
+       "time_fix"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "leave_type_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Leave Type Name"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     },
+     "requested_at": {
+      "format": "date-time",
+      "title": "Requested At",
+      "type": "string"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     }
+    },
+    "required": [
+     "kind",
+     "id",
+     "employee_id",
+     "employee_name",
+     "requested_at",
+     "reason"
+    ],
+    "title": "ApprovalItem",
+    "type": "object"
+   },
+   "ApprovalsOut": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ApprovalItem"
+      },
+      "title": "Items",
+      "type": "array"
+     }
+    },
+    "required": [
+     "items"
+    ],
+    "title": "ApprovalsOut",
+    "type": "object"
+   },
    "AudienceRef": {
     "properties": {
      "id": {
@@ -1412,6 +1579,19 @@
     "title": "CorrectionOut",
     "type": "object"
    },
+   "CountOut": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "count"
+    ],
+    "title": "CountOut",
+    "type": "object"
+   },
    "CurrentWorkspace": {
     "properties": {
      "business_type": {
@@ -1580,6 +1760,34 @@
      }
     },
     "title": "DecisionIn",
+    "type": "object"
+   },
+   "DecisionOut": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "leave",
+       "time_fix"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kind",
+     "id",
+     "status"
+    ],
+    "title": "DecisionOut",
     "type": "object"
    },
    "DeleteWorkspaceIn": {
@@ -9095,6 +9303,180 @@
     "summary": "Receipts",
     "tags": [
      "announcements"
+    ]
+   }
+  },
+  "/v1/approvals": {
+   "get": {
+    "operationId": "inbox_v1_approvals_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApprovalsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Inbox",
+    "tags": [
+     "approvals"
+    ]
+   }
+  },
+  "/v1/approvals/count": {
+   "get": {
+    "operationId": "count_v1_approvals_count_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CountOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Count",
+    "tags": [
+     "approvals"
+    ]
+   }
+  },
+  "/v1/approvals/{kind}/{item_id}/approve": {
+   "post": {
+    "operationId": "approve_v1_approvals__kind___item_id__approve_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "kind",
+      "required": true,
+      "schema": {
+       "enum": [
+        "leave",
+        "time_fix"
+       ],
+       "title": "Kind",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DecisionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Approve",
+    "tags": [
+     "approvals"
+    ]
+   }
+  },
+  "/v1/approvals/{kind}/{item_id}/reject": {
+   "post": {
+    "operationId": "reject_v1_approvals__kind___item_id__reject_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "kind",
+      "required": true,
+      "schema": {
+       "enum": [
+        "leave",
+        "time_fix"
+       ],
+       "title": "Kind",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DecisionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reject",
+    "tags": [
+     "approvals"
     ]
    }
   },

@@ -177,6 +177,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inbox */
+        get: operations["inbox_v1_approvals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Count */
+        get: operations["count_v1_approvals_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{kind}/{item_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve */
+        post: operations["approve_v1_approvals__kind___item_id__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{kind}/{item_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject */
+        post: operations["reject_v1_approvals__kind___item_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/attendance/clock-in": {
         parameters: {
             query?: never;
@@ -2337,6 +2405,54 @@ export interface components {
             /** Title */
             title?: string | null;
         };
+        /** ApprovalItem */
+        ApprovalItem: {
+            /** Clock In At */
+            clock_in_at?: string | null;
+            /** Clock Out At */
+            clock_out_at?: string | null;
+            /** Days */
+            days?: number | null;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Employee Name */
+            employee_name: string | null;
+            /** End Date */
+            end_date?: string | null;
+            /** Fix Kind */
+            fix_kind?: string | null;
+            /** Half Day */
+            half_day?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "leave" | "time_fix";
+            /** Leave Type Name */
+            leave_type_name?: string | null;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Start Date */
+            start_date?: string | null;
+        };
+        /** ApprovalsOut */
+        ApprovalsOut: {
+            /** Items */
+            items: components["schemas"]["ApprovalItem"][];
+        };
         /** AudienceRef */
         AudienceRef: {
             /**
@@ -2627,6 +2743,11 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** CountOut */
+        CountOut: {
+            /** Count */
+            count: number;
+        };
         /** CurrentWorkspace */
         CurrentWorkspace: {
             /** Business Type */
@@ -2697,6 +2818,21 @@ export interface components {
         DecisionIn: {
             /** Note */
             note?: string | null;
+        };
+        /** DecisionOut */
+        DecisionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "leave" | "time_fix";
+            /** Status */
+            status: string;
         };
         /** DeleteWorkspaceIn */
         DeleteWorkspaceIn: {
@@ -5358,6 +5494,118 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReceiptsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inbox_v1_approvals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalsOut"];
+                };
+            };
+        };
+    };
+    count_v1_approvals_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CountOut"];
+                };
+            };
+        };
+    };
+    approve_v1_approvals__kind___item_id__approve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "leave" | "time_fix";
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_v1_approvals__kind___item_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "leave" | "time_fix";
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionOut"];
                 };
             };
             /** @description Validation Error */

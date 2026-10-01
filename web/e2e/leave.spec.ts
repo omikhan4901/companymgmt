@@ -53,7 +53,8 @@ test("staff ask for leave and the owner approves it", async ({ page, browser }, 
   await expect(note).toBeVisible();
   await expectAccessible(page, "notifications: open");
   await note.click();
-  await expect(page).toHaveURL(/\/app\/leave/);
+  await expect(page).toHaveURL(/\/app\/approvals/);
+  await expect(page.getByRole("listitem").filter({ hasText: "Nadia Islam" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
   await page.goto("/app/leave?tab=requests");
   const card = page.getByRole("listitem").filter({ hasText: "Nadia Islam" });

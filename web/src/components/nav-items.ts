@@ -1,6 +1,6 @@
 "use client";
 
-import { Banknote, CalendarClock, FileText, Home, ListChecks, Megaphone, Settings, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { Banknote, CalendarClock, FileText, Home, Inbox, ListChecks, Megaphone, Settings, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/session";
@@ -21,6 +21,7 @@ export function useNavItems(): NavItem[] {
     { href: "/app/tasks", label: t("nav.tasks"), short: t("nav.tasks"), icon: ListChecks, show: hasModule("tasks") && can("tasks.self") },
     { href: "/app/announcements", label: t("nav.announcements"), short: t("nav.announcementsShort"), icon: Megaphone, show: hasModule("announcements") && can("announcements.read") },
     { href: "/app/documents", label: t("nav.documents"), short: t("nav.documentsShort"), icon: FileText, show: hasModule("documents") && can("documents.read") },
+    { href: "/app/approvals", label: t("nav.approvals"), short: t("nav.approvalsShort"), icon: Inbox, show: can("leave.approve") || can("attendance.approve") },
     { href: "/app/attendance", label: t("nav.attendance"), short: t("nav.attendanceShort"), icon: CalendarClock, show: hasModule("attendance") && can("attendance.self") },
     { href: "/app/leave", label: t("nav.leave"), short: t("nav.leave"), icon: TreePalm, show: hasModule("leave") && can("leave.self") },
     { href: "/app/payroll", label: t("nav.payroll"), short: t("nav.payroll"), icon: Banknote, show: hasModule("payroll") && can("payroll.self") },

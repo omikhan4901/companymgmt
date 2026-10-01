@@ -1,7 +1,7 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Check, CheckCircle2, Circle, Mail, MapPin, Sparkles, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, CheckCircle2, Circle, Mail, MapPin, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -9,11 +9,12 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { api } from "@/api/client";
-import { useAttendanceSettings, useAway, useCorrections, useDepartments, useLeaveRequests, usePresent, useTimesheet } from "@/api/hooks";
+import { useAttendanceSettings, useAway, useDepartments, useLeaveRequests, usePresent, useTimesheet } from "@/api/hooks";
 import type { AttendanceRecord, Employee, Page } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { ClockCard } from "@/components/attendance/clock-card";
 import { useFeed } from "@/components/announcements/data";
+import { ApprovalRow, useApprovals } from "@/components/approvals/approvals";
 import { useToAcknowledge } from "@/components/documents/data";
 import { useMyWork } from "@/components/tasks/data";
 import { TaskRow } from "@/components/tasks/shared";
@@ -26,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { intlLocale } from "@/i18n";
 import { errorMessage } from "@/lib/errors";
-import { formatAgo, formatDateTime, formatDay, formatDuration, formatNumber, formatTime, todayIn } from "@/lib/format";
+import { formatAgo, formatDay, formatDuration, formatNumber, formatTime, todayIn } from "@/lib/format";
 import { addDays, daysBetween, startOfWeek } from "@/lib/week";
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -271,20 +272,22 @@ function MyWorkCard({ className }: { className?: string }) {
 
 function ApprovalsCard({ className }: { className?: string }) {
   const { t } = useTranslation();
-  const { timezone } = useWorkspace();
-  const queryClient = useQueryClient();
-  const pending = useCorrections("pending", false);
-  const decide = useMutation({
-    mutationFn: ({ id, action }: { id: string; action: "approve" | "reject" }) => api(`/v1/attendance/corrections/${id}/${action}`, { body: {} }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance"] }),
-    onError: (e) => toast.error(errorMessage(e)),
-  });
+  const pending = useApprovals();
   const items = pending.data ?? [];
   return (
     <Card className={className}>
       <CardHeader
         title={t("home.waiting")}
-        action={items.length > 0 ? <Badge tone="accent">{formatNumber(items.length)}</Badge> : undefined}
+        action={
+          <Link href="/app/approvals" className="text-sm font-medium text-accent-soft-text hover:underline">
+            {t("nav.approvals")}
+            {items.length > 0 && (
+              <Badge tone="accent" className="ml-2">
+                {formatNumber(items.length)}
+              </Badge>
+            )}
+          </Link>
+        }
       />
       <div className="flex flex-col gap-2 px-5 pb-5 pt-3">
         {pending.data && items.length === 0 && (
@@ -293,28 +296,13 @@ function ApprovalsCard({ className }: { className?: string }) {
             {t("attendance.noRequests")}
           </p>
         )}
-        {items.slice(0, 4).map((c) => (
-          <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-surface-2 px-3 py-2.5">
-            <Badge tone="warn" className="w-12 justify-center">
-              {t("home.fixBadge")}
-            </Badge>
-            <div className="flex min-w-0 flex-1 flex-col text-sm">
-              <span className="truncate font-semibold">{c.employee_name}</span>
-              <span className="truncate text-muted">
-                {t(`attendance.kind.${c.kind}`)}
-                {c.proposed_clock_in_at ? ` · ${formatDateTime(c.proposed_clock_in_at, timezone)}` : ""}
-              </span>
-            </div>
-            <Button size="iconSm" aria-label={`${t("attendance.reject")}: ${c.employee_name}`} onClick={() => decide.mutate({ id: c.id, action: "reject" })} disabled={decide.isPending}>
-              <X aria-hidden="true" />
-            </Button>
-            <Button size="iconSm" variant="solid" aria-label={`${t("attendance.approve")}: ${c.employee_name}`} onClick={() => decide.mutate({ id: c.id, action: "approve" })} disabled={decide.isPending}>
-              <Check aria-hidden="true" />
-            </Button>
-          </div>
-        ))}
+        <ul className="flex flex-col gap-2">
+          {items.slice(0, 4).map((item) => (
+            <ApprovalRow key={`${item.kind}-${item.id}`} item={item} compact />
+          ))}
+        </ul>
         {items.length > 4 && (
-          <Link href="/app/attendance?tab=corrections" className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-soft-text hover:underline">
+          <Link href="/app/approvals" className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-soft-text hover:underline">
             {t("home.seeAll")} <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         )}
@@ -453,7 +441,7 @@ export default function HomePage() {
         ) : null}
 
         {self || manager ? <HoursCard days={series.days} title={manager ? t("home.teamHours") : t("home.myHours")} className="md:col-span-2" /> : null}
-        {manager && can("attendance.approve") && <ApprovalsCard className="md:col-span-2" />}
+        {(can("leave.approve") || can("attendance.approve")) && <ApprovalsCard className="md:col-span-2" />}
         {manager && <AtWorkCard className="md:col-span-2" />}
         {hasModule("documents") && can("documents.read") && <ToReadCard className="md:col-span-2" />}
         {hasModule("announcements") && can("announcements.read") && <NewsCard className="md:col-span-2" />}
