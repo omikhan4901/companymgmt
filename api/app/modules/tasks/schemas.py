@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import Field, StringConstraints
 
@@ -113,6 +113,9 @@ class TaskOut(Out):
     checklist_total: int
     comments: int
     can_delete: bool
+    # Onboarding items: the checklist they belong to, and a document to read.
+    onboarding: bool = False
+    document_id: uuid.UUID | None = None
     version: int
 
 
@@ -139,3 +142,43 @@ class CommentOut(Out):
     mine: bool
     body: str
     created_at: datetime
+
+
+class TemplateItem(In):
+    title: Title
+    who: Literal["joiner", "manager"] = "joiner"
+    due_days: int = Field(default=0, ge=0, le=365)
+    # A document to read; acknowledging it ticks the item off.
+    document_id: uuid.UUID | None = None
+    notes: LongText | None = None
+
+
+class TemplateIn(In):
+    name: ShortName
+    automatic: bool = False
+    items: list[TemplateItem] = Field(default_factory=list, max_length=50)
+
+
+class TemplateOut(Out):
+    id: uuid.UUID
+    name: str
+    automatic: bool
+    items: list[dict[str, Any]]
+    version: int
+
+
+class StartIn(In):
+    employee_id: uuid.UUID
+    template_id: uuid.UUID
+    start_date: date | None = None
+
+
+class RunOut(Out):
+    id: uuid.UUID
+    employee_id: uuid.UUID
+    employee_name: str
+    template_name: str
+    start_date: date
+    total: int
+    done: int
+    overdue: int

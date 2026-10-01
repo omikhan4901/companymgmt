@@ -371,6 +371,13 @@ async def acknowledge(ctx: Ctx, document_id: uuid.UUID) -> DocumentDetail:
     await audit.record(
         ctx.db, "document.acknowledged", target_type="document", target_id=doc.id, data={"title": doc.title}
     )
+    await events.emit(
+        ctx.db,
+        "document.acknowledged",
+        subject_type="document",
+        subject_id=doc.id,
+        data={"document_id": doc.id, "title": doc.title, "version_id": doc.current_version_id},
+    )
     await ctx.db.commit()
     return await get(ctx, doc.id)
 

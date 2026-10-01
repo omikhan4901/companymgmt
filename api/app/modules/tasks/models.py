@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import (
     Boolean,
@@ -19,7 +20,7 @@ from sqlalchemy import (
     Uuid,
 )
 from sqlalchemy import text as sql
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.models import Base, IdMixin, TenantScoped, TimestampMixin, Versioned
@@ -56,6 +57,11 @@ class Task(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
         UniqueConstraint("tenant_id", "id"),
         ForeignKeyConstraint(["tenant_id", "project_id"], ["projects.tenant_id", "projects.id"]),
         ForeignKeyConstraint(["tenant_id", "assignee_id"], ["employees.tenant_id", "employees.id"]),
+        ForeignKeyConstraint(
+            ["tenant_id", "onboarding_run_id"],
+            ["onboarding_runs.tenant_id", "onboarding_runs.id"],
+            ondelete="CASCADE",
+        ),
         CheckConstraint("status IN ('todo', 'doing', 'done')", name="status"),
         CheckConstraint("priority IN ('low', 'normal', 'high', 'urgent')", name="priority"),
         CheckConstraint("(status = 'done') = (completed_at IS NOT NULL)", name="completed"),
@@ -75,8 +81,11 @@ class Task(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
     position: Mapped[float] = mapped_column(Float, default=0)
     completed_at: Mapped[datetime | None]
     created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
-    # Onboarding checklists (M3.7) mark the tasks they created.
+    # Onboarding checklists mark the tasks they created.
     source: Mapped[str | None] = mapped_column(String(40))
+    onboarding_run_id: Mapped[uuid.UUID | None]
+    # A document to read (not a foreign key: documents are another module).
+    document_id: Mapped[uuid.UUID | None]
 
 
 class ChecklistItem(IdMixin, TenantScoped, TimestampMixin, Base):
@@ -104,3 +113,33 @@ class TaskComment(IdMixin, TenantScoped, TimestampMixin, Base):
     task_id: Mapped[uuid.UUID]
     author_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     body: Mapped[str] = mapped_column(Text)
+
+
+class OnboardingTemplate(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
+    """A reusable checklist for new joiners."""
+
+    __tablename__ = "onboarding_templates"
+    __table_args__ = (UniqueConstraint("tenant_id", "id"),)
+
+    name: Mapped[str] = mapped_column(String(120))
+    # Start it by itself for everyone who joins the workspace.
+    automatic: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sql("false"))
+    # [{"title", "who": "joiner" | "manager", "due_days", "document_id"?}]
+    items: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+
+
+class OnboardingRun(IdMixin, TenantScoped, TimestampMixin, Base):
+    """A checklist started for one person. Its items are ordinary tasks."""
+
+    __tablename__ = "onboarding_runs"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        ForeignKeyConstraint(["tenant_id", "employee_id"], ["employees.tenant_id", "employees.id"]),
+        Index("ix_onboarding_runs_employee", "tenant_id", "employee_id"),
+    )
+
+    employee_id: Mapped[uuid.UUID]
+    template_name: Mapped[str] = mapped_column(String(120))
+    start_date: Mapped[date] = mapped_column(Date)
+    started_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))

@@ -199,6 +199,10 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["item_id"] = task.json()["checklist"][0]["id"]
     comment = await owner.post(f"/v1/tasks/{ids['task_id']}/comments", json={"body": "Hi"})
     ids["comment_id"] = comment.json()["id"]
+    checklist = await owner.post(
+        "/v1/onboarding/templates", json={"name": "First week", "items": [{"title": "Say hello"}]}
+    )
+    ids["template_id"] = checklist.json()["id"]
     news = await owner.post("/v1/announcements", json={"title": "Hello", "body": "Welcome."})
     ids["announcement_id"] = news.json()["id"]
     doc = await owner.post("/v1/documents", json={"title": "Handbook", "requires_ack": True})

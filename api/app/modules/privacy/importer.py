@@ -65,6 +65,8 @@ IMPORTED = {
     "tasks",
     "task_checklist_items",
     "task_comments",
+    "onboarding_templates",
+    "onboarding_runs",
     "announcements",
     "documents",
     "document_versions",

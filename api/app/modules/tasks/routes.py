@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, Query, Request, Response
 
 from app.core.http import check_if_match, set_etag
 from app.modules.platform.deps import Ctx, allow
-from app.modules.tasks import access, service
+from app.modules.tasks import access, onboarding, service
 from app.modules.tasks.schemas import (
     ChecklistIn,
     ChecklistItemOut,
@@ -24,11 +24,17 @@ from app.modules.tasks.schemas import (
     ProjectIn,
     ProjectOut,
     ProjectPatch,
+    RunOut,
+    StartIn,
     TaskDetail,
     TaskIn,
     TaskOut,
     TaskPatch,
+    TemplateIn,
+    TemplateOut,
 )
+
+onboarding.register_hooks()
 
 router = APIRouter(prefix="/v1", tags=["tasks"])
 MODULE = "tasks"
@@ -161,3 +167,43 @@ async def add_comment(task_id: uuid.UUID, body: CommentIn, ctx: Ctx = Self) -> C
 async def delete_comment(task_id: uuid.UUID, comment_id: uuid.UUID, ctx: Ctx = Self) -> Response:
     await service.delete_comment(ctx, task_id, comment_id)
     return Response(status_code=204)
+
+
+# ---- Onboarding checklists -------------------------------------------------------------
+
+
+@router.get("/onboarding/templates", response_model=list[TemplateOut])
+async def list_templates(ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))) -> list[TemplateOut]:
+    return await onboarding.list_templates(ctx)
+
+
+@router.post("/onboarding/templates", response_model=TemplateOut, status_code=201)
+async def create_template(
+    body: TemplateIn, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))
+) -> TemplateOut:
+    return await onboarding.save_template(ctx, body)
+
+
+@router.put("/onboarding/templates/{template_id}", response_model=TemplateOut)
+async def update_template(
+    template_id: uuid.UUID, body: TemplateIn, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))
+) -> TemplateOut:
+    return await onboarding.save_template(ctx, body, template_id)
+
+
+@router.delete("/onboarding/templates/{template_id}", status_code=204)
+async def delete_template(
+    template_id: uuid.UUID, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))
+) -> Response:
+    await onboarding.delete_template(ctx, template_id)
+    return Response(status_code=204)
+
+
+@router.get("/onboarding/runs", response_model=list[RunOut])
+async def list_runs(ctx: Ctx = Self, mine: bool = False) -> list[RunOut]:
+    return await onboarding.runs(ctx, mine=mine)
+
+
+@router.post("/onboarding/runs", response_model=RunOut, status_code=201)
+async def start_run(body: StartIn, ctx: Ctx = Depends(allow(access.MANAGE, module=MODULE))) -> RunOut:
+    return await onboarding.start(ctx, body.employee_id, body.template_id, body.start_date)

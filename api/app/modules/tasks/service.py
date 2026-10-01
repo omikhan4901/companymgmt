@@ -317,6 +317,8 @@ async def _task_out(ctx: Ctx, tasks: Sequence[Task]) -> list[TaskOut]:
                 checklist_total=total,
                 comments=comments.get(t.id, 0),
                 can_delete=await _can_delete(ctx, t, project),
+                onboarding=t.onboarding_run_id is not None,
+                document_id=t.document_id,
                 version=t.version,
             )
         )
