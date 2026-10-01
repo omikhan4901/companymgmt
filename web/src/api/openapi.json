@@ -2064,6 +2064,85 @@
     "title": "InviteOut",
     "type": "object"
    },
+   "ItemIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "earning",
+       "deduction"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "kind",
+     "label",
+     "amount"
+    ],
+    "title": "ItemIn",
+    "type": "object"
+   },
+   "ItemOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "run_id": {
+      "format": "uuid",
+      "title": "Run Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "run_id",
+     "employee_id",
+     "kind",
+     "label",
+     "amount"
+    ],
+    "title": "ItemOut",
+    "type": "object"
+   },
    "LeaveTypeIn": {
     "additionalProperties": false,
     "properties": {
@@ -2368,6 +2447,141 @@
      }
     },
     "title": "LeaveTypePatch",
+    "type": "object"
+   },
+   "LoanIn": {
+    "additionalProperties": false,
+    "properties": {
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "installment": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Installment",
+      "type": "integer"
+     },
+     "kind": {
+      "default": "advance",
+      "enum": [
+       "advance",
+       "loan"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "maxLength": 120,
+      "title": "Label",
+      "type": "string"
+     },
+     "principal": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Principal",
+      "type": "integer"
+     },
+     "start_period": {
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+      "title": "Start Period",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "label",
+     "principal",
+     "installment",
+     "start_period"
+    ],
+    "title": "LoanIn",
+    "type": "object"
+   },
+   "LoanOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "installment": {
+      "title": "Installment",
+      "type": "integer"
+     },
+     "kind": {
+      "enum": [
+       "advance",
+       "loan"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "outstanding": {
+      "title": "Outstanding",
+      "type": "integer"
+     },
+     "principal": {
+      "title": "Principal",
+      "type": "integer"
+     },
+     "start_period": {
+      "title": "Start Period",
+      "type": "string"
+     },
+     "status": {
+      "enum": [
+       "active",
+       "closed"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "kind",
+     "label",
+     "principal",
+     "installment",
+     "outstanding",
+     "start_period",
+     "status",
+     "created_at",
+     "version"
+    ],
+    "title": "LoanOut",
     "type": "object"
    },
    "LoginIn": {
@@ -2926,6 +3140,374 @@
      "new_password"
     ],
     "title": "PasswordChangeIn",
+    "type": "object"
+   },
+   "PayLine": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "earning",
+       "deduction"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "ref": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ref"
+     }
+    },
+    "required": [
+     "code",
+     "label",
+     "kind",
+     "amount"
+    ],
+    "title": "PayLine",
+    "type": "object"
+   },
+   "PayrollSettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "bonus_min_months": {
+      "default": 12,
+      "maximum": 60.0,
+      "minimum": 0.0,
+      "title": "Bonus Min Months",
+      "type": "integer"
+     },
+     "bonus_percent": {
+      "default": 100,
+      "maximum": 500.0,
+      "minimum": 0.0,
+      "title": "Bonus Percent",
+      "type": "integer"
+     },
+     "day_basis": {
+      "default": "calendar",
+      "enum": [
+       "calendar",
+       "thirty"
+      ],
+      "title": "Day Basis",
+      "type": "string"
+     },
+     "hours_per_day": {
+      "default": 8,
+      "maximum": 16.0,
+      "minimum": 1.0,
+      "title": "Hours Per Day",
+      "type": "integer"
+     },
+     "overtime_divisor": {
+      "default": 208,
+      "maximum": 400.0,
+      "minimum": 1.0,
+      "title": "Overtime Divisor",
+      "type": "integer"
+     },
+     "overtime_multiplier": {
+      "anyOf": [
+       {
+        "maximum": 5.0,
+        "minimum": 1.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "default": "2",
+      "title": "Overtime Multiplier"
+     },
+     "round_net": {
+      "default": true,
+      "title": "Round Net",
+      "type": "boolean"
+     },
+     "tax_enabled": {
+      "default": false,
+      "title": "Tax Enabled",
+      "type": "boolean"
+     },
+     "tax_table": {
+      "$ref": "#/components/schemas/TaxTable-Input"
+     }
+    },
+    "title": "PayrollSettingsIn",
+    "type": "object"
+   },
+   "PayrollSettingsOut": {
+    "properties": {
+     "bonus_min_months": {
+      "title": "Bonus Min Months",
+      "type": "integer"
+     },
+     "bonus_percent": {
+      "title": "Bonus Percent",
+      "type": "integer"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "day_basis": {
+      "enum": [
+       "calendar",
+       "thirty"
+      ],
+      "title": "Day Basis",
+      "type": "string"
+     },
+     "hours_per_day": {
+      "title": "Hours Per Day",
+      "type": "integer"
+     },
+     "overtime_divisor": {
+      "title": "Overtime Divisor",
+      "type": "integer"
+     },
+     "overtime_multiplier": {
+      "title": "Overtime Multiplier",
+      "type": "number"
+     },
+     "round_net": {
+      "title": "Round Net",
+      "type": "boolean"
+     },
+     "tax_enabled": {
+      "title": "Tax Enabled",
+      "type": "boolean"
+     },
+     "tax_table": {
+      "$ref": "#/components/schemas/TaxTable-Output"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "currency",
+     "day_basis",
+     "hours_per_day",
+     "overtime_multiplier",
+     "overtime_divisor",
+     "bonus_percent",
+     "bonus_min_months",
+     "round_net",
+     "tax_enabled",
+     "tax_table",
+     "version"
+    ],
+    "title": "PayrollSettingsOut",
+    "type": "object"
+   },
+   "PayslipOut": {
+    "properties": {
+     "account_last4": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Account Last4"
+     },
+     "carried_forward": {
+      "title": "Carried Forward",
+      "type": "integer"
+     },
+     "currency": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currency"
+     },
+     "days_in_period": {
+      "title": "Days In Period",
+      "type": "integer"
+     },
+     "deductions": {
+      "title": "Deductions",
+      "type": "integer"
+     },
+     "department_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Name"
+     },
+     "employee_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Code"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "title": "Employee Name",
+      "type": "string"
+     },
+     "gross": {
+      "title": "Gross",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "job_title": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Job Title"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/PayLine"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "overtime_minutes": {
+      "title": "Overtime Minutes",
+      "type": "integer"
+     },
+     "pay_rule": {
+      "title": "Pay Rule",
+      "type": "string"
+     },
+     "payable_days": {
+      "title": "Payable Days",
+      "type": "number"
+     },
+     "payment_method": {
+      "title": "Payment Method",
+      "type": "string"
+     },
+     "period": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Period"
+     },
+     "provider": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Provider"
+     },
+     "run_id": {
+      "format": "uuid",
+      "title": "Run Id",
+      "type": "string"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     },
+     "unpaid_leave_days": {
+      "title": "Unpaid Leave Days",
+      "type": "number"
+     },
+     "worked_minutes": {
+      "title": "Worked Minutes",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "run_id",
+     "employee_id",
+     "employee_name",
+     "employee_code",
+     "department_name",
+     "job_title",
+     "pay_rule",
+     "days_in_period",
+     "payable_days",
+     "unpaid_leave_days",
+     "worked_minutes",
+     "overtime_minutes",
+     "lines",
+     "gross",
+     "deductions",
+     "net",
+     "carried_forward",
+     "payment_method",
+     "provider",
+     "account_last4"
+    ],
+    "title": "PayslipOut",
     "type": "object"
    },
    "PermissionOut": {
@@ -4112,6 +4694,376 @@
     "title": "RolePatch",
     "type": "object"
    },
+   "RunDetail": {
+    "properties": {
+     "bonus_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bonus Label"
+     },
+     "computed_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Computed At"
+     },
+     "created_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "deductions": {
+      "title": "Deductions",
+      "type": "integer"
+     },
+     "finalized_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Finalized At"
+     },
+     "finalized_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Finalized By"
+     },
+     "gross": {
+      "title": "Gross",
+      "type": "integer"
+     },
+     "headcount": {
+      "title": "Headcount",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "missing": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Missing",
+      "type": "array"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "paid_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Paid At"
+     },
+     "payslips": {
+      "items": {
+       "$ref": "#/components/schemas/PayslipOut"
+      },
+      "title": "Payslips",
+      "type": "array"
+     },
+     "period": {
+      "title": "Period",
+      "type": "string"
+     },
+     "status": {
+      "enum": [
+       "draft",
+       "review",
+       "finalized",
+       "paid"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "submitted_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Submitted At"
+     },
+     "submitted_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Submitted By"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "period",
+     "status",
+     "bonus_label",
+     "currency",
+     "headcount",
+     "gross",
+     "deductions",
+     "net",
+     "computed_at",
+     "created_by",
+     "submitted_by",
+     "submitted_at",
+     "finalized_by",
+     "finalized_at",
+     "paid_at",
+     "version",
+     "payslips",
+     "missing"
+    ],
+    "title": "RunDetail",
+    "type": "object"
+   },
+   "RunIn": {
+    "additionalProperties": false,
+    "properties": {
+     "bonus_label": {
+      "anyOf": [
+       {
+        "maxLength": 80,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bonus Label"
+     },
+     "period": {
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+      "title": "Period",
+      "type": "string"
+     }
+    },
+    "required": [
+     "period"
+    ],
+    "title": "RunIn",
+    "type": "object"
+   },
+   "RunOut": {
+    "properties": {
+     "bonus_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Bonus Label"
+     },
+     "computed_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Computed At"
+     },
+     "created_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "deductions": {
+      "title": "Deductions",
+      "type": "integer"
+     },
+     "finalized_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Finalized At"
+     },
+     "finalized_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Finalized By"
+     },
+     "gross": {
+      "title": "Gross",
+      "type": "integer"
+     },
+     "headcount": {
+      "title": "Headcount",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "paid_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Paid At"
+     },
+     "period": {
+      "title": "Period",
+      "type": "string"
+     },
+     "status": {
+      "enum": [
+       "draft",
+       "review",
+       "finalized",
+       "paid"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "submitted_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Submitted At"
+     },
+     "submitted_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Submitted By"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "period",
+     "status",
+     "bonus_label",
+     "currency",
+     "headcount",
+     "gross",
+     "deductions",
+     "net",
+     "computed_at",
+     "created_by",
+     "submitted_by",
+     "submitted_at",
+     "finalized_by",
+     "finalized_at",
+     "paid_at",
+     "version"
+    ],
+    "title": "RunOut",
+    "type": "object"
+   },
    "SessionOut": {
     "properties": {
      "created_at": {
@@ -4468,6 +5420,304 @@
     "title": "StatusOut",
     "type": "object"
    },
+   "StructureIn": {
+    "additionalProperties": false,
+    "properties": {
+     "account": {
+      "anyOf": [
+       {
+        "pattern": "^[0-9 \\-]{4,34}$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Account"
+     },
+     "basic": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Basic",
+      "type": "integer"
+     },
+     "conveyance": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Conveyance",
+      "type": "integer"
+     },
+     "deduct_tax": {
+      "default": true,
+      "title": "Deduct Tax",
+      "type": "boolean"
+     },
+     "effective_from": {
+      "format": "date",
+      "title": "Effective From",
+      "type": "string"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "house_rent": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "House Rent",
+      "type": "integer"
+     },
+     "medical": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Medical",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "other": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Other",
+      "type": "integer"
+     },
+     "overtime": {
+      "default": false,
+      "title": "Overtime",
+      "type": "boolean"
+     },
+     "pay_rule": {
+      "default": "monthly",
+      "enum": [
+       "monthly",
+       "hourly",
+       "daily"
+      ],
+      "title": "Pay Rule",
+      "type": "string"
+     },
+     "payment_method": {
+      "default": "cash",
+      "enum": [
+       "cash",
+       "bank",
+       "wallet"
+      ],
+      "title": "Payment Method",
+      "type": "string"
+     },
+     "provider": {
+      "anyOf": [
+       {
+        "maxLength": 80,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Provider"
+     },
+     "rate": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Rate",
+      "type": "integer"
+     },
+     "tax_free_override": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Free Override"
+     }
+    },
+    "required": [
+     "employee_id",
+     "effective_from"
+    ],
+    "title": "StructureIn",
+    "type": "object"
+   },
+   "StructureOut": {
+    "properties": {
+     "account_last4": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Account Last4"
+     },
+     "basic": {
+      "title": "Basic",
+      "type": "integer"
+     },
+     "conveyance": {
+      "title": "Conveyance",
+      "type": "integer"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "deduct_tax": {
+      "title": "Deduct Tax",
+      "type": "boolean"
+     },
+     "effective_from": {
+      "format": "date",
+      "title": "Effective From",
+      "type": "string"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "employee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Employee Name"
+     },
+     "house_rent": {
+      "title": "House Rent",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "medical": {
+      "title": "Medical",
+      "type": "integer"
+     },
+     "monthly_total": {
+      "default": 0,
+      "title": "Monthly Total",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "other": {
+      "title": "Other",
+      "type": "integer"
+     },
+     "overtime": {
+      "title": "Overtime",
+      "type": "boolean"
+     },
+     "pay_rule": {
+      "enum": [
+       "monthly",
+       "hourly",
+       "daily"
+      ],
+      "title": "Pay Rule",
+      "type": "string"
+     },
+     "payment_method": {
+      "enum": [
+       "cash",
+       "bank",
+       "wallet"
+      ],
+      "title": "Payment Method",
+      "type": "string"
+     },
+     "provider": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Provider"
+     },
+     "rate": {
+      "title": "Rate",
+      "type": "integer"
+     },
+     "tax_free_override": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Free Override"
+     }
+    },
+    "required": [
+     "id",
+     "employee_id",
+     "effective_from",
+     "pay_rule",
+     "basic",
+     "house_rent",
+     "medical",
+     "conveyance",
+     "other",
+     "rate",
+     "overtime",
+     "deduct_tax",
+     "tax_free_override",
+     "payment_method",
+     "provider",
+     "account_last4",
+     "note",
+     "created_at"
+    ],
+    "title": "StructureOut",
+    "type": "object"
+   },
    "SwitchIn": {
     "additionalProperties": false,
     "properties": {
@@ -4481,6 +5731,179 @@
      "tenant_id"
     ],
     "title": "SwitchIn",
+    "type": "object"
+   },
+   "TaxSlab-Input": {
+    "properties": {
+     "rate": {
+      "anyOf": [
+       {
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "title": "Rate"
+     },
+     "width": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Width"
+     }
+    },
+    "required": [
+     "width",
+     "rate"
+    ],
+    "title": "TaxSlab",
+    "type": "object"
+   },
+   "TaxSlab-Output": {
+    "properties": {
+     "rate": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Rate",
+      "type": "string"
+     },
+     "width": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Width"
+     }
+    },
+    "required": [
+     "width",
+     "rate"
+    ],
+    "title": "TaxSlab",
+    "type": "object"
+   },
+   "TaxTable-Input": {
+    "properties": {
+     "exempt_cap": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Exempt Cap"
+     },
+     "exempt_fraction": {
+      "default": "0",
+      "maxLength": 20,
+      "pattern": "^(\\d+(\\.\\d+)?|\\d+/[1-9]\\d*)$",
+      "title": "Exempt Fraction",
+      "type": "string"
+     },
+     "minimum": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Minimum",
+      "type": "integer"
+     },
+     "name": {
+      "default": "",
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "slabs": {
+      "items": {
+       "$ref": "#/components/schemas/TaxSlab-Input"
+      },
+      "maxItems": 20,
+      "title": "Slabs",
+      "type": "array"
+     },
+     "tax_free": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Tax Free",
+      "type": "integer"
+     }
+    },
+    "title": "TaxTable",
+    "type": "object"
+   },
+   "TaxTable-Output": {
+    "properties": {
+     "exempt_cap": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Exempt Cap"
+     },
+     "exempt_fraction": {
+      "default": "0",
+      "maxLength": 20,
+      "pattern": "^(\\d+(\\.\\d+)?|\\d+/[1-9]\\d*)$",
+      "title": "Exempt Fraction",
+      "type": "string"
+     },
+     "minimum": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Minimum",
+      "type": "integer"
+     },
+     "name": {
+      "default": "",
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "slabs": {
+      "items": {
+       "$ref": "#/components/schemas/TaxSlab-Output"
+      },
+      "maxItems": 20,
+      "title": "Slabs",
+      "type": "array"
+     },
+     "tax_free": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Tax Free",
+      "type": "integer"
+     }
+    },
+    "title": "TaxTable",
     "type": "object"
    },
    "TempPasswordOut": {
@@ -8321,6 +9744,932 @@
     "summary": "List Modules",
     "tags": [
      "plans"
+    ]
+   }
+  },
+  "/v1/payroll/loans": {
+   "get": {
+    "operationId": "loans_v1_payroll_loans_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "employee_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Employee Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "include_closed",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Include Closed",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/LoanOut"
+         },
+         "title": "Response Loans V1 Payroll Loans Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Loans",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "post": {
+    "operationId": "add_loan_v1_payroll_loans_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/LoanIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LoanOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Loan",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/loans/{loan_id}/close": {
+   "post": {
+    "operationId": "close_loan_v1_payroll_loans__loan_id__close_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "loan_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Loan Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LoanOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Close Loan",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/payslips": {
+   "get": {
+    "operationId": "my_payslips_v1_payroll_payslips_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PayslipOut"
+         },
+         "title": "Response My Payslips V1 Payroll Payslips Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Payslips",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/payslips/{payslip_id}": {
+   "get": {
+    "operationId": "payslip_v1_payroll_payslips__payslip_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "payslip_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Payslip Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PayslipOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Payslip",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs": {
+   "get": {
+    "operationId": "runs_v1_payroll_runs_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RunOut"
+         },
+         "title": "Response Runs V1 Payroll Runs Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Runs",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "post": {
+    "operationId": "create_run_v1_payroll_runs_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RunIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Run",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}": {
+   "delete": {
+    "operationId": "delete_run_v1_payroll_runs__run_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Run",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "get": {
+    "operationId": "run_detail_v1_payroll_runs__run_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Run Detail",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/finalize": {
+   "post": {
+    "operationId": "finalize_v1_payroll_runs__run_id__finalize_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Finalize",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/items": {
+   "get": {
+    "operationId": "items_v1_payroll_runs__run_id__items_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ItemOut"
+         },
+         "title": "Response Items V1 Payroll Runs  Run Id  Items Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Items",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "post": {
+    "operationId": "add_item_v1_payroll_runs__run_id__items_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ItemIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ItemOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Item",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/items/{item_id}": {
+   "delete": {
+    "operationId": "remove_item_v1_payroll_runs__run_id__items__item_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove Item",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/paid": {
+   "post": {
+    "operationId": "mark_paid_v1_payroll_runs__run_id__paid_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Mark Paid",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/recompute": {
+   "post": {
+    "operationId": "recompute_v1_payroll_runs__run_id__recompute_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Recompute",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/reopen": {
+   "post": {
+    "operationId": "reopen_v1_payroll_runs__run_id__reopen_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reopen",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/submit": {
+   "post": {
+    "operationId": "submit_v1_payroll_runs__run_id__submit_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Submit",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/runs/{run_id}/transfers.csv": {
+   "get": {
+    "operationId": "transfer_sheet_v1_payroll_runs__run_id__transfers_csv_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "run_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Run Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Transfer Sheet",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/salaries": {
+   "get": {
+    "operationId": "salaries_v1_payroll_salaries_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/StructureOut"
+         },
+         "title": "Response Salaries V1 Payroll Salaries Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Salaries",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "post": {
+    "operationId": "set_salary_v1_payroll_salaries_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StructureIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StructureOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Set Salary",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/salaries/{employee_id}": {
+   "get": {
+    "operationId": "salary_history_v1_payroll_salaries__employee_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "employee_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Employee Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/StructureOut"
+         },
+         "title": "Response Salary History V1 Payroll Salaries  Employee Id  Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Salary History",
+    "tags": [
+     "payroll"
+    ]
+   }
+  },
+  "/v1/payroll/settings": {
+   "get": {
+    "operationId": "get_settings_v1_payroll_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PayrollSettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings",
+    "tags": [
+     "payroll"
+    ]
+   },
+   "put": {
+    "operationId": "put_settings_v1_payroll_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PayrollSettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PayrollSettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Put Settings",
+    "tags": [
+     "payroll"
     ]
    }
   },
