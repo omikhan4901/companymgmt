@@ -87,6 +87,8 @@ export function refreshSession(): Promise<boolean> {
 export interface RequestOptions {
   method?: string;
   body?: unknown;
+  /** Sent as is (e.g. a file), instead of JSON. */
+  rawBody?: Blob;
   query?: Record<string, string | number | boolean | undefined | null>;
   headers?: Record<string, string>;
   version?: number;
@@ -106,11 +108,12 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
   const headers: Record<string, string> = { ...(options.headers ?? {}) };
   if (accessToken) headers.authorization = `Bearer ${accessToken}`;
   if (options.body !== undefined) headers["content-type"] = "application/json";
+  if (options.rawBody !== undefined) headers["content-type"] ??= options.rawBody.type || "application/octet-stream";
   if (options.version !== undefined) headers["if-match"] = `W/"${options.version}"`;
   return fetch(buildUrl(path, options.query), {
-    method: options.method ?? (options.body === undefined ? "GET" : "POST"),
+    method: options.method ?? (options.body === undefined && options.rawBody === undefined ? "GET" : "POST"),
     headers,
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: options.rawBody ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
     credentials: "include",
     signal: options.signal,
   });

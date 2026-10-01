@@ -11205,6 +11205,35 @@
     ]
    }
   },
+  "/v1/privacy/workspace-import": {
+   "post": {
+    "description": "Body: the export ZIP itself (Content-Type: application/zip).",
+    "operationId": "workspace_import_v1_privacy_workspace_import_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "additionalProperties": {
+           "type": "integer"
+          },
+          "type": "object"
+         },
+         "title": "Response Workspace Import V1 Privacy Workspace Import Post",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Workspace Import",
+    "tags": [
+     "privacy"
+    ]
+   }
+  },
   "/v1/roles": {
    "get": {
     "operationId": "list_roles_v1_roles_get",

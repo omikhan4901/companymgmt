@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, ShieldCheck, Trash2, Undo2 } from "lucide-react";
+import { Download, ShieldCheck, Trash2, Undo2, Upload } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -10,14 +10,15 @@ import { ApiError, api, download } from "@/api/client";
 import { useSession, useWorkspace } from "@/auth/session";
 import { useStepUp } from "@/components/step-up";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/choice";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
-import { formatDay } from "@/lib/format";
+import { formatDay, formatNumber } from "@/lib/format";
 
 function RequireMfa() {
   const { t } = useTranslation();
@@ -123,6 +124,59 @@ function DeleteCard() {
   );
 }
 
+function ImportCard() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [stepUp, dialog] = useStepUp();
+  const [busy, setBusy] = useState(false);
+  const run = async (file: File) => {
+    setBusy(true);
+    try {
+      const result = await stepUp(() =>
+        api<{ imported: Record<string, number> }>("/v1/privacy/workspace-import", { rawBody: new Blob([file], { type: "application/zip" }) }),
+      );
+      const total = Object.values(result.imported).reduce((a, b) => a + b, 0);
+      toast.success(t("privacy.imported", { count: total, formatted: formatNumber(total) }));
+      void queryClient.invalidateQueries();
+    } catch (e) {
+      if (e === null) return;
+      const known = e instanceof ApiError && ["import_not_empty", "import_format", "import_too_large"].includes(e.code);
+      toast.error(known ? t(`privacy.importErrors.${(e as ApiError).code}`) : errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Card>
+      <CardHeader title={t("privacy.importTitle")} sub={t("privacy.importBody")} />
+      <div className="px-5 pb-5 pt-2">
+        <label
+          className={cn(
+            buttonVariants({ variant: "secondary" }),
+            "cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent",
+            busy && "pointer-events-none opacity-60",
+          )}
+        >
+          <Upload aria-hidden="true" />
+          {t("privacy.importButton")}
+          <input
+            type="file"
+            accept=".zip,application/zip"
+            className="sr-only"
+            disabled={busy}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void run(file);
+            }}
+          />
+        </label>
+      </div>
+      {dialog}
+    </Card>
+  );
+}
+
 /** Settings → Data and security. */
 export function WorkspaceData() {
   const { can } = useSession();
@@ -130,6 +184,7 @@ export function WorkspaceData() {
     <div className="grid max-w-3xl gap-4">
       {can("workspace.manage") && <RequireMfa />}
       {can("workspace.export") && <ExportCard />}
+      {can("workspace.import") && <ImportCard />}
       {can("workspace.delete") && <DeleteCard />}
     </div>
   );

@@ -12,7 +12,12 @@ test("an owner exports, deletes and restores the workspace", async ({ page }, in
   await expectAccessible(page, "settings: data and security");
   const zip = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download export" }).click();
-  expect((await zip).suggestedFilename()).toMatch(/-export-\d{8}\.zip$/);
+  const exported = await zip;
+  expect(exported.suggestedFilename()).toMatch(/-export-\d{8}\.zip$/);
+
+  // A new workspace can take an export (here, its own: it's still empty).
+  await page.getByLabel("Choose export file").setInputFiles(await exported.path());
+  await expect(page.getByText(/^Imported \d+ records?\.$/)).toBeVisible();
 
   await page.goto("/app/account");
   const mine = page.waitForEvent("download");
