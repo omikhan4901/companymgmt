@@ -1,11 +1,13 @@
 """Restore a workspace export into a new, empty workspace.
 
 Business records come across: branches, departments, people, attendance, leave,
-payroll, tasks and projects, and announcements (not who has read them). Logins, roles,
-invitations and the audit log don't: they belong to the old workspace, and the owner
-invites people again. Every record gets a new id (the old
-workspace may still exist on this server), references are rewritten to match, and
-encrypted fields are encrypted again for their new rows.
+payroll, tasks and projects, announcements (not who has read them), and documents with
+every version (not who has acknowledged them). Logins, roles, invitations and the audit
+log don't: they belong to the old workspace, and the owner invites people again.
+Documents shown to some roles follow the roles of the same kind in the new workspace.
+Every record gets a new id (the old workspace may still exist on this server),
+references are rewritten to match, and encrypted fields are encrypted again for their
+new rows.
 """
 
 from __future__ import annotations
@@ -32,7 +34,7 @@ from app.modules.payroll.models import Loan, PayrollRun, SalaryStructure
 from app.modules.people.models import Department, Employee
 from app.modules.people.service import employee_for_membership
 from app.modules.platform.deps import Ctx
-from app.modules.platform.models import Branch
+from app.modules.platform.models import Branch, Role
 from app.modules.privacy.service import FORMAT, VERSION, tenant_tables
 from app.modules.tasks.models import Project, Task
 
@@ -64,6 +66,8 @@ IMPORTED = {
     "task_checklist_items",
     "task_comments",
     "announcements",
+    "documents",
+    "document_versions",
 }
 # Settings the new workspace was given when its modules were switched on; replaced.
 SEEDED = ("leave_types", "leave_policies", "payroll_settings", "attendance_settings")
@@ -93,6 +97,15 @@ def _read(body: bytes) -> dict[str, list[dict[str, Any]]]:
                 if not isinstance(rows, list):
                     raise Invalid("The export is damaged.", code="import_format")
                 data[name] = rows
+        names = set(archive.namelist())
+        for row in data.get("document_versions", []):
+            path = str(row.get("file") or "")
+            if not path.startswith("files/") or path not in names:
+                raise Invalid("The export is damaged.", code="import_format")
+            row["data"] = archive.read(path)
+        # Roles don't come across, but documents shown to some roles point at them.
+        if "data/roles.json" in names:
+            data["_roles"] = json.loads(archive.read("data/roles.json"))
         return data
     except (zipfile.BadZipFile, KeyError, json.JSONDecodeError, UnicodeDecodeError) as exc:
         raise Invalid("This isn't a CompanyMgmt workspace export.", code="import_format") from exc
@@ -160,6 +173,12 @@ async def import_workspace(ctx: Ctx, body: bytes) -> dict[str, int]:
         if match:
             merged = str(match["id"])
             ids[merged] = str(own.id)
+
+    # Documents shown to some roles follow the roles of the same kind here.
+    here = {r.key: str(r.id) for r in await db.scalars(select(Role))}
+    for role in data.pop("_roles", []):
+        if role.get("key") in here and role.get("id"):
+            ids[str(role["id"])] = here[role["key"]]
 
     for name in SEEDED:
         if name in data:

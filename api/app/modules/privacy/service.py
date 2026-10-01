@@ -97,6 +97,7 @@ README = """CompanyMgmt workspace export
 data/<table>.json   Every record in the workspace, one file per table, as stored.
                     National ID and account numbers are decrypted.
 csv/*.csv           The same people, attendance, leave and payslips as spreadsheets.
+files/              Every version of every document, as uploaded.
 manifest.json       What's inside, row counts and when it was made.
 
 Money is in minor units (paisa, cents): 2080000 means 20,800.00.
@@ -119,6 +120,12 @@ async def workspace_export(ctx: Ctx) -> tuple[bytes, str]:
         {"id": str(u.id), "name": u.name, "email": u.email, "username": u.username, "locale": u.locale}
         for u in await db.scalars(select(User).where(User.id.in_(member_ids)))
     ]
+    # Document files go into the ZIP as files; their rows say where.
+    blobs: dict[str, bytes] = {}
+    for row in data.get("document_versions", []):
+        path = f"files/{row['id']}/{row['filename']}"
+        blobs[path] = row.pop("data")
+        row["file"] = path
     names = {e["id"]: e["full_name"] for e in data.get("employees", [])}
     for key in ("attendance_records", "leave_requests", "payslips"):
         for row in data.get(key, []):
@@ -142,6 +149,8 @@ async def workspace_export(ctx: Ctx) -> tuple[bytes, str]:
         for name, rows in data.items():
             zf.writestr(f"data/{name}.json", json.dumps(rows, indent=1, ensure_ascii=False))
         zf.writestr("data/users.json", json.dumps(users, indent=1, ensure_ascii=False))
+        for path, blob in blobs.items():
+            zf.writestr(path, blob)
         zf.writestr(
             "csv/people.csv",
             _csv(

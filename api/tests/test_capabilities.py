@@ -60,7 +60,7 @@ async def agency(client: httpx.AsyncClient) -> dict[str, Any]:
     await cook.post("/v1/attendance/clock-in", json={})
     await owner.put(
         "/v1/workspace/modules",
-        json={"modules": ["attendance", "leave", "payroll", "tasks", "announcements"]},
+        json={"modules": ["attendance", "leave", "payroll", "tasks", "announcements", "documents"]},
     )
     project = (
         await owner.post(
@@ -82,6 +82,15 @@ async def agency(client: httpx.AsyncClient) -> dict[str, Any]:
             "audience_ids": [kitchen["id"]],
         },
     )
+    kitchen_only = {"visibility": "departments", "visibility_ids": [kitchen["id"]]}
+    for title, extra in (("Handbook", {}), ("Kitchen rules", kitchen_only)):
+        doc = (await owner.post("/v1/documents", json={"title": title, "requires_ack": True, **extra})).json()
+        await owner.post(
+            f"/v1/documents/{doc['id']}/versions",
+            params={"filename": "rules.pdf"},
+            content=b"%PDF-1.7",
+            headers={"content-type": "application/octet-stream"},
+        )
     todo = (await seller.post("/v1/tasks", json={"title": "Call client"})).json()
     return {
         "project_id": project["id"],
@@ -123,6 +132,8 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("notifications.inbox", "/v1/notifications", {}),
         ("tasks.my_work", "/v1/tasks/my-work", {}),
         ("announcements.feed", "/v1/announcements", {}),
+        ("documents.library", "/v1/documents", {}),
+        ("documents.to_acknowledge", "/v1/documents/to-acknowledge", {}),
         ("announcements.feed", "/v1/announcements", {"limit": 1}),
         ("tasks.projects", "/v1/projects", {}),
         ("tasks.list", "/v1/tasks", {}),

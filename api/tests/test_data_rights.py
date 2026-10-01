@@ -288,7 +288,7 @@ async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncCli
     run = (await source.post("/v1/payroll/runs", json={"period": f"{first:%Y-%m}"})).json()
     await source.post(f"/v1/payroll/runs/{run['id']}/submit")
     await source.post(f"/v1/payroll/runs/{run['id']}/finalize")
-    tasks_on = {"modules": ["attendance", "leave", "payroll", "tasks"]}
+    tasks_on = {"modules": ["attendance", "leave", "payroll", "tasks", "documents"]}
     await source.put("/v1/workspace/modules", json=tasks_on)
     menu = (await source.post("/v1/projects", json={"name": "Menu", "member_ids": [cook["id"]]})).json()
     task = (
@@ -303,6 +303,19 @@ async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncCli
         )
     ).json()
     await source.post(f"/v1/tasks/{task['id']}/comments", json={"body": "By Friday"})
+    managers = next(r["id"] for r in (await source.get("/v1/roles")).json() if r["key"] == "manager")
+    guide = (
+        await source.post(
+            "/v1/documents", json={"title": "Guide", "visibility": "roles", "visibility_ids": [managers]}
+        )
+    ).json()
+    pdf = b"%PDF-1.7 guide"
+    await source.post(
+        f"/v1/documents/{guide['id']}/versions",
+        params={"filename": "guide.pdf"},
+        content=pdf,
+        headers={"content-type": "application/octet-stream"},
+    )
     export = (await source.get("/v1/privacy/workspace-export")).content
 
     target = await signup(client, business="New Shop", email_addr=new_owner_email)
@@ -335,6 +348,11 @@ async def test_an_export_restores_into_an_empty_workspace(client: httpx.AsyncCli
     [moved] = (await target.get("/v1/tasks", params={"project_id": project["id"]})).json()
     assert moved["assignee"]["id"] == new_cook["id"]
     assert (moved["checklist_total"], moved["comments"]) == (1, 1)
+    [doc] = (await target.get("/v1/documents")).json()
+    here = next(r["id"] for r in (await target.get("/v1/roles")).json() if r["key"] == "manager")
+    assert [v["id"] for v in doc["visibility_names"]] == [here]
+    file = await target.get(f"/v1/documents/{doc['id']}/versions/{doc['current']['id']}/file")
+    assert file.content == pdf
     assert (await target.get("/v1/audit/verify")).json()["ok"] is True
     # The source workspace is untouched.
     assert (await source.get(f"/v1/people/{cook['id']}")).status_code == 200
@@ -355,3 +373,16 @@ async def test_imports_refuse_bad_files_and_non_owners(client: httpx.AsyncClient
         zf.writestr("manifest.json", json.dumps({"format": "something-else", "version": 1}))
     other = {"content": fake.getvalue(), "headers": {"content-type": "application/zip"}}
     assert (await owner.post("/v1/privacy/workspace-import", **other)).json()["code"] == "import_format"
+
+
+async def test_large_imports_reach_the_importer(client: httpx.AsyncClient) -> None:
+    """Exports are often bigger than a JSON request; the size limit must not stop them."""
+    owner = await signup(client)
+    big = b"PK" + b"0" * 2_000_000
+    response = await owner.post(
+        "/v1/privacy/workspace-import", content=big, headers={"content-type": "application/zip"}
+    )
+    assert response.json()["code"] in ("import_format", "reauth_required")
+    # Elsewhere, the usual small limit still applies.
+    other = await owner.post("/v1/departments", content=big, headers={"content-type": "application/json"})
+    assert other.status_code == 413

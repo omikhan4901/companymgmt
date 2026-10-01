@@ -56,6 +56,7 @@ MODULES: dict[str, Module] = {
         Module("accounting", "Accounting", available=False),
         Module("tasks", "Tasks & projects", requires=("people",)),
         Module("announcements", "Announcements", requires=("people",)),
+        Module("documents", "Documents & policies", requires=("people",)),
     )
 }
 
@@ -64,7 +65,10 @@ BUSINESS_TYPES: dict[str, tuple[str, tuple[str, ...]]] = {
     "shop": ("simple", ("attendance", "sales", "customers", "expenses")),
     "restaurant": ("simple", ("attendance", "sales", "inventory", "expenses")),
     "retail": ("standard", ("attendance", "sales", "customers", "inventory", "expenses")),
-    "office": ("standard", ("attendance", "leave", "payroll", "expenses", "tasks", "announcements")),
+    "office": (
+        "standard",
+        ("attendance", "leave", "payroll", "expenses", "tasks", "announcements", "documents"),
+    ),
     "factory": ("advanced", ("attendance", "leave", "payroll", "inventory", "expenses", "accounting")),
     "other": ("standard", ("attendance",)),
 }
@@ -111,6 +115,7 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "tasks.manage",
             "announcements.read",
             "announcements.post",
+            "documents.read",
         ),
     ),
     BuiltinRole(
@@ -130,19 +135,34 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "payroll.run",
             "tasks.self",
             "announcements.read",
+            "documents.read",
         ),
     ),
     BuiltinRole(
         "cashier",
         "Cashier",
         "Sells and clocks in. No access to other people's data.",
-        ("attendance.self", "leave.self", "payroll.self", "tasks.self", "announcements.read"),
+        (
+            "attendance.self",
+            "leave.self",
+            "payroll.self",
+            "tasks.self",
+            "announcements.read",
+            "documents.read",
+        ),
     ),
     BuiltinRole(
         "employee",
         "Employee",
         "Clocks in, asks for leave and sees their own records.",
-        ("attendance.self", "leave.self", "payroll.self", "tasks.self", "announcements.read"),
+        (
+            "attendance.self",
+            "leave.self",
+            "payroll.self",
+            "tasks.self",
+            "announcements.read",
+            "documents.read",
+        ),
     ),
 )
 

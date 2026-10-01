@@ -18,6 +18,7 @@ ATTENDANCE = "/app/attendance"
 PAYROLL = "/app/payroll"
 TASKS = "/app/tasks"
 ANNOUNCEMENTS = "/app/announcements"
+DOCUMENTS = "/app/documents"
 
 
 def _user(value: object) -> uuid.UUID | None:
@@ -123,3 +124,10 @@ async def announced(db: AsyncSession, event: events.Event) -> None:
         link=f"{ANNOUNCEMENTS}?post={event.subject_id}",
         data={"title": event.data.get("title")},
     )
+
+
+@events.on("document.published")
+async def document_published(db: AsyncSession, event: events.Event) -> None:
+    people = await users_of(db, event.data.get("membership_ids") or [])
+    data = {"title": event.data.get("title"), "requires_ack": bool(event.data.get("requires_ack"))}
+    await notify(db, event, people, link=f"{DOCUMENTS}?doc={event.subject_id}", data=data)

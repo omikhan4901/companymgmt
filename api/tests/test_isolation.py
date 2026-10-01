@@ -187,7 +187,7 @@ async def _resources(owner: Account) -> dict[str, str]:
     )
     ids["request_id"] = leave.json()["id"]
     ids["notification_id"] = (await owner.get("/v1/notifications")).json()["items"][0]["id"]
-    modules = ["attendance", "leave", "payroll", "tasks", "announcements"]
+    modules = ["attendance", "leave", "payroll", "tasks", "announcements", "documents"]
     await owner.put("/v1/workspace/modules", json={"modules": modules})
     project = await owner.post("/v1/projects", json={"name": "Menu", "member_ids": [ids["employee_id"]]})
     ids["project_id"] = project.json()["id"]
@@ -200,6 +200,15 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["comment_id"] = comment.json()["id"]
     news = await owner.post("/v1/announcements", json={"title": "Hello", "body": "Welcome."})
     ids["announcement_id"] = news.json()["id"]
+    doc = await owner.post("/v1/documents", json={"title": "Handbook", "requires_ack": True})
+    ids["document_id"] = doc.json()["id"]
+    version = await owner.post(
+        f"/v1/documents/{ids['document_id']}/versions",
+        params={"filename": "handbook.pdf"},
+        content=b"%PDF-1.7",
+        headers={"content-type": "application/octet-stream"},
+    )
+    ids["version_id"] = version.json()["current"]["id"]
     salary = await owner.post(
         "/v1/payroll/salaries",
         json={"employee_id": ids["employee_id"], "effective_from": "2024-01-01", "basic": 1_000_000},
