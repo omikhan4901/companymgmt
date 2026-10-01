@@ -72,6 +72,10 @@ _KINDS: dict[str, dict[str, str]] = {
         "attendance_correction_rejected": "{actor} turned down your time fix",
         "payroll_submitted": "{actor} sent {period} payroll for approval",
         "payroll_finalized": "Your payslip for {period} is ready",
+        "task_assigned": "{actor} gave you a task: {title}",
+        "task_commented": "{actor} commented on {title}",
+        "task_completed": "{actor} finished {title}",
+        "project_members_added": "{actor} added you to {project}",
         "other": "Something changed",
     },
     "bn": {
@@ -85,6 +89,10 @@ _KINDS: dict[str, dict[str, str]] = {
         "attendance_correction_rejected": "{actor} আপনার সময় ঠিক করার অনুরোধ নামঞ্জুর করেছেন",
         "payroll_submitted": "{actor} {period}-এর বেতন অনুমোদনের জন্য পাঠিয়েছেন",
         "payroll_finalized": "{period}-এর পে-স্লিপ তৈরি",
+        "task_assigned": "{actor} আপনাকে একটি কাজ দিয়েছেন: {title}",
+        "task_commented": "{actor} {title}-এ মন্তব্য করেছেন",
+        "task_completed": "{actor} {title} শেষ করেছেন",
+        "project_members_added": "{actor} আপনাকে {project} প্রকল্পে যোগ করেছেন",
         "other": "কিছু পরিবর্তন হয়েছে",
     },
 }
@@ -147,6 +155,8 @@ def describe(n: Notification, lang: str, membership_id: uuid.UUID | None) -> str
         "type": data.get("type") or "",
         "dates": dates if start else "",
         "period": _period(data.get("period"), lang),
+        "title": data.get("title") or "",
+        "project": data.get("project_name") or "",
     }
     key = n.kind.replace(".", "_")
     if n.kind == "leave.cancelled":

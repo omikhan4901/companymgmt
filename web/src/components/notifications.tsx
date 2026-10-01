@@ -42,6 +42,8 @@ export function useDescribe() {
       type: typeof data.type === "string" ? data.type : "",
       dates: dates(data),
       period: month(data),
+      title: typeof data.title === "string" ? data.title : "",
+      project: typeof data.project_name === "string" ? data.project_name : "",
     };
     let key = n.kind.replace(".", "_");
     if (n.kind === "leave.cancelled") {
