@@ -169,11 +169,11 @@ and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md)
 
 ### Tests
 
-- **207 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
+- **208 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
   Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
   payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
   export, import, deletion and audit retention, plans, notifications and the daily
-  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, and capability
+  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, a 30-person agency's week, and capability
   parity with the API.
 - **Browser journeys** (Playwright) on desktop and phone, against the production build
   with its real security headers: sign up → add staff → staff signs in in Bangla and
