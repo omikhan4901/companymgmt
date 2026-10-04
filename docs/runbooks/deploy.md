@@ -129,7 +129,17 @@ domain later.
    then `gcloud secrets versions add turnstile-secret --data-file=-`, and add
    `TURNSTILE_SECRET=turnstile-secret:latest` to `--set-secrets` in `deploy.yml`.
 
-7. **Backups (R2)**: **R2 → Create bucket** `companymgmt-backups` (location: Asia
+7. Optional, the AI assistant (Gemini): in [Google AI Studio](https://aistudio.google.com/apikey)
+   create an API key **in a project with billing switched on** (on the free tier Google
+   may use prompts to improve its products, which the in-app terms don't allow). Add it:
+   `gcloud secrets create gemini-api-key --replication-policy=user-managed --locations=asia-southeast1`,
+   then `gcloud secrets versions add gemini-api-key --data-file=-`, and add
+   `GEMINI_API_KEY=gemini-api-key:latest` to `--set-secrets` in `deploy.yml`. That's all:
+   the assistant switches itself on, and each workspace's owner still chooses to use it.
+   Set `PLATFORM_OPERATORS` (your email, with two-step sign-in on) to change how many
+   questions each plan includes, under Settings → Platform.
+
+8. **Backups (R2)**: **R2 → Create bucket** `companymgmt-backups` (location: Asia
    Pacific). Then **R2 → Manage API tokens → Create API token**: *Object Read & Write*,
    only that bucket. Note the *Access Key ID*, *Secret Access Key* and the *S3 endpoint*
    (`https://<account-id>.r2.cloudflarestorage.com`), and add the keys to Google:
@@ -169,7 +179,7 @@ Actions**:
 | Variable | `MAIL_FROM` | `CompanyMgmt <no-reply@yourdomain>` |
 | Variable | `TURNSTILE_SITE_KEY` | optional, from step 3.6 |
 | Secret | `CLOUDFLARE_API_TOKEN` | from step 3.4 |
-| Variable | `BACKUP_AGE_RECIPIENT` | the `age1…` public key from step 3.7 |
+| Variable | `BACKUP_AGE_RECIPIENT` | the `age1…` public key from step 3.8 |
 | Variable | `R2_BACKUP_BUCKET` | `companymgmt-backups` |
 | Variable | `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
 | Variable | `DEPLOY_ENABLED` | `true` (last) |

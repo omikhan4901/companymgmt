@@ -1,7 +1,7 @@
 # Progress
 
-Current work: **the owner's 2026-10-04 plan** (below): the marketing site in the ResumeX
-style, then M6 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
+Current work: **the owner's 2026-10-04 plan** (below). The marketing site and M6 (AI
+copilot) are done; next is M7 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
 on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
 
 ## Owner decisions, 2026-10-04 (follow these)
@@ -83,6 +83,10 @@ input; list what does under "Blocked on the owner".
 - Push the `legacy-nsu-327` tag in the legacy repo (command in the plan, §11 Q1).
 - Cloud accounts for deployment (runbook).
 - Legal review of the privacy policy and terms (plan Q7).
+- A Gemini API key (from a Google Cloud project with billing on) to switch the assistant
+  on in production: `runbooks/deploy.md` step 3.7. Until then it stays off with a clear
+  message. Also try it with real questions before customers do (see M6 below). Once
+  it's live, move the assistant from "coming next" to the features on the home page.
 - Check the Bangladesh salary tax table (Payroll → Settings) against the Finance
   Ordinance 2025 with a tax adviser before turning tax deduction on.
 
@@ -241,6 +245,42 @@ architecture one-pager. Only built features and measured numbers.
   developer guide for picking the code up by hand. Next when work resumes: M4.3 in-app
   help and contact support, then the pilot playbook.
 
+## M6: done (AI copilot, read-only)
+
+- **Switched on by a key.** `GEMINI_API_KEY` is all it takes (`AI_PROVIDER=fake` gives a
+  scripted model for tests and demos, refused in production). Gemini is reached over
+  plain REST behind a provider port (`app/ai/provider.py`), so another provider is one
+  file. Without a key every AI screen says the assistant isn't set up, and nothing else
+  changes.
+- **The workspace chooses.** Off until the owner accepts the AI terms (what's sent to
+  Google, that answers can be wrong). Owners and admins tick features: questions,
+  documents and policies, the weekly brief. Changes are audited.
+- **Allowances are ours.** Questions per month per plan are a platform setting (Free 0,
+  Starter 100, Growth 500, Business 2,000, Enterprise unlimited to start), changed by
+  platform operators (`PLATFORM_OPERATORS`, two-step sign-in required) under Settings →
+  Platform; every change notifies the owners and admins of each workspace on that plan.
+- **Ask my company.** Questions in English or Bangla. The model only gets the read
+  capabilities the asker can use, called as the asker, so an owner, a manager and a
+  staff member get different, correct answers. Writes and unknown tools are refused;
+  tool results are data, never instructions; at most six steps. Answers cite numbered
+  sources that open the right page. Conversations are private to the person, can be
+  deleted, appear in their own data export and stay out of workspace exports.
+- **Documents.** Text is pulled from PDF, Word, PowerPoint and text files on upload
+  (hostile XML refused) and split into passages; search uses Postgres full-text search
+  under the same visibility rules as the documents themselves. Semantic search with
+  embeddings is ready on the port (`embed`) but not used yet; full-text works for both
+  languages without another service.
+- **Weekly brief.** For people who see reports: last week's report and pending approvals,
+  worked out as them, put into a few cited lines. One per person per week.
+- Tests: gating, scope leakage between roles and departments, refused writes, prompt
+  injection through tool results, privacy, allowances and notifications, the Gemini
+  request and reply format (against a fake transport), document extraction and search,
+  and a browser journey on desktop and phone.
+- **Not tested against the real Gemini yet** (no key, no spending). Before customers use
+  it, ask it 20–30 real questions in both languages and check the answers and sources.
+- For the legal review: Google as a sub-processor, cross-border transfer, the paid tier
+  (no training on prompts) as a hard requirement, and how long conversations are kept.
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -262,3 +302,5 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M4.1 spreadsheet import of people, departments and leave balances, with a preview.
 - 2026-10-01: M4.2 reports dashboard and lateness settings.
 - 2026-10-01: M4.2 report emails. Edge-case fixes. Developer guide and final README. Paused.
+- 2026-10-04: Marketing site restyled in the ResumeX look. Owner's M6–M11 decisions recorded; developer platform and easy onboarding added to M10.
+- 2026-10-04: M6 done: Gemini behind a port, switched on by a key; per-workspace opt-in and features; operator allowances with notifications; Ask with cited sources; document search; weekly brief.

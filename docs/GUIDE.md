@@ -179,7 +179,7 @@ it can have.
 ```
 
 The same service functions are also called by **capabilities** (section 4.10), the layer
-the AI assistant will use in a later milestone. That's why logic lives in services, not routes.
+the AI assistant uses. That's why logic lives in services, not routes.
 
 ### 2.3 The stack, in one table
 
@@ -222,7 +222,7 @@ companymgmt/
 │   │   ├── models_registry.py imports every model so Alembic sees all tables
 │   │   ├── core/             shared building blocks (no business features)
 │   │   ├── modules/          one folder per feature area (see 4.2)
-│   │   ├── ai/               the capability/tool layer for the future assistant
+│   │   ├── ai/               the AI assistant: provider port, Gemini, Ask, brief
 │   │   └── jobs/             nightly maintenance
 │   ├── scripts/              demo_seed.py, agency_week.py
 │   └── tests/                pytest tests, one file per area
@@ -462,13 +462,31 @@ digest and the report emails. Locally you can call them yourself, e.g. in a Pyth
 `await send_reports()` from `app.modules.reports.subscriptions`. The schedule is in
 `docs/runbooks/deploy.md`.
 
-### 4.10 Capabilities: the layer the AI will use
+### 4.10 Capabilities and the AI assistant
 
 `@capability(...)` in each module's `capabilities.py` describes one read or write: its
 input and output schema, the permission it needs and the REST route it mirrors. The AI
-assistant (milestone M6) will only ever reach data through these. Never through the database
-directly. `tests/test_capabilities.py` proves that every read capability answers, and refuses,
+assistant only ever reaches data through these. Never through the database directly.
+`tests/test_capabilities.py` proves that every read capability answers, and refuses,
 exactly like its REST route, for an owner, a manager and a staff member.
+
+The assistant lives in `api/app/ai/`:
+
+| File | What it does |
+|------|--------------|
+| `provider.py` | The port: `generate(system, turns, tools)` and `embed(texts)`. Picks the model from settings. |
+| `gemini.py` | Gemini over REST. Tool names travel as `leave__balances`; schemas are simplified for Gemini. |
+| `fake.py` | A scripted model for tests and local demos (`AI_PROVIDER=fake`). |
+| `workspace.py` | Is AI on here, which features, the plan's allowance and what's used. `require()` checks all of it. |
+| `assistant.py` | One question: offer the asker's read tools, run up to six steps, save the answer with sources. |
+| `brief.py` | The weekly brief, worked out from `reports.overview` and `approvals.pending`. |
+| `operator.py` | Platform operators set allowances per plan; workspaces are notified. |
+
+To try it locally without a key, put `AI_PROVIDER=fake` in `.env`, restart the API, then
+switch it on under Settings → AI assistant. With a real key, put `GEMINI_API_KEY=…` instead
+(leave `AI_PROVIDER` empty). Tests use `provider.use_model(FakeModel(...))`; give it a
+`script` of `Reply` objects to make the model do exactly what a test needs, including
+misbehave.
 
 ### 4.11 Python tooling you'll use daily
 
@@ -738,7 +756,7 @@ Budget target: under $50/month for the first customers.
 | Module | A feature area a workspace switches on (leave, payroll…) | section 4.2 |
 | Modular monolith | One app and one database, split into modules with enforced boundaries | [Modular monolith](https://www.kamilgrzybek.com/blog/posts/modular-monolith-primer) |
 | Service function | Where business rules live; routes and capabilities call it | section 4.2 |
-| Capability | A described read/write the AI layer can use | section 4.10 |
+| Capability | A described read/write the AI assistant can use | section 4.10 |
 | Domain event | A record that something happened ("leave.approved") | [Domain events](https://martinfowler.com/eaaDev/DomainEvent.html) |
 | Outbox | Side effects saved with the change, sent after commit | [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html) |
 | Migration | A versioned change to the database schema | [Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) |

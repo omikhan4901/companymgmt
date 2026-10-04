@@ -3,15 +3,16 @@
 **One place to run a company: people, attendance, leave, payroll, tasks and projects, for
 every business from a tea stall with two staff to an agency with many branches.**
 Multi-tenant SaaS in English and বাংলা, with clock-ins checked against each branch's
-location, built so a permission-aware AI assistant can sit on top of it later.
+location, and an AI assistant that only ever sees what the person asking may see.
 
 ![Home](docs/screenshots/home.png)
 
 > **Status (October 2026): paused at a stable, fully tested point.** Milestones 1 to 3
 > are done: accounts, people, attendance, leave, payroll, data rights, notifications,
 > tasks and projects, announcements, documents and policies, the approvals inbox and
-> onboarding checklists, plus the foundations for AI. From the pilot milestone (M4), the
-> spreadsheet import and reports (with weekly and monthly report emails) are done.
+> onboarding checklists. From the pilot milestone (M4), the spreadsheet import and
+> reports (with weekly and monthly report emails) are done. M6, the read-only AI
+> copilot, is done and switches itself on when a Gemini API key is set.
 > A 30-person sample agency runs a whole week in the product, in a test. It isn't live
 > yet: deployment is scripted and waits on cloud accounts. See [Future work](#future-work).
 >
@@ -134,25 +135,28 @@ imports, deletion). Each module only depends on the ones below it, and none depe
 AI layer; import-linter enforces both in CI. Business logic lives in typed service
 functions that the routes call.
 
-### Ready for AI, without AI yet
+### The AI assistant (M6)
 
-The assistant (Milestones 6–7) will never touch the database. It will see what the person
-asking may see, and nothing else:
+The assistant never touches the database. It sees what the person asking may see, and
+nothing else:
 
 - **Capability registry.** Every module describes what it can do as typed capabilities
-  (`people.search`, `leave.balances`, `tasks.my_work`, `payroll.my_payslips`…), each with
+  (`people.search`, `leave.balances`, `tasks.my_work`, `documents.search`…), each with
   input and output schemas, the permission and module it needs, and whether it reads or
-  changes data. They are listed and called under `/v1/ai`, as the signed-in person, with
-  the same checks as the API. Capabilities that change data are refused until
-  propose-and-confirm exists.
+  changes data. The model is offered only the read capabilities the asker can use, and
+  each call runs as them, with the same checks as the API.
 - **A test proves it:** every read capability gives exactly the same answer, or the same
   refusal, as its REST route for an owner, a department-scoped manager and an employee.
-- **Context builder.** One call turns a request into the facts a model needs: workspace,
-  role, permissions, department scope, branch, language, time zone and today's date there.
-- **Domain events.** Important changes (leave decisions, time fixes, payroll, task
-  assignments and comments) are written to an append-only event log in the same
-  transaction as the change. Notifications are built from it now; automations and a weekly
-  brief will read it later.
+- **Switched on by a key, chosen by the workspace.** Setting `GEMINI_API_KEY` turns it on
+  for the server (Gemini Flash over REST, behind a provider port). Each workspace's owner
+  accepts the AI terms, and its admins tick what it helps with: questions, documents and
+  policies, a weekly brief. Questions per month come from the plan, set by platform
+  operators; workspaces are notified when that changes.
+- **Answers cite sources.** Each fact is numbered and links to the page it came from.
+  Tool results are treated as data, never instructions. Conversations are private to the
+  person and can be deleted.
+- **Domain events.** Important changes are written to an append-only event log in the same
+  transaction as the change. Notifications are built from it; automations (M7) will be.
 
 ### Tenant isolation, three layers
 
@@ -245,9 +249,6 @@ What's left, in the order of the [roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-
 
 **Later milestones:**
 - **M5 Billing** with Paddle: checkout, renewals, dunning (plans and limits already exist).
-- **M6 AI copilot (read-only):** "ask my company", policy questions answered with
-  sources, a weekly company brief, all through the existing capabilities and always within
-  the asker's permissions.
 - **M7 AI actions and automation:** the AI proposes, a person confirms; plain-language
   automations; early-warning signals.
 - **M3 leftovers:** approval chains with several steps (they arrive with expenses and
@@ -260,8 +261,8 @@ What's left, in the order of the [roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-
 **Known limits today:** reports are worked out on every request (fine up to a few hundred
 people; larger workspaces will want stored daily totals); lateness uses one start time per
 workspace, not per branch or shift; the weekly days off are one setting per workspace;
-the spreadsheet import reads CSV only; the AI layer is the capability registry only, with
-no model connected yet.
+the spreadsheet import reads CSV only; the assistant hasn't been tried against the real
+Gemini yet (no key configured), and document search is full-text, not semantic.
 
 ## Project documents
 
