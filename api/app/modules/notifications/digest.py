@@ -80,6 +80,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "document_published": "{actor} shared {title}",
         "document_ack_requested": "{actor} asks you to read and acknowledge {title}",
         "ai_allowance_changed": "The assistant allowance for your plan changed",
+        "automation_message": "{title}",
         "other": "Something changed",
     },
     "bn": {
@@ -101,6 +102,7 @@ _KINDS: dict[str, dict[str, str]] = {
         "document_published": "{actor} {title} শেয়ার করেছেন",
         "document_ack_requested": "{actor} আপনাকে {title} পড়ে নিশ্চিত করতে বলেছেন",
         "ai_allowance_changed": "আপনার প্ল্যানে সহকারীর মাসিক সীমা বদলেছে",
+        "automation_message": "{title}",
         "other": "কিছু পরিবর্তন হয়েছে",
     },
 }

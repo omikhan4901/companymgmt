@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Awaitable, Callable
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any
 
@@ -33,6 +34,9 @@ Subscriber = Callable[[AsyncSession, "Event"], Awaitable[None]]
 _now: dict[str, list[Subscriber]] = {}
 _later: dict[str, list[Subscriber]] = {}
 TOPIC = "domain_event"
+# Set while an automation runs: events it causes carry it in `data["origin"]`, so
+# automations never start other automations (no loops).
+origin: ContextVar[str | None] = ContextVar("event_origin", default=None)
 
 
 class DomainEvent(TenantScoped, Base):
@@ -114,6 +118,8 @@ async def emit(
 ) -> Event:
     tenant_id = current_tenant(db)
     actor = actor_user_id or context.current().user_id
+    if origin.get():
+        data = {**(data or {}), "origin": origin.get()}
     row = DomainEvent(
         id=uuid7(),
         tenant_id=tenant_id,

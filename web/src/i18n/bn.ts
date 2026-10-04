@@ -1055,6 +1055,7 @@ const bn: Messages = {
       payroll_submitted: "{{actor}} {{period}}-এর বেতন অনুমোদনের জন্য পাঠিয়েছেন",
       payroll_finalized: "{{period}}-এর পে-স্লিপ তৈরি",
       ai_allowance_changed: "আপনার প্ল্যানে সহকারীর মাসিক সীমা বদলেছে",
+      automation_message: "{{title}}",
       other: "কিছু পরিবর্তন হয়েছে",
     },
   },

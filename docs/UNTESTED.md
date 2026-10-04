@@ -19,3 +19,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   "Help me write" menu in the announcement and new-task dialogs; "Summarise" on documents.
   Writing and summaries now count towards the monthly allowance. Tests
   `test_writing_help_*` and `test_document_summaries_*` written, never run.
+- [ ] **Automations (API).** New module `app/modules/automations` (schedule or event
+  triggers, conditions, notify / create-task actions, recipients incl. overdue tasks and
+  not clocked in), engine with rate limits, auto-pause, loop guard (`events.origin`),
+  `member.joined` event, `/internal/automations/tick` (needs a Cloud Scheduler job every
+  15 minutes, not added to infra yet), migration 0018, AI drafting
+  `POST /v1/ai/automations/draft`. Tests in `api/tests/test_automations.py` and the
+  isolation test, never run; migration applied locally only.

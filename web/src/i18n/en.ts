@@ -1053,6 +1053,7 @@ const en = {
       payroll_submitted: "{{actor}} sent {{period}} payroll for approval",
       payroll_finalized: "Your payslip for {{period}} is ready",
       ai_allowance_changed: "The assistant's monthly allowance for your plan changed",
+      automation_message: "{{title}}",
       other: "Something changed",
     },
   },

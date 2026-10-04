@@ -21,6 +21,8 @@ from app.core.middleware import RequestContextMiddleware
 from app.modules.announcements.routes import router as announcements_router
 from app.modules.approvals.routes import router as approvals_router
 from app.modules.attendance.routes import router as attendance_router
+from app.modules.automations.routes import internal_router as automations_internal_router
+from app.modules.automations.routes import router as automations_router
 from app.modules.documents.routes import router as documents_router
 from app.modules.imports.routes import router as imports_router
 from app.modules.leave.routes import router as leave_router
@@ -55,12 +57,14 @@ ROUTERS = (
     documents_router,
     approvals_router,
     reports_router,
+    automations_router,
     privacy_router,
     ai_router,
     operator_router,
     internal_router,
     notifications_internal_router,
     reports_internal_router,
+    automations_internal_router,
 )
 ops_router = APIRouter(tags=["ops"])
 

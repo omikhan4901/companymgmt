@@ -261,6 +261,15 @@ async def _resources(owner: Account) -> dict[str, str]:
         ids["action_id"] = offered.json()["answer"]["actions"][0]["id"]
     finally:
         provider.use_model(None)
+    automation = await owner.post(
+        "/v1/automations",
+        json={
+            "name": "Monday hello",
+            "trigger": {"type": "schedule", "every": "week"},
+            "actions": [{"type": "notify", "to": {"kind": "everyone"}, "message": "Hello"}],
+        },
+    )
+    ids["automation_id"] = automation.json()["id"]
     assert all(ids.values()), ids
     return ids
 

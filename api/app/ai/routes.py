@@ -9,7 +9,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field, StringConstraints
 
-from app.ai import actions, assistant, brief, operator, workspace, writing
+from app.ai import actions, assistant, automations, brief, operator, workspace, writing
 from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
 from app.modules.platform.capabilities import invoke
@@ -70,6 +70,14 @@ async def write(body: writing.WriteIn, ctx: Ctx = Depends(allow(AI_USE))) -> wri
 @router.post("/documents/{document_id}/summary", response_model=writing.WriteOut)
 async def summarise(document_id: uuid.UUID, ctx: Ctx = Depends(allow(AI_USE))) -> writing.WriteOut:
     return await writing.summarise(ctx, document_id)
+
+
+@router.post("/automations/draft", response_model=automations.DraftOut)
+async def draft_automation(
+    body: automations.DraftIn, ctx: Ctx = Depends(allow(AI_USE))
+) -> automations.DraftOut:
+    """An automation drafted from plain words, for the editor. Nothing is saved."""
+    return await automations.draft(ctx, body)
 
 
 @router.post("/actions/{action_id}/confirm", response_model=actions.ActionOut)
