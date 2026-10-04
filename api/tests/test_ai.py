@@ -10,12 +10,13 @@ from typing import Any
 
 import httpx
 import pytest
+from pydantic import ValidationError
 
 from app.ai import provider
 from app.ai.fake import FakeModel
 from app.ai.gemini import Gemini, simplify
 from app.ai.provider import Reply, Tool, ToolCall, Turn
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from tests.helpers import Account, add_staff, invite_and_join, signup
 from tests.test_data_rights import enable_mfa
 
@@ -306,6 +307,17 @@ def test_a_gemini_key_is_all_it_takes(monkeypatch: pytest.MonkeyPatch) -> None:
     assert isinstance(provider.get_model(), Gemini)
 
 
+def test_the_scripted_model_never_runs_in_production() -> None:
+    with pytest.raises(ValidationError, match="dev and test only"):
+        Settings(
+            env="prod",
+            jwt_private_key="k",
+            field_encryption_keys='{"k1": "' + "A" * 43 + '="}',
+            email_backend="smtp",
+            ai_provider="fake",
+        )
+
+
 async def test_conversations_stay_out_of_workspace_exports(
     client: httpx.AsyncClient, fake: FakeModel
 ) -> None:
@@ -356,6 +368,7 @@ async def test_the_weekly_brief_is_for_report_viewers_and_kept_for_the_week(
     again = (await owner.post("/v1/ai/brief")).json()
     assert (again["message"]["id"], len(fake.calls)) == (message["id"], calls)
     assert (await owner.get("/v1/ai/status")).json()["used"] == 1
+    assert (await owner.get("/v1/ai/conversations")).json() == []  # briefs aren't listed as questions
 
     # A manager's brief covers their departments only.
     assert (await manager.post("/v1/ai/brief")).status_code == 200

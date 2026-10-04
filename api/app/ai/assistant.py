@@ -48,6 +48,8 @@ LINKS = {
     "notifications": "/app",
     "reports": "/app/reports",
 }
+# Weekly briefs are kept as conversations with this title prefix, and listed apart.
+BRIEF_PREFIX = "Brief: week of "
 LANGUAGES = {"en": "English", "bn": "Bangla (বাংলা)"}
 
 SYSTEM = """You are the assistant inside CompanyMgmt, a company management app, for the \
@@ -225,7 +227,10 @@ async def conversations(ctx: Ctx) -> list[ConversationOut]:
     assert ctx.membership is not None
     rows = await ctx.db.scalars(
         select(Conversation)
-        .where(Conversation.membership_id == ctx.membership.id)
+        .where(
+            Conversation.membership_id == ctx.membership.id,
+            Conversation.title.not_like(f"{BRIEF_PREFIX}%"),
+        )
         .order_by(Conversation.updated_at.desc())
         .limit(50)
     )

@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.ai import workspace
-from app.ai.assistant import LANGUAGES, MessageOut, SourceOut, _message_out
+from app.ai.assistant import BRIEF_PREFIX, LANGUAGES, MessageOut, SourceOut, _message_out
 from app.ai.context import build_context
 from app.ai.provider import AIUnavailable, Turn
 from app.core.errors import AppError, Forbidden, Unavailable
@@ -45,7 +45,7 @@ async def brief(ctx: Ctx) -> BriefOut:
     assert ctx.membership is not None
     now = today(ctx.tenant.timezone)
     start = now - timedelta(days=7)
-    title = f"Brief: week of {start.isoformat()}"
+    title = f"{BRIEF_PREFIX}{start.isoformat()}"
     existing = await ctx.db.scalar(
         select(Conversation).where(
             Conversation.membership_id == ctx.membership.id, Conversation.title == title

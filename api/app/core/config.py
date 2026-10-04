@@ -121,6 +121,8 @@ class Settings(BaseSettings):
                 raise ValueError(f"Missing required settings in {self.env}: {', '.join(missing)}")
             if self.email_backend in ("console", "memory"):
                 raise ValueError("A real email backend is required outside dev and test.")
+            if self.ai_provider == "fake":
+                raise ValueError("The scripted AI model is for dev and test only.")
         return self
 
     @property
