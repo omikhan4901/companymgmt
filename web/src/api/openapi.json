@@ -19,6 +19,17 @@
       "maxItems": 50,
       "title": "Features",
       "type": "array"
+     },
+     "signal_people": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Signal People"
      }
     },
     "required": [
@@ -67,6 +78,11 @@
       "format": "date",
       "title": "Resets On",
       "type": "string"
+     },
+     "signal_people": {
+      "default": false,
+      "title": "Signal People",
+      "type": "boolean"
      },
      "terms_accepted": {
       "title": "Terms Accepted",
@@ -2787,6 +2803,21 @@
      }
     },
     "title": "DepartmentPatch",
+    "type": "object"
+   },
+   "DismissIn": {
+    "properties": {
+     "key": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Key",
+      "type": "string"
+     }
+    },
+    "required": [
+     "key"
+    ],
+    "title": "DismissIn",
     "type": "object"
    },
    "DocumentDetail": {
@@ -8634,6 +8665,99 @@
      "branches_located"
     ],
     "title": "SettingsOut",
+    "type": "object"
+   },
+   "SignalOut": {
+    "properties": {
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "attendance_drop",
+       "project_slipping",
+       "project_due",
+       "heavy_workload"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "severity": {
+      "enum": [
+       "notice",
+       "warning"
+      ],
+      "title": "Severity",
+      "type": "string"
+     },
+     "subject": {
+      "title": "Subject",
+      "type": "string"
+     },
+     "values": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "string"
+        }
+       ]
+      },
+      "title": "Values",
+      "type": "object"
+     }
+    },
+    "required": [
+     "key",
+     "kind",
+     "severity",
+     "subject",
+     "link"
+    ],
+    "title": "SignalOut",
+    "type": "object"
+   },
+   "SignalsOut": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/SignalOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "on": {
+      "title": "On",
+      "type": "boolean"
+     },
+     "people": {
+      "title": "People",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "on",
+     "people",
+     "items"
+    ],
+    "title": "SignalsOut",
     "type": "object"
    },
    "SignupIn": {
@@ -18316,6 +18440,62 @@
      }
     },
     "summary": "Overview",
+    "tags": [
+     "reports"
+    ]
+   }
+  },
+  "/v1/reports/signals": {
+   "get": {
+    "description": "Early-warning signals within your departments (when the workspace has them on).",
+    "operationId": "get_signals_v1_reports_signals_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SignalsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Signals",
+    "tags": [
+     "reports"
+    ]
+   }
+  },
+  "/v1/reports/signals/dismiss": {
+   "post": {
+    "operationId": "dismiss_signal_v1_reports_signals_dismiss_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DismissIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Dismiss Signal",
     "tags": [
      "reports"
     ]

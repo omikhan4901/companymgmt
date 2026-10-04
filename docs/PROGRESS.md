@@ -1,7 +1,7 @@
 # Progress
 
 Current work: **the owner's 2026-10-04 plan** (below). The marketing site and M6 (AI
-copilot) are done; next is M7 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
+copilot) are done; M7 is built but untested (speed mode, `docs/UNTESTED.md`); next is M8 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
 on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
 
 ## Owner decisions, 2026-10-04 (follow these)
@@ -281,6 +281,27 @@ architecture one-pager. Only built features and measured numbers.
 - For the legal review: Google as a sub-processor, cross-border transfer, the paid tier
   (no training on prompts) as a hard requirement, and how long conversations are kept.
 
+## M7: built, not yet tested (AI actions and automation)
+
+Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
+- **Actions:** the assistant offers to create or change tasks, comment, ask for or decide
+  leave, and post announcements. It only proposes; the person who asked confirms, as
+  themselves, within an hour, and the change is audited "via the assistant".
+- **Writing help:** draft from notes, improve, shorten, translate (English ↔ Bangla) in the
+  announcement and task dialogs; summaries of documents the person can open.
+- **Automations:** schedule (day, working day, week, month, in the workspace's time zone)
+  or event triggers (joining, leave, tasks, documents, news, payroll), conditions on event
+  values, steps that notify people or create tasks; recipients by role, department,
+  chosen people, the person it's about, people with overdue tasks or not clocked in.
+  They run as their owner, pause themselves when they run too often or their owner
+  leaves, never start each other, and keep a run history. Starter templates, and
+  drafts from plain words for review.
+- **Signals:** attendance dropping in a department, projects slipping or due soon, and
+  (only when chosen) people with unusually many open tasks. Dismissible.
+- Each is a feature admins tick under Settings → AI assistant: actions, writing,
+  automations (the AI drafting; the editor is always there for owners and admins),
+  signals.
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -304,3 +325,4 @@ architecture one-pager. Only built features and measured numbers.
 - 2026-10-01: M4.2 report emails. Edge-case fixes. Developer guide and final README. Paused.
 - 2026-10-04: Marketing site restyled in the ResumeX look. Owner's M6–M11 decisions recorded; developer platform and easy onboarding added to M10.
 - 2026-10-04: M6 done: Gemini behind a port, switched on by a key; per-workspace opt-in and features; operator allowances with notifications; Ask with cited sources; document search; weekly brief.
+- 2026-10-04: Owner switched to speed mode (code and unit tests, lint and types only; `docs/UNTESTED.md`). M7 built: actions with confirmation, writing help, automations, signals.

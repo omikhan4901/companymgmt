@@ -2444,6 +2444,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/reports/signals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Signals
+         * @description Early-warning signals within your departments (when the workspace has them on).
+         */
+        get: operations["get_signals_v1_reports_signals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reports/signals/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss Signal */
+        post: operations["dismiss_signal_v1_reports_signals_dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/reports/subscription": {
         parameters: {
             query?: never;
@@ -2723,6 +2760,8 @@ export interface components {
             enabled: boolean;
             /** Features */
             features?: string[];
+            /** Signal People */
+            signal_people?: boolean | null;
         };
         /** AIStatusOut */
         AIStatusOut: {
@@ -2743,6 +2782,11 @@ export interface components {
              * Format: date
              */
             resets_on: string;
+            /**
+             * Signal People
+             * @default false
+             */
+            signal_people: boolean;
             /** Terms Accepted */
             terms_accepted: boolean;
             /** Used */
@@ -3617,6 +3661,11 @@ export interface components {
             name?: string | null;
             /** Parent Id */
             parent_id?: string | null;
+        };
+        /** DismissIn */
+        DismissIn: {
+            /** Key */
+            key: string;
         };
         /** DocumentDetail */
         DocumentDetail: {
@@ -5526,6 +5575,38 @@ export interface components {
             location_mode: "off" | "record" | "require";
             /** Max Accuracy M */
             max_accuracy_m: number;
+        };
+        /** SignalOut */
+        SignalOut: {
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "attendance_drop" | "project_slipping" | "project_due" | "heavy_workload";
+            /** Link */
+            link: string | null;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "notice" | "warning";
+            /** Subject */
+            subject: string;
+            /** Values */
+            values?: {
+                [key: string]: number | string;
+            };
+        };
+        /** SignalsOut */
+        SignalsOut: {
+            /** Items */
+            items: components["schemas"]["SignalOut"][];
+            /** On */
+            on: boolean;
+            /** People */
+            people: boolean;
         };
         /** SignupIn */
         SignupIn: {
@@ -11556,6 +11637,57 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OverviewOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_signals_v1_reports_signals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignalsOut"];
+                };
+            };
+        };
+    };
+    dismiss_signal_v1_reports_signals_dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DismissIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

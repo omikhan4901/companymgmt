@@ -47,6 +47,8 @@ class AISettings(TenantScoped, TimestampMixin, Versioned, Base):
     terms_accepted_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     # Features the workspace's admins ticked for AI help (M7); empty until they choose.
     features: Mapped[list[str]] = mapped_column(JSONB, default=list)
+    # Early-warning signals about individual people (heavy workloads); off unless chosen.
+    signal_people: Mapped[bool] = mapped_column(Boolean, default=False, server_default=expression.false())
 
 
 class AIUsage(IdMixin, TenantScoped, TimestampMixin, Base):

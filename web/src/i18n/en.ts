@@ -1132,6 +1132,8 @@ const en = {
     summary: "Summary",
     summarise: "Summarise",
     summaryNote: "Written by the assistant from this file. The file itself is what counts.",
+    signalPeople: "Signals about individual people",
+    signalPeopleHint: "For example, someone with far more open tasks than colleagues. Tell your team these exist if you switch this on.",
     confirm: "Confirm",
     openResult: "Open it",
     actionDone: "Done.",
@@ -1278,6 +1280,18 @@ const en = {
     couldntDraft: "The assistant couldn't turn that into an automation.",
     deleteTitle: "Delete {{name}}?",
     deleteBody: "Its run history goes too. This can't be undone.",
+  },
+  signals: {
+    title: "Needs a look",
+    sub: "Unusual changes in your departments, worked out from the numbers.",
+    note: "Signals describe what changed. They aren't a judgement of anyone. Dismissed ones stay hidden for 30 days.",
+    dismiss: "Dismiss signal about {{subject}}",
+    kinds: {
+      attendance_drop: "attendance was {{now}}% over the last 30 days, down from {{before}}%.",
+      project_slipping: "{{overdue}} of {{open}} open tasks are overdue.",
+      project_due: "due {{due}} with {{open}} tasks still open.",
+      heavy_workload: "{{open}} open tasks, where most people have about {{typical}}.",
+    },
   },
   palette: {
     title: "Go to or do",

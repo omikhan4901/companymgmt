@@ -29,3 +29,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   (schedule/event, conditions, notify/create-task steps, recipient picker), starter
   templates, "Describe what you want" (AI draft). Nav item for `automations.manage`.
   No browser test yet; never opened in a browser.
+- [ ] **Early-warning signals.** `app/modules/reports/signals.py` (attendance drop by
+  department, projects slipping or due, heavy workloads when `signal_people` is on),
+  `GET /v1/reports/signals`, dismiss for 30 days, migration 0019 (`signal_dismissals`,
+  `ai_settings.signal_people`); "Needs a look" card on Reports; people-signals switch in
+  AI settings. Tests in `api/tests/test_signals.py` never run; the attendance-drop signal
+  has no test at all (needs attendance history seeded); performance with many
+  departments unmeasured (two overview reports per department).

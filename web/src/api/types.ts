@@ -88,3 +88,5 @@ export type Automation = S["AutomationOut"];
 export type AutomationInput = S["AutomationIn"];
 export type AutomationRun = S["AutomationRunOut"];
 export type AutomationDraft = S["DraftOut"];
+export type Signals = S["SignalsOut"];
+export type Signal = S["SignalOut"];

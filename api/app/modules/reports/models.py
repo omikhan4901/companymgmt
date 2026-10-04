@@ -31,3 +31,19 @@ class ReportSubscription(IdMixin, TenantScoped, TimestampMixin, Base):
     # None: everything the member can see.
     department_id: Mapped[uuid.UUID | None]
     last_sent_on: Mapped[date | None] = mapped_column(Date)
+
+
+class SignalDismissal(IdMixin, TenantScoped, TimestampMixin, Base):
+    """Someone dismissed a signal; it stays hidden for them until `until`."""
+
+    __tablename__ = "signal_dismissals"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "membership_id", "key"),
+        ForeignKeyConstraint(
+            ["tenant_id", "membership_id"], ["memberships.tenant_id", "memberships.id"], ondelete="CASCADE"
+        ),
+    )
+
+    membership_id: Mapped[uuid.UUID]
+    key: Mapped[str] = mapped_column(String(200))
+    until: Mapped[date] = mapped_column(Date)

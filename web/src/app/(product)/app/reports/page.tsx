@@ -12,6 +12,7 @@ import { departmentOptions, useDepartments } from "@/api/hooks";
 import type { Overview, ReportSubscription } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { BarChart, type Bar } from "@/components/bar-chart";
+import { SignalsCard } from "@/components/ai/signals";
 import { PageHeader } from "@/components/page";
 import { Card, CardHeader, EmptyState } from "@/components/ui/card";
 import { Switch } from "@/components/ui/choice";
@@ -197,6 +198,7 @@ export default function ReportsPage() {
   return (
     <>
       <PageHeader title={t("reports.title")} sub={t("reports.sub")} />
+      <SignalsCard />
       <div className="mb-5 flex flex-wrap items-end gap-3">
         <Field label={t("reports.period")} className="w-full sm:w-52">
           <Select value={period} onChange={(e) => setPeriod(e.target.value as Period)}>

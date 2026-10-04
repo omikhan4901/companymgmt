@@ -38,17 +38,20 @@ class AIStatusOut(BaseModel):
     allowance: int | None
     used: int
     resets_on: date
+    signal_people: bool = False
 
 
 class AISettingsIn(BaseModel):
     enabled: bool
     accept_terms: bool = False
     features: list[str] = Field(default_factory=list, max_length=50)
+    # None leaves it as it is.
+    signal_people: bool | None = None
 
 
 async def settings(ctx: Ctx) -> AISettings:
     row = await ctx.db.scalar(select(AISettings))
-    return row or AISettings(enabled=False, features=[])
+    return row or AISettings(enabled=False, features=[], signal_people=False)
 
 
 async def allowance(ctx: Ctx) -> int | None:
@@ -89,6 +92,7 @@ async def status(ctx: Ctx) -> AIStatusOut:
         allowance=await allowance(ctx),
         used=await used(ctx),
         resets_on=resets,
+        signal_people=bool(row.signal_people),
     )
 
 
@@ -99,7 +103,7 @@ async def save(ctx: Ctx, body: AISettingsIn) -> AIStatusOut:
         raise Invalid(errors=[{"field": "features", "message": f"Unknown feature: {unknown[0]}"}])
     row = await ctx.db.scalar(select(AISettings).with_for_update())
     if row is None:
-        row = AISettings(tenant_id=ctx.tenant_id, enabled=False, features=[])
+        row = AISettings(tenant_id=ctx.tenant_id, enabled=False, features=[], signal_people=False)
         ctx.db.add(row)
     if body.accept_terms and row.terms_accepted_at is None:
         if not ctx.is_owner:
@@ -111,13 +115,18 @@ async def save(ctx: Ctx, body: AISettingsIn) -> AIStatusOut:
     before = {"enabled": row.enabled, "features": list(row.features or [])}
     row.enabled = body.enabled
     row.features = sorted(set(body.features))
+    if body.signal_people is not None:
+        row.signal_people = body.signal_people
     await ctx.db.flush()
     await audit.record(
         ctx.db,
         "ai.settings_changed",
         target_type="workspace",
         target_id=ctx.tenant_id,
-        data={"before": before, "after": {"enabled": row.enabled, "features": row.features}},
+        data={
+            "before": before,
+            "after": {"enabled": row.enabled, "features": row.features, "signal_people": row.signal_people},
+        },
     )
     await ctx.db.commit()
     return await status(ctx)

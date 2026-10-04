@@ -25,6 +25,7 @@ interface Change {
   enabled: boolean;
   features: string[];
   accept_terms?: boolean;
+  signal_people?: boolean;
 }
 
 /** Workspace admins switch the assistant on and choose which features it helps with. */
@@ -79,6 +80,15 @@ export function AISettings() {
           </Card>
         ))}
       </fieldset>
+      {s.features.includes("signals") && (
+        <Card className="flex items-center gap-3 px-4 py-3">
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="font-medium">{t("ai.signalPeople")}</span>
+            <span className="text-xs text-muted">{t("ai.signalPeopleHint")}</span>
+          </span>
+          <Switch checked={s.signal_people ?? false} disabled={!s.enabled || save.isPending} onCheckedChange={(on) => change({ signal_people: on })} aria-label={t("ai.signalPeople")} />
+        </Card>
+      )}
       <p className="text-xs text-muted">{t("ai.privacy")}</p>
       <Dialog open={!!terms} onOpenChange={(o) => !o && setTerms(null)}>
         <DialogContent
