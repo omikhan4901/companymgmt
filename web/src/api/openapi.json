@@ -294,57 +294,6 @@
     "title": "ActionOut",
     "type": "object"
    },
-   "AdjustmentIn": {
-    "additionalProperties": false,
-    "properties": {
-     "days": {
-      "anyOf": [
-       {
-        "maximum": 366.0,
-        "minimum": -366.0,
-        "multipleOf": 0.5,
-        "type": "number"
-       },
-       {
-        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-        "type": "string"
-       }
-      ],
-      "title": "Days"
-     },
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "leave_type_id": {
-      "format": "uuid",
-      "title": "Leave Type Id",
-      "type": "string"
-     },
-     "reason": {
-      "maxLength": 300,
-      "minLength": 3,
-      "title": "Reason",
-      "type": "string"
-     },
-     "year": {
-      "maximum": 2100.0,
-      "minimum": 2000.0,
-      "title": "Year",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "employee_id",
-     "leave_type_id",
-     "year",
-     "days",
-     "reason"
-    ],
-    "title": "AdjustmentIn",
-    "type": "object"
-   },
    "AdjustmentOut": {
     "properties": {
      "created_at": {
@@ -1853,6 +1802,37 @@
     "title": "CalendarEntry",
     "type": "object"
    },
+   "CategoryTotal": {
+    "properties": {
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "category_id",
+     "name",
+     "total"
+    ],
+    "title": "CategoryTotal",
+    "type": "object"
+   },
    "CellError": {
     "properties": {
      "column": {
@@ -2020,6 +2000,34 @@
      }
     },
     "title": "ClockOut",
+    "type": "object"
+   },
+   "CloseIn": {
+    "additionalProperties": false,
+    "properties": {
+     "counted_cash": {
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Counted Cash",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "counted_cash"
+    ],
+    "title": "CloseIn",
     "type": "object"
    },
    "CodeIn": {
@@ -2545,6 +2553,249 @@
     "title": "CurrentWorkspace",
     "type": "object"
    },
+   "CustomerIn": {
+    "additionalProperties": false,
+    "properties": {
+     "address": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "credit_limit": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Credit Limit"
+     },
+     "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "CustomerIn",
+    "type": "object"
+   },
+   "CustomerOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "credit_limit": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Credit Limit"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_activity": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Activity"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "phone",
+     "address",
+     "note",
+     "credit_limit",
+     "active",
+     "balance",
+     "last_activity",
+     "version"
+    ],
+    "title": "CustomerOut",
+    "type": "object"
+   },
+   "CustomerPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Active"
+     },
+     "address": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "credit_limit": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Credit Limit"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "no_limit": {
+      "default": false,
+      "title": "No Limit",
+      "type": "boolean"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     }
+    },
+    "title": "CustomerPatch",
+    "type": "object"
+   },
    "DayOut": {
     "properties": {
      "date": {
@@ -2572,6 +2823,30 @@
      "needs_review"
     ],
     "title": "DayOut",
+    "type": "object"
+   },
+   "DayTotal": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "day": {
+      "format": "date",
+      "title": "Day",
+      "type": "string"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "day",
+     "count",
+     "total"
+    ],
+    "title": "DayTotal",
     "type": "object"
    },
    "DecisionIn": {
@@ -3880,6 +4155,78 @@
     "title": "EmployeePatch",
     "type": "object"
    },
+   "EntryOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "sale",
+       "return",
+       "payment",
+       "adjustment"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "format": "date",
+      "title": "Occurred On",
+      "type": "string"
+     },
+     "sale_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sale Id"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "amount",
+     "occurred_on",
+     "sale_id",
+     "note",
+     "created_at",
+     "balance"
+    ],
+    "title": "EntryOut",
+    "type": "object"
+   },
    "EventInfo": {
     "properties": {
      "about_a_person": {
@@ -3930,6 +4277,359 @@
      "event"
     ],
     "title": "EventTrigger",
+    "type": "object"
+   },
+   "ExpenseIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     },
+     "paid_from": {
+      "default": "petty_cash",
+      "enum": [
+       "drawer",
+       "petty_cash",
+       "bank",
+       "other"
+      ],
+      "title": "Paid From",
+      "type": "string"
+     },
+     "payee": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Payee"
+     }
+    },
+    "required": [
+     "amount"
+    ],
+    "title": "ExpenseIn",
+    "type": "object"
+   },
+   "ExpenseOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "category_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Name"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created By Name"
+     },
+     "has_receipt": {
+      "title": "Has Receipt",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "expense",
+       "top_up"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "format": "date",
+      "title": "Occurred On",
+      "type": "string"
+     },
+     "paid_from": {
+      "enum": [
+       "drawer",
+       "petty_cash",
+       "bank",
+       "other"
+      ],
+      "title": "Paid From",
+      "type": "string"
+     },
+     "payee": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Payee"
+     },
+     "receipt_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Receipt Name"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "occurred_on",
+     "amount",
+     "category_id",
+     "category_name",
+     "payee",
+     "note",
+     "paid_from",
+     "branch_id",
+     "created_by_name",
+     "created_at",
+     "has_receipt",
+     "receipt_name",
+     "version"
+    ],
+    "title": "ExpenseOut",
+    "type": "object"
+   },
+   "ExpensePatch": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 10000000000000.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Amount"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     },
+     "paid_from": {
+      "anyOf": [
+       {
+        "enum": [
+         "drawer",
+         "petty_cash",
+         "bank",
+         "other"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Paid From"
+     },
+     "payee": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Payee"
+     }
+    },
+    "title": "ExpensePatch",
+    "type": "object"
+   },
+   "ExpensesOut": {
+    "properties": {
+     "by_category": {
+      "items": {
+       "$ref": "#/components/schemas/CategoryTotal"
+      },
+      "title": "By Category",
+      "type": "array"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ExpenseOut"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "petty_cash": {
+      "title": "Petty Cash",
+      "type": "integer"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "items",
+     "total",
+     "by_category",
+     "petty_cash"
+    ],
+    "title": "ExpensesOut",
     "type": "object"
    },
    "FieldOut": {
@@ -4812,6 +5512,205 @@
     "title": "LeaveTypePatch",
     "type": "object"
    },
+   "LineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "discount": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Discount",
+      "type": "integer"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "product_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Product Id"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 100000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "default": "1",
+      "title": "Quantity"
+     },
+     "tax_rate_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 10,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Rate Ids"
+     },
+     "unit_price": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit Price"
+     }
+    },
+    "title": "LineIn",
+    "type": "object"
+   },
+   "LineOut": {
+    "properties": {
+     "discount": {
+      "title": "Discount",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "product_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Product Id"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "returned": {
+      "default": "0",
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Returned",
+      "type": "string"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "taxes": {
+      "items": {
+       "$ref": "#/components/schemas/LineTaxOut"
+      },
+      "title": "Taxes",
+      "type": "array"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     },
+     "unit_price": {
+      "title": "Unit Price",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "product_id",
+     "name",
+     "quantity",
+     "unit_price",
+     "discount",
+     "net",
+     "tax",
+     "total",
+     "taxes"
+    ],
+    "title": "LineOut",
+    "type": "object"
+   },
+   "LineTaxOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "percent": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Percent",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "percent",
+     "amount"
+    ],
+    "title": "LineTaxOut",
+    "type": "object"
+   },
    "LoanIn": {
     "additionalProperties": false,
     "properties": {
@@ -5627,6 +6526,32 @@
     "title": "OnboardingRunOut",
     "type": "object"
    },
+   "OpenIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "opening_float": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Opening Float",
+      "type": "integer"
+     }
+    },
+    "title": "OpenIn",
+    "type": "object"
+   },
    "OperatorMe": {
     "properties": {
      "operator": {
@@ -5921,6 +6846,46 @@
      "amount"
     ],
     "title": "PayLine",
+    "type": "object"
+   },
+   "PaymentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     }
+    },
+    "required": [
+     "amount"
+    ],
+    "title": "PaymentIn",
     "type": "object"
    },
    "PayrollSettingsIn": {
@@ -6564,6 +7529,319 @@
     "title": "PresentOut",
     "type": "object"
    },
+   "ProductIn": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "favorite": {
+      "default": false,
+      "title": "Favorite",
+      "type": "boolean"
+     },
+     "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "default": 0,
+      "maximum": 100000.0,
+      "minimum": 0.0,
+      "title": "Position",
+      "type": "integer"
+     },
+     "price": {
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Price",
+      "type": "integer"
+     },
+     "tax_rate_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 10,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Rate Ids"
+     },
+     "unit": {
+      "default": "pcs",
+      "maxLength": 10,
+      "minLength": 1,
+      "title": "Unit",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "price"
+    ],
+    "title": "ProductIn",
+    "type": "object"
+   },
+   "ProductOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "favorite": {
+      "title": "Favorite",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "title": "Position",
+      "type": "integer"
+     },
+     "price": {
+      "title": "Price",
+      "type": "integer"
+     },
+     "tax_rate_ids": {
+      "items": {
+       "format": "uuid",
+       "type": "string"
+      },
+      "title": "Tax Rate Ids",
+      "type": "array"
+     },
+     "unit": {
+      "title": "Unit",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "code",
+     "category_id",
+     "price",
+     "tax_rate_ids",
+     "unit",
+     "favorite",
+     "active",
+     "position",
+     "version"
+    ],
+    "title": "ProductOut",
+    "type": "object"
+   },
+   "ProductPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Active"
+     },
+     "category_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Id"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "favorite": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Favorite"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "position": {
+      "anyOf": [
+       {
+        "maximum": 100000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Position"
+     },
+     "price": {
+      "anyOf": [
+       {
+        "maximum": 10000000000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price"
+     },
+     "tax_rate_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "format": "uuid",
+         "type": "string"
+        },
+        "maxItems": 10,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Rate Ids"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "maxLength": 10,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     }
+    },
+    "title": "ProductPatch",
+    "type": "object"
+   },
+   "ProductTotal": {
+    "properties": {
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "name",
+     "quantity",
+     "total"
+    ],
+    "title": "ProductTotal",
+    "type": "object"
+   },
    "ProfileIn": {
     "additionalProperties": false,
     "properties": {
@@ -7080,55 +8358,11 @@
     "title": "ReauthIn",
     "type": "object"
    },
-   "ReceiptOut": {
-    "properties": {
-     "department": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Department"
-     },
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "read_at": {
-      "anyOf": [
-       {
-        "format": "date-time",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Read At"
-     }
-    },
-    "required": [
-     "employee_id",
-     "name",
-     "department",
-     "read_at"
-    ],
-    "title": "ReceiptOut",
-    "type": "object"
-   },
    "ReceiptsOut": {
     "properties": {
      "people": {
       "items": {
-       "$ref": "#/components/schemas/ReceiptOut"
+       "$ref": "#/components/schemas/app__modules__announcements__schemas__ReceiptOut"
       },
       "title": "People",
       "type": "array"
@@ -7920,6 +9154,78 @@
     "title": "ResetIn",
     "type": "object"
    },
+   "ReturnIn": {
+    "additionalProperties": false,
+    "properties": {
+     "client_id": {
+      "format": "uuid",
+      "title": "Client Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/ReturnLineIn"
+      },
+      "maxItems": 200,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "to_account": {
+      "default": false,
+      "title": "To Account",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "client_id",
+     "lines"
+    ],
+    "title": "ReturnIn",
+    "type": "object"
+   },
+   "ReturnLineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "line_id": {
+      "format": "uuid",
+      "title": "Line Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 100000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,9}|(?=[\\d.]{1,13}0*$)\\d{0,9}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     }
+    },
+    "required": [
+     "line_id",
+     "quantity"
+    ],
+    "title": "ReturnLineIn",
+    "type": "object"
+   },
    "RoleIn": {
     "additionalProperties": false,
     "properties": {
@@ -8473,6 +9779,239 @@
     "title": "RunOut",
     "type": "object"
    },
+   "SaleIn": {
+    "additionalProperties": false,
+    "properties": {
+     "client_id": {
+      "format": "uuid",
+      "title": "Client Id",
+      "type": "string"
+     },
+     "customer_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Customer Id"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/LineIn"
+      },
+      "maxItems": 200,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "paid_cash": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Paid Cash",
+      "type": "integer"
+     },
+     "sold_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sold At"
+     }
+    },
+    "required": [
+     "client_id",
+     "lines"
+    ],
+    "title": "SaleIn",
+    "type": "object"
+   },
+   "SaleOut": {
+    "properties": {
+     "change": {
+      "title": "Change",
+      "type": "integer"
+     },
+     "customer_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Customer Id"
+     },
+     "customer_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Customer Name"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "sale",
+       "return"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/LineOut"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "number": {
+      "title": "Number",
+      "type": "integer"
+     },
+     "on_account": {
+      "title": "On Account",
+      "type": "integer"
+     },
+     "original_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Original Id"
+     },
+     "paid_cash": {
+      "title": "Paid Cash",
+      "type": "integer"
+     },
+     "prices_include_tax": {
+      "title": "Prices Include Tax",
+      "type": "boolean"
+     },
+     "rounding": {
+      "title": "Rounding",
+      "type": "integer"
+     },
+     "sold_at": {
+      "format": "date-time",
+      "title": "Sold At",
+      "type": "string"
+     },
+     "sold_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sold By Name"
+     },
+     "status": {
+      "enum": [
+       "completed",
+       "voided"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     },
+     "void_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Void Reason"
+     }
+    },
+    "required": [
+     "id",
+     "number",
+     "kind",
+     "status",
+     "original_id",
+     "sold_at",
+     "sold_by_name",
+     "customer_id",
+     "customer_name",
+     "net",
+     "tax",
+     "rounding",
+     "total",
+     "paid_cash",
+     "change",
+     "on_account",
+     "prices_include_tax",
+     "note",
+     "void_reason",
+     "lines"
+    ],
+    "title": "SaleOut",
+    "type": "object"
+   },
    "ScheduleTrigger": {
     "properties": {
      "day": {
@@ -8517,59 +10056,27 @@
     "title": "ScheduleTrigger",
     "type": "object"
    },
-   "SessionOut": {
+   "SellerTotal": {
     "properties": {
-     "created_at": {
-      "format": "date-time",
-      "title": "Created At",
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
       "type": "string"
      },
-     "current": {
-      "title": "Current",
-      "type": "boolean"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "ip": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Ip"
-     },
-     "last_seen_at": {
-      "format": "date-time",
-      "title": "Last Seen At",
-      "type": "string"
-     },
-     "user_agent": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "User Agent"
+     "total": {
+      "title": "Total",
+      "type": "integer"
      }
     },
     "required": [
-     "id",
-     "created_at",
-     "last_seen_at",
-     "ip",
-     "user_agent",
-     "current"
+     "name",
+     "count",
+     "total"
     ],
-    "title": "SessionOut",
+    "title": "SellerTotal",
     "type": "object"
    },
    "SettingsIn": {
@@ -8665,6 +10172,144 @@
      "branches_located"
     ],
     "title": "SettingsOut",
+    "type": "object"
+   },
+   "ShopSettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "cash_rounding": {
+      "default": 1,
+      "maximum": 10000.0,
+      "minimum": 1.0,
+      "title": "Cash Rounding",
+      "type": "integer"
+     },
+     "prices_include_tax": {
+      "default": true,
+      "title": "Prices Include Tax",
+      "type": "boolean"
+     },
+     "receipt_footer": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Receipt Footer"
+     },
+     "receipt_header": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Receipt Header"
+     },
+     "tax_id": {
+      "anyOf": [
+       {
+        "maxLength": 60,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id"
+     },
+     "tax_id_label": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id Label"
+     }
+    },
+    "title": "ShopSettingsIn",
+    "type": "object"
+   },
+   "ShopSettingsOut": {
+    "properties": {
+     "cash_rounding": {
+      "title": "Cash Rounding",
+      "type": "integer"
+     },
+     "prices_include_tax": {
+      "title": "Prices Include Tax",
+      "type": "boolean"
+     },
+     "receipt_footer": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Receipt Footer"
+     },
+     "receipt_header": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Receipt Header"
+     },
+     "tax_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id"
+     },
+     "tax_id_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id Label"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "prices_include_tax",
+     "cash_rounding",
+     "tax_id_label",
+     "tax_id",
+     "receipt_header",
+     "receipt_footer",
+     "version"
+    ],
+    "title": "ShopSettingsOut",
     "type": "object"
    },
    "SignalOut": {
@@ -9023,6 +10668,62 @@
      "template_id"
     ],
     "title": "StartIn",
+    "type": "object"
+   },
+   "StatementOut": {
+    "properties": {
+     "closing": {
+      "title": "Closing",
+      "type": "integer"
+     },
+     "customer": {
+      "$ref": "#/components/schemas/CustomerOut"
+     },
+     "end": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "End"
+     },
+     "entries": {
+      "items": {
+       "$ref": "#/components/schemas/EntryOut"
+      },
+      "title": "Entries",
+      "type": "array"
+     },
+     "opening": {
+      "title": "Opening",
+      "type": "integer"
+     },
+     "start": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start"
+     }
+    },
+    "required": [
+     "customer",
+     "opening",
+     "entries",
+     "closing",
+     "start",
+     "end"
+    ],
+    "title": "StatementOut",
     "type": "object"
    },
    "StatusOut": {
@@ -9431,6 +11132,93 @@
      "has_email"
     ],
     "title": "SubscriptionOut",
+    "type": "object"
+   },
+   "SummaryOut": {
+    "properties": {
+     "cash": {
+      "title": "Cash",
+      "type": "integer"
+     },
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "days": {
+      "items": {
+       "$ref": "#/components/schemas/DayTotal"
+      },
+      "title": "Days",
+      "type": "array"
+     },
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "on_account": {
+      "title": "On Account",
+      "type": "integer"
+     },
+     "products": {
+      "items": {
+       "$ref": "#/components/schemas/ProductTotal"
+      },
+      "title": "Products",
+      "type": "array"
+     },
+     "returns": {
+      "title": "Returns",
+      "type": "integer"
+     },
+     "sellers": {
+      "items": {
+       "$ref": "#/components/schemas/SellerTotal"
+      },
+      "title": "Sellers",
+      "type": "array"
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "taxes": {
+      "items": {
+       "$ref": "#/components/schemas/TaxSummary"
+      },
+      "title": "Taxes",
+      "type": "array"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "start",
+     "end",
+     "count",
+     "net",
+     "tax",
+     "total",
+     "cash",
+     "on_account",
+     "returns",
+     "taxes",
+     "sellers",
+     "products",
+     "days"
+    ],
+    "title": "SummaryOut",
     "type": "object"
    },
    "SwitchIn": {
@@ -10107,6 +11895,133 @@
     "title": "TaskSummary",
     "type": "object"
    },
+   "TaxRateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 20,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "compound": {
+      "default": false,
+      "title": "Compound",
+      "type": "boolean"
+     },
+     "default": {
+      "default": false,
+      "title": "Default",
+      "type": "boolean"
+     },
+     "name": {
+      "maxLength": 60,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "percent": {
+      "anyOf": [
+       {
+        "maximum": 100.0,
+        "minimum": 0.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,3}|(?=[\\d.]{1,8}0*$)\\d{0,3}\\.\\d{0,4}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Percent"
+     },
+     "position": {
+      "default": 0,
+      "maximum": 1000.0,
+      "minimum": 0.0,
+      "title": "Position",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "name",
+     "percent"
+    ],
+    "title": "TaxRateIn",
+    "type": "object"
+   },
+   "TaxRateOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "compound": {
+      "title": "Compound",
+      "type": "boolean"
+     },
+     "default": {
+      "title": "Default",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "percent": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Percent",
+      "type": "string"
+     },
+     "position": {
+      "title": "Position",
+      "type": "integer"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "code",
+     "percent",
+     "compound",
+     "position",
+     "active",
+     "default",
+     "version"
+    ],
+    "title": "TaxRateOut",
+    "type": "object"
+   },
    "TaxSlab-Input": {
     "properties": {
      "rate": {
@@ -10170,6 +12085,52 @@
      "rate"
     ],
     "title": "TaxSlab",
+    "type": "object"
+   },
+   "TaxSummary": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "percent": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Percent",
+      "type": "string"
+     },
+     "taxable": {
+      "title": "Taxable",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "code",
+     "percent",
+     "taxable",
+     "amount"
+    ],
+    "title": "TaxSummary",
     "type": "object"
    },
    "TaxTable-Input": {
@@ -10523,6 +12484,46 @@
     "title": "TokenOut",
     "type": "object"
    },
+   "TopUpIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     }
+    },
+    "required": [
+     "amount"
+    ],
+    "title": "TopUpIn",
+    "type": "object"
+   },
    "UnreadOut": {
     "properties": {
      "unread": {
@@ -10663,6 +12664,22 @@
      "created_at"
     ],
     "title": "VersionOut",
+    "type": "object"
+   },
+   "VoidIn": {
+    "additionalProperties": false,
+    "properties": {
+     "reason": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+     }
+    },
+    "required": [
+     "reason"
+    ],
+    "title": "VoidIn",
     "type": "object"
    },
    "WorkspaceIn": {
@@ -10962,6 +12979,556 @@
      "text"
     ],
     "title": "WriteOut",
+    "type": "object"
+   },
+   "app__modules__announcements__schemas__ReceiptOut": {
+    "properties": {
+     "department": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "read_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Read At"
+     }
+    },
+    "required": [
+     "employee_id",
+     "name",
+     "department",
+     "read_at"
+    ],
+    "title": "ReceiptOut",
+    "type": "object"
+   },
+   "app__modules__customers__schemas__AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "maximum": 10000000000000.0,
+      "minimum": -10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "note": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Note",
+      "type": "string"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     }
+    },
+    "required": [
+     "amount",
+     "note"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
+   "app__modules__expenses__schemas__CategoryIn": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "maxLength": 20,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "name": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "default": 0,
+      "maximum": 10000.0,
+      "minimum": 0.0,
+      "title": "Position",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "CategoryIn",
+    "type": "object"
+   },
+   "app__modules__expenses__schemas__CategoryOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "title": "Position",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "code",
+     "active",
+     "position"
+    ],
+    "title": "CategoryOut",
+    "type": "object"
+   },
+   "app__modules__leave__schemas__AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": -366.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "title": "Days"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Reason",
+      "type": "string"
+     },
+     "year": {
+      "maximum": 2100.0,
+      "minimum": 2000.0,
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "leave_type_id",
+     "year",
+     "days",
+     "reason"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
+   "app__modules__platform__routes_auth__SessionOut": {
+    "properties": {
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "current": {
+      "title": "Current",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "ip": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ip"
+     },
+     "last_seen_at": {
+      "format": "date-time",
+      "title": "Last Seen At",
+      "type": "string"
+     },
+     "user_agent": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "User Agent"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "last_seen_at",
+     "ip",
+     "user_agent",
+     "current"
+    ],
+    "title": "SessionOut",
+    "type": "object"
+   },
+   "app__modules__sales__schemas__CategoryIn": {
+    "additionalProperties": false,
+    "properties": {
+     "color": {
+      "default": "#0f766e",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "title": "Color",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "default": 0,
+      "maximum": 10000.0,
+      "minimum": 0.0,
+      "title": "Position",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "CategoryIn",
+    "type": "object"
+   },
+   "app__modules__sales__schemas__CategoryOut": {
+    "properties": {
+     "color": {
+      "title": "Color",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "position": {
+      "title": "Position",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "color",
+     "position"
+    ],
+    "title": "CategoryOut",
+    "type": "object"
+   },
+   "app__modules__sales__schemas__ReceiptOut": {
+    "properties": {
+     "branch_address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Address"
+     },
+     "branch_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Name"
+     },
+     "currency": {
+      "title": "Currency",
+      "type": "string"
+     },
+     "footer": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Footer"
+     },
+     "header": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Header"
+     },
+     "sale": {
+      "$ref": "#/components/schemas/SaleOut"
+     },
+     "shop_name": {
+      "title": "Shop Name",
+      "type": "string"
+     },
+     "tax_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id"
+     },
+     "tax_id_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id Label"
+     },
+     "taxes": {
+      "items": {
+       "$ref": "#/components/schemas/TaxSummary"
+      },
+      "title": "Taxes",
+      "type": "array"
+     }
+    },
+    "required": [
+     "sale",
+     "shop_name",
+     "branch_name",
+     "branch_address",
+     "tax_id_label",
+     "tax_id",
+     "header",
+     "footer",
+     "currency",
+     "taxes"
+    ],
+    "title": "ReceiptOut",
+    "type": "object"
+   },
+   "app__modules__sales__schemas__SessionOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "cash_expenses": {
+      "title": "Cash Expenses",
+      "type": "integer"
+     },
+     "cash_refunds": {
+      "title": "Cash Refunds",
+      "type": "integer"
+     },
+     "cash_sales": {
+      "title": "Cash Sales",
+      "type": "integer"
+     },
+     "closed_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Closed At"
+     },
+     "counted_cash": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Counted Cash"
+     },
+     "difference": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Difference"
+     },
+     "expected_cash": {
+      "title": "Expected Cash",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "opened_at": {
+      "format": "date-time",
+      "title": "Opened At",
+      "type": "string"
+     },
+     "opened_by_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Opened By Name"
+     },
+     "opening_float": {
+      "title": "Opening Float",
+      "type": "integer"
+     },
+     "sales_count": {
+      "title": "Sales Count",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "branch_id",
+     "opened_by_name",
+     "opened_at",
+     "opening_float",
+     "closed_at",
+     "cash_sales",
+     "cash_refunds",
+     "cash_expenses",
+     "expected_cash",
+     "counted_cash",
+     "difference",
+     "sales_count",
+     "note"
+    ],
+    "title": "SessionOut",
     "type": "object"
    }
   }
@@ -13516,7 +16083,7 @@
        "application/json": {
         "schema": {
          "items": {
-          "$ref": "#/components/schemas/SessionOut"
+          "$ref": "#/components/schemas/app__modules__platform__routes_auth__SessionOut"
          },
          "title": "Response List Sessions V1 Auth Sessions Get",
          "type": "array"
@@ -14136,6 +16703,386 @@
     "summary": "Update Branch",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/customers": {
+   "get": {
+    "operationId": "list_customers_v1_customers_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "in": "query",
+      "name": "owing",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Owing",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/CustomerOut"
+         },
+         "title": "Response List Customers V1 Customers Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Customers",
+    "tags": [
+     "customers"
+    ]
+   },
+   "post": {
+    "operationId": "create_v1_customers_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CustomerIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CustomerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create",
+    "tags": [
+     "customers"
+    ]
+   }
+  },
+  "/v1/customers/{customer_id}": {
+   "get": {
+    "operationId": "get_v1_customers__customer_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "customer_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Customer Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CustomerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get",
+    "tags": [
+     "customers"
+    ]
+   },
+   "patch": {
+    "operationId": "update_v1_customers__customer_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "customer_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Customer Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CustomerPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CustomerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update",
+    "tags": [
+     "customers"
+    ]
+   }
+  },
+  "/v1/customers/{customer_id}/adjustments": {
+   "post": {
+    "operationId": "adjust_v1_customers__customer_id__adjustments_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "customer_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Customer Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__customers__schemas__AdjustmentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CustomerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Adjust",
+    "tags": [
+     "customers"
+    ]
+   }
+  },
+  "/v1/customers/{customer_id}/payments": {
+   "post": {
+    "operationId": "pay_v1_customers__customer_id__payments_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "customer_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Customer Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PaymentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CustomerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Pay",
+    "tags": [
+     "customers"
+    ]
+   }
+  },
+  "/v1/customers/{customer_id}/statement": {
+   "get": {
+    "operationId": "statement_v1_customers__customer_id__statement_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "customer_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Customer Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StatementOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Statement",
+    "tags": [
+     "customers"
     ]
    }
   },
@@ -14764,6 +17711,510 @@
     ]
    }
   },
+  "/v1/expenses": {
+   "get": {
+    "operationId": "list_expenses_v1_expenses_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     },
+     {
+      "in": "query",
+      "name": "category_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Category Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpensesOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Expenses",
+    "tags": [
+     "expenses"
+    ]
+   },
+   "post": {
+    "operationId": "create_v1_expenses_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExpenseIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpenseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
+  "/v1/expenses/categories": {
+   "get": {
+    "operationId": "categories_v1_expenses_categories_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/app__modules__expenses__schemas__CategoryOut"
+         },
+         "title": "Response Categories V1 Expenses Categories Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Categories",
+    "tags": [
+     "expenses"
+    ]
+   },
+   "post": {
+    "operationId": "create_category_v1_expenses_categories_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__expenses__schemas__CategoryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__expenses__schemas__CategoryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Category",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
+  "/v1/expenses/categories/{category_id}": {
+   "put": {
+    "operationId": "save_category_v1_expenses_categories__category_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "category_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Category Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__expenses__schemas__CategoryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__expenses__schemas__CategoryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Category",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
+  "/v1/expenses/top-ups": {
+   "post": {
+    "description": "Money put into petty cash.",
+    "operationId": "top_up_v1_expenses_top_ups_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TopUpIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpenseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Top Up",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
+  "/v1/expenses/{expense_id}": {
+   "delete": {
+    "operationId": "delete_v1_expenses__expense_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "expense_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Expense Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete",
+    "tags": [
+     "expenses"
+    ]
+   },
+   "get": {
+    "operationId": "get_v1_expenses__expense_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "expense_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Expense Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpenseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get",
+    "tags": [
+     "expenses"
+    ]
+   },
+   "patch": {
+    "operationId": "update_v1_expenses__expense_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "expense_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Expense Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExpensePatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpenseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
+  "/v1/expenses/{expense_id}/receipt": {
+   "get": {
+    "operationId": "receipt_v1_expenses__expense_id__receipt_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "expense_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Expense Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Receipt",
+    "tags": [
+     "expenses"
+    ]
+   },
+   "put": {
+    "description": "Body: the photo or PDF itself (up to 5 MB).",
+    "operationId": "attach_v1_expenses__expense_id__receipt_put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "expense_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Expense Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "filename",
+      "required": true,
+      "schema": {
+       "maxLength": 200,
+       "minLength": 1,
+       "title": "Filename",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExpenseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Attach",
+    "tags": [
+     "expenses"
+    ]
+   }
+  },
   "/v1/invites": {
    "get": {
     "operationId": "list_invites_v1_invites_get",
@@ -15026,7 +18477,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/AdjustmentIn"
+        "$ref": "#/components/schemas/app__modules__leave__schemas__AdjustmentIn"
        }
       }
      },
@@ -18709,6 +22160,949 @@
     "summary": "Update Role",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/sales": {
+   "get": {
+    "operationId": "list_sales_v1_sales_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "day",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Day"
+      }
+     },
+     {
+      "in": "query",
+      "name": "customer_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Customer Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/SaleOut"
+         },
+         "title": "Response List Sales V1 Sales Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Sales",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "description": "Record a sale. Sending the same `client_id` again returns the first (200).",
+    "operationId": "sell_v1_sales_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SaleIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SaleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Sell",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/categories": {
+   "get": {
+    "operationId": "categories_v1_sales_categories_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/app__modules__sales__schemas__CategoryOut"
+         },
+         "title": "Response Categories V1 Sales Categories Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Categories",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "operationId": "create_category_v1_sales_categories_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__sales__schemas__CategoryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__sales__schemas__CategoryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Category",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/categories/{category_id}": {
+   "put": {
+    "operationId": "save_category_v1_sales_categories__category_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "category_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Category Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__sales__schemas__CategoryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__sales__schemas__CategoryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Category",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/drawer": {
+   "get": {
+    "description": "Your open cash drawer, or nothing.",
+    "operationId": "current_drawer_v1_sales_drawer_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "anyOf": [
+          {
+           "$ref": "#/components/schemas/app__modules__sales__schemas__SessionOut"
+          },
+          {
+           "type": "null"
+          }
+         ],
+         "title": "Response Current Drawer V1 Sales Drawer Get"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Current Drawer",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/drawer/close": {
+   "post": {
+    "operationId": "close_drawer_v1_sales_drawer_close_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CloseIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__sales__schemas__SessionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Close Drawer",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/drawer/open": {
+   "post": {
+    "operationId": "open_drawer_v1_sales_drawer_open_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OpenIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__sales__schemas__SessionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Open Drawer",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/drawers": {
+   "get": {
+    "operationId": "drawers_v1_sales_drawers_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/app__modules__sales__schemas__SessionOut"
+         },
+         "title": "Response Drawers V1 Sales Drawers Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Drawers",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/products": {
+   "get": {
+    "operationId": "products_v1_sales_products_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "include_inactive",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Include Inactive",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ProductOut"
+         },
+         "title": "Response Products V1 Sales Products Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Products",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "operationId": "create_product_v1_sales_products_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Product",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/products/{product_id}": {
+   "patch": {
+    "operationId": "update_product_v1_sales_products__product_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "product_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Product Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProductPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProductOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Product",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/settings": {
+   "get": {
+    "operationId": "get_settings_v1_sales_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShopSettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings",
+    "tags": [
+     "sales"
+    ]
+   },
+   "put": {
+    "operationId": "save_settings_v1_sales_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ShopSettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ShopSettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Settings",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/summary": {
+   "get": {
+    "operationId": "summary_v1_sales_summary_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SummaryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Summary",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/tax-rates": {
+   "get": {
+    "operationId": "tax_rates_v1_sales_tax_rates_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TaxRateOut"
+         },
+         "title": "Response Tax Rates V1 Sales Tax Rates Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Tax Rates",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "operationId": "create_tax_rate_v1_sales_tax_rates_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TaxRateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaxRateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Tax Rate",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/tax-rates/{rate_id}": {
+   "put": {
+    "operationId": "save_tax_rate_v1_sales_tax_rates__rate_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "rate_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Rate Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TaxRateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaxRateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Tax Rate",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/{sale_id}": {
+   "get": {
+    "operationId": "get_sale_v1_sales__sale_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "sale_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Sale Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SaleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Sale",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/{sale_id}/receipt": {
+   "get": {
+    "operationId": "receipt_v1_sales__sale_id__receipt_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "sale_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Sale Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__sales__schemas__ReceiptOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Receipt",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/{sale_id}/returns": {
+   "post": {
+    "operationId": "return_items_v1_sales__sale_id__returns_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "sale_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Sale Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReturnIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SaleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Return Items",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/{sale_id}/void": {
+   "post": {
+    "operationId": "void_v1_sales__sale_id__void_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "sale_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Sale Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/VoidIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SaleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Void",
+    "tags": [
+     "sales"
     ]
    }
   },

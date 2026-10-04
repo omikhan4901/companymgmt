@@ -36,3 +36,18 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   AI settings. Tests in `api/tests/test_signals.py` never run; the attendance-drop signal
   has no test at all (needs attendance history seeded); performance with many
   departments unmeasured (two overview reports per department).
+
+## M8 Shop pack
+
+- [ ] **Shop API.** New modules `sales` (catalogue, categories, tax rates the workspace
+  defines incl. compound and inclusive/exclusive prices, shop settings, cash drawer
+  open/close with expected vs counted cash, sales with idempotent `client_id` for
+  offline tills, returns, voids, receipts, period summary with tax totals), `customers`
+  (dues ledger, credit limits, payments, adjustments, statements) and `expenses`
+  (categories seeded on enable, receipt photos checked by file signature, petty cash
+  top-ups, drawer expenses counted at drawer close). Migration 0020. Capabilities
+  `sales.summary`, `customers.list`. Built-in roles got sales/customers/expenses
+  permissions. Tests: `test_tax.py` (incl. a Hypothesis property), `test_shop.py`,
+  parity and isolation additions — none run. Check: the isolation test now switches on
+  seven modules (may exceed a plan's module limit); workspace export of
+  `expenses.receipt` bytes and `sale_lines` JSON not checked.

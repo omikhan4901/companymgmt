@@ -92,8 +92,8 @@ type = "layers"
 layers = [
     "app.modules.privacy",
     "app.modules.payroll",
-    "app.modules.approvals | app.modules.automations | app.modules.imports | app.modules.reports",
-    "app.modules.announcements | app.modules.attendance | app.modules.documents | app.modules.leave | app.modules.notifications | app.modules.tasks",
+    "app.modules.approvals | app.modules.automations | app.modules.imports | app.modules.reports | app.modules.sales",
+    "app.modules.announcements | app.modules.attendance | app.modules.customers | app.modules.documents | app.modules.expenses | app.modules.leave | app.modules.notifications | app.modules.tasks",
     "app.modules.people",
     "app.modules.platform",
 ]

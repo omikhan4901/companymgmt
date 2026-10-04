@@ -23,7 +23,9 @@ from app.modules.approvals.routes import router as approvals_router
 from app.modules.attendance.routes import router as attendance_router
 from app.modules.automations.routes import internal_router as automations_internal_router
 from app.modules.automations.routes import router as automations_router
+from app.modules.customers.routes import router as customers_router
 from app.modules.documents.routes import router as documents_router
+from app.modules.expenses.routes import router as expenses_router
 from app.modules.imports.routes import router as imports_router
 from app.modules.leave.routes import router as leave_router
 from app.modules.notifications.routes import internal_router as notifications_internal_router
@@ -38,6 +40,7 @@ from app.modules.platform.routes_workspace import router as workspace_router
 from app.modules.privacy.routes import router as privacy_router
 from app.modules.reports.routes import internal_router as reports_internal_router
 from app.modules.reports.routes import router as reports_router
+from app.modules.sales.routes import router as sales_router
 from app.modules.tasks.routes import router as tasks_router
 
 log = logging.getLogger("app")
@@ -58,6 +61,9 @@ ROUTERS = (
     approvals_router,
     reports_router,
     automations_router,
+    sales_router,
+    customers_router,
+    expenses_router,
     privacy_router,
     ai_router,
     operator_router,

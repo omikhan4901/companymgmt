@@ -13,6 +13,7 @@ Three layers are tested:
 from __future__ import annotations
 
 import re
+import uuid
 from datetime import UTC, datetime, timedelta
 
 import httpx
@@ -270,6 +271,27 @@ async def _resources(owner: Account) -> dict[str, str]:
         },
     )
     ids["automation_id"] = automation.json()["id"]
+    await owner.put("/v1/workspace/modules", json={"modules": [*modules, "sales", "customers", "expenses"]})
+    rate = await owner.post("/v1/sales/tax-rates", json={"name": "VAT", "percent": "15"})
+    ids["rate_id"] = rate.json()["id"]
+    category = await owner.post("/v1/sales/categories", json={"name": "Drinks"})
+    ids["category_id"] = category.json()["id"]
+    product = await owner.post("/v1/sales/products", json={"name": "Tea", "price": 2000})
+    ids["product_id"] = product.json()["id"]
+    customer = await owner.post("/v1/customers", json={"name": "Karim"})
+    ids["customer_id"] = customer.json()["id"]
+    await owner.post("/v1/sales/drawer/open", json={})
+    sold = await owner.post(
+        "/v1/sales",
+        json={
+            "client_id": str(uuid.uuid4()),
+            "lines": [{"product_id": ids["product_id"]}],
+            "paid_cash": 3000,
+        },
+    )
+    ids["sale_id"] = sold.json()["id"]
+    expense = await owner.post("/v1/expenses", json={"amount": 100, "payee": "Milk"})
+    ids["expense_id"] = expense.json()["id"]
     assert all(ids.values()), ids
     return ids
 

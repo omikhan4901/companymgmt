@@ -144,6 +144,9 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("tasks.get", f"/v1/tasks/{a['todo_id']}", {"task_id": a["todo_id"]}),
         ("notifications.inbox", "/v1/notifications", {"unread": True, "limit": 1}),
         ("reports.overview", "/v1/reports/overview", {"from": f"{MONTH}-01", "to": f"{MONTH}-28"}),
+        ("customers.list", "/v1/customers", {}),
+        ("customers.list", "/v1/customers", {"owing": True}),
+        ("sales.summary", "/v1/sales/summary", {"from": f"{MONTH}-01", "to": f"{MONTH}-28"}),
         (
             "reports.overview",
             "/v1/reports/overview",

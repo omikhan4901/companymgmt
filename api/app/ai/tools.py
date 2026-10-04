@@ -7,6 +7,7 @@ from typing import Any
 from app.modules.announcements import capabilities as _announcements  # noqa: F401
 from app.modules.approvals import capabilities as _approvals  # noqa: F401
 from app.modules.attendance import capabilities as _attendance  # noqa: F401
+from app.modules.customers import capabilities as _customers  # noqa: F401
 from app.modules.documents import capabilities as _documents  # noqa: F401
 from app.modules.leave import capabilities as _leave  # noqa: F401
 from app.modules.notifications import capabilities as _notifications  # noqa: F401
@@ -15,6 +16,7 @@ from app.modules.people import capabilities as _people  # noqa: F401
 from app.modules.platform.capabilities import REGISTRY, visible
 from app.modules.platform.deps import Ctx
 from app.modules.reports import capabilities as _reports  # noqa: F401
+from app.modules.sales import capabilities as _sales  # noqa: F401
 from app.modules.tasks import capabilities as _tasks  # noqa: F401
 
 __all__ = ["REGISTRY", "tool_specs"]
