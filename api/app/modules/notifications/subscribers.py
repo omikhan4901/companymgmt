@@ -136,3 +136,11 @@ async def document_published(db: AsyncSession, event: events.Event) -> None:
     people = await users_of(db, event.data.get("membership_ids") or [])
     data = {"title": event.data.get("title"), "requires_ack": bool(event.data.get("requires_ack"))}
     await notify(db, event, people, link=f"{DOCUMENTS}?doc={event.subject_id}", data=data)
+
+
+@events.on("ai.allowance_changed")
+async def ai_allowance_changed(db: AsyncSession, event: events.Event) -> None:
+    """The platform changed how many questions this workspace's plan may ask the assistant."""
+    people = await holders(db, "ai.manage")
+    data = {"plan": event.data.get("plan"), "questions": event.data.get("questions")}
+    await notify(db, event, people, link="/app/settings?tab=ai", data=data)

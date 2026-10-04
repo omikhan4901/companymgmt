@@ -18,6 +18,10 @@ BILLING_MANAGE = perms.register(
     "billing.manage", "Manage the plan and billing", module="platform", owner_only=True
 )
 MEMBERS_VIEW = perms.register("members.view", "See members", module="platform")
+AI_USE = perms.register("ai.use", "Ask the assistant", module="platform")
+AI_MANAGE = perms.register(
+    "ai.manage", "Switch the assistant on and choose what it helps with", module="platform"
+)
 MEMBERS_INVITE = perms.register("members.invite", "Invite members and add staff", module="platform")
 MEMBERS_MANAGE = perms.register(
     "members.manage",
@@ -117,6 +121,7 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "announcements.post",
             "documents.read",
             "reports.view",
+            "ai.use",
         ),
     ),
     BuiltinRole(
@@ -137,6 +142,7 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "tasks.self",
             "announcements.read",
             "documents.read",
+            "ai.use",
         ),
     ),
     BuiltinRole(
@@ -163,6 +169,7 @@ BUILTIN_ROLES: tuple[BuiltinRole, ...] = (
             "tasks.self",
             "announcements.read",
             "documents.read",
+            "ai.use",
         ),
     ),
 )

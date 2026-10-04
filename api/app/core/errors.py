@@ -75,6 +75,10 @@ class Gone(AppError):
     status, code, title = 410, "gone", "This no longer exists"
 
 
+class Unavailable(AppError):
+    status, code, title = 503, "unavailable", "This isn't available right now"
+
+
 def _problem(
     request: Request,
     status: int,

@@ -74,6 +74,31 @@ class Settings(BaseSettings):
     proxy_token: SecretStr = SecretStr("")
     sentry_dsn: SecretStr = SecretStr("")
 
+    # AI. Setting GEMINI_API_KEY is all it takes to switch the assistant on (workspaces
+    # still choose to use it). AI_PROVIDER "fake" is a deterministic stand-in for tests.
+    ai_provider: Literal["", "gemini", "fake"] = ""
+    gemini_api_key: SecretStr = SecretStr("")
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_embed_model: str = "gemini-embedding-001"
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
+    # People who run the platform (comma-separated emails). They can change things that
+    # apply to every workspace, like AI allowances, and must use two-step sign-in.
+    platform_operators: list[str] = []
+
+    @field_validator("platform_operators", mode="before")
+    @classmethod
+    def _split_operators(cls, value: object) -> object:
+        if isinstance(value, str) and not value.startswith("["):
+            return [o.strip().lower() for o in value.split(",") if o.strip()]
+        return value
+
+    @property
+    def ai_provider_name(self) -> str:
+        """The provider in use: an explicit AI_PROVIDER, else Gemini when a key is set."""
+        if self.ai_provider:
+            return self.ai_provider
+        return "gemini" if self.gemini_api_key.get_secret_value() else ""
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

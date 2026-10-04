@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from sqlalchemy import text
 
+from app.ai.routes import operator_router
 from app.ai.routes import router as ai_router
 from app.core.config import get_settings
 from app.core.db import dispose_engine, open_session
@@ -56,6 +57,7 @@ ROUTERS = (
     reports_router,
     privacy_router,
     ai_router,
+    operator_router,
     internal_router,
     notifications_internal_router,
     reports_internal_router,

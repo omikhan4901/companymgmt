@@ -19,6 +19,8 @@ import httpx
 import psycopg
 import pytest
 
+from app.ai import provider
+from app.ai.fake import FakeModel
 from app.core.config import get_settings
 from app.main import api_routes
 from app.models_registry import metadata
@@ -28,6 +30,7 @@ from tests.helpers import Account, add_staff, if_match, invite_and_join, role_id
 GLOBAL_TABLES = {
     "tenants": "the workspaces themselves",
     "plans": "the public price list",
+    "ai_allowances": "assistant questions a month per plan, set by platform operators",
     "users": "people can belong to several workspaces",
     "auth_sessions": "per user, looked up by session id from a signed token",
     "refresh_tokens": "per session, looked up by the hash of a secret",
@@ -241,6 +244,13 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["item_id"] = item.json()["id"]
     sessions = (await staff_account.get("/v1/auth/sessions")).json()
     ids["session_id"] = sessions[0]["id"]
+    provider.use_model(FakeModel())
+    try:
+        await owner.put("/v1/ai/settings", json={"enabled": True, "accept_terms": True, "features": ["ask"]})
+        asked = await owner.post("/v1/ai/ask", json={"question": "How many leave days do I have?"})
+        ids["conversation_id"] = asked.json()["conversation_id"]
+    finally:
+        provider.use_model(None)
     assert all(ids.values()), ids
     return ids
 

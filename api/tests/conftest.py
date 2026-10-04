@@ -61,6 +61,11 @@ def _clean() -> None:
     with psycopg.connect(owner_dsn(), autocommit=True) as conn:
         conn.execute("SET app.allow_purge = 'on'")
         conn.execute(f"TRUNCATE {tables} RESTART IDENTITY CASCADE")
+        # The AI allowances the migration seeds (tests may change them).
+        conn.execute(
+            "INSERT INTO ai_allowances (plan_key, questions_per_month) VALUES "
+            "('free', 0), ('starter', 100), ('growth', 500), ('business', 2000), ('enterprise', NULL)"
+        )
     email.sent.clear()
 
 

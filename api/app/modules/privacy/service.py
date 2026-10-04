@@ -32,6 +32,7 @@ from app.modules.notifications.models import Notification
 from app.modules.payroll.models import PayrollRun, Payslip, SalaryStructure
 from app.modules.people.models import Employee
 from app.modules.people.service import employee_for_membership
+from app.modules.platform.ai_models import Conversation, Message
 from app.modules.platform.deps import Ctx
 from app.modules.platform.models import Membership, User
 
@@ -65,6 +66,11 @@ def _readable(table: str, row: dict[str, Any]) -> dict[str, Any]:
         token = row.pop(column, None)
         row[name] = crypto.decrypt(token, context=context(row)) if token else None
     return {k: jsonable(v) for k, v in row.items()}
+
+
+# Each person's own assistant conversations are theirs, not the workspace's: they come in
+# the personal export instead. Search passages are copies of the documents' own text.
+NOT_EXPORTED = {"ai_conversations", "ai_messages", "document_passages"}
 
 
 def tenant_tables() -> list[Table]:
@@ -113,6 +119,8 @@ async def workspace_export(ctx: Ctx) -> tuple[bytes, str]:
     counts: dict[str, int] = {}
     data: dict[str, list[dict[str, Any]]] = {}
     for table in tenant_tables():
+        if table.name in NOT_EXPORTED:
+            continue
         data[table.name] = await _rows(db, table, tenant.id)
         counts[table.name] = len(data[table.name])
     member_ids = [uuid.UUID(m["user_id"]) for m in data.get("memberships", [])]
@@ -255,6 +263,9 @@ async def my_data(ctx: Ctx) -> tuple[bytes, str]:
         )
     out["audit_events_by_me"] = await rows(AuditEvent, AuditEvent.actor_user_id == user.id)
     out["notifications"] = await rows(Notification, Notification.user_id == user.id)
+    mine = select(Conversation.id).where(Conversation.membership_id == ctx.membership.id)
+    out["assistant_conversations"] = await rows(Conversation, Conversation.membership_id == ctx.membership.id)
+    out["assistant_messages"] = await rows(Message, Message.conversation_id.in_(mine))
     out["memberships_elsewhere"] = len(
         list(await db.scalars(select(Membership.id).where(Membership.user_id == user.id)))
     )
