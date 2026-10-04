@@ -2066,6 +2066,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Join
+         * @description Make your own staff account from a join link, then sign in with it.
+         */
+        post: operations["join_v1_join_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/join-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Links */
+        get: operations["list_links_v1_join_links_get"];
+        put?: never;
+        /** Create Link */
+        post: operations["create_link_v1_join_links_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/join-links/{link_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Link */
+        delete: operations["revoke_link_v1_join_links__link_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/join/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lookup Link */
+        get: operations["lookup_link_v1_join_lookup_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/leave/adjustments": {
         parameters: {
             query?: never;
@@ -3078,6 +3150,26 @@ export interface paths {
         patch: operations["update_project_v1_projects__project_id__patch"];
         trace?: never;
     };
+    "/v1/public/workspace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find Workspace
+         * @description What the sign-in page on `<slug>.companymgmt.app` shows (name only; nothing private).
+         */
+        get: operations["find_workspace_v1_public_workspace_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/reports/overview": {
         parameters: {
             query?: never;
@@ -3627,6 +3719,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/welcome/checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Checklist */
+        get: operations["checklist_v1_welcome_checklist_get"];
+        /** Hide */
+        put: operations["hide_v1_welcome_checklist_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/welcome/sample-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sample Status */
+        get: operations["sample_status_v1_welcome_sample_data_get"];
+        put?: never;
+        /**
+         * Add Sample
+         * @description Fill the workspace with a few sample people, tasks and items to try things.
+         */
+        post: operations["add_sample_v1_welcome_sample_data_post"];
+        /** Remove Sample */
+        delete: operations["remove_sample_v1_welcome_sample_data_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/workspace": {
         parameters: {
             query?: never;
@@ -3643,6 +3775,26 @@ export interface paths {
         head?: never;
         /** Update Workspace */
         patch: operations["update_workspace_v1_workspace_patch"];
+        trace?: never;
+    };
+    "/v1/workspace/address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Change Address
+         * @description The workspace's address and staff code. Only the owner can change it.
+         */
+        put: operations["change_address_v1_workspace_address_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/workspace/delete": {
@@ -3842,6 +3994,18 @@ export interface components {
             link: string | null;
             /** Status */
             status: string;
+        };
+        /** AddressIn */
+        AddressIn: {
+            /** Slug */
+            slug: string;
+        };
+        /** AddressOut */
+        AddressOut: {
+            /** Previous */
+            previous: string[];
+            /** Slug */
+            slug: string;
         };
         /** AdjustmentIn */
         AdjustmentIn: {
@@ -4461,6 +4625,15 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** ChecklistItem */
+        ChecklistItem: {
+            /** Done */
+            done: boolean;
+            /** Key */
+            key: string;
+            /** Link */
+            link: string;
+        };
         /** ChecklistItemOut */
         ChecklistItemOut: {
             /** Done */
@@ -4472,6 +4645,15 @@ export interface components {
             id: string;
             /** Text */
             text: string;
+        };
+        /** ChecklistOut */
+        ChecklistOut: {
+            /** Dismissed */
+            dismissed: boolean;
+            /** Items */
+            items: components["schemas"]["ChecklistItem"][];
+            /** Sample Data */
+            sample_data: boolean;
         };
         /** ChecklistPatch */
         ChecklistPatch: {
@@ -5428,6 +5610,11 @@ export interface components {
             /** Left */
             left: number;
         };
+        /** HideIn */
+        HideIn: {
+            /** Hidden */
+            hidden: boolean;
+        };
         /** HolidayIn */
         HolidayIn: {
             /** Branch Id */
@@ -5599,6 +5786,89 @@ export interface components {
              * @default true
              */
             track: boolean;
+        };
+        /** JoinIn */
+        JoinIn: {
+            /** Name */
+            name: string;
+            /** Password */
+            password: string;
+            /** Token */
+            token: string;
+            /** Username */
+            username: string;
+        };
+        /** JoinLinkIn */
+        JoinLinkIn: {
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
+            /** Label */
+            label?: string | null;
+            /**
+             * Max Uses
+             * @default 20
+             */
+            max_uses: number;
+            /**
+             * Role Id
+             * Format: uuid
+             */
+            role_id: string;
+            /** Scope Department Id */
+            scope_department_id?: string | null;
+        };
+        /** JoinLinkOut */
+        JoinLinkOut: {
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Hint */
+            hint: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string | null;
+            /** Max Uses */
+            max_uses: number;
+            /** Revoked */
+            revoked: boolean;
+            /**
+             * Role Id
+             * Format: uuid
+             */
+            role_id: string;
+            /** Role Name */
+            role_name: string;
+            /** Scope Department Id */
+            scope_department_id: string | null;
+            /** Token */
+            token?: string | null;
+            /** Uses */
+            uses: number;
+        };
+        /** JoinLookupOut */
+        JoinLookupOut: {
+            /** Role */
+            role: string;
+            /** Workspace */
+            workspace: string;
+            /** Workspace Code */
+            workspace_code: string;
+        };
+        /** JoinOut */
+        JoinOut: {
+            /** Username */
+            username: string;
+            /** Workspace Code */
+            workspace_code: string;
         };
         /** JournalEntryOut */
         JournalEntryOut: {
@@ -6854,6 +7124,17 @@ export interface components {
             /** Storage Mb */
             storage_mb: number | null;
         };
+        /** PublicWorkspaceOut */
+        PublicWorkspaceOut: {
+            /** Locale */
+            locale: string;
+            /** Moved To */
+            moved_to?: string | null;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
         /** PurchaseIn */
         PurchaseIn: {
             /** Branch Id */
@@ -7528,6 +7809,13 @@ export interface components {
             tax_id_label: string | null;
             /** Taxes */
             taxes: components["schemas"]["TaxSummary"][];
+        };
+        /** SampleOut */
+        SampleOut: {
+            /** Present */
+            present: boolean;
+            /** Records */
+            records: number;
         };
         /** ScheduleTrigger */
         ScheduleTrigger: {
@@ -13309,6 +13597,152 @@ export interface operations {
             };
         };
     };
+    join_v1_join_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_links_v1_join_links_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinLinkOut"][];
+                };
+            };
+        };
+    };
+    create_link_v1_join_links_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinLinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinLinkOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_link_v1_join_links__link_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                link_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lookup_link_v1_join_lookup_get: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinLookupOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_adjustments_v1_leave_adjustments_get: {
         parameters: {
             query?: {
@@ -15622,6 +16056,37 @@ export interface operations {
             };
         };
     };
+    find_workspace_v1_public_workspace_get: {
+        parameters: {
+            query: {
+                slug: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicWorkspaceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     overview_v1_reports_overview_get: {
         parameters: {
             query: {
@@ -16956,6 +17421,119 @@ export interface operations {
             };
         };
     };
+    checklist_v1_welcome_checklist_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChecklistOut"];
+                };
+            };
+        };
+    };
+    hide_v1_welcome_checklist_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HideIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChecklistOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sample_status_v1_welcome_sample_data_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SampleOut"];
+                };
+            };
+        };
+    };
+    add_sample_v1_welcome_sample_data_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SampleOut"];
+                };
+            };
+        };
+    };
+    remove_sample_v1_welcome_sample_data_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SampleOut"];
+                };
+            };
+        };
+    };
     get_workspace_v1_workspace_get: {
         parameters: {
             query?: never;
@@ -16996,6 +17574,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkspaceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_address_v1_workspace_address_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddressOut"];
                 };
             };
             /** @description Validation Error */

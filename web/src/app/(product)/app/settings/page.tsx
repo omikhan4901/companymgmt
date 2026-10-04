@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { api } from "@/api/client";
 import { useAttendanceSettings, useBranches } from "@/api/hooks";
+import { AddressCard } from "@/components/address-card";
 import { AIAllowances, AISettings, useIsOperator } from "@/components/ai/settings";
 import type { AuditEvent, Branch, Page, Workspace } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
@@ -427,7 +428,17 @@ export default function SettingsPage() {
   const { can } = useSession();
   const operator = useIsOperator();
   const tabs = [
-    { key: "workspace", label: t("settings.tabs.workspace"), content: <WorkspaceForm />, show: can("workspace.manage") },
+    {
+      key: "workspace",
+      label: t("settings.tabs.workspace"),
+      content: (
+        <>
+          <WorkspaceForm />
+          <AddressCard />
+        </>
+      ),
+      show: can("workspace.manage"),
+    },
     { key: "modules", label: t("settings.tabs.modules"), content: <Modules />, show: can("workspace.manage") },
     { key: "branches", label: t("settings.tabs.branches"), content: <Branches />, show: can("branches.manage") },
     { key: "plan", label: t("settings.tabs.plan"), content: <PlanTab />, show: can("workspace.manage") },

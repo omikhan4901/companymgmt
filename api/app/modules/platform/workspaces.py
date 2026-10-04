@@ -9,7 +9,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 
-from sqlalchemy import func, select, text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
@@ -68,12 +68,124 @@ def slugify(name: str) -> str:
     return slug if len(slug) >= 3 else f"ws-{secrets.token_hex(3)}"
 
 
+SLUG = re.compile(r"^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$")
+RESERVED = frozenset(
+    [
+        "www",
+        "app",
+        "api",
+        "admin",
+        "administrator",
+        "root",
+        "mail",
+        "email",
+        "smtp",
+        "imap",
+        "pop",
+        "ftp",
+        "ns",
+        "ns1",
+        "ns2",
+        "dns",
+        "cdn",
+        "static",
+        "assets",
+        "media",
+        "files",
+        "img",
+        "images",
+        "help",
+        "support",
+        "status",
+        "docs",
+        "developer",
+        "developers",
+        "dev",
+        "staging",
+        "test",
+        "demo",
+        "sandbox",
+        "billing",
+        "pay",
+        "payment",
+        "payments",
+        "checkout",
+        "invoice",
+        "login",
+        "logout",
+        "signin",
+        "signup",
+        "register",
+        "account",
+        "accounts",
+        "auth",
+        "oauth",
+        "sso",
+        "saml",
+        "scim",
+        "webhook",
+        "webhooks",
+        "security",
+        "trust",
+        "legal",
+        "privacy",
+        "terms",
+        "blog",
+        "news",
+        "about",
+        "contact",
+        "careers",
+        "jobs",
+        "team",
+        "official",
+        "verify",
+        "verification",
+        "secure",
+        "internal",
+        "system",
+        "null",
+        "undefined",
+        "companymgmt",
+        "company-mgmt",
+        "companymanagement",
+    ]
+)
+# Our own name with the usual swaps, so no workspace can pose as us.
+LOOKALIKE = re.compile(r"c[o0]mpany[-_.]?m[a@]?n?[a@]?g?e?m?e?n?t|c[o0]mpanymgmt|cmpnymgmt")
+
+
+def slug_problem(slug: str) -> str | None:
+    if not SLUG.match(slug):
+        return (
+            "Use 3 to 40 lowercase letters, numbers and dashes, starting and ending with a letter or number."
+        )
+    if slug in RESERVED or slug.startswith("xn--") or LOOKALIKE.search(slug.replace("-", "")):
+        return "This address is reserved. Choose another."
+    if "--" in slug:
+        return "Don't use two dashes in a row."
+    return None
+
+
+async def slug_taken(db: AsyncSession, slug: str, *, mine: uuid.UUID | None = None) -> bool:
+    other = await db.scalar(select(Tenant.id).where(Tenant.slug == slug, Tenant.id != mine))
+    if other:
+        return True
+    used = await db.scalar(select(Tenant.id).where(Tenant.previous_slugs.contains([slug]), Tenant.id != mine))
+    return used is not None
+
+
 async def unique_slug(db: AsyncSession, name: str) -> str:
+    """A free address for a new workspace (never reserved, a look-alike, or used before)."""
     base = slugify(name)
+    if slug_problem(base):
+        base = (
+            f"ws-{base[:20]}".strip("-")
+            if not slug_problem(f"ws-{base[:20]}".strip("-"))
+            else f"ws-{secrets.token_hex(3)}"
+        )
     slug = base
     for _ in range(20):
-        taken = await db.scalar(select(func.count()).select_from(Tenant).where(Tenant.slug == slug))
-        if not taken:
+        if not await slug_taken(db, slug):
             return slug
         slug = f"{base[:33]}-{secrets.token_hex(2)}"
     return f"ws-{secrets.token_hex(6)}"

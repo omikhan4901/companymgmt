@@ -19,5 +19,6 @@ from app.modules.platform import models as platform_models  # noqa: F401
 from app.modules.reports import models as reports_models  # noqa: F401
 from app.modules.sales import models as sales_models  # noqa: F401
 from app.modules.tasks import models as tasks_models  # noqa: F401
+from app.modules.welcome import models as welcome_models  # noqa: F401
 
 metadata = Base.metadata

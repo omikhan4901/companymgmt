@@ -80,6 +80,10 @@ class Tenant(IdMixin, TimestampMixin, Base):
     deletion_contact: Mapped[str | None] = mapped_column(String(254))
     # Owners and admins must use two-step verification.
     require_admin_mfa: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Addresses this workspace used before; never given to another workspace.
+    previous_slugs: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
+    # The owner hid the first-day checklist.
+    checklist_dismissed_at: Mapped[datetime | None]
 
 
 class Subscription(IdMixin, TenantScoped, TimestampMixin, Base):
@@ -264,6 +268,28 @@ class Invite(IdMixin, TenantScoped, Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     expires_at: Mapped[datetime]
     accepted_at: Mapped[datetime | None]
+    revoked_at: Mapped[datetime | None]
+
+
+class JoinLink(IdMixin, TenantScoped, TimestampMixin, Base):
+    """A link (or QR code) people open to make their own staff account in a workspace."""
+
+    __tablename__ = "join_links"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        ForeignKeyConstraint(["tenant_id", "role_id"], ["roles.tenant_id", "roles.id"]),
+    )
+
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    # The first characters, so people can tell links apart (the rest is never stored).
+    hint: Mapped[str] = mapped_column(String(8))
+    label: Mapped[str | None] = mapped_column(String(120))
+    role_id: Mapped[uuid.UUID]
+    scope_department_id: Mapped[uuid.UUID | None]
+    expires_at: Mapped[datetime]
+    max_uses: Mapped[int] = mapped_column(Integer, default=20)
+    uses: Mapped[int] = mapped_column(Integer, default=0)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     revoked_at: Mapped[datetime | None]
 
 

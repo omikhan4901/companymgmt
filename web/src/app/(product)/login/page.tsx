@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ToggleGroup } from "radix-ui";
 import { useCallback, useState } from "react";
@@ -20,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password";
 import { currentLang } from "@/i18n";
 import { errorMessage } from "@/lib/errors";
+import { slugFromHost } from "@/lib/address";
 import { safeNext } from "@/lib/nav";
 
 interface Credentials {
@@ -34,14 +36,22 @@ function LoginForm() {
   const { signIn } = useSession();
   const router = useRouter();
   const params = useSearchParams();
-  const [mode, setMode] = useState<"email" | "staff">(params.get("workspace") ? "staff" : "email");
+  // Opened on a workspace's own address (<slug>.companymgmt.app): staff sign in without the code.
+  const [hostSlug] = useState(() => (typeof window === "undefined" ? null : slugFromHost(window.location.host)));
+  const place = useQuery({
+    queryKey: ["public-workspace", hostSlug],
+    queryFn: () => api<{ name: string; slug: string; moved_to: string | null }>("/v1/public/workspace", { query: { slug: hostSlug ?? "" } }),
+    enabled: !!hostSlug,
+    retry: false,
+  });
+  const [mode, setMode] = useState<"email" | "staff">(params.get("workspace") || hostSlug ? "staff" : "email");
   const [challenge, setChallenge] = useState<string | null>(null);
   const [needCaptcha, setNeedCaptcha] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | undefined>();
   const [error, setError] = useState<string | null>(null);
   const onToken = useCallback((token: string) => setCaptchaToken(token), []);
   const { register, handleSubmit, formState } = useForm<Credentials>({
-    defaultValues: { email: "", workspace: params.get("workspace") ?? "", username: "", password: "" },
+    defaultValues: { email: "", workspace: params.get("workspace") ?? hostSlug ?? "", username: "", password: "" },
   });
   const required = { required: t("common.required") };
 
@@ -108,9 +118,13 @@ function LoginForm() {
           </Field>
         ) : (
           <>
-            <Field label={t("auth.workspaceCode")} help={t("auth.workspaceCodeHelp")} error={formState.errors.workspace?.message}>
-              <Input autoComplete="organization" autoCapitalize="none" {...register("workspace", required)} />
-            </Field>
+            {hostSlug ? (
+              <p className="text-sm text-muted">{t("auth.signingInTo", { name: place.data?.name ?? hostSlug })}</p>
+            ) : (
+              <Field label={t("auth.workspaceCode")} help={t("auth.workspaceCodeHelp")} error={formState.errors.workspace?.message}>
+                <Input autoComplete="organization" autoCapitalize="none" {...register("workspace", required)} />
+              </Field>
+            )}
             <Field label={t("auth.username")} error={formState.errors.username?.message}>
               <Input autoComplete="username" autoCapitalize="none" {...register("username", required)} />
             </Field>

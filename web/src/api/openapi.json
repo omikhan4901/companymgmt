@@ -417,6 +417,43 @@
     "title": "ActionOut",
     "type": "object"
    },
+   "AddressIn": {
+    "additionalProperties": false,
+    "properties": {
+     "slug": {
+      "maxLength": 40,
+      "minLength": 3,
+      "title": "Slug",
+      "type": "string"
+     }
+    },
+    "required": [
+     "slug"
+    ],
+    "title": "AddressIn",
+    "type": "object"
+   },
+   "AddressOut": {
+    "properties": {
+     "previous": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Previous",
+      "type": "array"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     }
+    },
+    "required": [
+     "slug",
+     "previous"
+    ],
+    "title": "AddressOut",
+    "type": "object"
+   },
    "AdjustmentIn": {
     "additionalProperties": false,
     "properties": {
@@ -2307,6 +2344,29 @@
     "title": "ChecklistIn",
     "type": "object"
    },
+   "ChecklistItem": {
+    "properties": {
+     "done": {
+      "title": "Done",
+      "type": "boolean"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "link": {
+      "title": "Link",
+      "type": "string"
+     }
+    },
+    "required": [
+     "key",
+     "done",
+     "link"
+    ],
+    "title": "ChecklistItem",
+    "type": "object"
+   },
    "ChecklistItemOut": {
     "properties": {
      "done": {
@@ -2329,6 +2389,32 @@
      "done"
     ],
     "title": "ChecklistItemOut",
+    "type": "object"
+   },
+   "ChecklistOut": {
+    "properties": {
+     "dismissed": {
+      "title": "Dismissed",
+      "type": "boolean"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ChecklistItem"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "sample_data": {
+      "title": "Sample Data",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "items",
+     "dismissed",
+     "sample_data"
+    ],
+    "title": "ChecklistOut",
     "type": "object"
    },
    "ChecklistPatch": {
@@ -5541,6 +5627,19 @@
     "title": "Headcount",
     "type": "object"
    },
+   "HideIn": {
+    "properties": {
+     "hidden": {
+      "title": "Hidden",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "hidden"
+    ],
+    "title": "HideIn",
+    "type": "object"
+   },
    "HolidayIn": {
     "additionalProperties": false,
     "properties": {
@@ -5957,6 +6056,223 @@
      }
     },
     "title": "ItemSettingsIn",
+    "type": "object"
+   },
+   "JoinIn": {
+    "additionalProperties": false,
+    "properties": {
+     "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "password": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "token": {
+      "maxLength": 200,
+      "title": "Token",
+      "type": "string"
+     },
+     "username": {
+      "maxLength": 40,
+      "minLength": 3,
+      "pattern": "^[a-z0-9._-]+$",
+      "title": "Username",
+      "type": "string"
+     }
+    },
+    "required": [
+     "token",
+     "name",
+     "username",
+     "password"
+    ],
+    "title": "JoinIn",
+    "type": "object"
+   },
+   "JoinLinkIn": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "default": 7,
+      "maximum": 30.0,
+      "minimum": 1.0,
+      "title": "Days",
+      "type": "integer"
+     },
+     "label": {
+      "anyOf": [
+       {
+        "maxLength": 120,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Label"
+     },
+     "max_uses": {
+      "default": 20,
+      "maximum": 500.0,
+      "minimum": 1.0,
+      "title": "Max Uses",
+      "type": "integer"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     }
+    },
+    "required": [
+     "role_id"
+    ],
+    "title": "JoinLinkIn",
+    "type": "object"
+   },
+   "JoinLinkOut": {
+    "properties": {
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "hint": {
+      "title": "Hint",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Label"
+     },
+     "max_uses": {
+      "title": "Max Uses",
+      "type": "integer"
+     },
+     "revoked": {
+      "title": "Revoked",
+      "type": "boolean"
+     },
+     "role_id": {
+      "format": "uuid",
+      "title": "Role Id",
+      "type": "string"
+     },
+     "role_name": {
+      "title": "Role Name",
+      "type": "string"
+     },
+     "scope_department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Scope Department Id"
+     },
+     "token": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Token"
+     },
+     "uses": {
+      "title": "Uses",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "hint",
+     "label",
+     "role_id",
+     "role_name",
+     "scope_department_id",
+     "expires_at",
+     "max_uses",
+     "uses",
+     "revoked"
+    ],
+    "title": "JoinLinkOut",
+    "type": "object"
+   },
+   "JoinLookupOut": {
+    "properties": {
+     "role": {
+      "title": "Role",
+      "type": "string"
+     },
+     "workspace": {
+      "title": "Workspace",
+      "type": "string"
+     },
+     "workspace_code": {
+      "title": "Workspace Code",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace",
+     "workspace_code",
+     "role"
+    ],
+    "title": "JoinLookupOut",
+    "type": "object"
+   },
+   "JoinOut": {
+    "properties": {
+     "username": {
+      "title": "Username",
+      "type": "string"
+     },
+     "workspace_code": {
+      "title": "Workspace Code",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace_code",
+     "username"
+    ],
+    "title": "JoinOut",
     "type": "object"
    },
    "JournalEntryOut": {
@@ -9609,6 +9925,40 @@
     "title": "PublicPlan",
     "type": "object"
    },
+   "PublicWorkspaceOut": {
+    "properties": {
+     "locale": {
+      "title": "Locale",
+      "type": "string"
+     },
+     "moved_to": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Moved To"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "slug": {
+      "title": "Slug",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "slug",
+     "locale"
+    ],
+    "title": "PublicWorkspaceOut",
+    "type": "object"
+   },
    "PurchaseIn": {
     "additionalProperties": false,
     "properties": {
@@ -11805,6 +12155,24 @@
      "taxes"
     ],
     "title": "SaleReceiptOut",
+    "type": "object"
+   },
+   "SampleOut": {
+    "properties": {
+     "present": {
+      "title": "Present",
+      "type": "boolean"
+     },
+     "records": {
+      "title": "Records",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "present",
+     "records"
+    ],
+    "title": "SampleOut",
     "type": "object"
    },
    "ScheduleTrigger": {
@@ -21838,6 +22206,191 @@
     ]
    }
   },
+  "/v1/join": {
+   "post": {
+    "description": "Make your own staff account from a join link, then sign in with it.",
+    "operationId": "join_v1_join_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/JoinIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JoinOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Join",
+    "tags": [
+     "onboarding"
+    ]
+   }
+  },
+  "/v1/join-links": {
+   "get": {
+    "operationId": "list_links_v1_join_links_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/JoinLinkOut"
+         },
+         "title": "Response List Links V1 Join Links Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Links",
+    "tags": [
+     "onboarding"
+    ]
+   },
+   "post": {
+    "operationId": "create_link_v1_join_links_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/JoinLinkIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JoinLinkOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Link",
+    "tags": [
+     "onboarding"
+    ]
+   }
+  },
+  "/v1/join-links/{link_id}": {
+   "delete": {
+    "operationId": "revoke_link_v1_join_links__link_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "link_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Link Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Revoke Link",
+    "tags": [
+     "onboarding"
+    ]
+   }
+  },
+  "/v1/join/lookup": {
+   "get": {
+    "operationId": "lookup_link_v1_join_lookup_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "token",
+      "required": true,
+      "schema": {
+       "maxLength": 200,
+       "title": "Token",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JoinLookupOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Lookup Link",
+    "tags": [
+     "onboarding"
+    ]
+   }
+  },
   "/v1/leave/adjustments": {
    "get": {
     "operationId": "list_adjustments_v1_leave_adjustments_get",
@@ -25264,6 +25817,51 @@
     ]
    }
   },
+  "/v1/public/workspace": {
+   "get": {
+    "description": "What the sign-in page on `<slug>.companymgmt.app` shows (name only; nothing private).",
+    "operationId": "find_workspace_v1_public_workspace_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "slug",
+      "required": true,
+      "schema": {
+       "maxLength": 40,
+       "minLength": 3,
+       "title": "Slug",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PublicWorkspaceOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Find Workspace",
+    "tags": [
+     "onboarding"
+    ]
+   }
+  },
   "/v1/reports/overview": {
    "get": {
     "operationId": "overview_v1_reports_overview_get",
@@ -27220,6 +27818,126 @@
     ]
    }
   },
+  "/v1/welcome/checklist": {
+   "get": {
+    "operationId": "checklist_v1_welcome_checklist_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChecklistOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Checklist",
+    "tags": [
+     "welcome"
+    ]
+   },
+   "put": {
+    "operationId": "hide_v1_welcome_checklist_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/HideIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChecklistOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Hide",
+    "tags": [
+     "welcome"
+    ]
+   }
+  },
+  "/v1/welcome/sample-data": {
+   "delete": {
+    "operationId": "remove_sample_v1_welcome_sample_data_delete",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SampleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Remove Sample",
+    "tags": [
+     "welcome"
+    ]
+   },
+   "get": {
+    "operationId": "sample_status_v1_welcome_sample_data_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SampleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Sample Status",
+    "tags": [
+     "welcome"
+    ]
+   },
+   "post": {
+    "description": "Fill the workspace with a few sample people, tasks and items to try things.",
+    "operationId": "add_sample_v1_welcome_sample_data_post",
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SampleOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Add Sample",
+    "tags": [
+     "welcome"
+    ]
+   }
+  },
   "/v1/workspace": {
    "get": {
     "operationId": "get_workspace_v1_workspace_get",
@@ -27277,6 +27995,48 @@
     "summary": "Update Workspace",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/workspace/address": {
+   "put": {
+    "description": "The workspace's address and staff code. Only the owner can change it.",
+    "operationId": "change_address_v1_workspace_address_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AddressIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AddressOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Change Address",
+    "tags": [
+     "onboarding"
     ]
    }
   },

@@ -13,6 +13,7 @@ import { departmentOptions, keys, useDepartments, useRoles } from "@/api/hooks";
 import type { Invite, Member, Page, Permission, Role, StaffCreated } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { PageHeader } from "@/components/page";
+import { JoinLinks } from "@/components/team/join-links";
 import { Secret } from "@/components/secret";
 import { Alert } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
@@ -556,7 +557,7 @@ function Roles() {
 export default function TeamPage() {
   const { t } = useTranslation();
   const { can, me } = useSession();
-  const [active, setActive] = useTab(["members", "invites", "roles"]);
+  const [active, setActive] = useTab(["members", "invites", "links", "roles"]);
   const [dialog, setDialog] = useState<"invite" | "staff" | null>(null);
   if (!can("members.view")) return <EmptyState icon={<Users />} title={t("common.notAllowed")} />;
   const canInvite = can("members.invite");
@@ -590,10 +591,12 @@ export default function TeamPage() {
         <TabsList className="mb-5 w-fit">
           <TabsTrigger value="members">{t("team.tabs.members")}</TabsTrigger>
           <TabsTrigger value="invites">{t("team.tabs.invites")}</TabsTrigger>
+          {canInvite && <TabsTrigger value="links">{t("team.tabs.links")}</TabsTrigger>}
           <TabsTrigger value="roles">{t("team.tabs.roles")}</TabsTrigger>
         </TabsList>
         <TabsContent value="members">{active === "members" && <Members />}</TabsContent>
         <TabsContent value="invites">{active === "invites" && <Invitations />}</TabsContent>
+        <TabsContent value="links">{active === "links" && canInvite && <JoinLinks />}</TabsContent>
         <TabsContent value="roles">{active === "roles" && <Roles />}</TabsContent>
       </Tabs>
       {dialog === "invite" && <InviteDialog onClose={() => setDialog(null)} />}

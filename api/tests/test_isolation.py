@@ -330,6 +330,8 @@ async def _resources(owner: Account) -> dict[str, str]:
         },
     )
     ids["template_id"] = template.json()["id"]
+    link = await owner.post("/v1/join-links", json={"role_id": await role_id(owner, "employee")})
+    ids["link_id"] = link.json()["id"]
     assert all(ids.values()), ids
     return ids
 

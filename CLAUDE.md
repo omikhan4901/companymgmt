@@ -15,7 +15,8 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
   unit tests, run only lint and type checks (`ruff`, `mypy`, `lint-imports`, `tsc`,
   `eslint`), commit and push to `main`; don't run the test suites. List everything
   untested in `docs/UNTESTED.md`; a later test-and-fix pass works through it. The rule
-  below applies again after that pass.
+  below applies again after that pass. The GitHub CI workflow is switched off for now
+  (owner); see `docs/UNTESTED.md` for how to turn it back on.
 - **Run `scripts/check.sh` before every push.** Push only when it passes. Never leave
   `main` broken. Gate the commit/push on the script's own exit code
   (`./scripts/check.sh > log; [ $? -eq 0 ] && git push`), never on a pipe into `grep`.

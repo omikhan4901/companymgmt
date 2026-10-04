@@ -38,12 +38,14 @@ from app.modules.platform.deps import public
 from app.modules.platform.internal import router as internal_router
 from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
+from app.modules.platform.routes_join import router as join_router
 from app.modules.platform.routes_workspace import router as workspace_router
 from app.modules.privacy.routes import router as privacy_router
 from app.modules.reports.routes import internal_router as reports_internal_router
 from app.modules.reports.routes import router as reports_router
 from app.modules.sales.routes import router as sales_router
 from app.modules.tasks.routes import router as tasks_router
+from app.modules.welcome.routes import router as welcome_router
 
 log = logging.getLogger("app")
 
@@ -71,6 +73,8 @@ ROUTERS = (
     privacy_router,
     ai_router,
     operator_router,
+    join_router,
+    welcome_router,
     internal_router,
     notifications_internal_router,
     reports_internal_router,

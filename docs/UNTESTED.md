@@ -5,6 +5,11 @@ and type checks are run locally. CI runs the tests on GitHub and may be red unti
 test-and-fix pass. Everything below needs that pass: run `./scripts/check.sh` with
 `E2E=1`, fix what breaks, then delete the entry.
 
+**The CI workflow is switched off on GitHub** (owner, 2026-10-04). Turn it back on for
+the test-and-fix pass: Actions → CI → Enable workflow (or
+`gh api -X PUT repos/omikhan4901/companymgmt/actions/workflows/371331708/enable`).
+CodeQL, Deploy and Dependabot are still on.
+
 Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests passing).
 
 ## M7 AI actions and automation
@@ -90,3 +95,17 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   of accounts with ledgers; tax-return template editor and filling; settings: lock
   date, tax and expense-category account mapping, backfill). Nav items. Not built
   with `next build` locally; never opened in a browser.
+
+
+## M10 Enterprise and developer platform
+
+- [ ] **Easy onboarding.** Workspace addresses (`PUT /v1/workspace/address`, owner
+  only; reserved and look-alike names refused; old addresses kept by `previous_slugs`
+  and never reused; `GET /v1/public/workspace`), join links (`/v1/join-links`, public
+  `/v1/join/lookup` and `/v1/join` creating a staff account), first-day checklist and
+  sample data (`app/modules/welcome`), migration 0022. Web: `/join` page, Team →
+  Join links (QR code on a canvas, copy, WhatsApp share), home checklist card with
+  sample data, Settings → address card, login page reads the workspace from
+  `<slug>.<NEXT_PUBLIC_WORKSPACE_DOMAIN>`. Tests: `test_onboarding.py`,
+  `lib/address.test.ts`, isolation addition — none run. Needs the owner: wildcard DNS
+  and Pages custom domains for `*.companymgmt.app`, and API CORS for those origins.

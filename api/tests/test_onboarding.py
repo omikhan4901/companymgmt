@@ -1,94 +1,133 @@
-"""Onboarding checklists: templates become tasks for the joiner and their manager."""
+"""Easy onboarding: workspace addresses, join links, sample data and the checklist."""
 
 from __future__ import annotations
 
-from datetime import date, timedelta
 from typing import Any
 
 import httpx
 
-from tests.helpers import Account, add_staff, invite_and_join, signup
-
-TASKS_ON = {"modules": ["attendance", "leave", "tasks", "documents"]}
-
-
-async def template(owner: Account, **extra: Any) -> dict[str, Any]:
-    body = {
-        "name": "First week",
-        "items": [
-            {"title": "Set up your email", "who": "joiner", "due_days": 0},
-            {"title": "Introduce them to the team", "who": "manager", "due_days": 1},
-            {"title": "Read the handbook", "who": "joiner", "due_days": 3, **extra.pop("doc", {})},
-        ],
-        **extra,
-    }
-    response = await owner.post("/v1/onboarding/templates", json=body)
-    assert response.status_code == 201, response.text
-    data: dict[str, Any] = response.json()
-    return data
+from app.modules.platform.workspaces import slug_problem
+from tests.helpers import add_staff, role_id, signup
 
 
-async def test_starting_a_checklist_creates_tasks_for_joiner_and_manager(client: httpx.AsyncClient) -> None:
+def test_reserved_and_lookalike_addresses_are_refused() -> None:
+    for bad in (
+        "www",
+        "admin",
+        "api",
+        "companymgmt",
+        "c0mpanymgmt",
+        "company-mgmt",
+        "xn--abc",
+        "a--b",
+        "-shop",
+        "s",
+    ):
+        assert slug_problem(bad), bad
+    for good in ("cha-ghor", "dhaka-tea-2", "rahim-store"):
+        assert slug_problem(good) is None, good
+
+
+async def test_owners_change_the_address_and_old_ones_stay_theirs(client: httpx.AsyncClient) -> None:
     owner = await signup(client)
-    await owner.put("/v1/workspace/modules", json=TASKS_ON)
-    design = (await owner.post("/v1/departments", json={"name": "Design"})).json()
-    lead = await invite_and_join(owner, role="manager", scope_department_id=design["id"])
-    staff_data, staff = await add_staff(owner, name="New Joiner", scope_department_id=design["id"])
-    joiner_id = str((await staff.get("/v1/leave/balances")).json()["employee_id"])
-    first_week = await template(owner)
-    start = date(2027, 3, 1)
-    run = await owner.post(
-        "/v1/onboarding/runs",
-        json={"employee_id": joiner_id, "template_id": first_week["id"], "start_date": str(start)},
+    other = await signup(client)
+    old = (await owner.get("/v1/workspace")).json()["slug"]
+    changed = await owner.put("/v1/workspace/address", json={"slug": "cha-ghor-dhaka"})
+    assert changed.status_code == 200, changed.text
+    assert changed.json()["previous"] == [old]
+    found = (await client.get("/v1/public/workspace", params={"slug": "cha-ghor-dhaka"})).json()
+    assert found["moved_to"] is None
+    moved = (await client.get("/v1/public/workspace", params={"slug": old})).json()
+    assert moved["moved_to"] == "cha-ghor-dhaka"
+    # Nobody else can take the new or the old address.
+    for slug in ("cha-ghor-dhaka", old):
+        taken = await other.put("/v1/workspace/address", json={"slug": slug})
+        assert (taken.status_code, taken.json()["code"]) == (409, "slug_taken")
+    reserved = await other.put("/v1/workspace/address", json={"slug": "support"})
+    assert reserved.status_code == 422
+    admin_role = await role_id(owner, "admin")
+    _, staff = await add_staff(owner, role="admin")
+    refused = await staff.put("/v1/workspace/address", json={"slug": "new-name"})
+    assert (refused.status_code, refused.json()["code"]) == (403, "owner_only")
+    assert admin_role
+
+
+async def test_join_links_let_people_make_their_own_staff_account(client: httpx.AsyncClient) -> None:
+    owner = await signup(client)
+    link = await owner.post(
+        "/v1/join-links", json={"role_id": await role_id(owner, "employee"), "max_uses": 1, "days": 3}
     )
-    assert run.status_code == 201, run.text
-    assert (run.json()["total"], run.json()["done"]) == (3, 0)
-    mine = {t["title"]: t for t in (await staff.get("/v1/tasks/my-work")).json()}
-    assert set(mine) == {"Set up your email", "Read the handbook"}
-    assert mine["Read the handbook"]["due_date"] == str(start + timedelta(days=3))
-    # The manager item goes to the person running the joiner's department.
-    theirs = [t["title"] for t in (await lead.get("/v1/tasks/my-work")).json()]
-    assert theirs == ["Introduce them to the team"]
-    # Progress follows the tasks.
-    email = mine["Set up your email"]
-    await staff.post(f"/v1/tasks/{email['id']}/move", json={"status": "done"})
-    [progress] = (await staff.get("/v1/onboarding/runs", params={"mine": True})).json()
-    assert (progress["done"], progress["total"]) == (1, 3)
-    assert [r["employee_name"] for r in (await lead.get("/v1/onboarding/runs")).json()] == ["New Joiner"]
-    # Scoped managers start checklists for their people but don't edit the templates.
-    assert (
-        await lead.post("/v1/onboarding/templates", json={"name": "Mine", "items": []})
-    ).status_code == 403
-    assert (await staff.get("/v1/onboarding/templates")).status_code == 403
-    assert staff_data["member"]["name"] == "New Joiner"
-
-
-async def test_reading_a_document_ticks_the_item_off(client: httpx.AsyncClient) -> None:
-    owner = await signup(client)
-    await owner.put("/v1/workspace/modules", json=TASKS_ON)
-    handbook = (await owner.post("/v1/documents", json={"title": "Handbook", "requires_ack": True})).json()
-    await owner.post(
-        f"/v1/documents/{handbook['id']}/versions",
-        params={"filename": "handbook.pdf"},
-        content=b"%PDF-1.7",
-        headers={"content-type": "application/octet-stream"},
+    assert link.status_code == 201, link.text
+    token = link.json()["token"]
+    assert token
+    assert (await owner.get("/v1/join-links")).json()[0]["token"] is None  # shown once
+    looked = (await client.get("/v1/join/lookup", params={"token": token})).json()
+    assert looked["role"] == "Employee"
+    joined = await client.post(
+        "/v1/join",
+        json={
+            "token": token,
+            "name": "Mina Akter",
+            "username": "mina",
+            "password": "tea and biscuits every day",
+        },
     )
-    first_week = await template(owner, doc={"document_id": handbook["id"]})
-    _, staff = await add_staff(owner, name="New Joiner")
-    joiner_id = str((await staff.get("/v1/leave/balances")).json()["employee_id"])
-    await owner.post("/v1/onboarding/runs", json={"employee_id": joiner_id, "template_id": first_week["id"]})
-    read = next(t for t in (await staff.get("/v1/tasks/my-work")).json() if t["title"] == "Read the handbook")
-    assert read["document_id"] == handbook["id"]
-    await staff.post(f"/v1/documents/{handbook['id']}/acknowledge")
-    assert (await staff.get(f"/v1/tasks/{read['id']}")).json()["status"] == "done"
+    assert joined.status_code == 201, joined.text
+    signed = await client.post(
+        "/v1/auth/login",
+        json={
+            "workspace": joined.json()["workspace_code"],
+            "username": "mina",
+            "password": "tea and biscuits every day",
+        },
+    )
+    assert signed.status_code == 200, signed.text
+    # Used up after one person.
+    again = await client.post(
+        "/v1/join",
+        json={
+            "token": token,
+            "name": "Someone",
+            "username": "someone",
+            "password": "tea and biscuits every day",
+        },
+    )
+    assert again.json()["code"] == "join_used_up"
+    # Revoked links stop working, and bad tokens tell nothing.
+    second = (await owner.post("/v1/join-links", json={"role_id": await role_id(owner, "employee")})).json()
+    assert (await owner.delete(f"/v1/join-links/{second['id']}")).status_code == 204
+    gone = await client.get("/v1/join/lookup", params={"token": second["token"]})
+    assert gone.json()["code"] == "join_invalid"
+    assert (await client.get("/v1/join/lookup", params={"token": "nonsense"})).json()[
+        "code"
+    ] == "join_invalid"
 
 
-async def test_automatic_checklists_start_when_someone_joins(client: httpx.AsyncClient) -> None:
+async def test_sample_data_comes_and_goes(client: httpx.AsyncClient) -> None:
     owner = await signup(client)
-    await owner.put("/v1/workspace/modules", json=TASKS_ON)
-    await template(owner, automatic=True)
-    joiner = await invite_and_join(owner)
-    titles = {t["title"] for t in (await joiner.get("/v1/tasks/my-work")).json()}
-    assert titles == {"Set up your email", "Read the handbook"}
-    # The owner gets the manager's part.
-    assert "Introduce them to the team" in {t["title"] for t in (await owner.get("/v1/tasks/my-work")).json()}
+    await owner.put("/v1/workspace/modules", json={"modules": ["attendance", "tasks", "sales", "customers"]})
+    added = await owner.post("/v1/welcome/sample-data")
+    assert added.status_code == 201, added.text
+    people = (await owner.get("/v1/people")).json()["items"]
+    assert any(p["full_name"].endswith("(sample)") for p in people)
+    assert (await owner.post("/v1/welcome/sample-data")).status_code == 409
+    removed = (await owner.delete("/v1/welcome/sample-data")).json()
+    assert removed == {"present": False, "records": 0}
+    people = (await owner.get("/v1/people")).json()["items"]
+    assert not any(p["full_name"].endswith("(sample)") for p in people)
+    products: list[dict[str, Any]] = (await owner.get("/v1/sales/products")).json()
+    assert not any(p["name"].endswith("(sample)") for p in products)
+
+
+async def test_the_first_day_checklist(client: httpx.AsyncClient) -> None:
+    owner = await signup(client)
+    first = (await owner.get("/v1/welcome/checklist")).json()
+    done = {i["key"]: i["done"] for i in first["items"]}
+    assert done["team"] is False
+    await add_staff(owner)
+    done = {i["key"]: i["done"] for i in (await owner.get("/v1/welcome/checklist")).json()["items"]}
+    assert done["team"] is True
+    hidden = (await owner.put("/v1/welcome/checklist", json={"hidden": True})).json()
+    assert hidden["dismissed"] is True
+    _, staff = await add_staff(owner)
+    assert (await staff.get("/v1/welcome/checklist")).status_code == 403

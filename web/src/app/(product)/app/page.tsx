@@ -21,6 +21,7 @@ import { RunProgress, useRuns } from "@/components/tasks/onboarding";
 import { TaskRow } from "@/components/tasks/shared";
 import { BarChart, type Bar } from "@/components/bar-chart";
 import { PageHeader } from "@/components/page";
+import { FirstDay } from "@/components/welcome";
 import { Alert } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -411,6 +412,7 @@ export default function HomePage() {
         sub={`${workspace.name} · ${new Intl.DateTimeFormat(intlLocale(), { weekday: "long", day: "numeric", month: "long", timeZone: workspace.timezone }).format(new Date())}`}
         title={t("home.greeting", { name: (me?.name ?? "").split(" ")[0] })}
       />
+      <FirstDay />
 
       <div className="mb-5 flex flex-col gap-3 empty:hidden">
         {me?.email && !me.email_verified && (
