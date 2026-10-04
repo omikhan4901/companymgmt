@@ -5,11 +5,13 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import zipfile
 from typing import Any
 
 import httpx
 import psycopg
+import pytest
 from weasyprint import HTML
 
 from app.ai import provider
@@ -42,7 +44,8 @@ async def search(account: Account, q: str) -> list[dict[str, Any]]:
     return found
 
 
-def test_text_comes_out_of_real_files() -> None:
+def test_text_comes_out_of_real_files(caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.INFO)  # logging a broken file must not fail either
     pdf = HTML(string="<h1>Leave policy</h1><p>Casual leave is ten days a year.</p>").write_pdf()
     assert pdf is not None
     assert "Casual leave is ten days a year." in extract("leave.pdf", pdf)

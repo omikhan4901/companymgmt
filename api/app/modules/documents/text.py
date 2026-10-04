@@ -64,7 +64,7 @@ def extract(filename: str, data: bytes) -> str:
         else:
             return ""
     except Exception as exc:  # a broken or hostile file: just not searchable
-        log.info("no text from file", extra={"filename": filename, "error": type(exc).__name__})
+        log.info("no text from file", extra={"file": filename, "error": type(exc).__name__})
         return ""
     text = re.sub(r"[ \t\r\f\v]+", " ", text)
     text = re.sub(r"\n\s*\n+", "\n\n", text)
