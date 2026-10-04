@@ -3,6 +3,7 @@
 With a script, it returns the scripted replies in order. Without one it behaves like a
 cautious assistant: for a question it calls the first offered tool whose name matches a
 keyword in the question, then answers from the tool results, citing them as [1], [2]….
+Offered no tools, it writes one line per data block it was given, citing each.
 Embeddings are bag-of-words hashes, so similar words give similar vectors.
 """
 
@@ -53,6 +54,11 @@ class FakeModel:
                 for i, t in enumerate(results, 1)
             ]
             return Reply(text="Here's what I found.\n" + "\n".join(lines), tokens_in=tokens, tokens_out=40)
+        if not tools:
+            # Asked to write from data blocks (the weekly brief): one line per block.
+            blocks = [line.split(":")[0] for line in (last.text or "").splitlines() if line.startswith("[")]
+            lines = [f"{b[b.index(']') + 2 :]} looks steady. {b[: b.index(']') + 1]}" for b in blocks]
+            return Reply(text="\n".join(lines) or "Nothing to report.", tokens_in=tokens, tokens_out=30)
         question = (last.text or "").lower()
         offered = {t.name for t in tools}
         for word, tool in KEYWORDS:

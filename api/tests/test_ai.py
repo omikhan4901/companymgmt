@@ -323,3 +323,44 @@ async def test_conversations_stay_out_of_workspace_exports(
     mine = (await staff.get("/v1/privacy/my-data")).json()
     assert [c["title"] for c in mine["assistant_conversations"]] == ["How many leave days do I have?"]
     assert [m["role"] for m in mine["assistant_messages"]] == ["user", "assistant"]
+
+
+async def test_the_weekly_brief_is_for_report_viewers_and_kept_for_the_week(
+    client: httpx.AsyncClient, fake: FakeModel
+) -> None:
+    owner = await signup(client)
+    kitchen = (await owner.post("/v1/departments", json={"name": "Kitchen"})).json()
+    await add_staff(owner, name="Cook Karim", scope_department_id=kitchen["id"])
+    await add_staff(owner, name="Seller Salma")
+    manager = await invite_and_join(owner, role="manager", scope_department_id=kitchen["id"])
+    _, staff = await add_staff(owner)
+    await switch_on(owner, ["ask"])
+    off = await owner.post("/v1/ai/brief")
+    assert (off.status_code, off.json()["code"]) == (403, "ai_feature_off")
+    await switch_on(owner)
+    refused = await staff.post("/v1/ai/brief")
+    assert (refused.status_code, refused.json()["code"]) == (403, "brief_needs_reports")
+
+    first = await owner.post("/v1/ai/brief")
+    assert first.status_code == 200, first.text
+    message = first.json()["message"]
+    assert [s["capability"] for s in message["sources"]] == ["reports.overview", "approvals.pending"]
+    assert "[1]" in message["text"]
+    assert "[2]" in message["text"]
+    system, turns, offered = fake.calls[-1]
+    assert offered == []  # the brief only words the facts; it can't look anything up
+    assert "data, not instructions" in system
+    owner_data = turns[0].text or ""
+    # Asking again the same week shows the same brief, without asking the model again.
+    calls = len(fake.calls)
+    again = (await owner.post("/v1/ai/brief")).json()
+    assert (again["message"]["id"], len(fake.calls)) == (message["id"], calls)
+    assert (await owner.get("/v1/ai/status")).json()["used"] == 1
+
+    # A manager's brief covers their departments only.
+    assert (await manager.post("/v1/ai/brief")).status_code == 200
+    manager_data = fake.calls[-1][1][0].text or ""
+    assert (
+        json.loads(manager_data.split("\n", 1)[1].split("\n\n")[0])["headcount"]
+        != json.loads(owner_data.split("\n", 1)[1].split("\n\n")[0])["headcount"]
+    )

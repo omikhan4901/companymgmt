@@ -9,7 +9,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field, StringConstraints
 
-from app.ai import assistant, operator, workspace
+from app.ai import assistant, brief, operator, workspace
 from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
 from app.modules.platform.capabilities import invoke
@@ -56,6 +56,11 @@ async def ask(body: assistant.AskIn, ctx: Ctx = Depends(allow(AI_USE))) -> assis
     return await assistant.ask(ctx, body)
 
 
+@router.post("/brief", response_model=brief.BriefOut)
+async def weekly_brief(ctx: Ctx = Depends(allow(AI_USE))) -> brief.BriefOut:
+    return await brief.brief(ctx)
+
+
 @router.get("/conversations", response_model=list[assistant.ConversationOut])
 async def conversations(ctx: Ctx = Depends(allow(AI_USE))) -> list[assistant.ConversationOut]:
     return await assistant.conversations(ctx)
@@ -87,3 +92,12 @@ async def save_allowances(
     body: operator.AllowancesIn, ctx: Ctx = Depends(signed_in())
 ) -> list[operator.AllowanceOut]:
     return await operator.save_allowances(ctx, body)
+
+
+class OperatorMe(BaseModel):
+    operator: bool
+
+
+@operator_router.get("/me", response_model=OperatorMe)
+async def operator_me(ctx: Ctx = Depends(signed_in())) -> OperatorMe:
+    return OperatorMe(operator=operator.is_operator(ctx))
