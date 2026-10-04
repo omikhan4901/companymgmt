@@ -1,8 +1,10 @@
 # Progress
 
-Current work: **the owner's 2026-10-04 plan** (below). The marketing site and M6 (AI
-copilot) are done; M7, M8 and M9 are built but untested (speed mode, `docs/UNTESTED.md`); next is M10 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
-on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
+Current work: **the owner's 2026-10-04 plan** (below): marketing site → M6 → M7 → M8 →
+M9 → M10 → M11, then a legal review. The marketing site and M6 (AI copilot) are done
+and tested. M7, M8 and M9 are built but not yet tested (speed mode; see
+`docs/UNTESTED.md`). Now: M10. M5 (Paddle billing) is on hold. Going live still waits
+on the owner's cloud accounts (`runbooks/deploy.md`).
 
 ## Owner decisions, 2026-10-04 (follow these)
 
