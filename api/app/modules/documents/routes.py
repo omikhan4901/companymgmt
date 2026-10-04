@@ -12,7 +12,14 @@ from fastapi import APIRouter, Depends, Query, Request, Response
 from app.core.http import check_if_match, read_body, set_etag
 from app.core.middleware import allow_upload
 from app.modules.documents import access, files, service
-from app.modules.documents.schemas import AcksOut, DocumentDetail, DocumentIn, DocumentOut, DocumentPatch
+from app.modules.documents.schemas import (
+    AcksOut,
+    DocumentDetail,
+    DocumentIn,
+    DocumentOut,
+    DocumentPatch,
+    PassageOut,
+)
 from app.modules.platform.deps import Ctx, allow
 
 router = APIRouter(prefix="/v1/documents", tags=["documents"])
@@ -26,6 +33,15 @@ Manage = Depends(allow(access.MANAGE, module=MODULE))
 @router.get("", response_model=list[DocumentOut])
 async def library(ctx: Ctx = Read, archived: bool = False) -> list[DocumentOut]:
     return await service.list_documents(ctx, archived=archived)
+
+
+@router.get("/search", response_model=list[PassageOut])
+async def search(
+    q: Annotated[str, Query(min_length=1, max_length=300)],
+    limit: Annotated[int, Query(ge=1, le=20)] = 5,
+    ctx: Ctx = Read,
+) -> list[PassageOut]:
+    return await service.search(ctx, q, limit)
 
 
 @router.get("/to-acknowledge", response_model=list[DocumentOut])

@@ -13,6 +13,7 @@ from datetime import datetime
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Computed,
     ForeignKey,
     ForeignKeyConstraint,
     Index,
@@ -24,7 +25,7 @@ from sqlalchemy import (
     Uuid,
 )
 from sqlalchemy import text as sql
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 from sqlalchemy.orm import Mapped, deferred, mapped_column
 
 from app.core.models import Base, IdMixin, TenantScoped, TimestampMixin, Versioned
@@ -94,3 +95,23 @@ class DocumentAck(TenantScoped, Base):
     version_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
     acked_at: Mapped[datetime]
+
+
+class DocumentPassage(IdMixin, TenantScoped, Base):
+    """A searchable passage of a document's current version (rebuilt on each upload)."""
+
+    __tablename__ = "document_passages"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["tenant_id", "document_id"], ["documents.tenant_id", "documents.id"], ondelete="CASCADE"
+        ),
+        Index("ix_document_passages_document", "tenant_id", "document_id"),
+        Index("ix_document_passages_search", "search", postgresql_using="gin"),
+    )
+
+    document_id: Mapped[uuid.UUID]
+    version_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    ordinal: Mapped[int] = mapped_column(Integer)
+    text: Mapped[str] = mapped_column(Text)
+    # "simple": no stemming, so Bangla works as well as English.
+    search: Mapped[str] = mapped_column(TSVECTOR, Computed("to_tsvector('simple', text)", persisted=True))

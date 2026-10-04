@@ -10,15 +10,16 @@ from __future__ import annotations
 import uuid
 from collections.abc import Sequence
 
-from sqlalchemy import ColumnElement, and_, func, or_, select
+from sqlalchemy import ColumnElement, and_, delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import undefer
 
 from app.core import audit, events
 from app.core.errors import Forbidden, Invalid, NotFound
 from app.core.time import utcnow
-from app.modules.documents import access, files
-from app.modules.documents.models import Document, DocumentAck, DocumentVersion
+from app.modules.documents import access, files, text
+from app.modules.documents.models import Document, DocumentAck, DocumentPassage, DocumentVersion
 from app.modules.documents.schemas import (
     AckPerson,
     AcksOut,
@@ -27,6 +28,7 @@ from app.modules.documents.schemas import (
     DocumentIn,
     DocumentOut,
     DocumentPatch,
+    PassageOut,
     VersionOut,
 )
 from app.modules.people.access import ancestors, subtree
@@ -313,6 +315,7 @@ async def upload(
     await ctx.db.flush()
     doc.current_version_id = version.id
     doc.updated_at = utcnow()
+    await index(ctx.db, doc, version, data)
     await ctx.db.flush()
     await audit.record(
         ctx.db,
@@ -341,6 +344,67 @@ async def upload(
         )
     await ctx.db.commit()
     return await get(ctx, doc.id)
+
+
+async def index(db: AsyncSession, doc: Document, version: DocumentVersion, data: bytes) -> int:
+    """Make the version's text searchable (replacing the document's older passages)."""
+    await db.execute(delete(DocumentPassage).where(DocumentPassage.document_id == doc.id))
+    pieces = text.passages(text.extract(version.filename, data))
+    db.add_all(
+        DocumentPassage(document_id=doc.id, version_id=version.id, ordinal=i, text=piece)
+        for i, piece in enumerate(pieces)
+    )
+    return len(pieces)
+
+
+async def _index_missing(ctx: Ctx) -> None:
+    """Documents uploaded before search existed get indexed the first time anyone searches."""
+    indexed = select(DocumentPassage.document_id).distinct()
+    rows = (
+        await ctx.db.execute(
+            select(Document, DocumentVersion)
+            .join(DocumentVersion, DocumentVersion.id == Document.current_version_id)
+            .where(Document.id.not_in(indexed), Document.archived.is_(False))
+            .options(undefer(DocumentVersion.data))
+            .limit(20)
+        )
+    ).all()
+    for doc, version in rows:
+        await index(ctx.db, doc, version, version.data)
+    if rows:
+        await ctx.db.commit()
+
+
+async def search(ctx: Ctx, q: str, limit: int = 5) -> list[PassageOut]:
+    """Passages that match `q`, from documents this person may read, best first."""
+    ctx.require(access.READ)
+    words = q.strip()
+    if not words:
+        return []
+    await _index_missing(ctx)
+    query = func.websearch_to_tsquery("simple", words)
+    rank = func.ts_rank(DocumentPassage.search, query)
+    rows = (
+        await ctx.db.execute(
+            select(DocumentPassage, Document, DocumentVersion.number)
+            .join(Document, Document.id == DocumentPassage.document_id)
+            .join(DocumentVersion, DocumentVersion.id == DocumentPassage.version_id)
+            .where(await _visible(ctx), Document.archived.is_(False), DocumentPassage.search.op("@@")(query))
+            .order_by(rank.desc(), DocumentPassage.ordinal)
+            .limit(limit)
+        )
+    ).all()
+    return [
+        PassageOut(
+            document_id=doc.id,
+            title=doc.title,
+            category=doc.category,
+            version=number,
+            text=passage.text,
+            link=f"/app/documents?doc={doc.id}",
+        )
+        for passage, doc, number in rows
+    ]
 
 
 async def download(ctx: Ctx, document_id: uuid.UUID, version_id: uuid.UUID) -> tuple[bytes, str, str]:

@@ -87,3 +87,12 @@ class AcksOut(Out):
     total: int
     acknowledged: int
     people: list[AckPerson]
+
+
+class PassageOut(Out):
+    document_id: uuid.UUID
+    title: str
+    category: str
+    version: int
+    text: str
+    link: str
