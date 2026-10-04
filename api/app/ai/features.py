@@ -11,4 +11,8 @@ FEATURES: dict[str, tuple[str, str]] = {
         "নীতিমালা ও ডকুমেন্ট থেকে উত্তর, উদ্ধৃতিসহ",
     ),
     "brief": ("A weekly brief for owners and managers", "মালিক ও ম্যানেজারদের জন্য সাপ্তাহিক সারসংক্ষেপ"),
+    "actions": (
+        "Offer to do things (create tasks, ask for leave…), only after the person confirms",
+        "কাজ করে দেওয়ার প্রস্তাব (কাজ তৈরি, ছুটির আবেদন…), শুধু ব্যক্তি নিশ্চিত করলে",
+    ),
 }

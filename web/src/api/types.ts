@@ -83,3 +83,4 @@ export type AISource = S["SourceOut"];
 export type AIConversation = S["ConversationOut"];
 export type AIBrief = S["BriefOut"];
 export type AIAllowance = S["AllowanceOut"];
+export type AIAction = S["ActionOut"];

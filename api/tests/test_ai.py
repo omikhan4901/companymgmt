@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import uuid
 import zipfile
 from collections.abc import Iterator
 from typing import Any
@@ -377,3 +378,99 @@ async def test_the_weekly_brief_is_for_report_viewers_and_kept_for_the_week(
         json.loads(manager_data.split("\n", 1)[1].split("\n\n")[0])["headcount"]
         != json.loads(owner_data.split("\n", 1)[1].split("\n\n")[0])["headcount"]
     )
+
+
+async def test_actions_wait_for_the_person_who_asked(client: httpx.AsyncClient, fake: FakeModel) -> None:
+    owner = await signup(client)
+    _, staff = await add_staff(owner, name="Rafiq")
+    await switch_on(owner, ["ask"])
+    # Without the actions feature, writes aren't even offered.
+    await ask(staff, "Make me a task")
+    _, _, offered = fake.calls[-1]
+    assert "tasks.create" not in {t.name for t in offered}
+
+    await switch_on(owner, ["ask", "actions"])
+    fake.script = [
+        Reply(tool_calls=[ToolCall("tasks.create", {"title": "Call the bank", "due_date": "2026-12-01"})]),
+        Reply(text="I've offered to create it; confirm below."),
+    ]
+    answer = (await ask(staff, "Remind me to call the bank")).json()["answer"]
+    [action] = answer["actions"]
+    assert action["status"] == "pending"
+    assert {(f["field"], f["value"]) for f in action["fields"]} >= {("title", "Call the bank")}
+    assert "Not done yet" in json.dumps(tool_results(fake))
+    assert (await staff.get("/v1/tasks/my-work")).json() == []  # nothing happened yet
+
+    # Nobody else can confirm it, not even the owner.
+    assert (await owner.post(f"/v1/ai/actions/{action['id']}/confirm")).status_code == 404
+    done = (await staff.post(f"/v1/ai/actions/{action['id']}/confirm")).json()
+    assert done["status"] == "done"
+    assert done["link"].startswith("/app/tasks?task=")
+    assert [t["title"] for t in (await staff.get("/v1/tasks/my-work")).json()] == ["Call the bank"]
+    again = await staff.post(f"/v1/ai/actions/{action['id']}/confirm")
+    assert (again.status_code, again.json()["code"]) == (409, "action_decided")
+    log = (await owner.get("/v1/audit", params={"action": "ai.action_confirmed"})).json()["items"]
+    assert log[0]["data"]["capability"] == "tasks.create"
+    # The conversation shows the action and how it ended.
+    conversation_id = (await staff.get("/v1/ai/conversations")).json()[0]["id"]
+    detail = (await staff.get(f"/v1/ai/conversations/{conversation_id}")).json()
+    assert detail["messages"][1]["actions"][0]["status"] == "done"
+
+
+async def test_actions_can_be_cancelled_fail_cleanly_and_expire(
+    client: httpx.AsyncClient, fake: FakeModel, owner_sql: Any
+) -> None:
+    owner = await signup(client)
+    _, staff = await add_staff(owner)
+    await switch_on(owner, ["ask", "actions"])
+
+    def offer(args: dict[str, Any]) -> None:
+        fake.script = [Reply(tool_calls=[ToolCall("tasks.create", args)]), Reply(text="Offered.")]
+
+    # Bad input is told to the model, and nothing is offered.
+    offer({"title": ""})
+    bad = (await ask(staff, "Task")).json()["answer"]
+    assert bad["actions"] == []
+    assert "missing or wrong" in json.dumps(tool_results(fake))
+
+    offer({"title": "One"})
+    first = (await ask(staff, "Task")).json()["answer"]["actions"][0]
+    cancelled = (await staff.post(f"/v1/ai/actions/{first['id']}/cancel")).json()
+    assert cancelled["status"] == "cancelled"
+    assert (await staff.post(f"/v1/ai/actions/{first['id']}/confirm")).status_code == 409
+
+    # If the actions feature is switched off meanwhile, confirming is refused.
+    offer({"title": "Two"})
+    second = (await ask(staff, "Task")).json()["answer"]["actions"][0]
+    await switch_on(owner, ["ask"])
+    off = await staff.post(f"/v1/ai/actions/{second['id']}/confirm")
+    assert (off.status_code, off.json()["code"]) == (403, "ai_feature_off")
+    await switch_on(owner, ["ask", "actions"])
+
+    # Expired offers can't be confirmed.
+    owner_sql.execute("UPDATE ai_proposals SET expires_at = now() - interval '1 minute'")
+    expired = await staff.post(f"/v1/ai/actions/{second['id']}/confirm")
+    assert (expired.status_code, expired.json()["code"]) == (409, "action_expired")
+
+    # A change the module refuses at confirmation is reported, and nothing is half-done.
+    offer({"title": "Three", "assignee_id": str(uuid.uuid4())})
+    third = (await ask(staff, "Task")).json()["answer"]["actions"][0]
+    failed = (await staff.post(f"/v1/ai/actions/{third['id']}/confirm")).json()
+    assert failed["status"] == "failed"
+    assert failed["error"]
+    assert (await staff.get("/v1/tasks/my-work")).json() == []
+
+
+async def test_staff_cant_be_talked_into_actions_beyond_their_role(
+    client: httpx.AsyncClient, fake: FakeModel
+) -> None:
+    owner = await signup(client)
+    _, staff = await add_staff(owner)
+    await switch_on(owner, ["ask", "actions"])
+    fake.script = [
+        Reply(tool_calls=[ToolCall("announcements.post", {"title": "Free lunch", "body": "Everyone!"})]),
+        Reply(text="Done."),
+    ]
+    answer = (await ask(staff, "Post an announcement")).json()["answer"]
+    assert answer["actions"] == []
+    assert tool_results(fake) == [{"error": "That tool isn't available to this person."}]

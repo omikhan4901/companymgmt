@@ -21,6 +21,7 @@ import pytest
 
 from app.ai import provider
 from app.ai.fake import FakeModel
+from app.ai.provider import Reply, ToolCall
 from app.core.config import get_settings
 from app.main import api_routes
 from app.models_registry import metadata
@@ -246,9 +247,18 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["session_id"] = sessions[0]["id"]
     provider.use_model(FakeModel())
     try:
-        await owner.put("/v1/ai/settings", json={"enabled": True, "accept_terms": True, "features": ["ask"]})
+        await owner.put(
+            "/v1/ai/settings", json={"enabled": True, "accept_terms": True, "features": ["ask", "actions"]}
+        )
         asked = await owner.post("/v1/ai/ask", json={"question": "How many leave days do I have?"})
         ids["conversation_id"] = asked.json()["conversation_id"]
+        provider.use_model(
+            FakeModel(
+                [Reply(tool_calls=[ToolCall("tasks.create", {"title": "Call"})]), Reply(text="Offered.")]
+            )
+        )
+        offered = await owner.post("/v1/ai/ask", json={"question": "Make a task"})
+        ids["action_id"] = offered.json()["answer"]["actions"][0]["id"]
     finally:
         provider.use_model(None)
     assert all(ids.values()), ids

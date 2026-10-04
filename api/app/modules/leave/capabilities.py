@@ -9,7 +9,14 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.leave import access, service
-from app.modules.leave.schemas import CalendarEntry, LeaveTypeOut, PersonBalances, RequestIn, RequestOut
+from app.modules.leave.schemas import (
+    CalendarEntry,
+    DecisionIn,
+    LeaveTypeOut,
+    PersonBalances,
+    RequestIn,
+    RequestOut,
+)
 from app.modules.platform.capabilities import NoInput, capability
 from app.modules.platform.deps import Ctx
 
@@ -124,3 +131,25 @@ async def types(ctx: Ctx, _: NoInput) -> list[LeaveTypeOut]:
 )
 async def request(ctx: Ctx, data: RequestIn) -> RequestOut:
     return await service.create_request(ctx, data)
+
+
+class DecideIn(DecisionIn):
+    request_id: uuid.UUID
+    decision: Literal["approve", "reject"]
+
+
+@capability(
+    "leave.decide",
+    "Approve or turn down a leave request you're allowed to decide, with an optional note.",
+    input=DecideIn,
+    output=RequestOut,
+    permission=access.APPROVE,
+    module=MODULE,
+    kind="write",
+    scoped=True,
+    route="POST /v1/leave/requests/{request_id}/approve",
+)
+async def decide(ctx: Ctx, data: DecideIn) -> RequestOut:
+    if data.decision == "approve":
+        return await service.approve(ctx, data.request_id, data.note)
+    return await service.reject(ctx, data.request_id, data.note)

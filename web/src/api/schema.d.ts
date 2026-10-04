@@ -38,6 +38,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ai/actions/{action_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Action */
+        post: operations["cancel_action_v1_ai_actions__action_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/actions/{action_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm Action
+         * @description Do what the assistant offered, as the person confirming it.
+         */
+        post: operations["confirm_action_v1_ai_actions__action_id__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ai/ask": {
         parameters: {
             query?: never;
@@ -2599,6 +2636,28 @@ export interface components {
             /** Version Number */
             version_number: number | null;
         };
+        /** ActionOut */
+        ActionOut: {
+            /** Capability */
+            capability: string;
+            /** Error */
+            error: string | null;
+            /** Expires At */
+            expires_at: string;
+            /** Fields */
+            fields: components["schemas"]["FieldOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Link */
+            link: string | null;
+            /** Status */
+            status: string;
+        };
         /** AdjustmentIn */
         AdjustmentIn: {
             /** Days */
@@ -3563,6 +3622,18 @@ export interface components {
             /** Status */
             status?: ("active" | "inactive" | "left") | null;
         };
+        /** FieldOut */
+        FieldOut: {
+            /** Field */
+            field: string;
+            /**
+             * Kind
+             * @default text
+             */
+            kind: string;
+            /** Value */
+            value: string;
+        };
         /** ForgotIn */
         ForgotIn: {
             /** Captcha Token */
@@ -4075,6 +4146,8 @@ export interface components {
         };
         /** MessageOut */
         MessageOut: {
+            /** Actions */
+            actions?: components["schemas"]["ActionOut"][];
             /**
              * Id
              * Format: uuid
@@ -5925,6 +5998,68 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    cancel_action_v1_ai_actions__action_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                action_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_action_v1_ai_actions__action_id__confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                action_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

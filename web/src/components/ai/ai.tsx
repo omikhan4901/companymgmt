@@ -1,14 +1,19 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { BookOpen } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Check, X } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import { api } from "@/api/client";
-import type { AIMessage, AIStatus } from "@/api/types";
+import type { AIAction, AIMessage, AIStatus } from "@/api/types";
 import { useSession } from "@/auth/session";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { errorMessage } from "@/lib/errors";
 import { formatDay, formatNumber } from "@/lib/format";
+import { toast } from "sonner";
 
 export const aiKeys = {
   status: ["ai", "status"] as const,
@@ -33,6 +38,9 @@ export function AnswerBody({ message }: { message: AIMessage }) {
   return (
     <div className="flex flex-col gap-3">
       <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</p>
+      {(message.actions ?? []).map((a) => (
+        <ActionCard key={a.id} action={a} />
+      ))}
       {message.sources.length > 0 && (
         <div className="flex flex-col gap-1.5">
           <span className="text-xs font-medium text-muted">{t("ai.sources")}</span>
@@ -90,4 +98,69 @@ export function aiOpen(status: AIStatus | undefined, can: (permission: string) =
   const ask = on && status.features.includes("ask");
   const brief = on && status.features.includes("brief") && can("reports.view");
   return { ask, brief, any: ask || brief };
+}
+
+const TONES: Record<string, "accent" | "success" | "warn" | "danger" | undefined> = {
+  pending: "accent",
+  done: "success",
+  failed: "danger",
+  expired: "warn",
+};
+
+/** Something the assistant offered to do. Nothing happens until the person confirms. */
+export function ActionCard({ action: initial }: { action: AIAction }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [action, setAction] = useState(initial);
+  const decide = useMutation({
+    mutationFn: (what: "confirm" | "cancel") => api<AIAction>(`/v1/ai/actions/${action.id}/${what}`, { method: "POST" }),
+    onSuccess: (a) => {
+      setAction(a);
+      if (a.status === "done") toast.success(t("ai.actionDone"));
+      void queryClient.invalidateQueries();
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const value = (f: AIAction["fields"][number]) => {
+    if (f.kind === "date") return formatDay(f.value);
+    if (f.kind === "flag") return t("common.yes");
+    if (f.field === "decision" || f.field === "priority" || f.field === "status") return t(`ai.values.${f.value}`, { defaultValue: f.value });
+    return f.value;
+  };
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface-2/60 p-3.5" role="group" aria-label={action.label}>
+      <div className="flex items-start gap-2">
+        <span className="min-w-0 flex-1 text-sm font-medium">{t(`ai.capabilities.${action.capability}`, { defaultValue: action.label })}</span>
+        <Badge tone={TONES[action.status]}>{t(`ai.actionStatus.${action.status}`)}</Badge>
+      </div>
+      {action.fields.length > 0 && (
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+          {action.fields.map((f) => (
+            <div key={f.field} className="contents">
+              <dt className="text-muted">{t(`ai.fields.${f.field}`, { defaultValue: f.field })}</dt>
+              <dd className="min-w-0 whitespace-pre-wrap break-words">{value(f)}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {action.status === "failed" && action.error && <p className="text-sm text-danger-text">{action.error}</p>}
+      {action.status === "pending" && (
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="primary" loading={decide.isPending && decide.variables === "confirm"} disabled={decide.isPending} onClick={() => decide.mutate("confirm")}>
+            <Check aria-hidden="true" />
+            {t("ai.confirm")}
+          </Button>
+          <Button size="sm" disabled={decide.isPending} onClick={() => decide.mutate("cancel")}>
+            <X aria-hidden="true" />
+            {t("common.cancel")}
+          </Button>
+        </div>
+      )}
+      {action.status === "done" && action.link && (
+        <Link href={action.link} className="text-sm font-semibold text-accent-soft-text underline-offset-4 hover:underline">
+          {t("ai.openResult")}
+        </Link>
+      )}
+    </div>
+  );
 }

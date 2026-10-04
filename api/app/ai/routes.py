@@ -9,7 +9,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field, StringConstraints
 
-from app.ai import assistant, brief, operator, workspace
+from app.ai import actions, assistant, brief, operator, workspace
 from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
 from app.modules.platform.capabilities import invoke
@@ -59,6 +59,17 @@ async def ask(body: assistant.AskIn, ctx: Ctx = Depends(allow(AI_USE))) -> assis
 @router.post("/brief", response_model=brief.BriefOut)
 async def weekly_brief(ctx: Ctx = Depends(allow(AI_USE))) -> brief.BriefOut:
     return await brief.brief(ctx)
+
+
+@router.post("/actions/{action_id}/confirm", response_model=actions.ActionOut)
+async def confirm_action(action_id: uuid.UUID, ctx: Ctx = Depends(allow(AI_USE))) -> actions.ActionOut:
+    """Do what the assistant offered, as the person confirming it."""
+    return await actions.confirm(ctx, action_id)
+
+
+@router.post("/actions/{action_id}/cancel", response_model=actions.ActionOut)
+async def cancel_action(action_id: uuid.UUID, ctx: Ctx = Depends(allow(AI_USE))) -> actions.ActionOut:
+    return await actions.cancel(ctx, action_id)
 
 
 @router.get("/conversations", response_model=list[assistant.ConversationOut])

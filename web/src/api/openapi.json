@@ -212,6 +212,72 @@
     "title": "AcksOut",
     "type": "object"
    },
+   "ActionOut": {
+    "properties": {
+     "capability": {
+      "title": "Capability",
+      "type": "string"
+     },
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     },
+     "expires_at": {
+      "title": "Expires At",
+      "type": "string"
+     },
+     "fields": {
+      "items": {
+       "$ref": "#/components/schemas/FieldOut"
+      },
+      "title": "Fields",
+      "type": "array"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "capability",
+     "label",
+     "fields",
+     "status",
+     "expires_at",
+     "error",
+     "link"
+    ],
+    "title": "ActionOut",
+    "type": "object"
+   },
    "AdjustmentIn": {
     "additionalProperties": false,
     "properties": {
@@ -3405,6 +3471,29 @@
     "title": "EmployeePatch",
     "type": "object"
    },
+   "FieldOut": {
+    "properties": {
+     "field": {
+      "title": "Field",
+      "type": "string"
+     },
+     "kind": {
+      "default": "text",
+      "title": "Kind",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "field",
+     "value"
+    ],
+    "title": "FieldOut",
+    "type": "object"
+   },
    "ForgotIn": {
     "additionalProperties": false,
     "properties": {
@@ -4765,6 +4854,13 @@
    },
    "MessageOut": {
     "properties": {
+     "actions": {
+      "items": {
+       "$ref": "#/components/schemas/ActionOut"
+      },
+      "title": "Actions",
+      "type": "array"
+     },
      "id": {
       "format": "uuid",
       "title": "Id",
@@ -10122,6 +10218,93 @@
     "summary": "Readyz",
     "tags": [
      "ops"
+    ]
+   }
+  },
+  "/v1/ai/actions/{action_id}/cancel": {
+   "post": {
+    "operationId": "cancel_action_v1_ai_actions__action_id__cancel_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "action_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Action Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ActionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Cancel Action",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/actions/{action_id}/confirm": {
+   "post": {
+    "description": "Do what the assistant offered, as the person confirming it.",
+    "operationId": "confirm_action_v1_ai_actions__action_id__confirm_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "action_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Action Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ActionOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Confirm Action",
+    "tags": [
+     "ai"
     ]
    }
   },

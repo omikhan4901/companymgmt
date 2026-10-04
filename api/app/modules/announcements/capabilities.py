@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from app.modules.announcements import access, service
-from app.modules.announcements.schemas import AnnouncementOut
+from app.modules.announcements.schemas import AnnouncementIn, AnnouncementOut
 from app.modules.platform.capabilities import capability
 from app.modules.platform.deps import Ctx
 
@@ -25,3 +25,17 @@ class FeedIn(BaseModel):
 )
 async def feed(ctx: Ctx, data: FeedIn) -> list[AnnouncementOut]:
     return await service.feed(ctx, limit=data.limit)
+
+
+@capability(
+    "announcements.post",
+    "Post an announcement to everyone, or to some branches or departments.",
+    input=AnnouncementIn,
+    output=AnnouncementOut,
+    permission=access.POST,
+    module="announcements",
+    kind="write",
+    route="POST /v1/announcements",
+)
+async def post(ctx: Ctx, data: AnnouncementIn) -> AnnouncementOut:
+    return await service.create(ctx, data)

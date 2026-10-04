@@ -11,7 +11,15 @@ from pydantic import BaseModel, Field
 from app.modules.platform.capabilities import NoInput, capability
 from app.modules.platform.deps import Ctx
 from app.modules.tasks import access, service
-from app.modules.tasks.schemas import ProjectOut, TaskDetail, TaskIn, TaskOut
+from app.modules.tasks.schemas import (
+    CommentIn,
+    CommentOut,
+    ProjectOut,
+    TaskDetail,
+    TaskIn,
+    TaskOut,
+    TaskPatch,
+)
 
 MODULE = "tasks"
 
@@ -105,3 +113,39 @@ async def projects(ctx: Ctx, data: ProjectsIn) -> list[ProjectOut]:
 )
 async def create(ctx: Ctx, data: TaskIn) -> TaskDetail:
     return await service.create_task(ctx, data)
+
+
+class TaskChangeIn(TaskPatch):
+    task_id: uuid.UUID
+
+
+@capability(
+    "tasks.update",
+    "Change a task: its title, description, who it's for, due date, priority or status.",
+    input=TaskChangeIn,
+    output=TaskDetail,
+    permission=access.SELF,
+    module=MODULE,
+    kind="write",
+    route="PATCH /v1/tasks/{task_id}",
+)
+async def update(ctx: Ctx, data: TaskChangeIn) -> TaskDetail:
+    return await service.update_task(ctx, data.task_id, TaskPatch(**data.model_dump(exclude={"task_id"})))
+
+
+class TaskCommentIn(CommentIn):
+    task_id: uuid.UUID
+
+
+@capability(
+    "tasks.comment",
+    "Add a comment to a task.",
+    input=TaskCommentIn,
+    output=CommentOut,
+    permission=access.SELF,
+    module=MODULE,
+    kind="write",
+    route="POST /v1/tasks/{task_id}/comments",
+)
+async def comment(ctx: Ctx, data: TaskCommentIn) -> CommentOut:
+    return await service.add_comment(ctx, data.task_id, CommentIn(body=data.body))

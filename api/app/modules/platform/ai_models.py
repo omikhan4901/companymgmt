@@ -100,3 +100,37 @@ class Message(IdMixin, TenantScoped, TimestampMixin, Base):
     text: Mapped[str] = mapped_column(Text)
     # [{"n": 1, "capability": "leave.balances", "label": "...", "link": "/app/leave"}]
     sources: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
+
+
+class Proposal(IdMixin, TenantScoped, TimestampMixin, Base):
+    """Something the assistant offered to do. Nothing changes until the person who asked
+    confirms it, as themselves, with their permissions at that moment."""
+
+    __tablename__ = "ai_proposals"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["tenant_id", "membership_id"], ["memberships.tenant_id", "memberships.id"], ondelete="CASCADE"
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "conversation_id"],
+            ["ai_conversations.tenant_id", "ai_conversations.id"],
+            ondelete="CASCADE",
+        ),
+        CheckConstraint("status IN ('pending', 'done', 'cancelled', 'failed')", name="status"),
+        Index("ix_ai_proposals_member", "tenant_id", "membership_id", "status"),
+    )
+
+    membership_id: Mapped[uuid.UUID]
+    conversation_id: Mapped[uuid.UUID | None]
+    # The assistant message that offered it (set once the answer is saved).
+    message_id: Mapped[uuid.UUID | None]
+    capability: Mapped[str] = mapped_column(String(80))
+    args: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    # What the person sees before confirming: [{"label": "Title", "value": "…"}]
+    preview: Mapped[list[dict[str, str]]] = mapped_column(JSONB, default=list)
+    status: Mapped[str] = mapped_column(String(10), default="pending")
+    expires_at: Mapped[datetime]
+    decided_at: Mapped[datetime | None]
+    error: Mapped[str | None] = mapped_column(Text)
+    # Where to see the result, e.g. "/app/tasks?task=…".
+    link: Mapped[str | None] = mapped_column(String(300))
