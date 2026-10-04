@@ -62,5 +62,8 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 - No inline scripts or `dangerouslySetInnerHTML`: the CSP allows only each page's own
   Next.js scripts by hash. Anything that must run before paint goes in `public/*.js`.
 - Every UI string exists in `web/src/i18n/en.ts` and `bn.ts` (TypeScript checks this).
-- Work is paused at the owner's request (2026-10-01); the resume routine
-  (`trig_01BtkyYxPZW6r7FsBrpM5TLp`) is disabled. Start again only when the owner asks.
+- A routine (`trig_01BtkyYxPZW6r7FsBrpM5TLp`) wakes this session every 2 hours so work
+  continues after usage-limit pauses. Follow "Owner decisions, 2026-10-04" in
+  `docs/PROGRESS.md` for the order and scope. Disable it when only owner input is left.
+- The public marketing site uses the ResumeX look (teal, Inter / Plus Jakarta Sans); the
+  product under `/app` uses Atlas. Don't mix them.

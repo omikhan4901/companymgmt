@@ -1,7 +1,42 @@
 # Progress
 
-Current milestone: **M1, demoable slice**: code complete; waiting on the owner's cloud
-accounts to go live (see `runbooks/deploy.md`).
+Current work: **the owner's 2026-10-04 plan** (below): the marketing site in the ResumeX
+style, then M6 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
+on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
+
+## Owner decisions, 2026-10-04 (follow these)
+
+Work order: **marketing site → M6 → M7 → M8 → M9 → M10 → M11 → legal review.** No
+spending, no Paddle work (M5 on hold). Build and test everything that needs no owner
+input; list what does under "Blocked on the owner".
+
+- **Marketing site:** restyle the public site (`web/src/app/(site)`) in the ResumeX look
+  the owner uses elsewhere: teal `#007b7b` (dark `#006262`, tints `#effafa` / `#d5f2f1` /
+  `#a9e3e1`), ink `#0f1f2a`, navy `#002a3a`, Inter for text and Plus Jakarta Sans for
+  headings, a faint teal grid behind the hero, 10 px rounded buttons with a soft teal
+  shadow, slate greys. The product (`/app`) keeps Atlas. Public pages only claim what's
+  built; it's marketing only, no sign-up changes.
+- **M6 AI:** Gemini Flash. No key is configured: the code must switch AI on by itself the
+  moment `GEMINI_API_KEY` is set (and stay cleanly off, with a clear message, without it).
+  The provider sits behind a port so others can be added. AI allowances per plan are
+  ours to configure (an operator-only setting, not hard-coded); every change notifies
+  each workspace's owners and admins. Starting values are ours to choose.
+- **M7 AI everywhere:** AI help across almost every module. Each workspace's admins tick
+  which features get AI (all off until they choose). The AI proposes, a person confirms.
+- **M8 Shop pack:** receipts by browser printing for now (Bluetooth/USB printers later).
+  Tax is fully configurable by each workspace (rates, names, inclusive or exclusive,
+  per product, compound where needed) so any country works; no country's rules are
+  guessed or built in. Cash payments only for now. Dues ("baki khata") and expenses.
+- **M9 Inventory and accounting:** double-entry books. VAT returns and tax filings are
+  customisable report templates the workspace's own accountants set up (which accounts
+  and tax codes go in which box), not built-in rules for any one country.
+- **M10 Enterprise:** build and test everything that needs no owner intervention (SSO,
+  SCIM, API keys, bring-your-own AI key, dedicated-database support); real identity
+  providers and paid infrastructure wait for the owner.
+- **M11:** make it as secure as possible. The owner arranges the penetration test.
+- **After M11:** a thorough legal review: terms, privacy, data processing, AI use,
+  cross-border transfer, looking at what comparable companies publish. For a lawyer to
+  check, not legal advice.
 
 ## M1 checklist
 
