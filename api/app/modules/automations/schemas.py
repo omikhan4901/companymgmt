@@ -166,7 +166,7 @@ class AutomationOut(BaseModel):
     version: int
 
 
-class RunOut(BaseModel):
+class AutomationRunOut(BaseModel):
     id: uuid.UUID
     created_at: datetime
     status: str

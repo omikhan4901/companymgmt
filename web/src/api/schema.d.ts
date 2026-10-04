@@ -92,6 +92,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ai/automations/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Draft Automation
+         * @description An automation drafted from plain words, for the editor. Nothing is saved.
+         */
+        post: operations["draft_automation_v1_ai_automations_draft_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ai/brief": {
         parameters: {
             query?: never;
@@ -1016,6 +1036,95 @@ export interface paths {
         put?: never;
         /** Switch Workspace */
         post: operations["switch_workspace_v1_auth_switch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/automations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Automations */
+        get: operations["list_automations_v1_automations_get"];
+        put?: never;
+        /** Create */
+        post: operations["create_v1_automations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/automations/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Event Catalog */
+        get: operations["event_catalog_v1_automations_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/automations/{automation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["get_v1_automations__automation_id__get"];
+        /** Replace */
+        put: operations["replace_v1_automations__automation_id__put"];
+        post?: never;
+        /** Delete */
+        delete: operations["delete_v1_automations__automation_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update */
+        patch: operations["update_v1_automations__automation_id__patch"];
+        trace?: never;
+    };
+    "/v1/automations/{automation_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run Now */
+        post: operations["run_now_v1_automations__automation_id__run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/automations/{automation_id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Runs */
+        get: operations["runs_v1_automations__automation_id__runs_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2978,6 +3087,92 @@ export interface components {
             /** Target Type */
             target_type: string | null;
         };
+        /** AutomationIn */
+        AutomationIn: {
+            /** Actions */
+            actions: (components["schemas"]["NotifyAction"] | components["schemas"]["TaskAction"])[];
+            /** Conditions */
+            conditions?: components["schemas"]["Condition"][];
+            /**
+             * Drafted By Ai
+             * @default false
+             */
+            drafted_by_ai: boolean;
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /** Name */
+            name: string;
+            /** Trigger */
+            trigger: components["schemas"]["ScheduleTrigger"] | components["schemas"]["EventTrigger"];
+        };
+        /** AutomationOut */
+        AutomationOut: {
+            /** Actions */
+            actions: (components["schemas"]["NotifyAction"] | components["schemas"]["TaskAction"])[];
+            /** Conditions */
+            conditions: components["schemas"]["Condition"][];
+            /** Drafted By Ai */
+            drafted_by_ai: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Name */
+            name: string;
+            /** Next Run At */
+            next_run_at: string | null;
+            /**
+             * Owner Membership Id
+             * Format: uuid
+             */
+            owner_membership_id: string;
+            /** Owner Name */
+            owner_name: string | null;
+            /** Paused Reason */
+            paused_reason: string | null;
+            /** Trigger */
+            trigger: components["schemas"]["ScheduleTrigger"] | components["schemas"]["EventTrigger"];
+            /** Version */
+            version: number;
+        };
+        /** AutomationPatch */
+        AutomationPatch: {
+            /** Enabled */
+            enabled?: boolean | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** AutomationRunOut */
+        AutomationRunOut: {
+            /** Cause */
+            cause: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Detail */
+            detail: {
+                [key: string]: unknown;
+            }[];
+            /** Error */
+            error: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+        };
         /** BalanceOut */
         BalanceOut: {
             /** Adjusted */
@@ -3190,6 +3385,21 @@ export interface components {
             id: string;
             /** Mine */
             mine: boolean;
+        };
+        /**
+         * Condition
+         * @description Compares a value from the event (e.g. "days", "type", "department_id").
+         */
+        Condition: {
+            /** Field */
+            field: string;
+            /**
+             * Op
+             * @enum {string}
+             */
+            op: "eq" | "ne" | "gte" | "lte" | "contains";
+            /** Value */
+            value: string | number | boolean;
         };
         /** ConversationOut */
         ConversationOut: {
@@ -3541,6 +3751,17 @@ export interface components {
             /** Visibility Ids */
             visibility_ids?: string[] | null;
         };
+        /** DraftIn */
+        DraftIn: {
+            /** Text */
+            text: string;
+        };
+        /** DraftOut */
+        DraftOut: {
+            automation: components["schemas"]["AutomationIn"] | null;
+            /** Note */
+            note: string;
+        };
         /** EmployeeIn */
         EmployeeIn: {
             /** Branch Id */
@@ -3658,6 +3879,26 @@ export interface components {
             preferred_name?: string | null;
             /** Status */
             status?: ("active" | "inactive" | "left") | null;
+        };
+        /** EventInfo */
+        EventInfo: {
+            /** About A Person */
+            about_a_person: boolean;
+            /** Name */
+            name: string;
+        };
+        /** EventTrigger */
+        EventTrigger: {
+            /**
+             * Event
+             * @enum {string}
+             */
+            event: "member.joined" | "leave.requested" | "leave.approved" | "leave.rejected" | "leave.cancelled" | "task.assigned" | "task.completed" | "task.commented" | "attendance.correction_requested" | "document.published" | "document.acknowledged" | "announcement.published" | "payroll.finalized";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "event";
         };
         /** FieldOut */
         FieldOut: {
@@ -4257,6 +4498,17 @@ export interface components {
             /** Subject Type */
             subject_type: string | null;
         };
+        /** NotifyAction */
+        NotifyAction: {
+            /** Message */
+            message: string;
+            to: components["schemas"]["Recipients"];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "notify";
+        };
         /** OnboardingRunOut */
         OnboardingRunOut: {
             /** Done */
@@ -4784,6 +5036,24 @@ export interface components {
             /** Total */
             total: number;
         };
+        /**
+         * Recipients
+         * @description Who: everyone, people with a role, a department, chosen people, the person the event
+         *     is about, people with overdue tasks, or people who haven't clocked in today.
+         */
+        Recipients: {
+            /** Department Id */
+            department_id?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "everyone" | "role" | "department" | "people" | "subject" | "overdue_tasks" | "not_clocked_in";
+            /** Membership Ids */
+            membership_ids?: string[];
+            /** Role */
+            role?: string | null;
+        };
         /** RecordIn */
         RecordIn: {
             /** Branch Id */
@@ -5167,6 +5437,34 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** ScheduleTrigger */
+        ScheduleTrigger: {
+            /**
+             * Day
+             * @default 1
+             */
+            day: number;
+            /**
+             * Every
+             * @enum {string}
+             */
+            every: "day" | "workdays" | "week" | "month";
+            /**
+             * Time
+             * @default 09:00
+             */
+            time: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "schedule";
+            /**
+             * Weekday
+             * @default 1
+             */
+            weekday: number;
+        };
         /** SessionOut */
         SessionOut: {
             /**
@@ -5504,6 +5802,21 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** TaskAction */
+        TaskAction: {
+            assign_to?: components["schemas"]["Recipients"] | null;
+            /** Description */
+            description?: string | null;
+            /** Due In Days */
+            due_in_days?: number | null;
+            /** Title */
+            title: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "create_task";
         };
         /** TaskDetail */
         TaskDetail: {
@@ -6144,6 +6457,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnswerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    draft_automation_v1_ai_automations_draft_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DraftIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftOut"];
                 };
             };
             /** @description Validation Error */
@@ -7937,6 +8283,271 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_automations_v1_automations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"][];
+                };
+            };
+        };
+    };
+    create_v1_automations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    event_catalog_v1_automations_events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventInfo"][];
+                };
+            };
+        };
+    };
+    get_v1_automations__automation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_v1_automations__automation_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_v1_automations__automation_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_v1_automations__automation_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_now_v1_automations__automation_id__run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationRunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    runs_v1_automations__automation_id__runs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationRunOut"][];
                 };
             };
             /** @description Validation Error */

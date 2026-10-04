@@ -8,7 +8,13 @@ from fastapi import APIRouter, Depends, Request, Response
 
 from app.core.http import check_if_match
 from app.modules.automations import access, engine, service
-from app.modules.automations.schemas import AutomationIn, AutomationOut, AutomationPatch, EventInfo, RunOut
+from app.modules.automations.schemas import (
+    AutomationIn,
+    AutomationOut,
+    AutomationPatch,
+    AutomationRunOut,
+    EventInfo,
+)
 from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.internal import internal_only
 
@@ -55,13 +61,13 @@ async def delete(automation_id: uuid.UUID, ctx: Ctx = Manage) -> Response:
     return Response(status_code=204)
 
 
-@router.post("/{automation_id}/run", response_model=RunOut)
-async def run_now(automation_id: uuid.UUID, ctx: Ctx = Manage) -> RunOut:
+@router.post("/{automation_id}/run", response_model=AutomationRunOut)
+async def run_now(automation_id: uuid.UUID, ctx: Ctx = Manage) -> AutomationRunOut:
     return await service.run_now(ctx, automation_id)
 
 
-@router.get("/{automation_id}/runs", response_model=list[RunOut])
-async def runs(automation_id: uuid.UUID, ctx: Ctx = Manage) -> list[RunOut]:
+@router.get("/{automation_id}/runs", response_model=list[AutomationRunOut])
+async def runs(automation_id: uuid.UUID, ctx: Ctx = Manage) -> list[AutomationRunOut]:
     return await service.runs(ctx, automation_id)
 
 

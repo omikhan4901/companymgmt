@@ -1131,6 +1131,302 @@
     "title": "AuditOut",
     "type": "object"
    },
+   "AutomationIn": {
+    "additionalProperties": false,
+    "properties": {
+     "actions": {
+      "items": {
+       "discriminator": {
+        "mapping": {
+         "create_task": "#/components/schemas/TaskAction",
+         "notify": "#/components/schemas/NotifyAction"
+        },
+        "propertyName": "type"
+       },
+       "oneOf": [
+        {
+         "$ref": "#/components/schemas/NotifyAction"
+        },
+        {
+         "$ref": "#/components/schemas/TaskAction"
+        }
+       ]
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Actions",
+      "type": "array"
+     },
+     "conditions": {
+      "items": {
+       "$ref": "#/components/schemas/Condition"
+      },
+      "maxItems": 10,
+      "title": "Conditions",
+      "type": "array"
+     },
+     "drafted_by_ai": {
+      "default": false,
+      "title": "Drafted By Ai",
+      "type": "boolean"
+     },
+     "enabled": {
+      "default": false,
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "trigger": {
+      "discriminator": {
+       "mapping": {
+        "event": "#/components/schemas/EventTrigger",
+        "schedule": "#/components/schemas/ScheduleTrigger"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/ScheduleTrigger"
+       },
+       {
+        "$ref": "#/components/schemas/EventTrigger"
+       }
+      ],
+      "title": "Trigger"
+     }
+    },
+    "required": [
+     "name",
+     "trigger",
+     "actions"
+    ],
+    "title": "AutomationIn",
+    "type": "object"
+   },
+   "AutomationOut": {
+    "properties": {
+     "actions": {
+      "items": {
+       "discriminator": {
+        "mapping": {
+         "create_task": "#/components/schemas/TaskAction",
+         "notify": "#/components/schemas/NotifyAction"
+        },
+        "propertyName": "type"
+       },
+       "oneOf": [
+        {
+         "$ref": "#/components/schemas/NotifyAction"
+        },
+        {
+         "$ref": "#/components/schemas/TaskAction"
+        }
+       ]
+      },
+      "title": "Actions",
+      "type": "array"
+     },
+     "conditions": {
+      "items": {
+       "$ref": "#/components/schemas/Condition"
+      },
+      "title": "Conditions",
+      "type": "array"
+     },
+     "drafted_by_ai": {
+      "title": "Drafted By Ai",
+      "type": "boolean"
+     },
+     "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_run_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Run At"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "next_run_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Run At"
+     },
+     "owner_membership_id": {
+      "format": "uuid",
+      "title": "Owner Membership Id",
+      "type": "string"
+     },
+     "owner_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Owner Name"
+     },
+     "paused_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Paused Reason"
+     },
+     "trigger": {
+      "discriminator": {
+       "mapping": {
+        "event": "#/components/schemas/EventTrigger",
+        "schedule": "#/components/schemas/ScheduleTrigger"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/ScheduleTrigger"
+       },
+       {
+        "$ref": "#/components/schemas/EventTrigger"
+       }
+      ],
+      "title": "Trigger"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "enabled",
+     "trigger",
+     "conditions",
+     "actions",
+     "owner_membership_id",
+     "owner_name",
+     "drafted_by_ai",
+     "next_run_at",
+     "last_run_at",
+     "paused_reason",
+     "version"
+    ],
+    "title": "AutomationOut",
+    "type": "object"
+   },
+   "AutomationPatch": {
+    "additionalProperties": false,
+    "properties": {
+     "enabled": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Enabled"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     }
+    },
+    "title": "AutomationPatch",
+    "type": "object"
+   },
+   "AutomationRunOut": {
+    "properties": {
+     "cause": {
+      "title": "Cause",
+      "type": "string"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "detail": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Detail",
+      "type": "array"
+     },
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "status",
+     "cause",
+     "detail",
+     "error"
+    ],
+    "title": "AutomationRunOut",
+    "type": "object"
+   },
    "BalanceOut": {
     "properties": {
      "adjusted": {
@@ -1816,6 +2112,51 @@
      "created_at"
     ],
     "title": "CommentOut",
+    "type": "object"
+   },
+   "Condition": {
+    "description": "Compares a value from the event (e.g. \"days\", \"type\", \"department_id\").",
+    "properties": {
+     "field": {
+      "pattern": "^[a-z_]{1,40}$",
+      "title": "Field",
+      "type": "string"
+     },
+     "op": {
+      "enum": [
+       "eq",
+       "ne",
+       "gte",
+       "lte",
+       "contains"
+      ],
+      "title": "Op",
+      "type": "string"
+     },
+     "value": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "number"
+       },
+       {
+        "type": "integer"
+       },
+       {
+        "type": "boolean"
+       }
+      ],
+      "title": "Value"
+     }
+    },
+    "required": [
+     "field",
+     "op",
+     "value"
+    ],
+    "title": "Condition",
     "type": "object"
    },
    "ConversationOut": {
@@ -2890,6 +3231,43 @@
     "title": "DocumentPatch",
     "type": "object"
    },
+   "DraftIn": {
+    "properties": {
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "DraftIn",
+    "type": "object"
+   },
+   "DraftOut": {
+    "properties": {
+     "automation": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/AutomationIn"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "note": {
+      "title": "Note",
+      "type": "string"
+     }
+    },
+    "required": [
+     "automation",
+     "note"
+    ],
+    "title": "DraftOut",
+    "type": "object"
+   },
    "EmployeeIn": {
     "additionalProperties": false,
     "properties": {
@@ -3469,6 +3847,58 @@
      }
     },
     "title": "EmployeePatch",
+    "type": "object"
+   },
+   "EventInfo": {
+    "properties": {
+     "about_a_person": {
+      "title": "About A Person",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "about_a_person"
+    ],
+    "title": "EventInfo",
+    "type": "object"
+   },
+   "EventTrigger": {
+    "properties": {
+     "event": {
+      "enum": [
+       "member.joined",
+       "leave.requested",
+       "leave.approved",
+       "leave.rejected",
+       "leave.cancelled",
+       "task.assigned",
+       "task.completed",
+       "task.commented",
+       "attendance.correction_requested",
+       "document.published",
+       "document.acknowledged",
+       "announcement.published",
+       "payroll.finalized"
+      ],
+      "title": "Event",
+      "type": "string"
+     },
+     "type": {
+      "const": "event",
+      "default": "event",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "event"
+    ],
+    "title": "EventTrigger",
     "type": "object"
    },
    "FieldOut": {
@@ -5090,6 +5520,31 @@
     "title": "NotificationOut",
     "type": "object"
    },
+   "NotifyAction": {
+    "properties": {
+     "message": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+     },
+     "to": {
+      "$ref": "#/components/schemas/Recipients"
+     },
+     "type": {
+      "const": "notify",
+      "default": "notify",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "to",
+     "message"
+    ],
+    "title": "NotifyAction",
+    "type": "object"
+   },
    "OnboardingRunOut": {
     "properties": {
      "done": {
@@ -6664,6 +7119,62 @@
     "title": "ReceiptsOut",
     "type": "object"
    },
+   "Recipients": {
+    "description": "Who: everyone, people with a role, a department, chosen people, the person the event\nis about, people with overdue tasks, or people who haven't clocked in today.",
+    "properties": {
+     "department_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Department Id"
+     },
+     "kind": {
+      "enum": [
+       "everyone",
+       "role",
+       "department",
+       "people",
+       "subject",
+       "overdue_tasks",
+       "not_clocked_in"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "membership_ids": {
+      "items": {
+       "format": "uuid",
+       "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Membership Ids",
+      "type": "array"
+     },
+     "role": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Role"
+     }
+    },
+    "required": [
+     "kind"
+    ],
+    "title": "Recipients",
+    "type": "object"
+   },
    "RecordIn": {
     "additionalProperties": false,
     "properties": {
@@ -7931,6 +8442,50 @@
     "title": "RunOut",
     "type": "object"
    },
+   "ScheduleTrigger": {
+    "properties": {
+     "day": {
+      "default": 1,
+      "maximum": 28.0,
+      "minimum": 1.0,
+      "title": "Day",
+      "type": "integer"
+     },
+     "every": {
+      "enum": [
+       "day",
+       "workdays",
+       "week",
+       "month"
+      ],
+      "title": "Every",
+      "type": "string"
+     },
+     "time": {
+      "default": "09:00",
+      "title": "Time",
+      "type": "string"
+     },
+     "type": {
+      "const": "schedule",
+      "default": "schedule",
+      "title": "Type",
+      "type": "string"
+     },
+     "weekday": {
+      "default": 1,
+      "maximum": 7.0,
+      "minimum": 1.0,
+      "title": "Weekday",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "every"
+    ],
+    "title": "ScheduleTrigger",
+    "type": "object"
+   },
    "SessionOut": {
     "properties": {
      "created_at": {
@@ -8767,6 +9322,62 @@
      "tenant_id"
     ],
     "title": "SwitchIn",
+    "type": "object"
+   },
+   "TaskAction": {
+    "properties": {
+     "assign_to": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Recipients"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_in_days": {
+      "anyOf": [
+       {
+        "maximum": 365.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due In Days"
+     },
+     "title": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "type": {
+      "const": "create_task",
+      "default": "create_task",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "TaskAction",
     "type": "object"
    },
    "TaskDetail": {
@@ -10410,6 +11021,48 @@
      }
     },
     "summary": "Ask",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/automations/draft": {
+   "post": {
+    "description": "An automation drafted from plain words, for the editor. Nothing is saved.",
+    "operationId": "draft_automation_v1_ai_automations_draft_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DraftIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DraftOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Draft Automation",
     "tags": [
      "ai"
     ]
@@ -12884,6 +13537,364 @@
     "summary": "Switch Workspace",
     "tags": [
      "auth"
+    ]
+   }
+  },
+  "/v1/automations": {
+   "get": {
+    "operationId": "list_automations_v1_automations_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AutomationOut"
+         },
+         "title": "Response List Automations V1 Automations Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Automations",
+    "tags": [
+     "automations"
+    ]
+   },
+   "post": {
+    "operationId": "create_v1_automations_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AutomationIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutomationOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create",
+    "tags": [
+     "automations"
+    ]
+   }
+  },
+  "/v1/automations/events": {
+   "get": {
+    "operationId": "event_catalog_v1_automations_events_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/EventInfo"
+         },
+         "title": "Response Event Catalog V1 Automations Events Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Event Catalog",
+    "tags": [
+     "automations"
+    ]
+   }
+  },
+  "/v1/automations/{automation_id}": {
+   "delete": {
+    "operationId": "delete_v1_automations__automation_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete",
+    "tags": [
+     "automations"
+    ]
+   },
+   "get": {
+    "operationId": "get_v1_automations__automation_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutomationOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get",
+    "tags": [
+     "automations"
+    ]
+   },
+   "patch": {
+    "operationId": "update_v1_automations__automation_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AutomationPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutomationOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update",
+    "tags": [
+     "automations"
+    ]
+   },
+   "put": {
+    "operationId": "replace_v1_automations__automation_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AutomationIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutomationOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Replace",
+    "tags": [
+     "automations"
+    ]
+   }
+  },
+  "/v1/automations/{automation_id}/run": {
+   "post": {
+    "operationId": "run_now_v1_automations__automation_id__run_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutomationRunOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Run Now",
+    "tags": [
+     "automations"
+    ]
+   }
+  },
+  "/v1/automations/{automation_id}/runs": {
+   "get": {
+    "operationId": "runs_v1_automations__automation_id__runs_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "automation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Automation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AutomationRunOut"
+         },
+         "title": "Response Runs V1 Automations  Automation Id  Runs Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Runs",
+    "tags": [
+     "automations"
     ]
    }
   },

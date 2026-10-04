@@ -212,6 +212,10 @@ Actions**:
    gcloud scheduler jobs create http companymgmt-reports --location asia-southeast1 \
      --schedule "37 7 * * *" --time-zone "Asia/Dhaka" --uri "$API/internal/reports/send" \
      --http-method POST --headers "X-Internal-Token=$TOKEN"
+   # Scheduled automations that are due (each workspace's own schedule and time zone).
+   gcloud scheduler jobs create http companymgmt-automations --location asia-southeast1 \
+     --schedule "*/15 * * * *" --uri "$API/internal/automations/tick" \
+     --http-method POST --headers "X-Internal-Token=$TOKEN"
    ```
 
 3. The nightly jobs (`companymgmt-maintenance` purges deleted workspaces and old audit

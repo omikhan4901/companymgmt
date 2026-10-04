@@ -22,7 +22,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
 - [ ] **Automations (API).** New module `app/modules/automations` (schedule or event
   triggers, conditions, notify / create-task actions, recipients incl. overdue tasks and
   not clocked in), engine with rate limits, auto-pause, loop guard (`events.origin`),
-  `member.joined` event, `/internal/automations/tick` (needs a Cloud Scheduler job every
-  15 minutes, not added to infra yet), migration 0018, AI drafting
+  `member.joined` event, `/internal/automations/tick` (Cloud Scheduler job added to the deploy runbook), migration 0018, AI drafting
   `POST /v1/ai/automations/draft`. Tests in `api/tests/test_automations.py` and the
   isolation test, never run; migration applied locally only.
+- [ ] **Automations (web).** `/app/automations`: list, switch, run now, history, editor
+  (schedule/event, conditions, notify/create-task steps, recipient picker), starter
+  templates, "Describe what you want" (AI draft). Nav item for `automations.manage`.
+  No browser test yet; never opened in a browser.

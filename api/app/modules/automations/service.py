@@ -15,9 +15,9 @@ from app.modules.automations.schemas import (
     AutomationIn,
     AutomationOut,
     AutomationPatch,
+    AutomationRunOut,
     EventInfo,
     Recipients,
-    RunOut,
 )
 from app.modules.people.models import Department
 from app.modules.platform.deps import Ctx
@@ -188,7 +188,7 @@ async def delete(ctx: Ctx, automation_id: uuid.UUID) -> None:
     await ctx.db.commit()
 
 
-async def run_now(ctx: Ctx, automation_id: uuid.UUID) -> RunOut:
+async def run_now(ctx: Ctx, automation_id: uuid.UUID) -> AutomationRunOut:
     """Try it once, now (scheduled automations only; events can't be faked)."""
     assert ctx.tenant is not None
     row = await _automation(ctx, automation_id, lock=True)
@@ -198,13 +198,13 @@ async def run_now(ctx: Ctx, automation_id: uuid.UUID) -> RunOut:
     return _run_out(record)
 
 
-def _run_out(r: AutomationRun) -> RunOut:
-    return RunOut(
+def _run_out(r: AutomationRun) -> AutomationRunOut:
+    return AutomationRunOut(
         id=r.id, created_at=r.created_at, status=r.status, cause=r.cause, detail=r.detail or [], error=r.error
     )
 
 
-async def runs(ctx: Ctx, automation_id: uuid.UUID) -> list[RunOut]:
+async def runs(ctx: Ctx, automation_id: uuid.UUID) -> list[AutomationRunOut]:
     await _automation(ctx, automation_id)
     rows = await ctx.db.scalars(
         select(AutomationRun)

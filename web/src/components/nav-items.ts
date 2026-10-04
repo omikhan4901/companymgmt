@@ -1,6 +1,6 @@
 "use client";
 
-import { Banknote, BarChart3, CalendarClock, FileText, Home, Inbox, ListChecks, Megaphone, Settings, Sparkles, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { Banknote, BarChart3, CalendarClock, FileText, Home, Inbox, ListChecks, Megaphone, Settings, Sparkles, TreePalm, Users, UsersRound, Workflow, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/session";
@@ -31,6 +31,7 @@ export function useNavItems(): NavItem[] {
     { href: "/app/reports", label: t("nav.reports"), short: t("nav.reports"), icon: BarChart3, show: can("reports.view") },
     { href: "/app/people", label: t("nav.people"), short: t("nav.people"), icon: UsersRound, show: can("people.view") },
     { href: "/app/team", label: t("nav.team"), short: t("nav.team"), icon: Users, show: can("members.view") },
+    { href: "/app/automations", label: t("nav.automations"), short: t("nav.automations"), icon: Workflow, show: can("automations.manage") },
     {
       href: "/app/settings",
       label: t("nav.settings"),
