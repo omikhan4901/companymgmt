@@ -30,9 +30,18 @@ input; list what does under "Blocked on the owner".
 - **M9 Inventory and accounting:** double-entry books. VAT returns and tax filings are
   customisable report templates the workspace's own accountants set up (which accounts
   and tax codes go in which box), not built-in rules for any one country.
-- **M10 Enterprise:** build and test everything that needs no owner intervention (SSO,
-  SCIM, API keys, bring-your-own AI key, dedicated-database support); real identity
-  providers and paid infrastructure wait for the owner.
+- **M10 Enterprise and developer platform:** build and test everything that needs no
+  owner intervention (SSO, SCIM, API keys, bring-your-own AI key, dedicated-database
+  support); real identity providers and paid infrastructure wait for the owner.
+  Added 2026-10-04, mainly for enterprises: a public developer platform on top of the
+  existing API, a feature rather than a pivot. Service accounts / API keys with chosen
+  permissions, per-key rate limits, rotation and usage logs; signed webhooks for an event
+  catalogue (`employee.onboarded`, `employee.offboarded`, `leave.approved`…) with retries,
+  a delivery log, resend and a test button, refusing private and metadata addresses,
+  payloads without sensitive fields; ready-made provisioning recipes (GitHub, AWS,
+  Google); a stable public API contract with a deprecation policy and a contract test;
+  idempotency keys; generated TypeScript and Python SDKs; a sandbox workspace; and
+  developer docs on the public site.
 - **M11:** make it as secure as possible. The owner arranges the penetration test.
 - **Easy onboarding and addresses (asked 2026-10-04, build with M10):** each workspace gets
   its own address `<slug>.companymgmt.app` at sign-up (wildcard DNS; reserved and

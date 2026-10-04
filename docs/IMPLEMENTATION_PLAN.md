@@ -1054,7 +1054,7 @@ The data model and security stay the same the whole way, so no step needs a rewr
 | M7 | AI actions and automation | AI proposes, person confirms; plain-language automations; early-warning signals | 15–20 d | Planned |
 | M8 | Shop pack | Point of sale, dues ("baki khata"), expenses | 15–20 d | Planned |
 | M9 | Inventory and accounting | Stock, purchases, double-entry books | 20–25 d | Planned |
-| M10 | Enterprise | SSO, SCIM, API keys, dedicated database, bring-your-own AI model | 20–30 d | Planned |
+| M10 | Enterprise and developer platform | SSO, SCIM, API keys, dedicated database, bring-your-own AI model; webhooks, SDKs, a versioned public API and developer docs | 30–45 d | Planned |
 | M11 | Launch hardening | Full ASVS L2 sign-off, restore drill, runbooks, status page | 7–10 d | Planned |
 
 **Total**: about 160–220 focused days for everything. The product is sellable to its
