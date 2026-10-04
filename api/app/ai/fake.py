@@ -58,7 +58,10 @@ class FakeModel:
             # Asked to write from data blocks (the weekly brief): one line per block.
             blocks = [line.split(":")[0] for line in (last.text or "").splitlines() if line.startswith("[")]
             lines = [f"{b[b.index(']') + 2 :]} looks steady. {b[: b.index(']') + 1]}" for b in blocks]
-            return Reply(text="\n".join(lines) or "Nothing to report.", tokens_in=tokens, tokens_out=30)
+            if not lines:
+                # Writing help: give the text back, marked, so tests can see it went through.
+                return Reply(text=f"Edited: {(last.text or '')[:2000]}", tokens_in=tokens, tokens_out=30)
+            return Reply(text="\n".join(lines), tokens_in=tokens, tokens_out=30)
         question = (last.text or "").lower()
         offered = {t.name for t in tools}
         for word, tool in KEYWORDS:

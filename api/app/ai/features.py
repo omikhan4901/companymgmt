@@ -15,4 +15,10 @@ FEATURES: dict[str, tuple[str, str]] = {
         "Offer to do things (create tasks, ask for leave…), only after the person confirms",
         "কাজ করে দেওয়ার প্রস্তাব (কাজ তৈরি, ছুটির আবেদন…), শুধু ব্যক্তি নিশ্চিত করলে",
     ),
+    "writing": (
+        "Help writing announcements, tasks and documents, and translating them",
+        "ঘোষণা, কাজ ও ডকুমেন্ট লিখতে এবং অনুবাদে সাহায্য",
+    ),
+    "automations": ("Turn plain words into automations to review", "সাধারণ ভাষা থেকে অটোমেশন তৈরি, যাচাইয়ের জন্য"),
+    "signals": ("Early-warning signals for managers", "ম্যানেজারদের জন্য আগাম সতর্কসংকেত"),
 }

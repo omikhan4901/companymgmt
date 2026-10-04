@@ -14,3 +14,8 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   0017); `app/ai/actions.py`; confirm/cancel routes; action cards on the Ask page.
   Unit tests written in `api/tests/test_ai.py` (`test_actions_*`, `test_staff_cant_be_talked_*`)
   and the isolation test, never run. No browser test yet.
+- [ ] **Writing help.** `POST /v1/ai/write` (draft, improve, shorter, translate) and
+  `POST /v1/ai/documents/{id}/summary`; `app/ai/writing.py`; `documents.readable_text`;
+  "Help me write" menu in the announcement and new-task dialogs; "Summarise" on documents.
+  Writing and summaries now count towards the monthly allowance. Tests
+  `test_writing_help_*` and `test_document_summaries_*` written, never run.

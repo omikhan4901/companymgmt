@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Choice, ChoiceGroup, Switch } from "@/components/ui/choice";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
+import { WriteHelp } from "@/components/ai/write-help";
 import { Input, Textarea } from "@/components/ui/input";
 import { applyFieldErrors, errorMessage } from "@/lib/errors";
 
@@ -38,7 +39,7 @@ export function PostDialog({ post, onClose }: { post?: Announcement; onClose: ()
   const [targets, setTargets] = useState<string[]>(post?.audience_names.map((a) => a.id) ?? (scope ? [scope] : []));
   const [pinned, setPinned] = useState(post?.pinned ?? false);
   const [targetError, setTargetError] = useState<string | null>(null);
-  const { register, handleSubmit, setError, formState } = useForm<Values>({ defaultValues: { title: post?.title ?? "", body: post?.body ?? "" } });
+  const { register, handleSubmit, setError, formState, getValues, setValue } = useForm<Values>({ defaultValues: { title: post?.title ?? "", body: post?.body ?? "" } });
 
   // Scoped managers choose among their own department and the ones below it.
   const departmentChoices = useMemo(() => {
@@ -103,6 +104,7 @@ export function PostDialog({ post, onClose }: { post?: Announcement; onClose: ()
           <Field label={t("news.body")} error={formState.errors.body?.message}>
             <Textarea dir="auto" rows={6} maxLength={20000} {...register("body", { validate: (v) => v.trim().length > 0 || t("common.required") })} />
           </Field>
+          <WriteHelp kind="announcement" getText={() => getValues("body")} setText={(text) => setValue("body", text, { shouldDirty: true })} />
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium">{t("news.audience")}</legend>
             <ChoiceGroup

@@ -10162,6 +10162,72 @@
     ],
     "title": "WorkspaceRef",
     "type": "object"
+   },
+   "WriteIn": {
+    "properties": {
+     "kind": {
+      "default": "general",
+      "enum": [
+       "announcement",
+       "task",
+       "document",
+       "message",
+       "general"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "language": {
+      "anyOf": [
+       {
+        "enum": [
+         "en",
+         "bn"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Language"
+     },
+     "task": {
+      "enum": [
+       "draft",
+       "improve",
+       "shorter",
+       "translate"
+      ],
+      "title": "Task",
+      "type": "string"
+     },
+     "text": {
+      "maxLength": 8000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "task",
+     "text"
+    ],
+    "title": "WriteIn",
+    "type": "object"
+   },
+   "WriteOut": {
+    "properties": {
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "WriteOut",
+    "type": "object"
    }
   }
  },
@@ -10560,6 +10626,49 @@
     ]
    }
   },
+  "/v1/ai/documents/{document_id}/summary": {
+   "post": {
+    "operationId": "summarise_v1_ai_documents__document_id__summary_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "document_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Document Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WriteOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Summarise",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
   "/v1/ai/settings": {
    "put": {
     "operationId": "save_settings_v1_ai_settings_put",
@@ -10617,6 +10726,48 @@
      }
     },
     "summary": "Status",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/write": {
+   "post": {
+    "description": "Draft, improve, shorten or translate text. Nothing is saved.",
+    "operationId": "write_v1_ai_write_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/WriteIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/WriteOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Write",
     "tags": [
      "ai"
     ]

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, EmptyState } from "@/components/ui/card";
 import { Switch } from "@/components/ui/choice";
+import { DocumentSummary } from "@/components/ai/write-help";
 import { Dialog, SheetContent } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { intlLocale } from "@/i18n";
@@ -134,6 +135,7 @@ function DocumentBody({ doc }: { doc: DocDetail }) {
           {t("docs.download", { name: doc.current.filename })}
         </Button>
       )}
+      {doc.current && <DocumentSummary key={doc.current.id} documentId={doc.id} />}
       {doc.acknowledged === false && (
         <Card className="flex flex-col gap-3 border-warn-soft bg-warn-soft/40 p-4">
           <p className="text-sm">{t("docs.ackPrompt")}</p>

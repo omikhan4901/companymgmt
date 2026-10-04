@@ -195,6 +195,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ai/documents/{document_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Summarise */
+        post: operations["summarise_v1_ai_documents__document_id__summary_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ai/settings": {
         parameters: {
             query?: never;
@@ -223,6 +240,26 @@ export interface paths {
         get: operations["status_v1_ai_status_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ai/write": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write
+         * @description Draft, improve, shorten or translate text. Nothing is saved.
+         */
+        post: operations["write_v1_ai_write_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5949,6 +5986,29 @@ export interface components {
             /** Slug */
             slug: string;
         };
+        /** WriteIn */
+        WriteIn: {
+            /**
+             * Kind
+             * @default general
+             * @enum {string}
+             */
+            kind: "announcement" | "task" | "document" | "message" | "general";
+            /** Language */
+            language?: ("en" | "bn") | null;
+            /**
+             * Task
+             * @enum {string}
+             */
+            task: "draft" | "improve" | "shorter" | "translate";
+            /** Text */
+            text: string;
+        };
+        /** WriteOut */
+        WriteOut: {
+            /** Text */
+            text: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -6272,6 +6332,37 @@ export interface operations {
             };
         };
     };
+    summarise_v1_ai_documents__document_id__summary_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WriteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     save_settings_v1_ai_settings_put: {
         parameters: {
             query?: never;
@@ -6321,6 +6412,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AIStatusOut"];
+                };
+            };
+        };
+    };
+    write_v1_ai_write_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WriteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WriteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

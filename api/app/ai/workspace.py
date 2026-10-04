@@ -23,7 +23,7 @@ from app.modules.platform.ai_models import AIAllowance, AISettings, AIUsage
 from app.modules.platform.catalog import AI_MANAGE, AI_USE
 from app.modules.platform.deps import Ctx
 
-COUNTED = ("ask", "brief")
+COUNTED = ("ask", "brief", "write", "summary", "automation")
 
 
 class AIStatusOut(BaseModel):

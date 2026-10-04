@@ -19,7 +19,7 @@ import { normalizeDigits } from "@/lib/format";
 
 import { aiKeys, UsageLine, useAIStatus } from "./ai";
 
-const FEATURES = ["ask", "documents", "brief", "actions"] as const;
+const FEATURES = ["ask", "documents", "brief", "actions", "writing", "automations", "signals"] as const;
 
 interface Change {
   enabled: boolean;

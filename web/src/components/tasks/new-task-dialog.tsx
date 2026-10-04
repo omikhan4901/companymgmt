@@ -12,6 +12,7 @@ import { PeopleSelect } from "@/components/people-select";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
+import { WriteHelp } from "@/components/ai/write-help";
 import { Input, Select, Textarea } from "@/components/ui/input";
 import { applyFieldErrors, errorMessage } from "@/lib/errors";
 
@@ -32,7 +33,7 @@ export function NewTaskDialog({ projectId, onClose, onCreated }: { projectId?: s
   const { can } = useSession();
   const refresh = useRefreshTasks();
   const projects = useProjects();
-  const { register, handleSubmit, setError, control, formState } = useForm<Values>({
+  const { register, handleSubmit, setError, control, formState, getValues, setValue } = useForm<Values>({
     defaultValues: { title: "", project_id: projectId ?? "", assignee_id: "", due_date: "", priority: "normal", description: "" },
   });
   const chosen = useWatch({ control, name: "project_id" });
@@ -126,6 +127,7 @@ export function NewTaskDialog({ projectId, onClose, onCreated }: { projectId?: s
           <Field label={t("tasks.description")} optional={t("common.optional")}>
             <Textarea rows={3} maxLength={5000} {...register("description")} />
           </Field>
+          <WriteHelp kind="task" getText={() => getValues("description") ?? ""} setText={(text) => setValue("description", text, { shouldDirty: true })} />
         </form>
       </DialogContent>
     </Dialog>

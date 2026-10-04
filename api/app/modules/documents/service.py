@@ -474,3 +474,22 @@ async def acknowledgements(ctx: Ctx, document_id: uuid.UUID) -> AcksOut:
         acknowledged=sum(1 for p in people if p.acked_at),
         people=people,
     )
+
+
+async def readable_text(ctx: Ctx, document_id: uuid.UUID, *, limit: int = 60_000) -> tuple[str, str]:
+    """The title and text of a document's current version, if this person may open it
+    (passages overlap a little; fine for reading, not for quoting exactly)."""
+    doc = await _document(ctx, document_id)
+    await _index_missing(ctx)
+    pieces = await ctx.db.scalars(
+        select(DocumentPassage.text)
+        .where(DocumentPassage.document_id == doc.id)
+        .order_by(DocumentPassage.ordinal)
+    )
+    out, size = [], 0
+    for piece in pieces:
+        if size + len(piece) > limit:
+            break
+        out.append(piece)
+        size += len(piece)
+    return doc.title, "\n".join(out)

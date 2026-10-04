@@ -474,3 +474,53 @@ async def test_staff_cant_be_talked_into_actions_beyond_their_role(
     answer = (await ask(staff, "Post an announcement")).json()["answer"]
     assert answer["actions"] == []
     assert tool_results(fake) == [{"error": "That tool isn't available to this person."}]
+
+
+async def test_writing_help_returns_text_and_saves_nothing(
+    client: httpx.AsyncClient, fake: FakeModel
+) -> None:
+    owner = await signup(client)
+    _, staff = await add_staff(owner)
+    body = {"task": "improve", "kind": "announcement", "text": "office closed friday for eid"}
+    await switch_on(owner, ["ask"])
+    off = await staff.post("/v1/ai/write", json=body)
+    assert (off.status_code, off.json()["code"]) == (403, "ai_feature_off")
+    await switch_on(owner, ["ask", "writing"])
+    written = await staff.post("/v1/ai/write", json=body)
+    assert written.status_code == 200, written.text
+    assert written.json()["text"] == "Edited: office closed friday for eid"
+    system, turns, offered = fake.calls[-1]
+    assert offered == []  # no tools: it can't look anything up or change anything
+    assert "workplace announcement" in system
+    assert turns[0].text == "office closed friday for eid"
+    # Translating needs a target language, and says which.
+    missing = await staff.post("/v1/ai/write", json={"task": "translate", "text": "Hello"})
+    assert missing.status_code == 422
+    await staff.post("/v1/ai/write", json={"task": "translate", "text": "Hello", "language": "bn"})
+    assert "into Bangla" in fake.calls[-1][0]
+    # Writing counts towards the month's allowance.
+    assert (await owner.get("/v1/ai/status")).json()["used"] == 2
+
+
+async def test_document_summaries_only_for_documents_you_can_open(
+    client: httpx.AsyncClient, fake: FakeModel
+) -> None:
+    from tests.test_documents import make, office, upload
+
+    o = await office(client)
+    owner = o["owner"]
+    await switch_on(owner, ["ask", "documents"])
+    policy = await make(owner, "Leave policy")
+    await upload(owner, policy["id"], b"Casual leave is ten days a year.", "leave.txt")
+    secret = await make(owner, "Design pay", visibility="departments", visibility_ids=[o["design"]])
+    await upload(owner, secret["id"], b"Designers earn a lot.", "pay.txt")
+    empty = await make(owner, "Scan")
+    await upload(owner, empty["id"], b"\x89PNG", "scan.png")
+
+    summary = await o["seller"].post(f"/v1/ai/documents/{policy['id']}/summary")
+    assert summary.status_code == 200, summary.text
+    assert "Casual leave is ten days a year." in (fake.calls[-1][1][0].text or "")
+    assert "Leave policy" in fake.calls[-1][0]
+    assert (await o["seller"].post(f"/v1/ai/documents/{secret['id']}/summary")).status_code == 404
+    no_text = await o["seller"].post(f"/v1/ai/documents/{empty['id']}/summary")
+    assert (no_text.status_code, no_text.json()["code"]) == (422, "no_text")

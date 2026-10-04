@@ -9,7 +9,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel, Field, StringConstraints
 
-from app.ai import actions, assistant, brief, operator, workspace
+from app.ai import actions, assistant, brief, operator, workspace, writing
 from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
 from app.modules.platform.capabilities import invoke
@@ -59,6 +59,17 @@ async def ask(body: assistant.AskIn, ctx: Ctx = Depends(allow(AI_USE))) -> assis
 @router.post("/brief", response_model=brief.BriefOut)
 async def weekly_brief(ctx: Ctx = Depends(allow(AI_USE))) -> brief.BriefOut:
     return await brief.brief(ctx)
+
+
+@router.post("/write", response_model=writing.WriteOut)
+async def write(body: writing.WriteIn, ctx: Ctx = Depends(allow(AI_USE))) -> writing.WriteOut:
+    """Draft, improve, shorten or translate text. Nothing is saved."""
+    return await writing.write(ctx, body)
+
+
+@router.post("/documents/{document_id}/summary", response_model=writing.WriteOut)
+async def summarise(document_id: uuid.UUID, ctx: Ctx = Depends(allow(AI_USE))) -> writing.WriteOut:
+    return await writing.summarise(ctx, document_id)
 
 
 @router.post("/actions/{action_id}/confirm", response_model=actions.ActionOut)
