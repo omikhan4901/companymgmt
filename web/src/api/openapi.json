@@ -146,6 +146,129 @@
     "title": "AcceptIn",
     "type": "object"
    },
+   "AccountIn": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "maxLength": 20,
+      "minLength": 1,
+      "pattern": "^[0-9A-Za-z.\\-]+$",
+      "title": "Code",
+      "type": "string"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "type": {
+      "enum": [
+       "asset",
+       "liability",
+       "equity",
+       "income",
+       "expense"
+      ],
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "code",
+     "name",
+     "type"
+    ],
+    "title": "AccountIn",
+    "type": "object"
+   },
+   "AccountOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "role": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Role"
+     },
+     "type": {
+      "enum": [
+       "asset",
+       "liability",
+       "equity",
+       "income",
+       "expense"
+      ],
+      "title": "Type",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "code",
+     "name",
+     "type",
+     "role",
+     "active",
+     "description",
+     "version"
+    ],
+    "title": "AccountOut",
+    "type": "object"
+   },
    "AckPerson": {
     "properties": {
      "acked_at": {
@@ -292,57 +415,6 @@
      "link"
     ],
     "title": "ActionOut",
-    "type": "object"
-   },
-   "AdjustmentIn": {
-    "additionalProperties": false,
-    "properties": {
-     "days": {
-      "anyOf": [
-       {
-        "maximum": 366.0,
-        "minimum": -366.0,
-        "multipleOf": 0.5,
-        "type": "number"
-       },
-       {
-        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-        "type": "string"
-       }
-      ],
-      "title": "Days"
-     },
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "leave_type_id": {
-      "format": "uuid",
-      "title": "Leave Type Id",
-      "type": "string"
-     },
-     "reason": {
-      "maxLength": 300,
-      "minLength": 3,
-      "title": "Reason",
-      "type": "string"
-     },
-     "year": {
-      "maximum": 2100.0,
-      "minimum": 2000.0,
-      "title": "Year",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "employee_id",
-     "leave_type_id",
-     "year",
-     "days",
-     "reason"
-    ],
-    "title": "AdjustmentIn",
     "type": "object"
    },
    "AdjustmentOut": {
@@ -1526,6 +1598,170 @@
     "title": "BalanceOut",
     "type": "object"
    },
+   "BalanceSheetOut": {
+    "properties": {
+     "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+     },
+     "assets": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Assets",
+      "type": "array"
+     },
+     "balanced": {
+      "title": "Balanced",
+      "type": "boolean"
+     },
+     "earnings": {
+      "title": "Earnings",
+      "type": "integer"
+     },
+     "equity": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Equity",
+      "type": "array"
+     },
+     "liabilities": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Liabilities",
+      "type": "array"
+     },
+     "total_assets": {
+      "title": "Total Assets",
+      "type": "integer"
+     },
+     "total_equity": {
+      "title": "Total Equity",
+      "type": "integer"
+     },
+     "total_liabilities": {
+      "title": "Total Liabilities",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "as_of",
+     "assets",
+     "liabilities",
+     "equity",
+     "earnings",
+     "total_assets",
+     "total_liabilities",
+     "total_equity",
+     "balanced"
+    ],
+    "title": "BalanceSheetOut",
+    "type": "object"
+   },
+   "Box": {
+    "properties": {
+     "code": {
+      "maxLength": 20,
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+     },
+     "label": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+     },
+     "sources": {
+      "items": {
+       "$ref": "#/components/schemas/BoxSource"
+      },
+      "maxItems": 20,
+      "title": "Sources",
+      "type": "array"
+     }
+    },
+    "required": [
+     "code",
+     "label"
+    ],
+    "title": "Box",
+    "type": "object"
+   },
+   "BoxOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     }
+    },
+    "required": [
+     "code",
+     "label",
+     "amount"
+    ],
+    "title": "BoxOut",
+    "type": "object"
+   },
+   "BoxSource": {
+    "description": "What goes in a box: tax charged or the sales/purchases it was charged on, for some\ntax rates (output: on sales; input: on purchases); account movements; or other boxes.",
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Ids",
+      "type": "array"
+     },
+     "kind": {
+      "enum": [
+       "tax_amount",
+       "tax_base",
+       "account",
+       "boxes"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "side": {
+      "default": "output",
+      "enum": [
+       "output",
+       "input"
+      ],
+      "title": "Side",
+      "type": "string"
+     },
+     "sign": {
+      "default": 1,
+      "enum": [
+       1,
+       -1
+      ],
+      "title": "Sign",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "kind",
+     "ids"
+    ],
+    "title": "BoxSource",
+    "type": "object"
+   },
    "BranchIn": {
     "additionalProperties": false,
     "properties": {
@@ -2469,17 +2705,89 @@
     "title": "CorrectionOut",
     "type": "object"
    },
-   "CountOut": {
+   "CountIn": {
+    "additionalProperties": false,
     "properties": {
-     "count": {
-      "title": "Count",
-      "type": "integer"
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "counted_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Counted On"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/CountLineIn"
+      },
+      "maxItems": 2000,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
      }
     },
     "required": [
-     "count"
+     "lines"
     ],
-    "title": "CountOut",
+    "title": "CountIn",
+    "type": "object"
+   },
+   "CountLineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "counted": {
+      "anyOf": [
+       {
+        "maximum": 1000000000.0,
+        "minimum": 0.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Counted"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "product_id",
+     "counted"
+    ],
+    "title": "CountLineIn",
     "type": "object"
    },
    "CurrentWorkspace": {
@@ -4365,76 +4673,77 @@
     "title": "EmployeePatch",
     "type": "object"
    },
-   "EntryOut": {
+   "EntryIn": {
+    "additionalProperties": false,
     "properties": {
-     "amount": {
-      "title": "Amount",
-      "type": "integer"
-     },
-     "balance": {
-      "title": "Balance",
-      "type": "integer"
-     },
-     "created_at": {
-      "format": "date-time",
-      "title": "Created At",
-      "type": "string"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "kind": {
-      "enum": [
-       "sale",
-       "return",
-       "payment",
-       "adjustment"
-      ],
-      "title": "Kind",
-      "type": "string"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     },
-     "occurred_on": {
+     "entry_date": {
       "format": "date",
-      "title": "Occurred On",
+      "title": "Entry Date",
       "type": "string"
      },
-     "sale_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Sale Id"
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/EntryLineIn"
+      },
+      "maxItems": 200,
+      "minItems": 2,
+      "title": "Lines",
+      "type": "array"
+     },
+     "memo": {
+      "maxLength": 300,
+      "minLength": 1,
+      "title": "Memo",
+      "type": "string"
      }
     },
     "required": [
-     "id",
-     "kind",
-     "amount",
-     "occurred_on",
-     "sale_id",
-     "note",
-     "created_at",
-     "balance"
+     "entry_date",
+     "memo",
+     "lines"
     ],
-    "title": "EntryOut",
+    "title": "EntryIn",
+    "type": "object"
+   },
+   "EntryLineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "account_id": {
+      "format": "uuid",
+      "title": "Account Id",
+      "type": "string"
+     },
+     "credit": {
+      "default": 0,
+      "maximum": 1000000000000000.0,
+      "minimum": 0.0,
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "default": 0,
+      "maximum": 1000000000000000.0,
+      "minimum": 0.0,
+      "title": "Debit",
+      "type": "integer"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     }
+    },
+    "required": [
+     "account_id"
+    ],
+    "title": "EntryLineIn",
     "type": "object"
    },
    "EventInfo": {
@@ -5437,6 +5746,35 @@
     "title": "ItemOut",
     "type": "object"
    },
+   "ItemSettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "reorder_level": {
+      "anyOf": [
+       {
+        "maximum": 1000000000.0,
+        "minimum": -1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reorder Level"
+     },
+     "track": {
+      "default": true,
+      "title": "Track",
+      "type": "boolean"
+     }
+    },
+    "title": "ItemSettingsIn",
+    "type": "object"
+   },
    "LeaveByType": {
     "properties": {
      "color": {
@@ -5803,6 +6141,129 @@
     "title": "LeaveTypePatch",
     "type": "object"
    },
+   "LedgerOut": {
+    "properties": {
+     "accounts": {
+      "items": {
+       "$ref": "#/components/schemas/AccountOut"
+      },
+      "title": "Accounts",
+      "type": "array"
+     },
+     "closing": {
+      "title": "Closing",
+      "type": "integer"
+     },
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "opening": {
+      "title": "Opening",
+      "type": "integer"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/LedgerRow"
+      },
+      "title": "Rows",
+      "type": "array"
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     }
+    },
+    "required": [
+     "accounts",
+     "start",
+     "end",
+     "opening",
+     "rows",
+     "closing"
+    ],
+    "title": "LedgerOut",
+    "type": "object"
+   },
+   "LedgerRow": {
+    "properties": {
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "credit": {
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "title": "Debit",
+      "type": "integer"
+     },
+     "entry_date": {
+      "format": "date",
+      "title": "Entry Date",
+      "type": "string"
+     },
+     "entry_id": {
+      "format": "uuid",
+      "title": "Entry Id",
+      "type": "string"
+     },
+     "memo": {
+      "title": "Memo",
+      "type": "string"
+     },
+     "number": {
+      "title": "Number",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "entry_id",
+     "number",
+     "entry_date",
+     "memo",
+     "debit",
+     "credit",
+     "balance"
+    ],
+    "title": "LedgerRow",
+    "type": "object"
+   },
+   "LevelOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "low": {
+      "title": "Low",
+      "type": "boolean"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     }
+    },
+    "required": [
+     "branch_id",
+     "quantity",
+     "low"
+    ],
+    "title": "LevelOut",
+    "type": "object"
+   },
    "LineIn": {
     "additionalProperties": false,
     "properties": {
@@ -5883,83 +6344,6 @@
      }
     },
     "title": "LineIn",
-    "type": "object"
-   },
-   "LineOut": {
-    "properties": {
-     "discount": {
-      "title": "Discount",
-      "type": "integer"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "net": {
-      "title": "Net",
-      "type": "integer"
-     },
-     "product_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Product Id"
-     },
-     "quantity": {
-      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-      "title": "Quantity",
-      "type": "string"
-     },
-     "returned": {
-      "default": "0",
-      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-      "title": "Returned",
-      "type": "string"
-     },
-     "tax": {
-      "title": "Tax",
-      "type": "integer"
-     },
-     "taxes": {
-      "items": {
-       "$ref": "#/components/schemas/LineTaxOut"
-      },
-      "title": "Taxes",
-      "type": "array"
-     },
-     "total": {
-      "title": "Total",
-      "type": "integer"
-     },
-     "unit_price": {
-      "title": "Unit Price",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "product_id",
-     "name",
-     "quantity",
-     "unit_price",
-     "discount",
-     "net",
-     "tax",
-     "total",
-     "taxes"
-    ],
-    "title": "LineOut",
     "type": "object"
    },
    "LineTaxOut": {
@@ -6649,6 +7033,104 @@
     "title": "MoveIn",
     "type": "object"
    },
+   "MovementOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "ref_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ref Id"
+     },
+     "ref_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ref Type"
+     },
+     "unit_cost": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Unit Cost",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "product_id",
+     "branch_id",
+     "kind",
+     "quantity",
+     "unit_cost",
+     "value",
+     "occurred_at",
+     "ref_type",
+     "ref_id",
+     "note"
+    ],
+    "title": "MovementOut",
+    "type": "object"
+   },
    "NotificationOut": {
     "properties": {
      "actor_name": {
@@ -6841,6 +7323,63 @@
      }
     },
     "title": "OpenIn",
+    "type": "object"
+   },
+   "OpeningIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     },
+     "unit_cost": {
+      "anyOf": [
+       {
+        "maximum": 1000000000000.0,
+        "minimum": 0.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,21}0*$)\\d{0,16}\\.\\d{0,4}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Unit Cost"
+     }
+    },
+    "required": [
+     "product_id",
+     "quantity",
+     "unit_cost"
+    ],
+    "title": "OpeningIn",
     "type": "object"
    },
    "OperatorMe": {
@@ -8236,6 +8775,57 @@
     "title": "ProfileIn",
     "type": "object"
    },
+   "ProfitLossOut": {
+    "properties": {
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "expenses": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Expenses",
+      "type": "array"
+     },
+     "income": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Income",
+      "type": "array"
+     },
+     "profit": {
+      "title": "Profit",
+      "type": "integer"
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     },
+     "total_expenses": {
+      "title": "Total Expenses",
+      "type": "integer"
+     },
+     "total_income": {
+      "title": "Total Income",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "start",
+     "end",
+     "income",
+     "expenses",
+     "total_income",
+     "total_expenses",
+     "profit"
+    ],
+    "title": "ProfitLossOut",
+    "type": "object"
+   },
    "ProjectIn": {
     "additionalProperties": false,
     "properties": {
@@ -8634,6 +9224,282 @@
      "features"
     ],
     "title": "PublicPlan",
+    "type": "object"
+   },
+   "PurchaseIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/PurchaseLineIn"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "paid": {
+      "default": 0,
+      "maximum": 10000000000000.0,
+      "minimum": 0.0,
+      "title": "Paid",
+      "type": "integer"
+     },
+     "paid_from": {
+      "default": "drawer",
+      "enum": [
+       "drawer",
+       "petty_cash",
+       "bank",
+       "other"
+      ],
+      "title": "Paid From",
+      "type": "string"
+     },
+     "received_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Received On"
+     },
+     "reference": {
+      "anyOf": [
+       {
+        "maxLength": 60,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reference"
+     },
+     "supplier_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Supplier Id"
+     }
+    },
+    "required": [
+     "lines"
+    ],
+    "title": "PurchaseIn",
+    "type": "object"
+   },
+   "PurchaseLineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     },
+     "tax_rate_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Rate Id"
+     },
+     "unit_cost": {
+      "anyOf": [
+       {
+        "maximum": 1000000000000.0,
+        "minimum": 0.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,21}0*$)\\d{0,16}\\.\\d{0,4}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Unit Cost"
+     }
+    },
+    "required": [
+     "product_id",
+     "quantity",
+     "unit_cost"
+    ],
+    "title": "PurchaseLineIn",
+    "type": "object"
+   },
+   "PurchaseOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "paid": {
+      "title": "Paid",
+      "type": "integer"
+     },
+     "paid_from": {
+      "title": "Paid From",
+      "type": "string"
+     },
+     "received_on": {
+      "format": "date",
+      "title": "Received On",
+      "type": "string"
+     },
+     "reference": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reference"
+     },
+     "supplier_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Supplier Id"
+     },
+     "supplier_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Supplier Name"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "supplier_id",
+     "supplier_name",
+     "branch_id",
+     "reference",
+     "received_on",
+     "net",
+     "tax",
+     "total",
+     "paid",
+     "paid_from",
+     "lines",
+     "note",
+     "created_at"
+    ],
+    "title": "PurchaseOut",
     "type": "object"
    },
    "QuoteOut": {
@@ -9165,6 +10031,57 @@
      "recovery_codes"
     ],
     "title": "RecoveryCodesOut",
+    "type": "object"
+   },
+   "ReportRow": {
+    "properties": {
+     "account_id": {
+      "format": "uuid",
+      "title": "Account Id",
+      "type": "string"
+     },
+     "amount": {
+      "default": 0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "credit": {
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "title": "Debit",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "type": {
+      "enum": [
+       "asset",
+       "liability",
+       "equity",
+       "income",
+       "expense"
+      ],
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "account_id",
+     "code",
+     "name",
+     "type",
+     "debit",
+     "credit"
+    ],
+    "title": "ReportRow",
     "type": "object"
    },
    "RequestContext": {
@@ -10284,7 +11201,7 @@
      },
      "lines": {
       "items": {
-       "$ref": "#/components/schemas/LineOut"
+       "$ref": "#/components/schemas/app__modules__sales__schemas__LineOut"
       },
       "title": "Lines",
       "type": "array"
@@ -10627,101 +11544,6 @@
      "current"
     ],
     "title": "SessionOut",
-    "type": "object"
-   },
-   "SettingsIn": {
-    "additionalProperties": false,
-    "properties": {
-     "day_starts_at": {
-      "anyOf": [
-       {
-        "format": "time",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Day Starts At"
-     },
-     "late_after_minutes": {
-      "anyOf": [
-       {
-        "maximum": 240.0,
-        "minimum": 0.0,
-        "type": "integer"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Late After Minutes"
-     },
-     "location_mode": {
-      "enum": [
-       "off",
-       "record",
-       "require"
-      ],
-      "title": "Location Mode",
-      "type": "string"
-     },
-     "max_accuracy_m": {
-      "default": 100,
-      "maximum": 1000.0,
-      "minimum": 10.0,
-      "title": "Max Accuracy M",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "location_mode"
-    ],
-    "title": "SettingsIn",
-    "type": "object"
-   },
-   "SettingsOut": {
-    "properties": {
-     "branches_located": {
-      "title": "Branches Located",
-      "type": "integer"
-     },
-     "branches_total": {
-      "title": "Branches Total",
-      "type": "integer"
-     },
-     "day_starts_at": {
-      "format": "time",
-      "title": "Day Starts At",
-      "type": "string"
-     },
-     "late_after_minutes": {
-      "title": "Late After Minutes",
-      "type": "integer"
-     },
-     "location_mode": {
-      "enum": [
-       "off",
-       "record",
-       "require"
-      ],
-      "title": "Location Mode",
-      "type": "string"
-     },
-     "max_accuracy_m": {
-      "title": "Max Accuracy M",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "location_mode",
-     "max_accuracy_m",
-     "day_starts_at",
-     "late_after_minutes",
-     "branches_total",
-     "branches_located"
-    ],
-    "title": "SettingsOut",
     "type": "object"
    },
    "ShopSettingsIn": {
@@ -11243,7 +12065,7 @@
      },
      "entries": {
       "items": {
-       "$ref": "#/components/schemas/EntryOut"
+       "$ref": "#/components/schemas/app__modules__customers__schemas__EntryOut"
       },
       "title": "Entries",
       "type": "array"
@@ -11319,6 +12141,90 @@
      "location_mode"
     ],
     "title": "StatusOut",
+    "type": "object"
+   },
+   "StockOut": {
+    "properties": {
+     "average_cost": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Average Cost",
+      "type": "string"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "levels": {
+      "items": {
+       "$ref": "#/components/schemas/LevelOut"
+      },
+      "title": "Levels",
+      "type": "array"
+     },
+     "low": {
+      "title": "Low",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "reorder_level": {
+      "anyOf": [
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reorder Level"
+     },
+     "track": {
+      "title": "Track",
+      "type": "boolean"
+     },
+     "unit": {
+      "title": "Unit",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "product_id",
+     "name",
+     "code",
+     "unit",
+     "track",
+     "reorder_level",
+     "quantity",
+     "average_cost",
+     "value",
+     "levels",
+     "low"
+    ],
+    "title": "StockOut",
     "type": "object"
    },
    "StructureIn": {
@@ -11769,6 +12675,207 @@
      "days"
     ],
     "title": "SummaryOut",
+    "type": "object"
+   },
+   "SupplierIn": {
+    "additionalProperties": false,
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "address": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "name": {
+      "maxLength": 200,
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "tax_id": {
+      "anyOf": [
+       {
+        "maxLength": 60,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "SupplierIn",
+    "type": "object"
+   },
+   "SupplierOut": {
+    "properties": {
+     "active": {
+      "title": "Active",
+      "type": "boolean"
+     },
+     "address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Address"
+     },
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "phone": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Phone"
+     },
+     "tax_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Tax Id"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "phone",
+     "address",
+     "tax_id",
+     "note",
+     "active",
+     "balance",
+     "version"
+    ],
+    "title": "SupplierOut",
+    "type": "object"
+   },
+   "SupplierPaymentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "amount": {
+      "exclusiveMinimum": 0.0,
+      "maximum": 10000000000000.0,
+      "title": "Amount",
+      "type": "integer"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Occurred On"
+     },
+     "paid_from": {
+      "default": "bank",
+      "enum": [
+       "drawer",
+       "petty_cash",
+       "bank",
+       "other"
+      ],
+      "title": "Paid From",
+      "type": "string"
+     }
+    },
+    "required": [
+     "amount"
+    ],
+    "title": "SupplierPaymentIn",
     "type": "object"
    },
    "SwitchIn": {
@@ -12572,6 +13679,45 @@
     "title": "TaxRateOut",
     "type": "object"
    },
+   "TaxReturnOut": {
+    "properties": {
+     "boxes": {
+      "items": {
+       "$ref": "#/components/schemas/BoxOut"
+      },
+      "title": "Boxes",
+      "type": "array"
+     },
+     "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+     },
+     "template_id": {
+      "format": "uuid",
+      "title": "Template Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "template_id",
+     "name",
+     "start",
+     "end",
+     "boxes"
+    ],
+    "title": "TaxReturnOut",
+    "type": "object"
+   },
    "TaxSlab-Input": {
     "properties": {
      "rate": {
@@ -12804,34 +13950,6 @@
     "title": "TempPasswordOut",
     "type": "object"
    },
-   "TemplateIn": {
-    "additionalProperties": false,
-    "properties": {
-     "automatic": {
-      "default": false,
-      "title": "Automatic",
-      "type": "boolean"
-     },
-     "items": {
-      "items": {
-       "$ref": "#/components/schemas/TemplateItem"
-      },
-      "maxItems": 50,
-      "title": "Items",
-      "type": "array"
-     },
-     "name": {
-      "maxLength": 120,
-      "title": "Name",
-      "type": "string"
-     }
-    },
-    "required": [
-     "name"
-    ],
-    "title": "TemplateIn",
-    "type": "object"
-   },
    "TemplateItem": {
     "additionalProperties": false,
     "properties": {
@@ -12885,44 +14003,6 @@
      "title"
     ],
     "title": "TemplateItem",
-    "type": "object"
-   },
-   "TemplateOut": {
-    "properties": {
-     "automatic": {
-      "title": "Automatic",
-      "type": "boolean"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "items": {
-      "items": {
-       "additionalProperties": true,
-       "type": "object"
-      },
-      "title": "Items",
-      "type": "array"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "version": {
-      "title": "Version",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "name",
-     "automatic",
-     "items",
-     "version"
-    ],
-    "title": "TemplateOut",
     "type": "object"
    },
    "TimesheetOut": {
@@ -13072,6 +14152,123 @@
      "amount"
     ],
     "title": "TopUpIn",
+    "type": "object"
+   },
+   "TransferIn": {
+    "additionalProperties": false,
+    "properties": {
+     "from_branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "From Branch Id"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/TransferLineIn"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "to_branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "To Branch Id"
+     }
+    },
+    "required": [
+     "lines"
+    ],
+    "title": "TransferIn",
+    "type": "object"
+   },
+   "TransferLineIn": {
+    "additionalProperties": false,
+    "properties": {
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     }
+    },
+    "required": [
+     "product_id",
+     "quantity"
+    ],
+    "title": "TransferLineIn",
+    "type": "object"
+   },
+   "TrialBalanceOut": {
+    "properties": {
+     "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+     },
+     "credit": {
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "title": "Debit",
+      "type": "integer"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/ReportRow"
+      },
+      "title": "Rows",
+      "type": "array"
+     }
+    },
+    "required": [
+     "as_of",
+     "rows",
+     "debit",
+     "credit"
+    ],
+    "title": "TrialBalanceOut",
     "type": "object"
    },
    "UnreadOut": {
@@ -13530,6 +14727,795 @@
     ],
     "title": "WriteOut",
     "type": "object"
+   },
+   "app__modules__accounting__schemas__EntryOut": {
+    "properties": {
+     "entry_date": {
+      "format": "date",
+      "title": "Entry Date",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/app__modules__accounting__schemas__LineOut"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "memo": {
+      "title": "Memo",
+      "type": "string"
+     },
+     "number": {
+      "title": "Number",
+      "type": "integer"
+     },
+     "reversed_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reversed By"
+     },
+     "source_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Id"
+     },
+     "source_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Type"
+     }
+    },
+    "required": [
+     "id",
+     "number",
+     "entry_date",
+     "memo",
+     "source_type",
+     "source_id",
+     "reversed_by",
+     "lines"
+    ],
+    "title": "EntryOut",
+    "type": "object"
+   },
+   "app__modules__accounting__schemas__LineOut": {
+    "properties": {
+     "account_code": {
+      "title": "Account Code",
+      "type": "string"
+     },
+     "account_id": {
+      "format": "uuid",
+      "title": "Account Id",
+      "type": "string"
+     },
+     "account_name": {
+      "title": "Account Name",
+      "type": "string"
+     },
+     "credit": {
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "title": "Debit",
+      "type": "integer"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     }
+    },
+    "required": [
+     "account_id",
+     "account_code",
+     "account_name",
+     "debit",
+     "credit",
+     "description"
+    ],
+    "title": "LineOut",
+    "type": "object"
+   },
+   "app__modules__accounting__schemas__SettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "expense_accounts": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Expense Accounts",
+      "type": "object"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     },
+     "tax_accounts": {
+      "additionalProperties": {
+       "additionalProperties": {
+        "anyOf": [
+         {
+          "format": "uuid",
+          "type": "string"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "propertyNames": {
+        "enum": [
+         "output",
+         "input"
+        ]
+       },
+       "type": "object"
+      },
+      "title": "Tax Accounts",
+      "type": "object"
+     }
+    },
+    "title": "SettingsIn",
+    "type": "object"
+   },
+   "app__modules__accounting__schemas__SettingsOut": {
+    "properties": {
+     "expense_accounts": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "title": "Expense Accounts",
+      "type": "object"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     },
+     "tax_accounts": {
+      "additionalProperties": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": "object"
+      },
+      "title": "Tax Accounts",
+      "type": "object"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "locked_until",
+     "tax_accounts",
+     "expense_accounts",
+     "version"
+    ],
+    "title": "SettingsOut",
+    "type": "object"
+   },
+   "app__modules__accounting__schemas__TemplateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "boxes": {
+      "items": {
+       "$ref": "#/components/schemas/Box"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Boxes",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "name",
+     "boxes"
+    ],
+    "title": "TemplateIn",
+    "type": "object"
+   },
+   "app__modules__accounting__schemas__TemplateOut": {
+    "properties": {
+     "boxes": {
+      "items": {
+       "$ref": "#/components/schemas/Box"
+      },
+      "title": "Boxes",
+      "type": "array"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "boxes",
+     "note",
+     "version"
+    ],
+    "title": "TemplateOut",
+    "type": "object"
+   },
+   "app__modules__approvals__schemas__CountOut": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "count"
+    ],
+    "title": "CountOut",
+    "type": "object"
+   },
+   "app__modules__attendance__schemas__SettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "day_starts_at": {
+      "anyOf": [
+       {
+        "format": "time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Day Starts At"
+     },
+     "late_after_minutes": {
+      "anyOf": [
+       {
+        "maximum": 240.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Late After Minutes"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "default": 100,
+      "maximum": 1000.0,
+      "minimum": 10.0,
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode"
+    ],
+    "title": "SettingsIn",
+    "type": "object"
+   },
+   "app__modules__attendance__schemas__SettingsOut": {
+    "properties": {
+     "branches_located": {
+      "title": "Branches Located",
+      "type": "integer"
+     },
+     "branches_total": {
+      "title": "Branches Total",
+      "type": "integer"
+     },
+     "day_starts_at": {
+      "format": "time",
+      "title": "Day Starts At",
+      "type": "string"
+     },
+     "late_after_minutes": {
+      "title": "Late After Minutes",
+      "type": "integer"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode",
+     "max_accuracy_m",
+     "day_starts_at",
+     "late_after_minutes",
+     "branches_total",
+     "branches_located"
+    ],
+    "title": "SettingsOut",
+    "type": "object"
+   },
+   "app__modules__customers__schemas__EntryOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "sale",
+       "return",
+       "payment",
+       "adjustment"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "format": "date",
+      "title": "Occurred On",
+      "type": "string"
+     },
+     "sale_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sale Id"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "amount",
+     "occurred_on",
+     "sale_id",
+     "note",
+     "created_at",
+     "balance"
+    ],
+    "title": "EntryOut",
+    "type": "object"
+   },
+   "app__modules__inventory__schemas__AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "maximum": 1000000000.0,
+        "minimum": -1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     },
+     "reason": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+     }
+    },
+    "required": [
+     "product_id",
+     "quantity",
+     "reason"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
+   "app__modules__inventory__schemas__CountOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "counted_on": {
+      "format": "date",
+      "title": "Counted On",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "value": {
+      "title": "Value",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "branch_id",
+     "counted_on",
+     "lines",
+     "note",
+     "value"
+    ],
+    "title": "CountOut",
+    "type": "object"
+   },
+   "app__modules__leave__schemas__AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": -366.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "title": "Days"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Reason",
+      "type": "string"
+     },
+     "year": {
+      "maximum": 2100.0,
+      "minimum": 2000.0,
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "leave_type_id",
+     "year",
+     "days",
+     "reason"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
+   "app__modules__sales__schemas__LineOut": {
+    "properties": {
+     "discount": {
+      "title": "Discount",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "product_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Product Id"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "returned": {
+      "default": "0",
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Returned",
+      "type": "string"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "taxes": {
+      "items": {
+       "$ref": "#/components/schemas/LineTaxOut"
+      },
+      "title": "Taxes",
+      "type": "array"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     },
+     "unit_price": {
+      "title": "Unit Price",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "product_id",
+     "name",
+     "quantity",
+     "unit_price",
+     "discount",
+     "net",
+     "tax",
+     "total",
+     "taxes"
+    ],
+    "title": "LineOut",
+    "type": "object"
+   },
+   "app__modules__tasks__schemas__TemplateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "automatic": {
+      "default": false,
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/TemplateItem"
+      },
+      "maxItems": 50,
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "TemplateIn",
+    "type": "object"
+   },
+   "app__modules__tasks__schemas__TemplateOut": {
+    "properties": {
+     "automatic": {
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "items": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "automatic",
+     "items",
+     "version"
+    ],
+    "title": "TemplateOut",
+    "type": "object"
    }
   }
  },
@@ -13586,6 +15572,797 @@
     "summary": "Readyz",
     "tags": [
      "ops"
+    ]
+   }
+  },
+  "/v1/accounting/accounts": {
+   "get": {
+    "operationId": "accounts_v1_accounting_accounts_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AccountOut"
+         },
+         "title": "Response Accounts V1 Accounting Accounts Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Accounts",
+    "tags": [
+     "accounting"
+    ]
+   },
+   "post": {
+    "operationId": "create_account_v1_accounting_accounts_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AccountIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccountOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Account",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/accounts/{account_id}": {
+   "put": {
+    "operationId": "save_account_v1_accounting_accounts__account_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "account_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Account Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AccountIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccountOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Account",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/backfill": {
+   "post": {
+    "description": "Post anything not in the books yet (safe to run again).",
+    "operationId": "backfill_v1_accounting_backfill_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "integer"
+         },
+         "title": "Response Backfill V1 Accounting Backfill Post",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Backfill",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/balance-sheet": {
+   "get": {
+    "operationId": "balance_sheet_v1_accounting_balance_sheet_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "as_of",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "As Of",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BalanceSheetOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Balance Sheet",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/cash-book": {
+   "get": {
+    "operationId": "cash_book_v1_accounting_cash_book_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LedgerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Cash Book",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/entries": {
+   "get": {
+    "operationId": "entries_v1_accounting_entries_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+         },
+         "title": "Response Entries V1 Accounting Entries Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Entries",
+    "tags": [
+     "accounting"
+    ]
+   },
+   "post": {
+    "operationId": "post_entry_v1_accounting_entries_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EntryIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Post Entry",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/entries/{entry_id}/reverse": {
+   "post": {
+    "operationId": "reverse_v1_accounting_entries__entry_id__reverse_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entry_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Entry Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reverse",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/ledger/{account_id}": {
+   "get": {
+    "operationId": "ledger_v1_accounting_ledger__account_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "account_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Account Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LedgerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ledger",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/profit-and-loss": {
+   "get": {
+    "operationId": "profit_and_loss_v1_accounting_profit_and_loss_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProfitLossOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Profit And Loss",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/settings": {
+   "get": {
+    "operationId": "get_settings_v1_accounting_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings",
+    "tags": [
+     "accounting"
+    ]
+   },
+   "put": {
+    "operationId": "save_settings_v1_accounting_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Settings",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/tax-returns": {
+   "get": {
+    "operationId": "templates_v1_accounting_tax_returns_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+         },
+         "title": "Response Templates V1 Accounting Tax Returns Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Templates",
+    "tags": [
+     "accounting"
+    ]
+   },
+   "post": {
+    "operationId": "create_template_v1_accounting_tax_returns_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Template",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/tax-returns/{template_id}": {
+   "put": {
+    "operationId": "save_template_v1_accounting_tax_returns__template_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "template_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Template Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Template",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/tax-returns/{template_id}/fill": {
+   "get": {
+    "operationId": "fill_v1_accounting_tax_returns__template_id__fill_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "template_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Template Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TaxReturnOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Fill",
+    "tags": [
+     "accounting"
+    ]
+   }
+  },
+  "/v1/accounting/trial-balance": {
+   "get": {
+    "operationId": "trial_balance_v1_accounting_trial_balance_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "as_of",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "As Of",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TrialBalanceOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Trial Balance",
+    "tags": [
+     "accounting"
     ]
    }
   },
@@ -14462,7 +17239,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/CountOut"
+         "$ref": "#/components/schemas/app__modules__approvals__schemas__CountOut"
         }
        }
       },
@@ -15290,7 +18067,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/SettingsOut"
+         "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsOut"
         }
        }
       },
@@ -15308,7 +18085,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/SettingsIn"
+        "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsIn"
        }
       }
      },
@@ -15319,7 +18096,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/SettingsOut"
+         "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsOut"
         }
        }
       },
@@ -18215,6 +20992,667 @@
     ]
    }
   },
+  "/v1/inventory/adjustments": {
+   "post": {
+    "operationId": "adjust_v1_inventory_adjustments_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__inventory__schemas__AdjustmentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StockOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Adjust",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/counts": {
+   "post": {
+    "operationId": "count_v1_inventory_counts_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CountIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/app__modules__inventory__schemas__CountOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Count",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/items/{product_id}": {
+   "put": {
+    "operationId": "item_settings_v1_inventory_items__product_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "product_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Product Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ItemSettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StockOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Item Settings",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/items/{product_id}/movements": {
+   "get": {
+    "operationId": "movements_v1_inventory_items__product_id__movements_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "product_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Product Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/MovementOut"
+         },
+         "title": "Response Movements V1 Inventory Items  Product Id  Movements Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Movements",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/opening": {
+   "post": {
+    "operationId": "opening_v1_inventory_opening_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OpeningIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StockOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Opening",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/purchases": {
+   "get": {
+    "operationId": "purchases_v1_inventory_purchases_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "From"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "date",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "To"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PurchaseOut"
+         },
+         "title": "Response Purchases V1 Inventory Purchases Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Purchases",
+    "tags": [
+     "inventory"
+    ]
+   },
+   "post": {
+    "operationId": "receive_v1_inventory_purchases_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PurchaseIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PurchaseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Receive",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/purchases/{purchase_id}": {
+   "get": {
+    "operationId": "purchase_v1_inventory_purchases__purchase_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "purchase_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Purchase Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PurchaseOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Purchase",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/stock": {
+   "get": {
+    "operationId": "stock_v1_inventory_stock_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "branch_id",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Branch Id"
+      }
+     },
+     {
+      "in": "query",
+      "name": "low",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Low",
+       "type": "boolean"
+      }
+     },
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/StockOut"
+         },
+         "title": "Response Stock V1 Inventory Stock Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Stock",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/suppliers": {
+   "get": {
+    "operationId": "suppliers_v1_inventory_suppliers_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/SupplierOut"
+         },
+         "title": "Response Suppliers V1 Inventory Suppliers Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Suppliers",
+    "tags": [
+     "inventory"
+    ]
+   },
+   "post": {
+    "operationId": "create_supplier_v1_inventory_suppliers_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SupplierIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SupplierOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Supplier",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/suppliers/{supplier_id}": {
+   "put": {
+    "operationId": "save_supplier_v1_inventory_suppliers__supplier_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "supplier_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Supplier Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SupplierIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SupplierOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Supplier",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/suppliers/{supplier_id}/payments": {
+   "post": {
+    "operationId": "pay_supplier_v1_inventory_suppliers__supplier_id__payments_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "supplier_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Supplier Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SupplierPaymentIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SupplierOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Pay Supplier",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
+  "/v1/inventory/transfers": {
+   "post": {
+    "operationId": "transfer_v1_inventory_transfers_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TransferIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Transfer",
+    "tags": [
+     "inventory"
+    ]
+   }
+  },
   "/v1/invites": {
    "get": {
     "operationId": "list_invites_v1_invites_get",
@@ -18477,7 +21915,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/AdjustmentIn"
+        "$ref": "#/components/schemas/app__modules__leave__schemas__AdjustmentIn"
        }
       }
      },
@@ -19946,7 +23384,7 @@
        "application/json": {
         "schema": {
          "items": {
-          "$ref": "#/components/schemas/TemplateOut"
+          "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
          },
          "title": "Response List Templates V1 Onboarding Templates Get",
          "type": "array"
@@ -19967,7 +23405,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/TemplateIn"
+        "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateIn"
        }
       }
      },
@@ -19978,7 +23416,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/TemplateOut"
+         "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
         }
        }
       },
@@ -20054,7 +23492,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/TemplateIn"
+        "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateIn"
        }
       }
      },
@@ -20065,7 +23503,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/TemplateOut"
+         "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
         }
        }
       },

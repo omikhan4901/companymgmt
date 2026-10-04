@@ -18,6 +18,7 @@ from app.core.db import dispose_engine, open_session
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
+from app.modules.accounting.routes import router as accounting_router
 from app.modules.announcements.routes import router as announcements_router
 from app.modules.approvals.routes import router as approvals_router
 from app.modules.attendance.routes import router as attendance_router
@@ -27,6 +28,7 @@ from app.modules.customers.routes import router as customers_router
 from app.modules.documents.routes import router as documents_router
 from app.modules.expenses.routes import router as expenses_router
 from app.modules.imports.routes import router as imports_router
+from app.modules.inventory.routes import router as inventory_router
 from app.modules.leave.routes import router as leave_router
 from app.modules.notifications.routes import internal_router as notifications_internal_router
 from app.modules.notifications.routes import router as notifications_router
@@ -64,6 +66,8 @@ ROUTERS = (
     sales_router,
     customers_router,
     expenses_router,
+    inventory_router,
+    accounting_router,
     privacy_router,
     ai_router,
     operator_router,

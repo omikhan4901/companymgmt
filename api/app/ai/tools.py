@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.modules.accounting import capabilities as _accounting  # noqa: F401
 from app.modules.announcements import capabilities as _announcements  # noqa: F401
 from app.modules.approvals import capabilities as _approvals  # noqa: F401
 from app.modules.attendance import capabilities as _attendance  # noqa: F401
 from app.modules.customers import capabilities as _customers  # noqa: F401
 from app.modules.documents import capabilities as _documents  # noqa: F401
+from app.modules.inventory import capabilities as _inventory  # noqa: F401
 from app.modules.leave import capabilities as _leave  # noqa: F401
 from app.modules.notifications import capabilities as _notifications  # noqa: F401
 from app.modules.payroll import capabilities as _payroll  # noqa: F401

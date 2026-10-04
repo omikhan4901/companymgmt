@@ -181,13 +181,22 @@ async def adjust(ctx: Ctx, customer_id: uuid.UUID, body: DuesAdjustmentIn) -> Cu
     ctx.require(access.MANAGE)
     if body.amount == 0:
         raise Invalid(errors=[{"field": "amount", "message": "Enter an amount."}])
-    await post(ctx, customer_id, "adjustment", body.amount, note=body.note, occurred_on=body.occurred_on)
+    entry = await post(
+        ctx, customer_id, "adjustment", body.amount, note=body.note, occurred_on=body.occurred_on
+    )
     await audit.record(
         ctx.db,
         "customer.adjusted",
         target_type="customer",
         target_id=customer_id,
         data={"amount": body.amount, "note": body.note},
+    )
+    await events.emit(
+        ctx.db,
+        "customer.adjusted",
+        subject_type="customer",
+        subject_id=customer_id,
+        data={"amount": body.amount, "note": body.note, "entry_id": entry.id},
     )
     await ctx.db.commit()
     return await get(ctx, customer_id)

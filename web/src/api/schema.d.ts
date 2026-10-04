@@ -38,6 +38,251 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/accounting/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounts */
+        get: operations["accounts_v1_accounting_accounts_get"];
+        put?: never;
+        /** Create Account */
+        post: operations["create_account_v1_accounting_accounts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/accounts/{account_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save Account */
+        put: operations["save_account_v1_accounting_accounts__account_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/backfill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Backfill
+         * @description Post anything not in the books yet (safe to run again).
+         */
+        post: operations["backfill_v1_accounting_backfill_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/balance-sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Balance Sheet */
+        get: operations["balance_sheet_v1_accounting_balance_sheet_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/cash-book": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cash Book */
+        get: operations["cash_book_v1_accounting_cash_book_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Entries */
+        get: operations["entries_v1_accounting_entries_get"];
+        put?: never;
+        /** Post Entry */
+        post: operations["post_entry_v1_accounting_entries_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/entries/{entry_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reverse */
+        post: operations["reverse_v1_accounting_entries__entry_id__reverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/ledger/{account_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ledger */
+        get: operations["ledger_v1_accounting_ledger__account_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/profit-and-loss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profit And Loss */
+        get: operations["profit_and_loss_v1_accounting_profit_and_loss_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings_v1_accounting_settings_get"];
+        /** Save Settings */
+        put: operations["save_settings_v1_accounting_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/tax-returns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Templates */
+        get: operations["templates_v1_accounting_tax_returns_get"];
+        put?: never;
+        /** Create Template */
+        post: operations["create_template_v1_accounting_tax_returns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/tax-returns/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save Template */
+        put: operations["save_template_v1_accounting_tax_returns__template_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/tax-returns/{template_id}/fill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fill */
+        get: operations["fill_v1_accounting_tax_returns__template_id__fill_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounting/trial-balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trial Balance */
+        get: operations["trial_balance_v1_accounting_trial_balance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ai/actions/{action_id}/cancel": {
         parameters: {
             query?: never;
@@ -1537,6 +1782,212 @@ export interface paths {
          */
         put: operations["attach_v1_expenses__expense_id__receipt_put"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adjust */
+        post: operations["adjust_v1_inventory_adjustments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Count */
+        post: operations["count_v1_inventory_counts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/items/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Item Settings */
+        put: operations["item_settings_v1_inventory_items__product_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/items/{product_id}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Movements */
+        get: operations["movements_v1_inventory_items__product_id__movements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/opening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opening */
+        post: operations["opening_v1_inventory_opening_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/purchases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Purchases */
+        get: operations["purchases_v1_inventory_purchases_get"];
+        put?: never;
+        /** Receive */
+        post: operations["receive_v1_inventory_purchases_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/purchases/{purchase_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Purchase */
+        get: operations["purchase_v1_inventory_purchases__purchase_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stock */
+        get: operations["stock_v1_inventory_stock_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/suppliers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Suppliers */
+        get: operations["suppliers_v1_inventory_suppliers_get"];
+        put?: never;
+        /** Create Supplier */
+        post: operations["create_supplier_v1_inventory_suppliers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/suppliers/{supplier_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save Supplier */
+        put: operations["save_supplier_v1_inventory_suppliers__supplier_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/suppliers/{supplier_id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay Supplier */
+        post: operations["pay_supplier_v1_inventory_suppliers__supplier_id__payments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inventory/transfers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transfer */
+        post: operations["transfer_v1_inventory_transfers_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3301,6 +3752,50 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** AccountIn */
+        AccountIn: {
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            /** Code */
+            code: string;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "asset" | "liability" | "equity" | "income" | "expense";
+        };
+        /** AccountOut */
+        AccountOut: {
+            /** Active */
+            active: boolean;
+            /** Code */
+            code: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Role */
+            role: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "asset" | "liability" | "equity" | "income" | "expense";
+            /** Version */
+            version: number;
+        };
         /** AckPerson */
         AckPerson: {
             /** Acked At */
@@ -3347,25 +3842,6 @@ export interface components {
             link: string | null;
             /** Status */
             status: string;
-        };
-        /** AdjustmentIn */
-        AdjustmentIn: {
-            /** Days */
-            days: number | string;
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /**
-             * Leave Type Id
-             * Format: uuid
-             */
-            leave_type_id: string;
-            /** Reason */
-            reason: string;
-            /** Year */
-            year: number;
         };
         /** AdjustmentOut */
         AdjustmentOut: {
@@ -3747,6 +4223,74 @@ export interface components {
             /** Used */
             used: number;
         };
+        /** BalanceSheetOut */
+        BalanceSheetOut: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Assets */
+            assets: components["schemas"]["ReportRow"][];
+            /** Balanced */
+            balanced: boolean;
+            /** Earnings */
+            earnings: number;
+            /** Equity */
+            equity: components["schemas"]["ReportRow"][];
+            /** Liabilities */
+            liabilities: components["schemas"]["ReportRow"][];
+            /** Total Assets */
+            total_assets: number;
+            /** Total Equity */
+            total_equity: number;
+            /** Total Liabilities */
+            total_liabilities: number;
+        };
+        /** Box */
+        Box: {
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /** Sources */
+            sources?: components["schemas"]["BoxSource"][];
+        };
+        /** BoxOut */
+        BoxOut: {
+            /** Amount */
+            amount: number;
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+        };
+        /**
+         * BoxSource
+         * @description What goes in a box: tax charged or the sales/purchases it was charged on, for some
+         *     tax rates (output: on sales; input: on purchases); account movements; or other boxes.
+         */
+        BoxSource: {
+            /** Ids */
+            ids: string[];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_amount" | "tax_base" | "account" | "boxes";
+            /**
+             * Side
+             * @default output
+             * @enum {string}
+             */
+            side: "output" | "input";
+            /**
+             * Sign
+             * @default 1
+             * @enum {integer}
+             */
+            sign: 1 | -1;
+        };
         /** BranchIn */
         BranchIn: {
             /** Address */
@@ -4031,10 +4575,26 @@ export interface components {
             /** Version */
             version: number;
         };
-        /** CountOut */
-        CountOut: {
-            /** Count */
-            count: number;
+        /** CountIn */
+        CountIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /** Counted On */
+            counted_on?: string | null;
+            /** Lines */
+            lines: components["schemas"]["CountLineIn"][];
+            /** Note */
+            note?: string | null;
+        };
+        /** CountLineIn */
+        CountLineIn: {
+            /** Counted */
+            counted: number | string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
         };
         /** CurrentWorkspace */
         CurrentWorkspace: {
@@ -4562,36 +5122,37 @@ export interface components {
             /** Status */
             status?: ("active" | "inactive" | "left") | null;
         };
-        /** EntryOut */
-        EntryOut: {
-            /** Amount */
-            amount: number;
-            /** Balance */
-            balance: number;
+        /** EntryIn */
+        EntryIn: {
             /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "sale" | "return" | "payment" | "adjustment";
-            /** Note */
-            note: string | null;
-            /**
-             * Occurred On
+             * Entry Date
              * Format: date
              */
-            occurred_on: string;
-            /** Sale Id */
-            sale_id: string | null;
+            entry_date: string;
+            /** Lines */
+            lines: components["schemas"]["EntryLineIn"][];
+            /** Memo */
+            memo: string;
+        };
+        /** EntryLineIn */
+        EntryLineIn: {
+            /**
+             * Account Id
+             * Format: uuid
+             */
+            account_id: string;
+            /**
+             * Credit
+             * @default 0
+             */
+            credit: number;
+            /**
+             * Debit
+             * @default 0
+             */
+            debit: number;
+            /** Description */
+            description?: string | null;
         };
         /** EventInfo */
         EventInfo: {
@@ -4953,6 +5514,16 @@ export interface components {
              */
             run_id: string;
         };
+        /** ItemSettingsIn */
+        ItemSettingsIn: {
+            /** Reorder Level */
+            reorder_level?: number | string | null;
+            /**
+             * Track
+             * @default true
+             */
+            track: boolean;
+        };
         /** LeaveByType */
         LeaveByType: {
             /** Color */
@@ -5082,6 +5653,59 @@ export interface components {
              */
             unlimited: boolean;
         };
+        /** LedgerOut */
+        LedgerOut: {
+            /** Accounts */
+            accounts: components["schemas"]["AccountOut"][];
+            /** Closing */
+            closing: number;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Opening */
+            opening: number;
+            /** Rows */
+            rows: components["schemas"]["LedgerRow"][];
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+        };
+        /** LedgerRow */
+        LedgerRow: {
+            /** Balance */
+            balance: number;
+            /** Credit */
+            credit: number;
+            /** Debit */
+            debit: number;
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Entry Id
+             * Format: uuid
+             */
+            entry_id: string;
+            /** Memo */
+            memo: string;
+            /** Number */
+            number: number;
+        };
+        /** LevelOut */
+        LevelOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /** Low */
+            low: boolean;
+            /** Quantity */
+            quantity: string;
+        };
         /** LineIn */
         LineIn: {
             /**
@@ -5102,37 +5726,6 @@ export interface components {
             tax_rate_ids?: string[] | null;
             /** Unit Price */
             unit_price?: number | null;
-        };
-        /** LineOut */
-        LineOut: {
-            /** Discount */
-            discount: number;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Net */
-            net: number;
-            /** Product Id */
-            product_id: string | null;
-            /** Quantity */
-            quantity: string;
-            /**
-             * Returned
-             * @default 0
-             */
-            returned: string;
-            /** Tax */
-            tax: number;
-            /** Taxes */
-            taxes: components["schemas"]["LineTaxOut"][];
-            /** Total */
-            total: number;
-            /** Unit Price */
-            unit_price: number;
         };
         /** LineTaxOut */
         LineTaxOut: {
@@ -5375,6 +5968,40 @@ export interface components {
              */
             status: "todo" | "doing" | "done";
         };
+        /** MovementOut */
+        MovementOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Note */
+            note: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: string;
+            /** Ref Id */
+            ref_id: string | null;
+            /** Ref Type */
+            ref_type: string | null;
+            /** Unit Cost */
+            unit_cost: string;
+            /** Value */
+            value: number;
+        };
         /** NotificationOut */
         NotificationOut: {
             /** Actor Name */
@@ -5452,6 +6079,20 @@ export interface components {
              * @default 0
              */
             opening_float: number;
+        };
+        /** OpeningIn */
+        OpeningIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+            /** Unit Cost */
+            unit_cost: number | string;
         };
         /** OperatorMe */
         OperatorMe: {
@@ -5941,6 +6582,29 @@ export interface components {
             /** Name */
             name?: string | null;
         };
+        /** ProfitLossOut */
+        ProfitLossOut: {
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Expenses */
+            expenses: components["schemas"]["ReportRow"][];
+            /** Income */
+            income: components["schemas"]["ReportRow"][];
+            /** Profit */
+            profit: number;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /** Total Expenses */
+            total_expenses: number;
+            /** Total Income */
+            total_income: number;
+        };
         /** ProjectIn */
         ProjectIn: {
             /**
@@ -6039,6 +6703,88 @@ export interface components {
             price_year_cents: number | null;
             /** Storage Mb */
             storage_mb: number | null;
+        };
+        /** PurchaseIn */
+        PurchaseIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /** Lines */
+            lines: components["schemas"]["PurchaseLineIn"][];
+            /** Note */
+            note?: string | null;
+            /**
+             * Paid
+             * @default 0
+             */
+            paid: number;
+            /**
+             * Paid From
+             * @default drawer
+             * @enum {string}
+             */
+            paid_from: "drawer" | "petty_cash" | "bank" | "other";
+            /** Received On */
+            received_on?: string | null;
+            /** Reference */
+            reference?: string | null;
+            /** Supplier Id */
+            supplier_id?: string | null;
+        };
+        /** PurchaseLineIn */
+        PurchaseLineIn: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+            /** Tax Rate Id */
+            tax_rate_id?: string | null;
+            /** Unit Cost */
+            unit_cost: number | string;
+        };
+        /** PurchaseOut */
+        PurchaseOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: {
+                [key: string]: unknown;
+            }[];
+            /** Net */
+            net: number;
+            /** Note */
+            note: string | null;
+            /** Paid */
+            paid: number;
+            /** Paid From */
+            paid_from: string;
+            /**
+             * Received On
+             * Format: date
+             */
+            received_on: string;
+            /** Reference */
+            reference: string | null;
+            /** Supplier Id */
+            supplier_id: string | null;
+            /** Supplier Name */
+            supplier_name: string | null;
+            /** Tax */
+            tax: number;
+            /** Total */
+            total: number;
         };
         /** QuoteOut */
         QuoteOut: {
@@ -6190,6 +6936,32 @@ export interface components {
         RecoveryCodesOut: {
             /** Recovery Codes */
             recovery_codes: string[];
+        };
+        /** ReportRow */
+        ReportRow: {
+            /**
+             * Account Id
+             * Format: uuid
+             */
+            account_id: string;
+            /**
+             * Amount
+             * @default 0
+             */
+            amount: number;
+            /** Code */
+            code: string;
+            /** Credit */
+            credit: number;
+            /** Debit */
+            debit: number;
+            /** Name */
+            name: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "asset" | "liability" | "equity" | "income" | "expense";
         };
         /** RequestContext */
         RequestContext: {
@@ -6549,7 +7321,7 @@ export interface components {
              */
             kind: "sale" | "return";
             /** Lines */
-            lines: components["schemas"]["LineOut"][];
+            lines: components["schemas"]["app__modules__sales__schemas__LineOut"][];
             /** Net */
             net: number;
             /** Note */
@@ -6667,44 +7439,6 @@ export interface components {
             last_seen_at: string;
             /** User Agent */
             user_agent: string | null;
-        };
-        /** SettingsIn */
-        SettingsIn: {
-            /** Day Starts At */
-            day_starts_at?: string | null;
-            /** Late After Minutes */
-            late_after_minutes?: number | null;
-            /**
-             * Location Mode
-             * @enum {string}
-             */
-            location_mode: "off" | "record" | "require";
-            /**
-             * Max Accuracy M
-             * @default 100
-             */
-            max_accuracy_m: number;
-        };
-        /** SettingsOut */
-        SettingsOut: {
-            /** Branches Located */
-            branches_located: number;
-            /** Branches Total */
-            branches_total: number;
-            /**
-             * Day Starts At
-             * Format: time
-             */
-            day_starts_at: string;
-            /** Late After Minutes */
-            late_after_minutes: number;
-            /**
-             * Location Mode
-             * @enum {string}
-             */
-            location_mode: "off" | "record" | "require";
-            /** Max Accuracy M */
-            max_accuracy_m: number;
         };
         /** ShopSettingsIn */
         ShopSettingsIn: {
@@ -6872,7 +7606,7 @@ export interface components {
             /** End */
             end: string | null;
             /** Entries */
-            entries: components["schemas"]["EntryOut"][];
+            entries: components["schemas"]["app__modules__customers__schemas__EntryOut"][];
             /** Opening */
             opening: number;
             /** Start */
@@ -6894,6 +7628,34 @@ export interface components {
             open_record: components["schemas"]["RecordOut"] | null;
             /** Today Minutes */
             today_minutes: number;
+        };
+        /** StockOut */
+        StockOut: {
+            /** Average Cost */
+            average_cost: string;
+            /** Code */
+            code: string | null;
+            /** Levels */
+            levels: components["schemas"]["LevelOut"][];
+            /** Low */
+            low: boolean;
+            /** Name */
+            name: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: string;
+            /** Reorder Level */
+            reorder_level: string | null;
+            /** Track */
+            track: boolean;
+            /** Unit */
+            unit: string;
+            /** Value */
+            value: number;
         };
         /** StructureIn */
         StructureIn: {
@@ -7092,6 +7854,63 @@ export interface components {
             taxes: components["schemas"]["TaxSummary"][];
             /** Total */
             total: number;
+        };
+        /** SupplierIn */
+        SupplierIn: {
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            /** Address */
+            address?: string | null;
+            /** Name */
+            name: string;
+            /** Note */
+            note?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Tax Id */
+            tax_id?: string | null;
+        };
+        /** SupplierOut */
+        SupplierOut: {
+            /** Active */
+            active: boolean;
+            /** Address */
+            address: string | null;
+            /** Balance */
+            balance: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Tax Id */
+            tax_id: string | null;
+            /** Version */
+            version: number;
+        };
+        /** SupplierPaymentIn */
+        SupplierPaymentIn: {
+            /** Amount */
+            amount: number;
+            /** Note */
+            note?: string | null;
+            /** Occurred On */
+            occurred_on?: string | null;
+            /**
+             * Paid From
+             * @default bank
+             * @enum {string}
+             */
+            paid_from: "drawer" | "petty_cash" | "bank" | "other";
         };
         /** SwitchIn */
         SwitchIn: {
@@ -7357,6 +8176,28 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** TaxReturnOut */
+        TaxReturnOut: {
+            /** Boxes */
+            boxes: components["schemas"]["BoxOut"][];
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Name */
+            name: string;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+        };
         /** TaxSlab */
         "TaxSlab-Input": {
             /** Rate */
@@ -7445,18 +8286,6 @@ export interface components {
             /** Temporary Password */
             temporary_password: string;
         };
-        /** TemplateIn */
-        TemplateIn: {
-            /**
-             * Automatic
-             * @default false
-             */
-            automatic: boolean;
-            /** Items */
-            items?: components["schemas"]["TemplateItem"][];
-            /** Name */
-            name: string;
-        };
         /** TemplateItem */
         TemplateItem: {
             /** Document Id */
@@ -7476,24 +8305,6 @@ export interface components {
              * @enum {string}
              */
             who: "joiner" | "manager";
-        };
-        /** TemplateOut */
-        TemplateOut: {
-            /** Automatic */
-            automatic: boolean;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Items */
-            items: {
-                [key: string]: unknown;
-            }[];
-            /** Name */
-            name: string;
-            /** Version */
-            version: number;
         };
         /** TimesheetOut */
         TimesheetOut: {
@@ -7556,6 +8367,41 @@ export interface components {
             note?: string | null;
             /** Occurred On */
             occurred_on?: string | null;
+        };
+        /** TransferIn */
+        TransferIn: {
+            /** From Branch Id */
+            from_branch_id?: string | null;
+            /** Lines */
+            lines: components["schemas"]["TransferLineIn"][];
+            /** Note */
+            note?: string | null;
+            /** To Branch Id */
+            to_branch_id?: string | null;
+        };
+        /** TransferLineIn */
+        TransferLineIn: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+        };
+        /** TrialBalanceOut */
+        TrialBalanceOut: {
+            /**
+             * As Of
+             * Format: date
+             */
+            as_of: string;
+            /** Credit */
+            credit: number;
+            /** Debit */
+            debit: number;
+            /** Rows */
+            rows: components["schemas"]["ReportRow"][];
         };
         /** UnreadOut */
         UnreadOut: {
@@ -7702,6 +8548,297 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** EntryOut */
+        app__modules__accounting__schemas__EntryOut: {
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: components["schemas"]["app__modules__accounting__schemas__LineOut"][];
+            /** Memo */
+            memo: string;
+            /** Number */
+            number: number;
+            /** Reversed By */
+            reversed_by: string | null;
+            /** Source Id */
+            source_id: string | null;
+            /** Source Type */
+            source_type: string | null;
+        };
+        /** LineOut */
+        app__modules__accounting__schemas__LineOut: {
+            /** Account Code */
+            account_code: string;
+            /**
+             * Account Id
+             * Format: uuid
+             */
+            account_id: string;
+            /** Account Name */
+            account_name: string;
+            /** Credit */
+            credit: number;
+            /** Debit */
+            debit: number;
+            /** Description */
+            description: string | null;
+        };
+        /** SettingsIn */
+        app__modules__accounting__schemas__SettingsIn: {
+            /** Expense Accounts */
+            expense_accounts?: {
+                [key: string]: string | null;
+            };
+            /** Locked Until */
+            locked_until?: string | null;
+            /** Tax Accounts */
+            tax_accounts?: {
+                [key: string]: {
+                    [key: string]: string | null;
+                };
+            };
+        };
+        /** SettingsOut */
+        app__modules__accounting__schemas__SettingsOut: {
+            /** Expense Accounts */
+            expense_accounts: {
+                [key: string]: string;
+            };
+            /** Locked Until */
+            locked_until: string | null;
+            /** Tax Accounts */
+            tax_accounts: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+            /** Version */
+            version: number;
+        };
+        /** TemplateIn */
+        app__modules__accounting__schemas__TemplateIn: {
+            /** Boxes */
+            boxes: components["schemas"]["Box"][];
+            /** Name */
+            name: string;
+            /** Note */
+            note?: string | null;
+        };
+        /** TemplateOut */
+        app__modules__accounting__schemas__TemplateOut: {
+            /** Boxes */
+            boxes: components["schemas"]["Box"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Version */
+            version: number;
+        };
+        /** CountOut */
+        app__modules__approvals__schemas__CountOut: {
+            /** Count */
+            count: number;
+        };
+        /** SettingsIn */
+        app__modules__attendance__schemas__SettingsIn: {
+            /** Day Starts At */
+            day_starts_at?: string | null;
+            /** Late After Minutes */
+            late_after_minutes?: number | null;
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /**
+             * Max Accuracy M
+             * @default 100
+             */
+            max_accuracy_m: number;
+        };
+        /** SettingsOut */
+        app__modules__attendance__schemas__SettingsOut: {
+            /** Branches Located */
+            branches_located: number;
+            /** Branches Total */
+            branches_total: number;
+            /**
+             * Day Starts At
+             * Format: time
+             */
+            day_starts_at: string;
+            /** Late After Minutes */
+            late_after_minutes: number;
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /** Max Accuracy M */
+            max_accuracy_m: number;
+        };
+        /** EntryOut */
+        app__modules__customers__schemas__EntryOut: {
+            /** Amount */
+            amount: number;
+            /** Balance */
+            balance: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "sale" | "return" | "payment" | "adjustment";
+            /** Note */
+            note: string | null;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /** Sale Id */
+            sale_id: string | null;
+        };
+        /** AdjustmentIn */
+        app__modules__inventory__schemas__AdjustmentIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+            /** Reason */
+            reason: string;
+        };
+        /** CountOut */
+        app__modules__inventory__schemas__CountOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /**
+             * Counted On
+             * Format: date
+             */
+            counted_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: {
+                [key: string]: unknown;
+            }[];
+            /** Note */
+            note: string | null;
+            /** Value */
+            value: number;
+        };
+        /** AdjustmentIn */
+        app__modules__leave__schemas__AdjustmentIn: {
+            /** Days */
+            days: number | string;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /**
+             * Leave Type Id
+             * Format: uuid
+             */
+            leave_type_id: string;
+            /** Reason */
+            reason: string;
+            /** Year */
+            year: number;
+        };
+        /** LineOut */
+        app__modules__sales__schemas__LineOut: {
+            /** Discount */
+            discount: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Net */
+            net: number;
+            /** Product Id */
+            product_id: string | null;
+            /** Quantity */
+            quantity: string;
+            /**
+             * Returned
+             * @default 0
+             */
+            returned: string;
+            /** Tax */
+            tax: number;
+            /** Taxes */
+            taxes: components["schemas"]["LineTaxOut"][];
+            /** Total */
+            total: number;
+            /** Unit Price */
+            unit_price: number;
+        };
+        /** TemplateIn */
+        app__modules__tasks__schemas__TemplateIn: {
+            /**
+             * Automatic
+             * @default false
+             */
+            automatic: boolean;
+            /** Items */
+            items?: components["schemas"]["TemplateItem"][];
+            /** Name */
+            name: string;
+        };
+        /** TemplateOut */
+        app__modules__tasks__schemas__TemplateOut: {
+            /** Automatic */
+            automatic: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** Name */
+            name: string;
+            /** Version */
+            version: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -7751,6 +8888,547 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    accounts_v1_accounting_accounts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountOut"][];
+                };
+            };
+        };
+    };
+    create_account_v1_accounting_accounts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_account_v1_accounting_accounts__account_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    backfill_v1_accounting_backfill_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
+    };
+    balance_sheet_v1_accounting_balance_sheet_get: {
+        parameters: {
+            query: {
+                as_of: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BalanceSheetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cash_book_v1_accounting_cash_book_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LedgerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    entries_v1_accounting_entries_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_entry_v1_accounting_entries_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reverse_v1_accounting_entries__entry_id__reverse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ledger_v1_accounting_ledger__account_id__get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LedgerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    profit_and_loss_v1_accounting_profit_and_loss_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfitLossOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_v1_accounting_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsOut"];
+                };
+            };
+        };
+    };
+    save_settings_v1_accounting_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    templates_v1_accounting_tax_returns_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"][];
+                };
+            };
+        };
+    };
+    create_template_v1_accounting_tax_returns_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_template_v1_accounting_tax_returns__template_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fill_v1_accounting_tax_returns__template_id__fill_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaxReturnOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trial_balance_v1_accounting_trial_balance_get: {
+        parameters: {
+            query: {
+                as_of: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialBalanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -8449,7 +10127,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CountOut"];
+                    "application/json": components["schemas"]["app__modules__approvals__schemas__CountOut"];
                 };
             };
         };
@@ -8959,7 +10637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SettingsOut"];
+                    "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsOut"];
                 };
             };
         };
@@ -8973,7 +10651,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SettingsIn"];
+                "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsIn"];
             };
         };
         responses: {
@@ -8983,7 +10661,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SettingsOut"];
+                    "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsOut"];
                 };
             };
             /** @description Validation Error */
@@ -11037,6 +12715,454 @@ export interface operations {
             };
         };
     };
+    adjust_v1_inventory_adjustments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__inventory__schemas__AdjustmentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    count_v1_inventory_counts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CountIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__modules__inventory__schemas__CountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    item_settings_v1_inventory_items__product_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    movements_v1_inventory_items__product_id__movements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MovementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    opening_v1_inventory_opening_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purchases_v1_inventory_purchases_get: {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    receive_v1_inventory_purchases_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PurchaseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purchase_v1_inventory_purchases__purchase_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                purchase_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PurchaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_v1_inventory_stock_get: {
+        parameters: {
+            query?: {
+                branch_id?: string | null;
+                low?: boolean;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suppliers_v1_inventory_suppliers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"][];
+                };
+            };
+        };
+    };
+    create_supplier_v1_inventory_suppliers_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_supplier_v1_inventory_suppliers__supplier_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pay_supplier_v1_inventory_suppliers__supplier_id__payments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupplierPaymentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupplierOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transfer_v1_inventory_transfers_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_invites_v1_invites_get: {
         parameters: {
             query?: never;
@@ -11224,7 +13350,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AdjustmentIn"];
+                "application/json": components["schemas"]["app__modules__leave__schemas__AdjustmentIn"];
             };
         };
         responses: {
@@ -12160,7 +14286,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TemplateOut"][];
+                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"][];
                 };
             };
         };
@@ -12174,7 +14300,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TemplateIn"];
+                "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateIn"];
             };
         };
         responses: {
@@ -12184,7 +14310,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TemplateOut"];
+                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"];
                 };
             };
             /** @description Validation Error */
@@ -12209,7 +14335,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TemplateIn"];
+                "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateIn"];
             };
         };
         responses: {
@@ -12219,7 +14345,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TemplateOut"];
+                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"];
                 };
             };
             /** @description Validation Error */

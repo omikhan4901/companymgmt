@@ -147,6 +147,13 @@ async def test_capabilities_match_the_api_for_every_role(client: httpx.AsyncClie
         ("customers.list", "/v1/customers", {}),
         ("customers.list", "/v1/customers", {"owing": True}),
         ("sales.summary", "/v1/sales/summary", {"from": f"{MONTH}-01", "to": f"{MONTH}-28"}),
+        ("inventory.stock", "/v1/inventory/stock", {}),
+        ("inventory.stock", "/v1/inventory/stock", {"low": True}),
+        (
+            "accounting.profit_and_loss",
+            "/v1/accounting/profit-and-loss",
+            {"from": f"{MONTH}-01", "to": f"{MONTH}-28"},
+        ),
         (
             "reports.overview",
             "/v1/reports/overview",

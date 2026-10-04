@@ -700,6 +700,13 @@ async def return_items(ctx: Ctx, sale_id: uuid.UUID, body: ReturnIn) -> SaleOut:
         target_id=original.id,
         data={"return": str(row.id), "total": total},
     )
+    await events.emit(
+        ctx.db,
+        "sale.returned",
+        subject_type="sale",
+        subject_id=row.id,
+        data={"original_id": original.id, "total": total, "to_account": body.to_account},
+    )
     await ctx.db.commit()
     return await sale_out(ctx, row)
 
@@ -730,6 +737,13 @@ async def void(ctx: Ctx, sale_id: uuid.UUID, body: VoidIn) -> SaleOut:
         target_type="sale",
         target_id=row.id,
         data={"number": row.number, "reason": body.reason},
+    )
+    await events.emit(
+        ctx.db,
+        "sale.voided",
+        subject_type="sale",
+        subject_id=row.id,
+        data={"number": row.number, "kind": row.kind},
     )
     await ctx.db.commit()
     return await sale_out(ctx, row)

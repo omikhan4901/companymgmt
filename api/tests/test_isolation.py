@@ -292,6 +292,44 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["sale_id"] = sold.json()["id"]
     expense = await owner.post("/v1/expenses", json={"amount": 100, "payee": "Milk"})
     ids["expense_id"] = expense.json()["id"]
+    await owner.put(
+        "/v1/workspace/modules",
+        json={"modules": [*modules, "sales", "customers", "expenses", "inventory", "accounting"]},
+    )
+    supplier = await owner.post("/v1/inventory/suppliers", json={"name": "Wholesaler"})
+    ids["supplier_id"] = supplier.json()["id"]
+    bought = await owner.post(
+        "/v1/inventory/purchases",
+        json={
+            "supplier_id": ids["supplier_id"],
+            "lines": [{"product_id": ids["product_id"], "quantity": "1", "unit_cost": "100"}],
+        },
+    )
+    ids["purchase_id"] = bought.json()["id"]
+    account = await owner.post(
+        "/v1/accounting/accounts", json={"code": "9999", "name": "Test", "type": "asset"}
+    )
+    ids["account_id"] = account.json()["id"]
+    cash = next(a for a in (await owner.get("/v1/accounting/accounts")).json() if a["role"] == "cash")
+    entry = await owner.post(
+        "/v1/accounting/entries",
+        json={
+            "entry_date": str(start.date()),
+            "memo": "Test",
+            "lines": [{"account_id": ids["account_id"], "debit": 1}, {"account_id": cash["id"], "credit": 1}],
+        },
+    )
+    ids["entry_id"] = entry.json()["id"]
+    template = await owner.post(
+        "/v1/accounting/tax-returns",
+        json={
+            "name": "VAT",
+            "boxes": [
+                {"code": "1", "label": "Sales", "sources": [{"kind": "account", "ids": [ids["account_id"]]}]}
+            ],
+        },
+    )
+    ids["template_id"] = template.json()["id"]
     assert all(ids.values()), ids
     return ids
 

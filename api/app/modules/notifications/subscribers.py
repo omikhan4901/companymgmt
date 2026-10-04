@@ -144,3 +144,10 @@ async def ai_allowance_changed(db: AsyncSession, event: events.Event) -> None:
     people = await holders(db, "ai.manage")
     data = {"plan": event.data.get("plan"), "questions": event.data.get("questions")}
     await notify(db, event, people, link="/app/settings?tab=ai", data=data)
+
+
+@events.on("stock.low")
+async def stock_low(db: AsyncSession, event: events.Event) -> None:
+    """An item fell to its reorder level: tell the people who reorder stock."""
+    people = await holders(db, "inventory.manage")
+    await notify(db, event, people, link="/app/inventory?low=1")

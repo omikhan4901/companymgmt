@@ -196,6 +196,9 @@ async def top_up(ctx: Ctx, body: TopUpIn) -> ExpenseOut:
     await audit.record(
         ctx.db, "expense.petty_top_up", target_type="expense", target_id=row.id, data={"amount": row.amount}
     )
+    await events.emit(
+        ctx.db, "expense.petty_top_up", subject_type="expense", subject_id=row.id, data={"amount": row.amount}
+    )
     await ctx.db.commit()
     return await get(ctx, row.id)
 
@@ -213,6 +216,9 @@ async def update(ctx: Ctx, expense_id: uuid.UUID, body: ExpensePatch) -> Expense
     await audit.record(
         ctx.db, "expense.changed", target_type="expense", target_id=row.id, data={"amount": row.amount}
     )
+    await events.emit(
+        ctx.db, "expense.changed", subject_type="expense", subject_id=row.id, data={"amount": row.amount}
+    )
     await ctx.db.commit()
     return await get(ctx, row.id)
 
@@ -226,6 +232,9 @@ async def delete(ctx: Ctx, expense_id: uuid.UUID) -> None:
         target_type="expense",
         target_id=row.id,
         data={"amount": row.amount, "payee": row.payee},
+    )
+    await events.emit(
+        ctx.db, "expense.deleted", subject_type="expense", subject_id=row.id, data={"amount": row.amount}
     )
     await ctx.db.delete(row)
     await ctx.db.commit()

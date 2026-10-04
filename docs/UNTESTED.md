@@ -61,3 +61,25 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   Nav items. `lib/whatsapp.test.ts` written, not run. Never opened in a browser; no
   e2e. Known gaps: a sale the server refuses while syncing stays in the offline queue
   with no screen to fix it; cashier PINs (from the plan) not built.
+
+## M9 Inventory and accounting
+
+- [ ] **Inventory API.** `app/modules/inventory`: stock items (opt-in tracking, reorder
+  level), levels per branch, movement ledger with weighted average cost
+  (`costing.py`), opening stock, adjustments, purchases with input tax and supplier
+  balances, supplier payments, transfers, counts, low-stock events and notifications.
+  Stock follows `sale.completed` / `sale.returned` / `sale.voided` in the same
+  transaction. Migration 0021. Capability `inventory.stock`.
+- [ ] **Accounting API.** `app/modules/accounting`: starting chart with roles, posting
+  rules (`postings.py`), automatic postings after commit via the outbox for sales,
+  returns, voids, stock, purchases, supplier and customer payments, dues adjustments,
+  expenses (incl. changes, deletes, petty cash) and payroll; idempotent backfill on
+  enable and on demand; manual entries, reversal, period lock; trial balance, P&L,
+  balance sheet, ledger, cash book; tax-return templates built by the workspace and
+  filled per period. Capability `accounting.profit_and_loss`.
+- [ ] Tests written, never run: `test_ledger.py` (Hypothesis: postings balance,
+  stock reconciles), `test_books.py` (end to end incl. tax return boxes), parity and
+  isolation additions. Expected amounts in `test_books.py` were worked by hand; check
+  them carefully when they first run. Unverified: the outbox delivers `later`
+  subscribers for these events in tests (`outbox.dispatch()`), and postings for an
+  event whose module was switched on later are picked up by backfill.
