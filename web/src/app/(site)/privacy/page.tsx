@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <article className="prose-legal mx-auto max-w-3xl px-4 py-16 md:px-6">
-    <h1 className="text-4xl font-semibold tracking-tight">Privacy Policy</h1>
+    <h1 className="font-site-display text-4xl font-extrabold tracking-tight text-ink">Privacy Policy</h1>
     <p className="mt-2 text-sm text-muted">Last updated 30 September 2026. Draft pending legal review.</p>
 
     <h2>Who we are</h2>

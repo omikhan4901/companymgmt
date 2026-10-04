@@ -1,14 +1,18 @@
 import {
-  CalendarCheck2,
+  BarChart3,
+  Banknote,
+  CalendarClock,
   Check,
-  ClipboardCheck,
+  ClipboardList,
+  FileSpreadsheet,
+  FileText,
+  Inbox,
   Languages,
+  ListChecks,
   MapPin,
-  ScrollText,
+  Megaphone,
   ShieldCheck,
-  Smartphone,
-  UserRound,
-  UsersRound,
+  TreePalm,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -17,77 +21,93 @@ import type { ReactNode } from "react";
 import { PlanGrid } from "@/components/plan-grid";
 
 export const metadata: Metadata = {
-  title: { absolute: "CompanyMgmt: attendance and people for every business" },
-  description: "Location-checked clock-ins, fair time fixes, timesheets and your team in one place. Free for up to 5 people. In English and Bangla.",
+  title: { absolute: "CompanyMgmt: people, attendance, payroll and work in one place" },
+  description:
+    "Location-checked clock-ins, leave, payroll with Bangla payslips, tasks, announcements, policies and reports for businesses of any size. Free for up to 5 people.",
 };
 
-const features: { icon: ReactNode; title: string; text: string; wide?: boolean }[] = [
-  { icon: <MapPin />, title: "Clock in at work, not at home", text: "Each branch has an area on the map. Clock-ins outside it are refused or flagged: your choice.", wide: true },
-  { icon: <Smartphone />, title: "Any phone, one big button", text: "Night shifts and branches in different time zones handled." },
-  { icon: <UserRound />, title: "Staff without email", text: "Give each person a username; they sign in with your workspace code." },
-  { icon: <ClipboardCheck />, title: "Fix mistakes fairly", text: "Forgot to clock out? People ask for a fix, a manager approves it, and the change is recorded." },
-  { icon: <CalendarCheck2 />, title: "Monthly timesheets", text: "Hours per person per day, ready to check and download as a spreadsheet." },
-  { icon: <UsersRound />, title: "Your people in one place", text: "Profiles, departments and branches. Managers see only their own team.", wide: true },
-  { icon: <Languages />, title: "English and বাংলা", text: "Every screen in both languages, light or dark, in the colour you like.", wide: true },
-  { icon: <ScrollText />, title: "A record nobody can quietly change", text: "Important changes go into an audit log that can't be edited, with a built-in integrity check.", wide: true },
+const modules: { icon: ReactNode; title: string; text: string }[] = [
+  { icon: <MapPin />, title: "Attendance at work", text: "One-tap clock-in from any phone, checked against each branch's area on the map. Night shifts and time zones handled." },
+  { icon: <TreePalm />, title: "Leave", text: "Balances that add up, requests in two taps, a team calendar, and holidays per branch." },
+  { icon: <Banknote />, title: "Payroll", text: "Monthly pay runs with allowances, advances and deductions, and payslips in English or বাংলা." },
+  { icon: <ListChecks />, title: "Tasks and projects", text: "Boards per project, checklists and comments, and a My work list everyone can follow." },
+  { icon: <Megaphone />, title: "Announcements", text: "Post to everyone, a branch or a team, and see who has read it." },
+  { icon: <FileText />, title: "Documents and policies", text: "Handbooks and policies with versions, and a record of who acknowledged each one." },
+  { icon: <Inbox />, title: "One approvals inbox", text: "Leave and time fixes from your own team, longest-waiting first, decided in one place." },
+  { icon: <ClipboardList />, title: "Onboarding checklists", text: "A new joiner's first days, started by itself, with items for them and their manager." },
+  { icon: <BarChart3 />, title: "Reports", text: "Attendance rate, late arrivals, leave taken and overdue work, by period and department, by email if you like." },
+  { icon: <FileSpreadsheet />, title: "Import from a spreadsheet", text: "Bring the whole team in from a CSV. Every row is checked first, with problems explained line by line." },
+  { icon: <CalendarClock />, title: "Fair time fixes", text: "Forgot to clock out? People ask, a manager approves, and the change is recorded." },
+  { icon: <Languages />, title: "English and বাংলা", text: "Every screen, email and payslip in both languages. Names in any script, everywhere." },
+];
+
+const showcase: { title: string; text: string; points: string[]; image: string; alt: string; phone?: boolean }[] = [
+  {
+    title: "Clock-ins that happen at work",
+    text: "Place each branch on the map once. When someone clocks in, their phone shares its location for that moment only.",
+    points: ["Required, record only, or off: your choice", "A clear message when someone is too far", "Never tracked between clock-ins"],
+    image: "/screens/phone-too-far-bangla.png",
+    alt: "A phone in Bangla telling a staff member they are 2 km from the branch",
+    phone: true,
+  },
+  {
+    title: "Plan the work and watch it get done",
+    text: "Projects with boards, checklists and comments. Everyone sees their own work, most urgent first.",
+    points: ["Managers run their own department's projects", "People are told when work is given to them", "Due dates and overdue work stand out"],
+    image: "/screens/agency-board.png",
+    alt: "A campaign board with tasks to do, in progress and done",
+  },
+  {
+    title: "Know how the month went",
+    text: "Attendance rate, late arrivals, leave taken and overdue tasks for any period, for the whole company or one department.",
+    points: ["Your own start time and grace period", "Managers see their own teams only", "Weekly or monthly by email"],
+    image: "/screens/reports.png",
+    alt: "Reports for a 30-person agency's week",
+  },
+  {
+    title: "Policies everyone has actually read",
+    text: "Share the handbook and policies, ask people to acknowledge the ones that matter, and see who hasn't yet.",
+    points: ["Every version kept", "Choose who sees each document", "New joiners get them in their checklist"],
+    image: "/screens/policy-acknowledged.png",
+    alt: "The code of conduct, acknowledged by 30 of 30 people",
+  },
+];
+
+const steps = [
+  { title: "Create your workspace", text: "Pick your language and business type. We switch on only what you need." },
+  { title: "Add your people", text: "Import a spreadsheet, invite by email, or give staff a username with no email needed." },
+  { title: "Run the day from one place", text: "Clock-ins, leave, pay, work and news, on any phone or computer." },
 ];
 
 const security = [
-  "Each business's data is kept apart inside the database itself, not just by the app.",
-  "Two-step verification with an authenticator app, and a list of every signed-in device.",
-  "An audit log that can't be edited, with a built-in integrity check.",
-  "National ID numbers are encrypted. Passwords are hashed with Argon2.",
-  "Locations are saved only when someone clocks in or out, rounded to about 11 m. Never tracked in between.",
-  "Every page ships with a strict content security policy.",
+  "Each business's data is kept apart inside the database itself, not only by the app.",
+  "Two-step sign-in with an authenticator app, and a list of every signed-in device.",
+  "An audit log nobody can edit, with a built-in integrity check.",
+  "National ID and bank numbers encrypted; passwords hashed with Argon2.",
+  "Locations saved only at clock-in and clock-out, rounded to about 11 m.",
+  "Export everything, or delete your workspace, whenever you want.",
 ];
 
-const next = ["Leave", "Payroll with payslips", "Tasks and projects", "Announcements", "Documents and policies", "An assistant that answers from your own data"];
+const next = ["An assistant that answers from your own data", "Point of sale and dues", "Inventory and accounting", "Single sign-on"];
 
-function Preview() {
-  return (
-    <div className="relative mx-auto w-full max-w-md" aria-hidden="true">
-      <div className="flex flex-col gap-4 rounded-[26px] border border-border bg-surface p-4 shadow-2xl shadow-black/5">
-        <div className="flex flex-col gap-4 rounded-[18px] bg-accent p-5 text-on-accent">
-          <div className="flex items-center justify-between text-sm font-semibold">
-            <span className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-on-accent" />
-              Clocked in since 8:02
-            </span>
-            <span className="flex items-center gap-1 font-medium opacity-90">
-              <MapPin className="size-3.5" />
-              Main branch
-            </span>
-          </div>
-          <div className="flex items-end justify-between">
-            <span className="font-display text-5xl font-bold tracking-tight tabular-nums">6:14</span>
-            <span className="rounded-[10px] bg-surface px-4 py-2.5 text-sm font-semibold text-text">Clock out</span>
-          </div>
-          <span className="inline-flex w-fit items-center gap-1 rounded-md bg-surface px-2 py-0.5 text-xs font-semibold text-success-text">
-            <MapPin className="size-3" />
-            In: at branch
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-[16px] border border-border p-4">
-            <p className="text-xs text-muted">At work now</p>
-            <p className="font-display text-3xl font-semibold tabular-nums">5</p>
-          </div>
-          <div className="rounded-[16px] border border-border p-4">
-            <p className="text-xs text-muted">Hours this week</p>
-            <p className="font-display text-3xl font-semibold tabular-nums">186:20</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 rounded-[16px] border border-border px-3 py-2.5">
-          <span className="rounded-md bg-warn-soft px-2 py-0.5 text-xs font-semibold text-warn-text">Fix</span>
-          <span className="flex min-w-0 flex-1 flex-col text-sm">
-            <span className="font-semibold">Nadia Rahman</span>
-            <span className="truncate text-muted">Forgot to clock out Monday, 5:30 pm</span>
-          </span>
-          <span className="grid size-8 place-items-center rounded-lg bg-text text-surface">
-            <Check className="size-4" />
-          </span>
-        </div>
+function Screenshot({ src, alt, phone }: { src: string; alt: string; phone?: boolean }) {
+  if (phone) {
+    return (
+      <div className="mx-auto w-full max-w-[260px] rounded-[34px] border border-slate-200 bg-white p-2.5 shadow-[0_24px_60px_-24px_rgba(0,42,58,.35)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} width={1082} height={2202} loading="lazy" className="h-auto w-full rounded-[26px]" />
       </div>
+    );
+  }
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_-24px_rgba(0,42,58,.35)]">
+      <div className="flex gap-1.5 border-b border-slate-200 bg-slate-50 px-4 py-2.5" aria-hidden="true">
+        <span className="size-2.5 rounded-full bg-slate-300" />
+        <span className="size-2.5 rounded-full bg-slate-300" />
+        <span className="size-2.5 rounded-full bg-slate-300" />
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} width={1440} height={900} loading="lazy" className="h-auto w-full" />
     </div>
   );
 }
@@ -95,88 +115,94 @@ function Preview() {
 export default function Landing() {
   return (
     <>
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:px-6 md:py-24 lg:grid-cols-[1.1fr_1fr]">
-        <div className="flex flex-col items-start gap-6">
-          <span className="rounded-md bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent-soft-text">Free for up to 5 people</span>
-          <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[56px]">Run your team from one place, from a tea stall to a company with branches.</h1>
-          <p className="max-w-xl text-lg text-muted">Know who&apos;s at work and where they clocked in, fix mistakes fairly, and close the month with a timesheet you trust.</p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/signup" className="rounded-[12px] bg-accent px-6 py-3 font-semibold text-on-accent hover:bg-accent-hover">
+      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white">
+        <div className="site-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" aria-hidden="true" />
+        <div className="relative mx-auto max-w-[1200px] px-5 pb-10 pt-16 text-center md:px-8 md:pt-24">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-medium text-brand-dark shadow-sm">Free for up to 5 people</span>
+          <h1 className="mx-auto mt-5 max-w-3xl font-site-display text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+            Run your whole team from <span className="text-brand">one place</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
+            Attendance checked at the branch, leave that adds up, payroll with Bangla payslips, and the day&apos;s work, news and policies, from a tea stall to a company with branches.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link href="/signup" className="rounded-[10px] bg-brand px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-6px_rgba(0,123,123,.5)] hover:bg-brand-dark">
               Create your workspace
             </Link>
-            <Link href="/pricing" className="rounded-[12px] border border-border bg-surface px-6 py-3 font-semibold hover:bg-surface-2">
+            <Link href="/pricing" className="rounded-[10px] border border-slate-300 bg-white px-6 py-3 font-semibold text-ink hover:border-brand">
               See pricing
             </Link>
           </div>
-          <p className="text-sm text-muted">No card needed. Set up in two minutes.</p>
-        </div>
-        <Preview />
-      </section>
-
-      <section id="features" className="border-y border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-          <h2 className="text-3xl font-semibold">What you get today</h2>
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((f) => (
-              <li key={f.title} className={`flex flex-col gap-3 rounded-[var(--radius-card)] border border-border bg-bg p-5 ${f.wide ? "lg:col-span-2" : ""}`}>
-                <span className="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent-soft-text [&_svg]:size-5" aria-hidden="true">
-                  {f.icon}
-                </span>
-                <h3 className="text-base font-semibold">{f.title}</h3>
-                <p className="text-sm text-muted">{f.text}</p>
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 text-sm text-slate-500">No card needed. Set up in two minutes.</p>
+          <div className="mx-auto mt-14 max-w-5xl text-left">
+            <Screenshot src="/screens/home.png" alt="The CompanyMgmt home screen: who's at work, hours this week and requests waiting" />
+          </div>
         </div>
       </section>
 
-      <section id="location" className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:px-6 lg:grid-cols-2 lg:items-center">
-        <div className="flex flex-col gap-4">
-          <h2 className="text-3xl font-semibold">Clock-ins that happen at work</h2>
-          <p className="text-muted">Place each branch on the map once and choose how far &ldquo;at work&rdquo; reaches. When someone clocks in, their phone shares its location for that moment only.</p>
-          <ol className="flex flex-col gap-3">
-            {[
-              ["Required", "Clock-in works only inside a branch area. Clock-out is never blocked, only flagged."],
-              ["Record only", "Every clock-in is saved with its distance, and ones away from a branch are flagged for managers."],
-              ["Off", "No location at all, for teams that work on the road."],
-            ].map(([title, text]) => (
-              <li key={title} className="flex gap-3 rounded-[16px] border border-border bg-surface p-4">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-accent-soft-text" aria-hidden="true" />
-                <span className="flex flex-col">
-                  <span className="font-semibold">{title}</span>
-                  <span className="text-sm text-muted">{text}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="rounded-[var(--radius-card)] border border-border bg-surface p-6">
-          <p className="text-sm font-semibold text-muted">What staff see when they&apos;re too far</p>
-          <div className="mt-4 flex items-start gap-3 rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger-text">
-            <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            You&apos;re about 1.2 km from Gulshan kiosk. Clock in when you get there.
-          </div>
-          <p className="mt-6 text-sm font-semibold text-muted">What managers see</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
-            <span className="rounded-md bg-success-soft px-2 py-1 text-success-text">In: at branch</span>
-            <span className="rounded-md bg-warn-soft px-2 py-1 text-warn-text">Out: 6.9 km away</span>
-          </div>
-          <p className="mt-6 text-xs text-muted">A determined person can fake a phone&apos;s location. The check stops casual clock-ins from home, and the saved distance and accuracy help managers spot anything odd.</p>
+      <section id="features" className="mx-auto max-w-[1200px] px-5 py-20 md:px-8">
+        <p className="text-center text-sm font-semibold uppercase tracking-wider text-brand-dark">Everything in one place</p>
+        <h2 className="mt-2 text-center font-site-display text-3xl font-bold text-ink md:text-4xl">What you get today</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-center text-slate-600">Switch on only the modules you need. Everything works on a phone, in English and বাংলা.</p>
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {modules.map((m) => (
+            <li key={m.title} className="rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-[0_12px_32px_-16px_rgba(0,42,58,.25)]">
+              <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand [&_svg]:size-5" aria-hidden="true">
+                {m.icon}
+              </span>
+              <h3 className="mt-3 font-semibold text-ink">{m.title}</h3>
+              <p className="mt-1 text-slate-600">{m.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="bg-slate-50">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-20 px-5 py-20 md:px-8">
+          {showcase.map((s, i) => (
+            <div key={s.title} className="grid items-center gap-10 lg:grid-cols-2">
+              <div className={i % 2 ? "lg:order-2" : undefined}>
+                <h2 className="font-site-display text-3xl font-bold text-ink">{s.title}</h2>
+                <p className="mt-3 text-lg text-slate-600">{s.text}</p>
+                <ul className="mt-5 flex flex-col gap-2.5">
+                  {s.points.map((p) => (
+                    <li key={p} className="flex items-start gap-2.5 text-slate-700">
+                      <Check className="mt-0.5 size-5 shrink-0 text-brand" aria-hidden="true" />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Screenshot src={s.image} alt={s.alt} phone={s.phone} />
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="border-y border-border bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:grid-cols-2 md:items-center md:px-6">
-          <div className="flex flex-col gap-3">
-            <h2 className="text-3xl font-semibold">Simple for a shop. Ready for a company.</h2>
-            <p className="text-muted">Tell us what kind of business you run and we switch on only what you need. As you grow, add branches, departments, managers and custom roles. Nothing to move, nothing to re-learn.</p>
+      <section id="how" className="mx-auto max-w-[1200px] px-5 py-20 md:px-8">
+        <h2 className="text-center font-site-display text-3xl font-bold text-ink md:text-4xl">Up and running this afternoon</h2>
+        <ol className="mt-12 grid gap-4 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <li key={s.title} className="rounded-2xl border border-slate-200 bg-white p-6">
+              <span className="grid size-9 place-items-center rounded-full bg-brand font-site-display font-bold text-white" aria-hidden="true">
+                {i + 1}
+              </span>
+              <h3 className="mt-4 font-semibold text-ink">{s.title}</h3>
+              <p className="mt-1 text-slate-600">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-10 grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 md:grid-cols-2 md:items-center md:p-8">
+          <div>
+            <h3 className="font-site-display text-2xl font-bold text-ink">Simple for a shop. Ready for a company.</h3>
+            <p className="mt-2 text-slate-600">Big buttons and plain words for a team of three. Branches, departments, managers who see only their own people, and custom roles when you grow. Nothing to move, nothing to re-learn.</p>
           </div>
-          <div className="rounded-[var(--radius-card)] border border-border bg-bg p-6">
-            <p className="text-sm font-semibold text-muted">Coming next, one module at a time</p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {next.map((m) => (
-                <li key={m} className="rounded-full border border-dashed border-border-strong px-3 py-1 text-sm">
-                  {m}
+          <div>
+            <p className="text-sm font-semibold text-slate-600">Coming next</p>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {next.map((n) => (
+                <li key={n} className="rounded-full border border-dashed border-slate-300 px-3 py-1 text-sm text-slate-700">
+                  {n}
                 </li>
               ))}
             </ul>
@@ -184,40 +210,43 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="security" className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="size-7 text-accent-soft-text" aria-hidden="true" />
-          <h2 className="text-3xl font-semibold">Built to keep your data safe</h2>
-        </div>
-        <ul className="mt-8 grid gap-3 md:grid-cols-2">
-          {security.map((s) => (
-            <li key={s} className="flex items-start gap-3 rounded-[16px] border border-border bg-surface p-4">
-              <Check className="mt-0.5 size-5 shrink-0 text-success-text" aria-hidden="true" />
-              <span>{s}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="border-t border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-          <h2 className="text-center text-3xl font-semibold">Simple pricing</h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-muted">One price for your whole workspace, not per user. Every paid plan starts with a 14-day Growth trial.</p>
-          <div className="mt-10">
-            <PlanGrid />
+      <section id="security" className="bg-navy text-white">
+        <div className="mx-auto max-w-[1200px] px-5 py-20 md:px-8">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="size-8 text-brand-200" aria-hidden="true" />
+            <h2 className="font-site-display text-3xl font-bold md:text-4xl">Built to keep your data safe</h2>
           </div>
+          <ul className="mt-10 grid gap-3 md:grid-cols-2">
+            {security.map((s) => (
+              <li key={s} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+                <Check className="mt-0.5 size-5 shrink-0 text-brand-200" aria-hidden="true" />
+                <span className="text-slate-200">{s}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <div className="flex flex-col items-start gap-5 rounded-[26px] bg-accent p-8 text-on-accent md:flex-row md:items-center md:justify-between md:p-10">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-3xl font-semibold">Try it with your team this week.</h2>
-            <p className="opacity-90">Free for up to 5 people, forever. No card needed.</p>
+      <section className="mx-auto max-w-[1200px] px-5 py-20 md:px-8">
+        <h2 className="text-center font-site-display text-3xl font-bold text-ink md:text-4xl">Simple pricing</h2>
+        <p className="mx-auto mt-3 max-w-xl text-center text-slate-600">One price for your whole workspace, not per user. Every paid plan starts with a 14-day Growth trial.</p>
+        <div className="mt-12">
+          <PlanGrid />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-5 pb-20 md:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-brand-dark px-8 py-12 text-white md:px-12">
+          <div className="site-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_left,black,transparent)]" aria-hidden="true" />
+          <div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="font-site-display text-3xl font-bold">Try it with your team this week.</h2>
+              <p className="mt-2 text-brand-50">Free for up to 5 people, for good. No card needed.</p>
+            </div>
+            <Link href="/signup" className="rounded-[10px] bg-white px-6 py-3 font-semibold text-brand-dark hover:bg-brand-50">
+              Create your workspace
+            </Link>
           </div>
-          <Link href="/signup" className="rounded-[12px] bg-surface px-6 py-3 font-semibold text-text hover:bg-surface-2">
-            Create your workspace
-          </Link>
         </div>
       </section>
     </>

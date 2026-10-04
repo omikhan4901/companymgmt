@@ -34,6 +34,14 @@ input; list what does under "Blocked on the owner".
   SCIM, API keys, bring-your-own AI key, dedicated-database support); real identity
   providers and paid infrastructure wait for the owner.
 - **M11:** make it as secure as possible. The owner arranges the penetration test.
+- **Easy onboarding and addresses (asked 2026-10-04, build with M10):** each workspace gets
+  its own address `<slug>.companymgmt.app` at sign-up (wildcard DNS; reserved and
+  lookalike names refused; cookies stay per subdomain), showing its name and logo and
+  signing staff in without a workspace code. Plus invite links and QR codes, a WhatsApp
+  share, optional sample data to try and delete, and an owner's first-day checklist.
+  Customers' own domains (`hr.theircompany.com`) through Cloudflare for SaaS custom
+  hostnames as a paid-plan feature once billing exists. The wildcard DNS record needs
+  the owner's domain.
 - **After M11:** a thorough legal review: terms, privacy, data processing, AI use,
   cross-border transfer, looking at what comparable companies publish. For a lawyer to
   check, not legal advice.

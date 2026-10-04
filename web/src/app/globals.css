@@ -148,6 +148,19 @@
   --radius-card: 18px;
 }
 
+/* The public site's look (ResumeX): teal, ink and navy; Inter and Plus Jakarta Sans. */
+@theme {
+  --color-brand: #007b7b;
+  --color-brand-dark: #006262;
+  --color-brand-50: #effafa;
+  --color-brand-100: #d5f2f1;
+  --color-brand-200: #a9e3e1;
+  --color-ink: #0f1f2a;
+  --color-navy: #002a3a;
+  --font-site: "Inter Variable", "Noto Sans Bengali", ui-sans-serif, system-ui, sans-serif;
+  --font-site-display: "Plus Jakarta Sans", "Noto Sans Bengali", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer base {
   html {
     /* Keep focused and scrolled-to elements clear of the sticky header and phone tab bar. */
@@ -197,4 +210,41 @@
 }
 .prose-legal li {
   @apply mt-1.5;
+}
+
+/* Public site: always light, in the ResumeX colours. Shared components (logo, focus
+   rings) read the Atlas tokens, so the site sets them to its own values. */
+.site {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #0f1f2a;
+  --muted: #475569;
+  --accent: #007b7b;
+  --accent-hover: #006262;
+  --on-accent: #ffffff;
+  --accent-soft: #effafa;
+  --accent-soft-text: #006262;
+  color-scheme: light;
+  background: #ffffff;
+  color: var(--text);
+}
+.site :focus-visible {
+  outline: 2px solid #007b7b;
+  outline-offset: 2px;
+}
+.site-grid {
+  background-image:
+    linear-gradient(rgba(0, 123, 123, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 123, 123, 0.07) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.site .prose-legal h2 {
+  @apply font-site-display text-xl font-bold;
+}
+.site .prose-legal p,
+.site .prose-legal li {
+  color: #334155;
 }

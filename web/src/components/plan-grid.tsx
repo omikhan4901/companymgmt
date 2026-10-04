@@ -36,7 +36,7 @@ export function PlanGrid() {
               <h3 className="text-lg font-semibold">{p.name}</h3>
               {featured && <span className="rounded-md bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-soft-text">Most popular</span>}
             </div>
-            <p className="mt-3 font-display text-3xl font-semibold tabular-nums">
+            <p className="mt-3 font-site-display text-3xl font-semibold tabular-nums">
               {p.price_month_cents === null ? "Let's talk" : p.price_month_cents === 0 ? "$0" : money(p.price_month_cents)}
               {p.price_month_cents ? <span className="font-sans text-sm font-normal text-muted">/month</span> : null}
             </p>
