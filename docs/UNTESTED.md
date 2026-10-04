@@ -83,3 +83,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   them carefully when they first run. Unverified: the outbox delivers `later`
   subscribers for these events in tests (`outbox.dispatch()`), and postings for an
   event whose module was switched on later are picked up by backfill.
+- [ ] **Inventory and accounts web.** `/app/inventory` (stock with low filter, track an
+  item / opening stock / adjust / reorder level, receive purchases with input tax,
+  suppliers and payments, stock count) and `/app/accounting` (P&L, balance sheet,
+  trial balance with print; journal with hand entries and reversal; cash book; chart
+  of accounts with ledgers; tax-return template editor and filling; settings: lock
+  date, tax and expense-category account mapping, backfill). Nav items. Not built
+  with `next build` locally; never opened in a browser.

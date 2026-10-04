@@ -1,7 +1,7 @@
 # Progress
 
 Current work: **the owner's 2026-10-04 plan** (below). The marketing site and M6 (AI
-copilot) are done; M7 and M8 are built but untested (speed mode, `docs/UNTESTED.md`); next is M9 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
+copilot) are done; M7, M8 and M9 are built but untested (speed mode, `docs/UNTESTED.md`); next is M10 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
 on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
 
 ## Owner decisions, 2026-10-04 (follow these)
@@ -322,6 +322,27 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - **Not built yet:** cashier PINs on a shared till (needs device binding and lockouts;
   do it with M11's security work); a screen to fix offline sales the server refused.
 
+## M9: built, not yet tested (inventory and accounting)
+
+- **Inventory:** stock is tracked per item once it has opening stock, a purchase, or
+  its settings say so; levels per branch from a movement ledger; one weighted average
+  cost per item; purchases (with reclaimable input tax and what's owed to suppliers),
+  supplier payments, transfers between branches, stock counts, adjustments with a
+  reason; a notification when an item falls to its reorder level. Sales, returns and
+  voids move stock in the same transaction as the sale.
+- **Books:** a plain starting chart (renamable; roles tell automatic postings where to
+  go); every sale, return, void, stock movement, purchase, supplier and customer
+  payment, dues adjustment, expense (and its changes) and payroll run posts itself
+  after it's saved, once, through the outbox. Switching accounting on later backfills
+  everything. Hand entries, reversal, a lock date. Trial balance, profit and loss,
+  balance sheet, ledgers, cash book.
+- **Tax returns (owner decision):** templates the workspace's accountant builds: boxes
+  that add up tax charged or the sales it was charged on (per rate, sales or
+  purchases), account movements, or other boxes; filled for any period.
+- Property tests (`test_ledger.py`) for the plan's "done when": postings always balance
+  and stock always reconciles across thousands of random operations (written, not yet
+  run).
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -347,3 +368,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-04: M6 done: Gemini behind a port, switched on by a key; per-workspace opt-in and features; operator allowances with notifications; Ask with cited sources; document search; weekly brief.
 - 2026-10-04: Owner switched to speed mode (code and unit tests, lint and types only; `docs/UNTESTED.md`). M7 built: actions with confirmation, writing help, automations, signals.
 - 2026-10-04: M8 built: configurable taxes, the till with offline sales, receipts, returns and voids, dues, expenses.
+- 2026-10-04: M9 built: inventory with weighted average cost, self-posting double-entry books, reports, tax-return templates.
