@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { api } from "@/api/client";
 import { useAttendanceSettings, useBranches } from "@/api/hooks";
+import { AIAllowances, AISettings, useIsOperator } from "@/components/ai/settings";
 import type { AuditEvent, Branch, Page, Workspace } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { BranchSheet } from "@/components/branch-sheet";
@@ -424,11 +425,13 @@ function Audit() {
 export default function SettingsPage() {
   const { t } = useTranslation();
   const { can } = useSession();
+  const operator = useIsOperator();
   const tabs = [
     { key: "workspace", label: t("settings.tabs.workspace"), content: <WorkspaceForm />, show: can("workspace.manage") },
     { key: "modules", label: t("settings.tabs.modules"), content: <Modules />, show: can("workspace.manage") },
     { key: "branches", label: t("settings.tabs.branches"), content: <Branches />, show: can("branches.manage") },
     { key: "plan", label: t("settings.tabs.plan"), content: <PlanTab />, show: can("workspace.manage") },
+    { key: "ai", label: t("settings.tabs.ai"), content: <AISettings />, show: can("ai.manage") },
     { key: "audit", label: t("settings.tabs.audit"), content: <Audit />, show: can("audit.view") },
     {
       key: "data",
@@ -436,6 +439,7 @@ export default function SettingsPage() {
       content: <WorkspaceData />,
       show: can("workspace.manage") || can("workspace.export") || can("workspace.delete"),
     },
+    { key: "operator", label: t("settings.tabs.operator"), content: <AIAllowances />, show: operator.data?.operator === true },
   ].filter((x) => x.show);
   const [active, setActive] = useTab(tabs.map((x) => x.key));
   if (!tabs.length) return <EmptyState icon={<SettingsIcon />} title={t("common.notAllowed")} />;

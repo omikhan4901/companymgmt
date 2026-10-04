@@ -1,9 +1,10 @@
 "use client";
 
-import { Banknote, BarChart3, CalendarClock, FileText, Home, Inbox, ListChecks, Megaphone, Settings, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { Banknote, BarChart3, CalendarClock, FileText, Home, Inbox, ListChecks, Megaphone, Settings, Sparkles, TreePalm, Users, UsersRound, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/session";
+import { aiOpen, useAIStatus } from "@/components/ai/ai";
 
 export interface NavItem {
   href: string;
@@ -16,8 +17,10 @@ export interface NavItem {
 export function useNavItems(): NavItem[] {
   const { t } = useTranslation();
   const { can, hasModule } = useSession();
+  const ai = useAIStatus();
   const items: (NavItem & { show: boolean })[] = [
     { href: "/app", label: t("nav.home"), short: t("nav.homeShort"), icon: Home, show: true },
+    { href: "/app/ask", label: t("nav.ask"), short: t("nav.ask"), icon: Sparkles, show: aiOpen(ai.data, can).any },
     { href: "/app/tasks", label: t("nav.tasks"), short: t("nav.tasks"), icon: ListChecks, show: hasModule("tasks") && can("tasks.self") },
     { href: "/app/announcements", label: t("nav.announcements"), short: t("nav.announcementsShort"), icon: Megaphone, show: hasModule("announcements") && can("announcements.read") },
     { href: "/app/documents", label: t("nav.documents"), short: t("nav.documentsShort"), icon: FileText, show: hasModule("documents") && can("documents.read") },
@@ -33,7 +36,7 @@ export function useNavItems(): NavItem[] {
       label: t("nav.settings"),
       short: t("nav.settings"),
       icon: Settings,
-      show: can("workspace.manage") || can("branches.manage") || can("audit.view"),
+      show: can("workspace.manage") || can("branches.manage") || can("audit.view") || can("ai.manage"),
     },
   ];
   return items.filter((i) => i.show);

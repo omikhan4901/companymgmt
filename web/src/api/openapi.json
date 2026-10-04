@@ -1,6 +1,96 @@
 {
  "components": {
   "schemas": {
+   "AISettingsIn": {
+    "properties": {
+     "accept_terms": {
+      "default": false,
+      "title": "Accept Terms",
+      "type": "boolean"
+     },
+     "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "features": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 50,
+      "title": "Features",
+      "type": "array"
+     }
+    },
+    "required": [
+     "enabled"
+    ],
+    "title": "AISettingsIn",
+    "type": "object"
+   },
+   "AIStatusOut": {
+    "properties": {
+     "allowance": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Allowance"
+     },
+     "available": {
+      "title": "Available",
+      "type": "boolean"
+     },
+     "can_manage": {
+      "title": "Can Manage",
+      "type": "boolean"
+     },
+     "can_use": {
+      "title": "Can Use",
+      "type": "boolean"
+     },
+     "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "features": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Features",
+      "type": "array"
+     },
+     "resets_on": {
+      "format": "date",
+      "title": "Resets On",
+      "type": "string"
+     },
+     "terms_accepted": {
+      "title": "Terms Accepted",
+      "type": "boolean"
+     },
+     "used": {
+      "title": "Used",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "available",
+     "enabled",
+     "terms_accepted",
+     "can_use",
+     "can_manage",
+     "features",
+     "allowance",
+     "used",
+     "resets_on"
+    ],
+    "title": "AIStatusOut",
+    "type": "object"
+   },
    "AcceptIn": {
     "additionalProperties": false,
     "properties": {
@@ -231,6 +321,81 @@
      "created_at"
     ],
     "title": "AdjustmentOut",
+    "type": "object"
+   },
+   "AllowanceIn": {
+    "properties": {
+     "plan_key": {
+      "maxLength": 40,
+      "title": "Plan Key",
+      "type": "string"
+     },
+     "questions_per_month": {
+      "anyOf": [
+       {
+        "maximum": 1000000.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Questions Per Month"
+     }
+    },
+    "required": [
+     "plan_key"
+    ],
+    "title": "AllowanceIn",
+    "type": "object"
+   },
+   "AllowanceOut": {
+    "properties": {
+     "plan_key": {
+      "title": "Plan Key",
+      "type": "string"
+     },
+     "plan_name": {
+      "title": "Plan Name",
+      "type": "string"
+     },
+     "questions_per_month": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Questions Per Month"
+     }
+    },
+    "required": [
+     "plan_key",
+     "plan_name",
+     "questions_per_month"
+    ],
+    "title": "AllowanceOut",
+    "type": "object"
+   },
+   "AllowancesIn": {
+    "properties": {
+     "allowances": {
+      "items": {
+       "$ref": "#/components/schemas/AllowanceIn"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Allowances",
+      "type": "array"
+     }
+    },
+    "required": [
+     "allowances"
+    ],
+    "title": "AllowancesIn",
     "type": "object"
    },
    "AnnouncementIn": {
@@ -471,6 +636,28 @@
     "title": "AnnouncementPatch",
     "type": "object"
    },
+   "AnswerOut": {
+    "properties": {
+     "answer": {
+      "$ref": "#/components/schemas/MessageOut"
+     },
+     "conversation_id": {
+      "format": "uuid",
+      "title": "Conversation Id",
+      "type": "string"
+     },
+     "question": {
+      "$ref": "#/components/schemas/MessageOut"
+     }
+    },
+    "required": [
+     "conversation_id",
+     "question",
+     "answer"
+    ],
+    "title": "AnswerOut",
+    "type": "object"
+   },
    "ApprovalItem": {
     "properties": {
      "clock_in_at": {
@@ -636,6 +823,33 @@
      "items"
     ],
     "title": "ApprovalsOut",
+    "type": "object"
+   },
+   "AskIn": {
+    "properties": {
+     "conversation_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conversation Id"
+     },
+     "question": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Question",
+      "type": "string"
+     }
+    },
+    "required": [
+     "question"
+    ],
+    "title": "AskIn",
     "type": "object"
    },
    "AttendanceDay": {
@@ -1179,6 +1393,23 @@
     "title": "BranchPatch",
     "type": "object"
    },
+   "BriefOut": {
+    "properties": {
+     "message": {
+      "$ref": "#/components/schemas/MessageOut"
+     },
+     "week_of": {
+      "title": "Week Of",
+      "type": "string"
+     }
+    },
+    "required": [
+     "week_of",
+     "message"
+    ],
+    "title": "BriefOut",
+    "type": "object"
+   },
    "CalendarEntry": {
     "properties": {
      "color": {
@@ -1519,6 +1750,32 @@
      "created_at"
     ],
     "title": "CommentOut",
+    "type": "object"
+   },
+   "ConversationOut": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "messages": {
+      "items": {
+       "$ref": "#/components/schemas/MessageOut"
+      },
+      "title": "Messages",
+      "type": "array"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "title"
+    ],
+    "title": "ConversationOut",
     "type": "object"
    },
    "CorrectionIn": {
@@ -4506,6 +4763,38 @@
     "title": "MemberPatch",
     "type": "object"
    },
+   "MessageOut": {
+    "properties": {
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "role": {
+      "title": "Role",
+      "type": "string"
+     },
+     "sources": {
+      "items": {
+       "$ref": "#/components/schemas/SourceOut"
+      },
+      "title": "Sources",
+      "type": "array"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "role",
+     "text",
+     "sources"
+    ],
+    "title": "MessageOut",
+    "type": "object"
+   },
    "MfaSetupOut": {
     "properties": {
      "otpauth_uri": {
@@ -4756,6 +5045,19 @@
     "title": "OnboardingRunOut",
     "type": "object"
    },
+   "OperatorMe": {
+    "properties": {
+     "operator": {
+      "title": "Operator",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "operator"
+    ],
+    "title": "OperatorMe",
+    "type": "object"
+   },
    "OverviewOut": {
     "properties": {
      "attendance": {
@@ -4932,6 +5234,45 @@
      "items"
     ],
     "title": "Page[RecordOut]",
+    "type": "object"
+   },
+   "PassageOut": {
+    "properties": {
+     "category": {
+      "title": "Category",
+      "type": "string"
+     },
+     "document_id": {
+      "format": "uuid",
+      "title": "Document Id",
+      "type": "string"
+     },
+     "link": {
+      "title": "Link",
+      "type": "string"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "document_id",
+     "title",
+     "category",
+     "version",
+     "text",
+     "link"
+    ],
+    "title": "PassageOut",
     "type": "object"
    },
    "PasswordChangeIn": {
@@ -7760,6 +8101,41 @@
     "title": "SignupIn",
     "type": "object"
    },
+   "SourceOut": {
+    "properties": {
+     "capability": {
+      "title": "Capability",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "link": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Link"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "n",
+     "capability",
+     "label",
+     "link"
+    ],
+    "title": "SourceOut",
+    "type": "object"
+   },
    "StaffIn": {
     "additionalProperties": false,
     "properties": {
@@ -9749,6 +10125,68 @@
     ]
    }
   },
+  "/v1/ai/ask": {
+   "post": {
+    "operationId": "ask_v1_ai_ask_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AskIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AnswerOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ask",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/brief": {
+   "post": {
+    "operationId": "weekly_brief_v1_ai_brief_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BriefOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Weekly Brief",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
   "/v1/ai/capabilities": {
    "get": {
     "operationId": "capabilities_v1_ai_capabilities_get",
@@ -9832,6 +10270,170 @@
      }
     },
     "summary": "Context",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/conversations": {
+   "get": {
+    "operationId": "conversations_v1_ai_conversations_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ConversationOut"
+         },
+         "title": "Response Conversations V1 Ai Conversations Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Conversations",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/conversations/{conversation_id}": {
+   "delete": {
+    "operationId": "forget_v1_ai_conversations__conversation_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "conversation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Conversation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Forget",
+    "tags": [
+     "ai"
+    ]
+   },
+   "get": {
+    "operationId": "conversation_v1_ai_conversations__conversation_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "conversation_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Conversation Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ConversationOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Conversation",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/settings": {
+   "put": {
+    "operationId": "save_settings_v1_ai_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AISettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AIStatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Settings",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/status": {
+   "get": {
+    "operationId": "status_v1_ai_status_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AIStatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Status",
     "tags": [
      "ai"
     ]
@@ -12305,6 +12907,66 @@
     ]
    }
   },
+  "/v1/documents/search": {
+   "get": {
+    "operationId": "search_v1_documents_search_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": true,
+      "schema": {
+       "maxLength": 300,
+       "minLength": 1,
+       "title": "Q",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 5,
+       "maximum": 20,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PassageOut"
+         },
+         "title": "Response Search V1 Documents Search Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Search",
+    "tags": [
+     "documents"
+    ]
+   }
+  },
   "/v1/documents/to-acknowledge": {
    "get": {
     "operationId": "to_acknowledge_v1_documents_to_acknowledge_get",
@@ -14503,6 +15165,95 @@
     "summary": "Update Template",
     "tags": [
      "tasks"
+    ]
+   }
+  },
+  "/v1/operator/ai-allowances": {
+   "get": {
+    "operationId": "allowances_v1_operator_ai_allowances_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AllowanceOut"
+         },
+         "title": "Response Allowances V1 Operator Ai Allowances Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Allowances",
+    "tags": [
+     "operator"
+    ]
+   },
+   "put": {
+    "operationId": "save_allowances_v1_operator_ai_allowances_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AllowancesIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/AllowanceOut"
+         },
+         "title": "Response Save Allowances V1 Operator Ai Allowances Put",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Allowances",
+    "tags": [
+     "operator"
+    ]
+   }
+  },
+  "/v1/operator/me": {
+   "get": {
+    "operationId": "operator_me_v1_operator_me_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OperatorMe"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Operator Me",
+    "tags": [
+     "operator"
     ]
    }
   },
