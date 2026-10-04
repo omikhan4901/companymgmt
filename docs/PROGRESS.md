@@ -1,7 +1,7 @@
 # Progress
 
 Current work: **the owner's 2026-10-04 plan** (below). The marketing site and M6 (AI
-copilot) are done; M7 is built but untested (speed mode, `docs/UNTESTED.md`); next is M8 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
+copilot) are done; M7 and M8 are built but untested (speed mode, `docs/UNTESTED.md`); next is M9 → M7 → M8 → M9 → M10 → M11, then a legal review. M5 (Paddle billing) is
 on hold. Going live still waits on the owner's cloud accounts (`runbooks/deploy.md`).
 
 ## Owner decisions, 2026-10-04 (follow these)
@@ -302,6 +302,26 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
   automations (the AI drafting; the editor is always there for owners and admins),
   signals.
 
+## M8: built, not yet tested (shop pack)
+
+- **Taxes are the workspace's own** (owner decision): any number of rates with names,
+  codes for returns, inclusive or exclusive prices, compound taxes applied in order,
+  defaults for new items, cash rounding. Nothing country-specific is built in.
+- **The till** (`/app/pos`): open the drawer with a float, big item buttons, other
+  items typed in, cash and change, credit to a customer, receipts printed by the
+  browser (80 mm), sales made offline kept on the device and sent later (the server
+  keeps each once by its `client_id`). Closing the drawer compares counted cash with
+  what should be there (sales, refunds and drawer expenses).
+- **Sales**: by day, returns (cash or to the customer's account), voids with a reason,
+  a period summary with tax by rate for the accountant, best sellers, by seller.
+- **Customers and dues**: balances, credit limits, payments, adjustments with a note,
+  statements to print, reminders to share on WhatsApp.
+- **Expenses**: categories (seeded, editable), receipt photos, petty cash with top-ups,
+  cash taken from the drawer counted at closing.
+- Cash only for now (owner decision). Bluetooth/USB printers later.
+- **Not built yet:** cashier PINs on a shared till (needs device binding and lockouts;
+  do it with M11's security work); a screen to fix offline sales the server refused.
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -326,3 +346,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-04: Marketing site restyled in the ResumeX look. Owner's M6–M11 decisions recorded; developer platform and easy onboarding added to M10.
 - 2026-10-04: M6 done: Gemini behind a port, switched on by a key; per-workspace opt-in and features; operator allowances with notifications; Ask with cited sources; document search; weekly brief.
 - 2026-10-04: Owner switched to speed mode (code and unit tests, lint and types only; `docs/UNTESTED.md`). M7 built: actions with confirmation, writing help, automations, signals.
+- 2026-10-04: M8 built: configurable taxes, the till with offline sales, receipts, returns and voids, dues, expenses.
