@@ -13,15 +13,15 @@ from app.modules.accounting.schemas import (
     AccountIn,
     AccountOut,
     BalanceSheetOut,
+    BooksSettingsIn,
+    BooksSettingsOut,
     EntryIn,
-    EntryOut,
+    JournalEntryOut,
     LedgerOut,
     ProfitLossOut,
-    SettingsIn,
-    SettingsOut,
     TaxReturnOut,
-    TemplateIn,
-    TemplateOut,
+    TaxTemplateIn,
+    TaxTemplateOut,
     TrialBalanceOut,
 )
 from app.modules.platform.deps import Ctx, allow
@@ -49,13 +49,13 @@ async def save_account(account_id: uuid.UUID, body: AccountIn, ctx: Ctx = Manage
     return await service.save_account(ctx, body, account_id)
 
 
-@router.get("/settings", response_model=SettingsOut)
-async def get_settings(ctx: Ctx = View) -> SettingsOut:
+@router.get("/settings", response_model=BooksSettingsOut)
+async def get_settings(ctx: Ctx = View) -> BooksSettingsOut:
     return await service.get_settings(ctx)
 
 
-@router.put("/settings", response_model=SettingsOut)
-async def save_settings(body: SettingsIn, ctx: Ctx = Manage) -> SettingsOut:
+@router.put("/settings", response_model=BooksSettingsOut)
+async def save_settings(body: BooksSettingsIn, ctx: Ctx = Manage) -> BooksSettingsOut:
     return await service.save_settings(ctx, body)
 
 
@@ -65,22 +65,22 @@ async def backfill(ctx: Ctx = Manage) -> dict[str, int]:
     return {"entries": await service.run_backfill(ctx)}
 
 
-@router.get("/entries", response_model=list[EntryOut])
+@router.get("/entries", response_model=list[JournalEntryOut])
 async def entries(
     start: Annotated[date | None, Query(alias="from")] = None,
     end: Annotated[date | None, Query(alias="to")] = None,
     ctx: Ctx = View,
-) -> list[EntryOut]:
+) -> list[JournalEntryOut]:
     return await service.entries(ctx, start=start, end=end)
 
 
-@router.post("/entries", response_model=EntryOut, status_code=201)
-async def post_entry(body: EntryIn, ctx: Ctx = Manage) -> EntryOut:
+@router.post("/entries", response_model=JournalEntryOut, status_code=201)
+async def post_entry(body: EntryIn, ctx: Ctx = Manage) -> JournalEntryOut:
     return await service.post_manual(ctx, body)
 
 
-@router.post("/entries/{entry_id}/reverse", response_model=EntryOut, status_code=201)
-async def reverse(entry_id: uuid.UUID, ctx: Ctx = Manage) -> EntryOut:
+@router.post("/entries/{entry_id}/reverse", response_model=JournalEntryOut, status_code=201)
+async def reverse(entry_id: uuid.UUID, ctx: Ctx = Manage) -> JournalEntryOut:
     return await service.reverse_entry(ctx, entry_id)
 
 
@@ -109,18 +109,18 @@ async def cash_book(start: From, end: To, ctx: Ctx = View) -> LedgerOut:
     return await service.cash_book(ctx, start, end)
 
 
-@router.get("/tax-returns", response_model=list[TemplateOut])
-async def templates(ctx: Ctx = View) -> list[TemplateOut]:
+@router.get("/tax-returns", response_model=list[TaxTemplateOut])
+async def templates(ctx: Ctx = View) -> list[TaxTemplateOut]:
     return await service.templates(ctx)
 
 
-@router.post("/tax-returns", response_model=TemplateOut, status_code=201)
-async def create_template(body: TemplateIn, ctx: Ctx = Manage) -> TemplateOut:
+@router.post("/tax-returns", response_model=TaxTemplateOut, status_code=201)
+async def create_template(body: TaxTemplateIn, ctx: Ctx = Manage) -> TaxTemplateOut:
     return await service.save_template(ctx, body)
 
 
-@router.put("/tax-returns/{template_id}", response_model=TemplateOut)
-async def save_template(template_id: uuid.UUID, body: TemplateIn, ctx: Ctx = Manage) -> TemplateOut:
+@router.put("/tax-returns/{template_id}", response_model=TaxTemplateOut)
+async def save_template(template_id: uuid.UUID, body: TaxTemplateIn, ctx: Ctx = Manage) -> TaxTemplateOut:
     return await service.save_template(ctx, body, template_id)
 
 

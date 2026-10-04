@@ -3843,6 +3843,25 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** AdjustmentIn */
+        AdjustmentIn: {
+            /** Days */
+            days: number | string;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /**
+             * Leave Type Id
+             * Format: uuid
+             */
+            leave_type_id: string;
+            /** Reason */
+            reason: string;
+            /** Year */
+            year: number;
+        };
         /** AdjustmentOut */
         AdjustmentOut: {
             /**
@@ -4247,6 +4266,38 @@ export interface components {
             /** Total Liabilities */
             total_liabilities: number;
         };
+        /** BooksSettingsIn */
+        BooksSettingsIn: {
+            /** Expense Accounts */
+            expense_accounts?: {
+                [key: string]: string | null;
+            };
+            /** Locked Until */
+            locked_until?: string | null;
+            /** Tax Accounts */
+            tax_accounts?: {
+                [key: string]: {
+                    [key: string]: string | null;
+                };
+            };
+        };
+        /** BooksSettingsOut */
+        BooksSettingsOut: {
+            /** Expense Accounts */
+            expense_accounts: {
+                [key: string]: string;
+            };
+            /** Locked Until */
+            locked_until: string | null;
+            /** Tax Accounts */
+            tax_accounts: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+            /** Version */
+            version: number;
+        };
         /** Box */
         Box: {
             /** Code */
@@ -4575,17 +4626,6 @@ export interface components {
             /** Version */
             version: number;
         };
-        /** CountIn */
-        CountIn: {
-            /** Branch Id */
-            branch_id?: string | null;
-            /** Counted On */
-            counted_on?: string | null;
-            /** Lines */
-            lines: components["schemas"]["CountLineIn"][];
-            /** Note */
-            note?: string | null;
-        };
         /** CountLineIn */
         CountLineIn: {
             /** Counted */
@@ -4595,6 +4635,11 @@ export interface components {
              * Format: uuid
              */
             product_id: string;
+        };
+        /** CountOut */
+        CountOut: {
+            /** Count */
+            count: number;
         };
         /** CurrentWorkspace */
         CurrentWorkspace: {
@@ -5154,6 +5199,37 @@ export interface components {
             /** Description */
             description?: string | null;
         };
+        /** EntryOut */
+        EntryOut: {
+            /** Amount */
+            amount: number;
+            /** Balance */
+            balance: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "sale" | "return" | "payment" | "adjustment";
+            /** Note */
+            note: string | null;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /** Sale Id */
+            sale_id: string | null;
+        };
         /** EventInfo */
         EventInfo: {
             /** About A Person */
@@ -5524,6 +5600,49 @@ export interface components {
              */
             track: boolean;
         };
+        /** JournalEntryOut */
+        JournalEntryOut: {
+            /**
+             * Entry Date
+             * Format: date
+             */
+            entry_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: components["schemas"]["JournalLineOut"][];
+            /** Memo */
+            memo: string;
+            /** Number */
+            number: number;
+            /** Reversed By */
+            reversed_by: string | null;
+            /** Source Id */
+            source_id: string | null;
+            /** Source Type */
+            source_type: string | null;
+        };
+        /** JournalLineOut */
+        JournalLineOut: {
+            /** Account Code */
+            account_code: string;
+            /**
+             * Account Id
+             * Format: uuid
+             */
+            account_id: string;
+            /** Account Name */
+            account_name: string;
+            /** Credit */
+            credit: number;
+            /** Debit */
+            debit: number;
+            /** Description */
+            description: string | null;
+        };
         /** LeaveByType */
         LeaveByType: {
             /** Color */
@@ -5726,6 +5845,37 @@ export interface components {
             tax_rate_ids?: string[] | null;
             /** Unit Price */
             unit_price?: number | null;
+        };
+        /** LineOut */
+        LineOut: {
+            /** Discount */
+            discount: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Net */
+            net: number;
+            /** Product Id */
+            product_id: string | null;
+            /** Quantity */
+            quantity: string;
+            /**
+             * Returned
+             * @default 0
+             */
+            returned: string;
+            /** Tax */
+            tax: number;
+            /** Taxes */
+            taxes: components["schemas"]["LineTaxOut"][];
+            /** Total */
+            total: number;
+            /** Unit Price */
+            unit_price: number;
         };
         /** LineTaxOut */
         LineTaxOut: {
@@ -7321,7 +7471,7 @@ export interface components {
              */
             kind: "sale" | "return";
             /** Lines */
-            lines: components["schemas"]["app__modules__sales__schemas__LineOut"][];
+            lines: components["schemas"]["LineOut"][];
             /** Net */
             net: number;
             /** Note */
@@ -7439,6 +7589,44 @@ export interface components {
             last_seen_at: string;
             /** User Agent */
             user_agent: string | null;
+        };
+        /** SettingsIn */
+        SettingsIn: {
+            /** Day Starts At */
+            day_starts_at?: string | null;
+            /** Late After Minutes */
+            late_after_minutes?: number | null;
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /**
+             * Max Accuracy M
+             * @default 100
+             */
+            max_accuracy_m: number;
+        };
+        /** SettingsOut */
+        SettingsOut: {
+            /** Branches Located */
+            branches_located: number;
+            /** Branches Total */
+            branches_total: number;
+            /**
+             * Day Starts At
+             * Format: time
+             */
+            day_starts_at: string;
+            /** Late After Minutes */
+            late_after_minutes: number;
+            /**
+             * Location Mode
+             * @enum {string}
+             */
+            location_mode: "off" | "record" | "require";
+            /** Max Accuracy M */
+            max_accuracy_m: number;
         };
         /** ShopSettingsIn */
         ShopSettingsIn: {
@@ -7606,7 +7794,7 @@ export interface components {
             /** End */
             end: string | null;
             /** Entries */
-            entries: components["schemas"]["app__modules__customers__schemas__EntryOut"][];
+            entries: components["schemas"]["EntryOut"][];
             /** Opening */
             opening: number;
             /** Start */
@@ -7628,6 +7816,54 @@ export interface components {
             open_record: components["schemas"]["RecordOut"] | null;
             /** Today Minutes */
             today_minutes: number;
+        };
+        /** StockAdjustmentIn */
+        StockAdjustmentIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+            /** Reason */
+            reason: string;
+        };
+        /** StockCountIn */
+        StockCountIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /** Counted On */
+            counted_on?: string | null;
+            /** Lines */
+            lines: components["schemas"]["CountLineIn"][];
+            /** Note */
+            note?: string | null;
+        };
+        /** StockCountOut */
+        StockCountOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /**
+             * Counted On
+             * Format: date
+             */
+            counted_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lines */
+            lines: {
+                [key: string]: unknown;
+            }[];
+            /** Note */
+            note: string | null;
+            /** Value */
+            value: number;
         };
         /** StockOut */
         StockOut: {
@@ -8281,10 +8517,47 @@ export interface components {
              */
             tax_free: number;
         };
+        /** TaxTemplateIn */
+        TaxTemplateIn: {
+            /** Boxes */
+            boxes: components["schemas"]["Box"][];
+            /** Name */
+            name: string;
+            /** Note */
+            note?: string | null;
+        };
+        /** TaxTemplateOut */
+        TaxTemplateOut: {
+            /** Boxes */
+            boxes: components["schemas"]["Box"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Note */
+            note: string | null;
+            /** Version */
+            version: number;
+        };
         /** TempPasswordOut */
         TempPasswordOut: {
             /** Temporary Password */
             temporary_password: string;
+        };
+        /** TemplateIn */
+        TemplateIn: {
+            /**
+             * Automatic
+             * @default false
+             */
+            automatic: boolean;
+            /** Items */
+            items?: components["schemas"]["TemplateItem"][];
+            /** Name */
+            name: string;
         };
         /** TemplateItem */
         TemplateItem: {
@@ -8305,6 +8578,24 @@ export interface components {
              * @enum {string}
              */
             who: "joiner" | "manager";
+        };
+        /** TemplateOut */
+        TemplateOut: {
+            /** Automatic */
+            automatic: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** Name */
+            name: string;
+            /** Version */
+            version: number;
         };
         /** TimesheetOut */
         TimesheetOut: {
@@ -8547,297 +8838,6 @@ export interface components {
         WriteOut: {
             /** Text */
             text: string;
-        };
-        /** EntryOut */
-        app__modules__accounting__schemas__EntryOut: {
-            /**
-             * Entry Date
-             * Format: date
-             */
-            entry_date: string;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Lines */
-            lines: components["schemas"]["app__modules__accounting__schemas__LineOut"][];
-            /** Memo */
-            memo: string;
-            /** Number */
-            number: number;
-            /** Reversed By */
-            reversed_by: string | null;
-            /** Source Id */
-            source_id: string | null;
-            /** Source Type */
-            source_type: string | null;
-        };
-        /** LineOut */
-        app__modules__accounting__schemas__LineOut: {
-            /** Account Code */
-            account_code: string;
-            /**
-             * Account Id
-             * Format: uuid
-             */
-            account_id: string;
-            /** Account Name */
-            account_name: string;
-            /** Credit */
-            credit: number;
-            /** Debit */
-            debit: number;
-            /** Description */
-            description: string | null;
-        };
-        /** SettingsIn */
-        app__modules__accounting__schemas__SettingsIn: {
-            /** Expense Accounts */
-            expense_accounts?: {
-                [key: string]: string | null;
-            };
-            /** Locked Until */
-            locked_until?: string | null;
-            /** Tax Accounts */
-            tax_accounts?: {
-                [key: string]: {
-                    [key: string]: string | null;
-                };
-            };
-        };
-        /** SettingsOut */
-        app__modules__accounting__schemas__SettingsOut: {
-            /** Expense Accounts */
-            expense_accounts: {
-                [key: string]: string;
-            };
-            /** Locked Until */
-            locked_until: string | null;
-            /** Tax Accounts */
-            tax_accounts: {
-                [key: string]: {
-                    [key: string]: string;
-                };
-            };
-            /** Version */
-            version: number;
-        };
-        /** TemplateIn */
-        app__modules__accounting__schemas__TemplateIn: {
-            /** Boxes */
-            boxes: components["schemas"]["Box"][];
-            /** Name */
-            name: string;
-            /** Note */
-            note?: string | null;
-        };
-        /** TemplateOut */
-        app__modules__accounting__schemas__TemplateOut: {
-            /** Boxes */
-            boxes: components["schemas"]["Box"][];
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Note */
-            note: string | null;
-            /** Version */
-            version: number;
-        };
-        /** CountOut */
-        app__modules__approvals__schemas__CountOut: {
-            /** Count */
-            count: number;
-        };
-        /** SettingsIn */
-        app__modules__attendance__schemas__SettingsIn: {
-            /** Day Starts At */
-            day_starts_at?: string | null;
-            /** Late After Minutes */
-            late_after_minutes?: number | null;
-            /**
-             * Location Mode
-             * @enum {string}
-             */
-            location_mode: "off" | "record" | "require";
-            /**
-             * Max Accuracy M
-             * @default 100
-             */
-            max_accuracy_m: number;
-        };
-        /** SettingsOut */
-        app__modules__attendance__schemas__SettingsOut: {
-            /** Branches Located */
-            branches_located: number;
-            /** Branches Total */
-            branches_total: number;
-            /**
-             * Day Starts At
-             * Format: time
-             */
-            day_starts_at: string;
-            /** Late After Minutes */
-            late_after_minutes: number;
-            /**
-             * Location Mode
-             * @enum {string}
-             */
-            location_mode: "off" | "record" | "require";
-            /** Max Accuracy M */
-            max_accuracy_m: number;
-        };
-        /** EntryOut */
-        app__modules__customers__schemas__EntryOut: {
-            /** Amount */
-            amount: number;
-            /** Balance */
-            balance: number;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Kind
-             * @enum {string}
-             */
-            kind: "sale" | "return" | "payment" | "adjustment";
-            /** Note */
-            note: string | null;
-            /**
-             * Occurred On
-             * Format: date
-             */
-            occurred_on: string;
-            /** Sale Id */
-            sale_id: string | null;
-        };
-        /** AdjustmentIn */
-        app__modules__inventory__schemas__AdjustmentIn: {
-            /** Branch Id */
-            branch_id?: string | null;
-            /**
-             * Product Id
-             * Format: uuid
-             */
-            product_id: string;
-            /** Quantity */
-            quantity: number | string;
-            /** Reason */
-            reason: string;
-        };
-        /** CountOut */
-        app__modules__inventory__schemas__CountOut: {
-            /** Branch Id */
-            branch_id: string | null;
-            /**
-             * Counted On
-             * Format: date
-             */
-            counted_on: string;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Lines */
-            lines: {
-                [key: string]: unknown;
-            }[];
-            /** Note */
-            note: string | null;
-            /** Value */
-            value: number;
-        };
-        /** AdjustmentIn */
-        app__modules__leave__schemas__AdjustmentIn: {
-            /** Days */
-            days: number | string;
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /**
-             * Leave Type Id
-             * Format: uuid
-             */
-            leave_type_id: string;
-            /** Reason */
-            reason: string;
-            /** Year */
-            year: number;
-        };
-        /** LineOut */
-        app__modules__sales__schemas__LineOut: {
-            /** Discount */
-            discount: number;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Net */
-            net: number;
-            /** Product Id */
-            product_id: string | null;
-            /** Quantity */
-            quantity: string;
-            /**
-             * Returned
-             * @default 0
-             */
-            returned: string;
-            /** Tax */
-            tax: number;
-            /** Taxes */
-            taxes: components["schemas"]["LineTaxOut"][];
-            /** Total */
-            total: number;
-            /** Unit Price */
-            unit_price: number;
-        };
-        /** TemplateIn */
-        app__modules__tasks__schemas__TemplateIn: {
-            /**
-             * Automatic
-             * @default false
-             */
-            automatic: boolean;
-            /** Items */
-            items?: components["schemas"]["TemplateItem"][];
-            /** Name */
-            name: string;
-        };
-        /** TemplateOut */
-        app__modules__tasks__schemas__TemplateOut: {
-            /** Automatic */
-            automatic: boolean;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Items */
-            items: {
-                [key: string]: unknown;
-            }[];
-            /** Name */
-            name: string;
-            /** Version */
-            version: number;
         };
     };
     responses: never;
@@ -9083,7 +9083,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"][];
+                    "application/json": components["schemas"]["JournalEntryOut"][];
                 };
             };
             /** @description Validation Error */
@@ -9116,7 +9116,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"];
+                    "application/json": components["schemas"]["JournalEntryOut"];
                 };
             };
             /** @description Validation Error */
@@ -9147,7 +9147,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__EntryOut"];
+                    "application/json": components["schemas"]["JournalEntryOut"];
                 };
             };
             /** @description Validation Error */
@@ -9242,7 +9242,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsOut"];
+                    "application/json": components["schemas"]["BooksSettingsOut"];
                 };
             };
         };
@@ -9256,7 +9256,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsIn"];
+                "application/json": components["schemas"]["BooksSettingsIn"];
             };
         };
         responses: {
@@ -9266,7 +9266,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__SettingsOut"];
+                    "application/json": components["schemas"]["BooksSettingsOut"];
                 };
             };
             /** @description Validation Error */
@@ -9295,7 +9295,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"][];
+                    "application/json": components["schemas"]["TaxTemplateOut"][];
                 };
             };
         };
@@ -9309,7 +9309,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateIn"];
+                "application/json": components["schemas"]["TaxTemplateIn"];
             };
         };
         responses: {
@@ -9319,7 +9319,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"];
+                    "application/json": components["schemas"]["TaxTemplateOut"];
                 };
             };
             /** @description Validation Error */
@@ -9344,7 +9344,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateIn"];
+                "application/json": components["schemas"]["TaxTemplateIn"];
             };
         };
         responses: {
@@ -9354,7 +9354,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__accounting__schemas__TemplateOut"];
+                    "application/json": components["schemas"]["TaxTemplateOut"];
                 };
             };
             /** @description Validation Error */
@@ -10127,7 +10127,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__approvals__schemas__CountOut"];
+                    "application/json": components["schemas"]["CountOut"];
                 };
             };
         };
@@ -10637,7 +10637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsOut"];
+                    "application/json": components["schemas"]["SettingsOut"];
                 };
             };
         };
@@ -10651,7 +10651,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsIn"];
+                "application/json": components["schemas"]["SettingsIn"];
             };
         };
         responses: {
@@ -10661,7 +10661,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__attendance__schemas__SettingsOut"];
+                    "application/json": components["schemas"]["SettingsOut"];
                 };
             };
             /** @description Validation Error */
@@ -12724,7 +12724,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__inventory__schemas__AdjustmentIn"];
+                "application/json": components["schemas"]["StockAdjustmentIn"];
             };
         };
         responses: {
@@ -12757,7 +12757,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CountIn"];
+                "application/json": components["schemas"]["StockCountIn"];
             };
         };
         responses: {
@@ -12767,7 +12767,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__inventory__schemas__CountOut"];
+                    "application/json": components["schemas"]["StockCountOut"];
                 };
             };
             /** @description Validation Error */
@@ -13350,7 +13350,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__leave__schemas__AdjustmentIn"];
+                "application/json": components["schemas"]["AdjustmentIn"];
             };
         };
         responses: {
@@ -14286,7 +14286,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"][];
+                    "application/json": components["schemas"]["TemplateOut"][];
                 };
             };
         };
@@ -14300,7 +14300,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateIn"];
+                "application/json": components["schemas"]["TemplateIn"];
             };
         };
         responses: {
@@ -14310,7 +14310,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"];
+                    "application/json": components["schemas"]["TemplateOut"];
                 };
             };
             /** @description Validation Error */
@@ -14335,7 +14335,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateIn"];
+                "application/json": components["schemas"]["TemplateIn"];
             };
         };
         responses: {
@@ -14345,7 +14345,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__tasks__schemas__TemplateOut"];
+                    "application/json": components["schemas"]["TemplateOut"];
                 };
             };
             /** @description Validation Error */

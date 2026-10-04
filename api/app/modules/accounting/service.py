@@ -33,19 +33,19 @@ from app.modules.accounting.schemas import (
     AccountIn,
     AccountOut,
     BalanceSheetOut,
+    BooksSettingsIn,
+    BooksSettingsOut,
     BoxOut,
     EntryIn,
-    EntryOut,
+    JournalEntryOut,
+    JournalLineOut,
     LedgerOut,
     LedgerRow,
-    LineOut,
     ProfitLossOut,
     ReportRow,
-    SettingsIn,
-    SettingsOut,
     TaxReturnOut,
-    TemplateIn,
-    TemplateOut,
+    TaxTemplateIn,
+    TaxTemplateOut,
     TrialBalanceOut,
 )
 from app.modules.customers.models import Customer, CustomerEntry
@@ -611,8 +611,8 @@ async def save_account(ctx: Ctx, body: AccountIn, account_id: uuid.UUID | None =
     return _account_out(row)
 
 
-def _settings_out(s: AccountingSettings) -> SettingsOut:
-    return SettingsOut(
+def _settings_out(s: AccountingSettings) -> BooksSettingsOut:
+    return BooksSettingsOut(
         locked_until=s.locked_until,
         tax_accounts=s.tax_accounts or {},
         expense_accounts=s.expense_accounts or {},
@@ -620,12 +620,12 @@ def _settings_out(s: AccountingSettings) -> SettingsOut:
     )
 
 
-async def get_settings(ctx: Ctx) -> SettingsOut:
+async def get_settings(ctx: Ctx) -> BooksSettingsOut:
     ctx.require(access.VIEW)
     return _settings_out(await _settings(ctx.db))
 
 
-async def save_settings(ctx: Ctx, body: SettingsIn) -> SettingsOut:
+async def save_settings(ctx: Ctx, body: BooksSettingsIn) -> BooksSettingsOut:
     ctx.require(access.MANAGE)
     row = await _settings(ctx.db, lock=True)
     ids = {uuid.UUID(str(v)) for m in body.tax_accounts.values() for v in m.values() if v} | {
@@ -647,7 +647,7 @@ async def save_settings(ctx: Ctx, body: SettingsIn) -> SettingsOut:
     return _settings_out(row)
 
 
-async def _entry_out(ctx: Ctx, e: JournalEntry) -> EntryOut:
+async def _entry_out(ctx: Ctx, e: JournalEntry) -> JournalEntryOut:
     rows = (
         await ctx.db.execute(
             select(JournalLine, Account.code, Account.name)
@@ -656,7 +656,7 @@ async def _entry_out(ctx: Ctx, e: JournalEntry) -> EntryOut:
             .order_by(JournalLine.position)
         )
     ).all()
-    return EntryOut(
+    return JournalEntryOut(
         id=e.id,
         number=e.number,
         entry_date=e.entry_date,
@@ -665,7 +665,7 @@ async def _entry_out(ctx: Ctx, e: JournalEntry) -> EntryOut:
         source_id=e.source_id,
         reversed_by=e.reversed_by,
         lines=[
-            LineOut(
+            JournalLineOut(
                 account_id=line.account_id,
                 account_code=code,
                 account_name=name,
@@ -680,7 +680,7 @@ async def _entry_out(ctx: Ctx, e: JournalEntry) -> EntryOut:
 
 async def entries(
     ctx: Ctx, *, start: date | None = None, end: date | None = None, limit: int = 200
-) -> list[EntryOut]:
+) -> list[JournalEntryOut]:
     ctx.require(access.VIEW)
     query = select(JournalEntry)
     if start:
@@ -693,7 +693,7 @@ async def entries(
     return [await _entry_out(ctx, e) for e in rows]
 
 
-async def post_manual(ctx: Ctx, body: EntryIn) -> EntryOut:
+async def post_manual(ctx: Ctx, body: EntryIn) -> JournalEntryOut:
     ctx.require(access.MANAGE)
     settings = await _settings(ctx.db)
     if settings.locked_until and body.entry_date <= settings.locked_until:
@@ -718,7 +718,7 @@ async def post_manual(ctx: Ctx, body: EntryIn) -> EntryOut:
     return await _entry_out(ctx, entry)
 
 
-async def reverse_entry(ctx: Ctx, entry_id: uuid.UUID) -> EntryOut:
+async def reverse_entry(ctx: Ctx, entry_id: uuid.UUID) -> JournalEntryOut:
     ctx.require(access.MANAGE)
     assert ctx.tenant is not None
     entry = await ctx.db.scalar(select(JournalEntry).where(JournalEntry.id == entry_id).with_for_update())
@@ -930,11 +930,11 @@ async def cash_book(ctx: Ctx, start: date, end: date) -> LedgerOut:
 # ---- Tax returns ----------------------------------------------------------------------
 
 
-def _template_out(t: TaxReturnTemplate) -> TemplateOut:
-    return TemplateOut(id=t.id, name=t.name, boxes=t.boxes or [], note=t.note, version=t.version)
+def _template_out(t: TaxReturnTemplate) -> TaxTemplateOut:
+    return TaxTemplateOut(id=t.id, name=t.name, boxes=t.boxes or [], note=t.note, version=t.version)
 
 
-async def templates(ctx: Ctx) -> list[TemplateOut]:
+async def templates(ctx: Ctx) -> list[TaxTemplateOut]:
     ctx.require(access.VIEW)
     return [
         _template_out(t)
@@ -942,7 +942,9 @@ async def templates(ctx: Ctx) -> list[TemplateOut]:
     ]
 
 
-async def save_template(ctx: Ctx, body: TemplateIn, template_id: uuid.UUID | None = None) -> TemplateOut:
+async def save_template(
+    ctx: Ctx, body: TaxTemplateIn, template_id: uuid.UUID | None = None
+) -> TaxTemplateOut:
     ctx.require(access.MANAGE)
     codes = [b.code for b in body.boxes]
     if len(set(codes)) != len(codes):

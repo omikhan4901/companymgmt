@@ -33,7 +33,7 @@ class AccountOut(BaseModel):
     version: int
 
 
-class SettingsIn(In):
+class BooksSettingsIn(In):
     locked_until: date | None = None
     # {tax_rate_id: {"output": account_id, "input": account_id}}
     tax_accounts: dict[str, dict[Literal["output", "input"], uuid.UUID | None]] = Field(default_factory=dict)
@@ -41,7 +41,7 @@ class SettingsIn(In):
     expense_accounts: dict[str, uuid.UUID | None] = Field(default_factory=dict)
 
 
-class SettingsOut(BaseModel):
+class BooksSettingsOut(BaseModel):
     locked_until: date | None
     tax_accounts: dict[str, dict[str, str]]
     expense_accounts: dict[str, str]
@@ -67,7 +67,7 @@ class EntryIn(In):
     lines: list[EntryLineIn] = Field(min_length=2, max_length=200)
 
 
-class LineOut(BaseModel):
+class JournalLineOut(BaseModel):
     account_id: uuid.UUID
     account_code: str
     account_name: str
@@ -76,7 +76,7 @@ class LineOut(BaseModel):
     description: str | None
 
 
-class EntryOut(BaseModel):
+class JournalEntryOut(BaseModel):
     id: uuid.UUID
     number: int
     entry_date: date
@@ -84,7 +84,7 @@ class EntryOut(BaseModel):
     source_type: str | None
     source_id: uuid.UUID | None
     reversed_by: uuid.UUID | None
-    lines: list[LineOut]
+    lines: list[JournalLineOut]
 
 
 class ReportRow(BaseModel):
@@ -162,13 +162,13 @@ class Box(BaseModel):
     sources: list[BoxSource] = Field(default_factory=list, max_length=20)
 
 
-class TemplateIn(In):
+class TaxTemplateIn(In):
     name: Annotated[str, Field(min_length=1, max_length=120)]
     boxes: list[Box] = Field(min_length=1, max_length=100)
     note: str | None = Field(default=None, max_length=2000)
 
 
-class TemplateOut(BaseModel):
+class TaxTemplateOut(BaseModel):
     id: uuid.UUID
     name: str
     boxes: list[Box]

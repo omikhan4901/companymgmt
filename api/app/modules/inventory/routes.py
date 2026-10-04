@@ -10,14 +10,14 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from app.modules.inventory import access, service
 from app.modules.inventory.schemas import (
-    AdjustmentIn,
-    CountIn,
-    CountOut,
     ItemSettingsIn,
     MovementOut,
     OpeningIn,
     PurchaseIn,
     PurchaseOut,
+    StockAdjustmentIn,
+    StockCountIn,
+    StockCountOut,
     StockOut,
     SupplierIn,
     SupplierOut,
@@ -57,7 +57,7 @@ async def opening(body: OpeningIn, ctx: Ctx = Manage) -> StockOut:
 
 
 @router.post("/adjustments", response_model=StockOut, status_code=201)
-async def adjust(body: AdjustmentIn, ctx: Ctx = Manage) -> StockOut:
+async def adjust(body: StockAdjustmentIn, ctx: Ctx = Manage) -> StockOut:
     return await service.adjust(ctx, body)
 
 
@@ -86,8 +86,8 @@ async def transfer(body: TransferIn, ctx: Ctx = Manage) -> Response:
     return Response(status_code=204)
 
 
-@router.post("/counts", response_model=CountOut, status_code=201)
-async def count(body: CountIn, ctx: Ctx = Manage) -> CountOut:
+@router.post("/counts", response_model=StockCountOut, status_code=201)
+async def count(body: StockCountIn, ctx: Ctx = Manage) -> StockCountOut:
     return await service.count(ctx, body)
 
 

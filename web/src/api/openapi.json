@@ -417,6 +417,57 @@
     "title": "ActionOut",
     "type": "object"
    },
+   "AdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "days": {
+      "anyOf": [
+       {
+        "maximum": 366.0,
+        "minimum": -366.0,
+        "multipleOf": 0.5,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+        "type": "string"
+       }
+      ],
+      "title": "Days"
+     },
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "leave_type_id": {
+      "format": "uuid",
+      "title": "Leave Type Id",
+      "type": "string"
+     },
+     "reason": {
+      "maxLength": 300,
+      "minLength": 3,
+      "title": "Reason",
+      "type": "string"
+     },
+     "year": {
+      "maximum": 2100.0,
+      "minimum": 2000.0,
+      "title": "Year",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "employee_id",
+     "leave_type_id",
+     "year",
+     "days",
+     "reason"
+    ],
+    "title": "AdjustmentIn",
+    "type": "object"
+   },
    "AdjustmentOut": {
     "properties": {
      "created_at": {
@@ -1661,6 +1712,109 @@
     "title": "BalanceSheetOut",
     "type": "object"
    },
+   "BooksSettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "expense_accounts": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "format": "uuid",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Expense Accounts",
+      "type": "object"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     },
+     "tax_accounts": {
+      "additionalProperties": {
+       "additionalProperties": {
+        "anyOf": [
+         {
+          "format": "uuid",
+          "type": "string"
+         },
+         {
+          "type": "null"
+         }
+        ]
+       },
+       "propertyNames": {
+        "enum": [
+         "output",
+         "input"
+        ]
+       },
+       "type": "object"
+      },
+      "title": "Tax Accounts",
+      "type": "object"
+     }
+    },
+    "title": "BooksSettingsIn",
+    "type": "object"
+   },
+   "BooksSettingsOut": {
+    "properties": {
+     "expense_accounts": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "title": "Expense Accounts",
+      "type": "object"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     },
+     "tax_accounts": {
+      "additionalProperties": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": "object"
+      },
+      "title": "Tax Accounts",
+      "type": "object"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "locked_until",
+     "tax_accounts",
+     "expense_accounts",
+     "version"
+    ],
+    "title": "BooksSettingsOut",
+    "type": "object"
+   },
    "Box": {
     "properties": {
      "code": {
@@ -2705,61 +2859,6 @@
     "title": "CorrectionOut",
     "type": "object"
    },
-   "CountIn": {
-    "additionalProperties": false,
-    "properties": {
-     "branch_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Branch Id"
-     },
-     "counted_on": {
-      "anyOf": [
-       {
-        "format": "date",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Counted On"
-     },
-     "lines": {
-      "items": {
-       "$ref": "#/components/schemas/CountLineIn"
-      },
-      "maxItems": 2000,
-      "minItems": 1,
-      "title": "Lines",
-      "type": "array"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "maxLength": 1000,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     }
-    },
-    "required": [
-     "lines"
-    ],
-    "title": "CountIn",
-    "type": "object"
-   },
    "CountLineIn": {
     "additionalProperties": false,
     "properties": {
@@ -2788,6 +2887,19 @@
      "counted"
     ],
     "title": "CountLineIn",
+    "type": "object"
+   },
+   "CountOut": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "count"
+    ],
+    "title": "CountOut",
     "type": "object"
    },
    "CurrentWorkspace": {
@@ -4746,6 +4858,78 @@
     "title": "EntryLineIn",
     "type": "object"
    },
+   "EntryOut": {
+    "properties": {
+     "amount": {
+      "title": "Amount",
+      "type": "integer"
+     },
+     "balance": {
+      "title": "Balance",
+      "type": "integer"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "sale",
+       "return",
+       "payment",
+       "adjustment"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "occurred_on": {
+      "format": "date",
+      "title": "Occurred On",
+      "type": "string"
+     },
+     "sale_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sale Id"
+     }
+    },
+    "required": [
+     "id",
+     "kind",
+     "amount",
+     "occurred_on",
+     "sale_id",
+     "note",
+     "created_at",
+     "balance"
+    ],
+    "title": "EntryOut",
+    "type": "object"
+   },
    "EventInfo": {
     "properties": {
      "about_a_person": {
@@ -5775,6 +5959,128 @@
     "title": "ItemSettingsIn",
     "type": "object"
    },
+   "JournalEntryOut": {
+    "properties": {
+     "entry_date": {
+      "format": "date",
+      "title": "Entry Date",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/JournalLineOut"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "memo": {
+      "title": "Memo",
+      "type": "string"
+     },
+     "number": {
+      "title": "Number",
+      "type": "integer"
+     },
+     "reversed_by": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reversed By"
+     },
+     "source_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Id"
+     },
+     "source_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Type"
+     }
+    },
+    "required": [
+     "id",
+     "number",
+     "entry_date",
+     "memo",
+     "source_type",
+     "source_id",
+     "reversed_by",
+     "lines"
+    ],
+    "title": "JournalEntryOut",
+    "type": "object"
+   },
+   "JournalLineOut": {
+    "properties": {
+     "account_code": {
+      "title": "Account Code",
+      "type": "string"
+     },
+     "account_id": {
+      "format": "uuid",
+      "title": "Account Id",
+      "type": "string"
+     },
+     "account_name": {
+      "title": "Account Name",
+      "type": "string"
+     },
+     "credit": {
+      "title": "Credit",
+      "type": "integer"
+     },
+     "debit": {
+      "title": "Debit",
+      "type": "integer"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     }
+    },
+    "required": [
+     "account_id",
+     "account_code",
+     "account_name",
+     "debit",
+     "credit",
+     "description"
+    ],
+    "title": "JournalLineOut",
+    "type": "object"
+   },
    "LeaveByType": {
     "properties": {
      "color": {
@@ -6344,6 +6650,83 @@
      }
     },
     "title": "LineIn",
+    "type": "object"
+   },
+   "LineOut": {
+    "properties": {
+     "discount": {
+      "title": "Discount",
+      "type": "integer"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "net": {
+      "title": "Net",
+      "type": "integer"
+     },
+     "product_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Product Id"
+     },
+     "quantity": {
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Quantity",
+      "type": "string"
+     },
+     "returned": {
+      "default": "0",
+      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+      "title": "Returned",
+      "type": "string"
+     },
+     "tax": {
+      "title": "Tax",
+      "type": "integer"
+     },
+     "taxes": {
+      "items": {
+       "$ref": "#/components/schemas/LineTaxOut"
+      },
+      "title": "Taxes",
+      "type": "array"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     },
+     "unit_price": {
+      "title": "Unit Price",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "product_id",
+     "name",
+     "quantity",
+     "unit_price",
+     "discount",
+     "net",
+     "tax",
+     "total",
+     "taxes"
+    ],
+    "title": "LineOut",
     "type": "object"
    },
    "LineTaxOut": {
@@ -11201,7 +11584,7 @@
      },
      "lines": {
       "items": {
-       "$ref": "#/components/schemas/app__modules__sales__schemas__LineOut"
+       "$ref": "#/components/schemas/LineOut"
       },
       "title": "Lines",
       "type": "array"
@@ -11544,6 +11927,101 @@
      "current"
     ],
     "title": "SessionOut",
+    "type": "object"
+   },
+   "SettingsIn": {
+    "additionalProperties": false,
+    "properties": {
+     "day_starts_at": {
+      "anyOf": [
+       {
+        "format": "time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Day Starts At"
+     },
+     "late_after_minutes": {
+      "anyOf": [
+       {
+        "maximum": 240.0,
+        "minimum": 0.0,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Late After Minutes"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "default": 100,
+      "maximum": 1000.0,
+      "minimum": 10.0,
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode"
+    ],
+    "title": "SettingsIn",
+    "type": "object"
+   },
+   "SettingsOut": {
+    "properties": {
+     "branches_located": {
+      "title": "Branches Located",
+      "type": "integer"
+     },
+     "branches_total": {
+      "title": "Branches Total",
+      "type": "integer"
+     },
+     "day_starts_at": {
+      "format": "time",
+      "title": "Day Starts At",
+      "type": "string"
+     },
+     "late_after_minutes": {
+      "title": "Late After Minutes",
+      "type": "integer"
+     },
+     "location_mode": {
+      "enum": [
+       "off",
+       "record",
+       "require"
+      ],
+      "title": "Location Mode",
+      "type": "string"
+     },
+     "max_accuracy_m": {
+      "title": "Max Accuracy M",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "location_mode",
+     "max_accuracy_m",
+     "day_starts_at",
+     "late_after_minutes",
+     "branches_total",
+     "branches_located"
+    ],
+    "title": "SettingsOut",
     "type": "object"
    },
    "ShopSettingsIn": {
@@ -12065,7 +12543,7 @@
      },
      "entries": {
       "items": {
-       "$ref": "#/components/schemas/app__modules__customers__schemas__EntryOut"
+       "$ref": "#/components/schemas/EntryOut"
       },
       "title": "Entries",
       "type": "array"
@@ -12141,6 +12619,169 @@
      "location_mode"
     ],
     "title": "StatusOut",
+    "type": "object"
+   },
+   "StockAdjustmentIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "product_id": {
+      "format": "uuid",
+      "title": "Product Id",
+      "type": "string"
+     },
+     "quantity": {
+      "anyOf": [
+       {
+        "maximum": 1000000000.0,
+        "minimum": -1000000000.0,
+        "type": "number"
+       },
+       {
+        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
+        "type": "string"
+       }
+      ],
+      "title": "Quantity"
+     },
+     "reason": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+     }
+    },
+    "required": [
+     "product_id",
+     "quantity",
+     "reason"
+    ],
+    "title": "StockAdjustmentIn",
+    "type": "object"
+   },
+   "StockCountIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "counted_on": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Counted On"
+     },
+     "lines": {
+      "items": {
+       "$ref": "#/components/schemas/CountLineIn"
+      },
+      "maxItems": 2000,
+      "minItems": 1,
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "lines"
+    ],
+    "title": "StockCountIn",
+    "type": "object"
+   },
+   "StockCountOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "counted_on": {
+      "format": "date",
+      "title": "Counted On",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "lines": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Lines",
+      "type": "array"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "value": {
+      "title": "Value",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "branch_id",
+     "counted_on",
+     "lines",
+     "note",
+     "value"
+    ],
+    "title": "StockCountOut",
     "type": "object"
    },
    "StockOut": {
@@ -13937,6 +14578,88 @@
     "title": "TaxTable",
     "type": "object"
    },
+   "TaxTemplateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "boxes": {
+      "items": {
+       "$ref": "#/components/schemas/Box"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Boxes",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "name",
+     "boxes"
+    ],
+    "title": "TaxTemplateIn",
+    "type": "object"
+   },
+   "TaxTemplateOut": {
+    "properties": {
+     "boxes": {
+      "items": {
+       "$ref": "#/components/schemas/Box"
+      },
+      "title": "Boxes",
+      "type": "array"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "boxes",
+     "note",
+     "version"
+    ],
+    "title": "TaxTemplateOut",
+    "type": "object"
+   },
    "TempPasswordOut": {
     "properties": {
      "temporary_password": {
@@ -13948,6 +14671,34 @@
      "temporary_password"
     ],
     "title": "TempPasswordOut",
+    "type": "object"
+   },
+   "TemplateIn": {
+    "additionalProperties": false,
+    "properties": {
+     "automatic": {
+      "default": false,
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/TemplateItem"
+      },
+      "maxItems": 50,
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "maxLength": 120,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "TemplateIn",
     "type": "object"
    },
    "TemplateItem": {
@@ -14003,6 +14754,44 @@
      "title"
     ],
     "title": "TemplateItem",
+    "type": "object"
+   },
+   "TemplateOut": {
+    "properties": {
+     "automatic": {
+      "title": "Automatic",
+      "type": "boolean"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "items": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Items",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "automatic",
+     "items",
+     "version"
+    ],
+    "title": "TemplateOut",
     "type": "object"
    },
    "TimesheetOut": {
@@ -14727,795 +15516,6 @@
     ],
     "title": "WriteOut",
     "type": "object"
-   },
-   "app__modules__accounting__schemas__EntryOut": {
-    "properties": {
-     "entry_date": {
-      "format": "date",
-      "title": "Entry Date",
-      "type": "string"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "lines": {
-      "items": {
-       "$ref": "#/components/schemas/app__modules__accounting__schemas__LineOut"
-      },
-      "title": "Lines",
-      "type": "array"
-     },
-     "memo": {
-      "title": "Memo",
-      "type": "string"
-     },
-     "number": {
-      "title": "Number",
-      "type": "integer"
-     },
-     "reversed_by": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Reversed By"
-     },
-     "source_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Id"
-     },
-     "source_type": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Type"
-     }
-    },
-    "required": [
-     "id",
-     "number",
-     "entry_date",
-     "memo",
-     "source_type",
-     "source_id",
-     "reversed_by",
-     "lines"
-    ],
-    "title": "EntryOut",
-    "type": "object"
-   },
-   "app__modules__accounting__schemas__LineOut": {
-    "properties": {
-     "account_code": {
-      "title": "Account Code",
-      "type": "string"
-     },
-     "account_id": {
-      "format": "uuid",
-      "title": "Account Id",
-      "type": "string"
-     },
-     "account_name": {
-      "title": "Account Name",
-      "type": "string"
-     },
-     "credit": {
-      "title": "Credit",
-      "type": "integer"
-     },
-     "debit": {
-      "title": "Debit",
-      "type": "integer"
-     },
-     "description": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Description"
-     }
-    },
-    "required": [
-     "account_id",
-     "account_code",
-     "account_name",
-     "debit",
-     "credit",
-     "description"
-    ],
-    "title": "LineOut",
-    "type": "object"
-   },
-   "app__modules__accounting__schemas__SettingsIn": {
-    "additionalProperties": false,
-    "properties": {
-     "expense_accounts": {
-      "additionalProperties": {
-       "anyOf": [
-        {
-         "format": "uuid",
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ]
-      },
-      "title": "Expense Accounts",
-      "type": "object"
-     },
-     "locked_until": {
-      "anyOf": [
-       {
-        "format": "date",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Locked Until"
-     },
-     "tax_accounts": {
-      "additionalProperties": {
-       "additionalProperties": {
-        "anyOf": [
-         {
-          "format": "uuid",
-          "type": "string"
-         },
-         {
-          "type": "null"
-         }
-        ]
-       },
-       "propertyNames": {
-        "enum": [
-         "output",
-         "input"
-        ]
-       },
-       "type": "object"
-      },
-      "title": "Tax Accounts",
-      "type": "object"
-     }
-    },
-    "title": "SettingsIn",
-    "type": "object"
-   },
-   "app__modules__accounting__schemas__SettingsOut": {
-    "properties": {
-     "expense_accounts": {
-      "additionalProperties": {
-       "type": "string"
-      },
-      "title": "Expense Accounts",
-      "type": "object"
-     },
-     "locked_until": {
-      "anyOf": [
-       {
-        "format": "date",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Locked Until"
-     },
-     "tax_accounts": {
-      "additionalProperties": {
-       "additionalProperties": {
-        "type": "string"
-       },
-       "type": "object"
-      },
-      "title": "Tax Accounts",
-      "type": "object"
-     },
-     "version": {
-      "title": "Version",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "locked_until",
-     "tax_accounts",
-     "expense_accounts",
-     "version"
-    ],
-    "title": "SettingsOut",
-    "type": "object"
-   },
-   "app__modules__accounting__schemas__TemplateIn": {
-    "additionalProperties": false,
-    "properties": {
-     "boxes": {
-      "items": {
-       "$ref": "#/components/schemas/Box"
-      },
-      "maxItems": 100,
-      "minItems": 1,
-      "title": "Boxes",
-      "type": "array"
-     },
-     "name": {
-      "maxLength": 120,
-      "minLength": 1,
-      "title": "Name",
-      "type": "string"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "maxLength": 2000,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     }
-    },
-    "required": [
-     "name",
-     "boxes"
-    ],
-    "title": "TemplateIn",
-    "type": "object"
-   },
-   "app__modules__accounting__schemas__TemplateOut": {
-    "properties": {
-     "boxes": {
-      "items": {
-       "$ref": "#/components/schemas/Box"
-      },
-      "title": "Boxes",
-      "type": "array"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     },
-     "version": {
-      "title": "Version",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "name",
-     "boxes",
-     "note",
-     "version"
-    ],
-    "title": "TemplateOut",
-    "type": "object"
-   },
-   "app__modules__approvals__schemas__CountOut": {
-    "properties": {
-     "count": {
-      "title": "Count",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "count"
-    ],
-    "title": "CountOut",
-    "type": "object"
-   },
-   "app__modules__attendance__schemas__SettingsIn": {
-    "additionalProperties": false,
-    "properties": {
-     "day_starts_at": {
-      "anyOf": [
-       {
-        "format": "time",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Day Starts At"
-     },
-     "late_after_minutes": {
-      "anyOf": [
-       {
-        "maximum": 240.0,
-        "minimum": 0.0,
-        "type": "integer"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Late After Minutes"
-     },
-     "location_mode": {
-      "enum": [
-       "off",
-       "record",
-       "require"
-      ],
-      "title": "Location Mode",
-      "type": "string"
-     },
-     "max_accuracy_m": {
-      "default": 100,
-      "maximum": 1000.0,
-      "minimum": 10.0,
-      "title": "Max Accuracy M",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "location_mode"
-    ],
-    "title": "SettingsIn",
-    "type": "object"
-   },
-   "app__modules__attendance__schemas__SettingsOut": {
-    "properties": {
-     "branches_located": {
-      "title": "Branches Located",
-      "type": "integer"
-     },
-     "branches_total": {
-      "title": "Branches Total",
-      "type": "integer"
-     },
-     "day_starts_at": {
-      "format": "time",
-      "title": "Day Starts At",
-      "type": "string"
-     },
-     "late_after_minutes": {
-      "title": "Late After Minutes",
-      "type": "integer"
-     },
-     "location_mode": {
-      "enum": [
-       "off",
-       "record",
-       "require"
-      ],
-      "title": "Location Mode",
-      "type": "string"
-     },
-     "max_accuracy_m": {
-      "title": "Max Accuracy M",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "location_mode",
-     "max_accuracy_m",
-     "day_starts_at",
-     "late_after_minutes",
-     "branches_total",
-     "branches_located"
-    ],
-    "title": "SettingsOut",
-    "type": "object"
-   },
-   "app__modules__customers__schemas__EntryOut": {
-    "properties": {
-     "amount": {
-      "title": "Amount",
-      "type": "integer"
-     },
-     "balance": {
-      "title": "Balance",
-      "type": "integer"
-     },
-     "created_at": {
-      "format": "date-time",
-      "title": "Created At",
-      "type": "string"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "kind": {
-      "enum": [
-       "sale",
-       "return",
-       "payment",
-       "adjustment"
-      ],
-      "title": "Kind",
-      "type": "string"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     },
-     "occurred_on": {
-      "format": "date",
-      "title": "Occurred On",
-      "type": "string"
-     },
-     "sale_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Sale Id"
-     }
-    },
-    "required": [
-     "id",
-     "kind",
-     "amount",
-     "occurred_on",
-     "sale_id",
-     "note",
-     "created_at",
-     "balance"
-    ],
-    "title": "EntryOut",
-    "type": "object"
-   },
-   "app__modules__inventory__schemas__AdjustmentIn": {
-    "additionalProperties": false,
-    "properties": {
-     "branch_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Branch Id"
-     },
-     "product_id": {
-      "format": "uuid",
-      "title": "Product Id",
-      "type": "string"
-     },
-     "quantity": {
-      "anyOf": [
-       {
-        "maximum": 1000000000.0,
-        "minimum": -1000000000.0,
-        "type": "number"
-       },
-       {
-        "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,11}|(?=[\\d.]{1,15}0*$)\\d{0,11}\\.\\d{0,3}0*$)",
-        "type": "string"
-       }
-      ],
-      "title": "Quantity"
-     },
-     "reason": {
-      "maxLength": 500,
-      "minLength": 1,
-      "title": "Reason",
-      "type": "string"
-     }
-    },
-    "required": [
-     "product_id",
-     "quantity",
-     "reason"
-    ],
-    "title": "AdjustmentIn",
-    "type": "object"
-   },
-   "app__modules__inventory__schemas__CountOut": {
-    "properties": {
-     "branch_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Branch Id"
-     },
-     "counted_on": {
-      "format": "date",
-      "title": "Counted On",
-      "type": "string"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "lines": {
-      "items": {
-       "additionalProperties": true,
-       "type": "object"
-      },
-      "title": "Lines",
-      "type": "array"
-     },
-     "note": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Note"
-     },
-     "value": {
-      "title": "Value",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "branch_id",
-     "counted_on",
-     "lines",
-     "note",
-     "value"
-    ],
-    "title": "CountOut",
-    "type": "object"
-   },
-   "app__modules__leave__schemas__AdjustmentIn": {
-    "additionalProperties": false,
-    "properties": {
-     "days": {
-      "anyOf": [
-       {
-        "maximum": 366.0,
-        "minimum": -366.0,
-        "multipleOf": 0.5,
-        "type": "number"
-       },
-       {
-        "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-        "type": "string"
-       }
-      ],
-      "title": "Days"
-     },
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "leave_type_id": {
-      "format": "uuid",
-      "title": "Leave Type Id",
-      "type": "string"
-     },
-     "reason": {
-      "maxLength": 300,
-      "minLength": 3,
-      "title": "Reason",
-      "type": "string"
-     },
-     "year": {
-      "maximum": 2100.0,
-      "minimum": 2000.0,
-      "title": "Year",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "employee_id",
-     "leave_type_id",
-     "year",
-     "days",
-     "reason"
-    ],
-    "title": "AdjustmentIn",
-    "type": "object"
-   },
-   "app__modules__sales__schemas__LineOut": {
-    "properties": {
-     "discount": {
-      "title": "Discount",
-      "type": "integer"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "net": {
-      "title": "Net",
-      "type": "integer"
-     },
-     "product_id": {
-      "anyOf": [
-       {
-        "format": "uuid",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Product Id"
-     },
-     "quantity": {
-      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-      "title": "Quantity",
-      "type": "string"
-     },
-     "returned": {
-      "default": "0",
-      "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-      "title": "Returned",
-      "type": "string"
-     },
-     "tax": {
-      "title": "Tax",
-      "type": "integer"
-     },
-     "taxes": {
-      "items": {
-       "$ref": "#/components/schemas/LineTaxOut"
-      },
-      "title": "Taxes",
-      "type": "array"
-     },
-     "total": {
-      "title": "Total",
-      "type": "integer"
-     },
-     "unit_price": {
-      "title": "Unit Price",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "product_id",
-     "name",
-     "quantity",
-     "unit_price",
-     "discount",
-     "net",
-     "tax",
-     "total",
-     "taxes"
-    ],
-    "title": "LineOut",
-    "type": "object"
-   },
-   "app__modules__tasks__schemas__TemplateIn": {
-    "additionalProperties": false,
-    "properties": {
-     "automatic": {
-      "default": false,
-      "title": "Automatic",
-      "type": "boolean"
-     },
-     "items": {
-      "items": {
-       "$ref": "#/components/schemas/TemplateItem"
-      },
-      "maxItems": 50,
-      "title": "Items",
-      "type": "array"
-     },
-     "name": {
-      "maxLength": 120,
-      "title": "Name",
-      "type": "string"
-     }
-    },
-    "required": [
-     "name"
-    ],
-    "title": "TemplateIn",
-    "type": "object"
-   },
-   "app__modules__tasks__schemas__TemplateOut": {
-    "properties": {
-     "automatic": {
-      "title": "Automatic",
-      "type": "boolean"
-     },
-     "id": {
-      "format": "uuid",
-      "title": "Id",
-      "type": "string"
-     },
-     "items": {
-      "items": {
-       "additionalProperties": true,
-       "type": "object"
-      },
-      "title": "Items",
-      "type": "array"
-     },
-     "name": {
-      "title": "Name",
-      "type": "string"
-     },
-     "version": {
-      "title": "Version",
-      "type": "integer"
-     }
-    },
-    "required": [
-     "id",
-     "name",
-     "automatic",
-     "items",
-     "version"
-    ],
-    "title": "TemplateOut",
-    "type": "object"
    }
   }
  },
@@ -15859,7 +15859,7 @@
        "application/json": {
         "schema": {
          "items": {
-          "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+          "$ref": "#/components/schemas/JournalEntryOut"
          },
          "title": "Response Entries V1 Accounting Entries Get",
          "type": "array"
@@ -15901,7 +15901,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+         "$ref": "#/components/schemas/JournalEntryOut"
         }
        }
       },
@@ -15944,7 +15944,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__EntryOut"
+         "$ref": "#/components/schemas/JournalEntryOut"
         }
        }
       },
@@ -16091,7 +16091,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsOut"
+         "$ref": "#/components/schemas/BooksSettingsOut"
         }
        }
       },
@@ -16109,7 +16109,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsIn"
+        "$ref": "#/components/schemas/BooksSettingsIn"
        }
       }
      },
@@ -16120,7 +16120,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__SettingsOut"
+         "$ref": "#/components/schemas/BooksSettingsOut"
         }
        }
       },
@@ -16152,7 +16152,7 @@
        "application/json": {
         "schema": {
          "items": {
-          "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+          "$ref": "#/components/schemas/TaxTemplateOut"
          },
          "title": "Response Templates V1 Accounting Tax Returns Get",
          "type": "array"
@@ -16173,7 +16173,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateIn"
+        "$ref": "#/components/schemas/TaxTemplateIn"
        }
       }
      },
@@ -16184,7 +16184,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+         "$ref": "#/components/schemas/TaxTemplateOut"
         }
        }
       },
@@ -16226,7 +16226,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateIn"
+        "$ref": "#/components/schemas/TaxTemplateIn"
        }
       }
      },
@@ -16237,7 +16237,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__accounting__schemas__TemplateOut"
+         "$ref": "#/components/schemas/TaxTemplateOut"
         }
        }
       },
@@ -17239,7 +17239,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__approvals__schemas__CountOut"
+         "$ref": "#/components/schemas/CountOut"
         }
        }
       },
@@ -18067,7 +18067,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsOut"
+         "$ref": "#/components/schemas/SettingsOut"
         }
        }
       },
@@ -18085,7 +18085,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsIn"
+        "$ref": "#/components/schemas/SettingsIn"
        }
       }
      },
@@ -18096,7 +18096,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__attendance__schemas__SettingsOut"
+         "$ref": "#/components/schemas/SettingsOut"
         }
        }
       },
@@ -20999,7 +20999,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__inventory__schemas__AdjustmentIn"
+        "$ref": "#/components/schemas/StockAdjustmentIn"
        }
       }
      },
@@ -21040,7 +21040,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/CountIn"
+        "$ref": "#/components/schemas/StockCountIn"
        }
       }
      },
@@ -21051,7 +21051,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__inventory__schemas__CountOut"
+         "$ref": "#/components/schemas/StockCountOut"
         }
        }
       },
@@ -21915,7 +21915,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__leave__schemas__AdjustmentIn"
+        "$ref": "#/components/schemas/AdjustmentIn"
        }
       }
      },
@@ -23384,7 +23384,7 @@
        "application/json": {
         "schema": {
          "items": {
-          "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
+          "$ref": "#/components/schemas/TemplateOut"
          },
          "title": "Response List Templates V1 Onboarding Templates Get",
          "type": "array"
@@ -23405,7 +23405,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateIn"
+        "$ref": "#/components/schemas/TemplateIn"
        }
       }
      },
@@ -23416,7 +23416,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
+         "$ref": "#/components/schemas/TemplateOut"
         }
        }
       },
@@ -23492,7 +23492,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateIn"
+        "$ref": "#/components/schemas/TemplateIn"
        }
       }
      },
@@ -23503,7 +23503,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/app__modules__tasks__schemas__TemplateOut"
+         "$ref": "#/components/schemas/TemplateOut"
         }
        }
       },

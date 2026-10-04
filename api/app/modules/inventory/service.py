@@ -31,15 +31,15 @@ from app.modules.inventory.models import (
     Transfer,
 )
 from app.modules.inventory.schemas import (
-    AdjustmentIn,
-    CountIn,
-    CountOut,
     ItemSettingsIn,
     LevelOut,
     MovementOut,
     OpeningIn,
     PurchaseIn,
     PurchaseOut,
+    StockAdjustmentIn,
+    StockCountIn,
+    StockCountOut,
     StockOut,
     SupplierIn,
     SupplierOut,
@@ -372,7 +372,7 @@ async def opening(ctx: Ctx, body: OpeningIn) -> StockOut:
     return next(s for s in await stock(ctx) if s.product_id == body.product_id)
 
 
-async def adjust(ctx: Ctx, body: AdjustmentIn) -> StockOut:
+async def adjust(ctx: Ctx, body: StockAdjustmentIn) -> StockOut:
     ctx.require(access.MANAGE)
     if body.quantity == 0:
         raise Invalid(errors=[{"field": "quantity", "message": "Enter how many to add or remove."}])
@@ -611,7 +611,7 @@ async def transfer(ctx: Ctx, body: TransferIn) -> None:
     await ctx.db.commit()
 
 
-async def count(ctx: Ctx, body: CountIn) -> CountOut:
+async def count(ctx: Ctx, body: StockCountIn) -> StockCountOut:
     """A stock count: differences from what the books say become count movements."""
     ctx.require(access.MANAGE)
     assert ctx.tenant is not None
@@ -665,7 +665,7 @@ async def count(ctx: Ctx, body: CountIn) -> CountOut:
         data={"items": len(lines), "value": costing.money(total)},
     )
     await ctx.db.commit()
-    return CountOut(
+    return StockCountOut(
         id=row.id,
         branch_id=row.branch_id,
         counted_on=row.counted_on,

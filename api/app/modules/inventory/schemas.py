@@ -79,7 +79,7 @@ class OpeningIn(In):
     unit_cost: Cost
 
 
-class AdjustmentIn(In):
+class StockAdjustmentIn(In):
     product_id: uuid.UUID
     branch_id: uuid.UUID | None = None
     # Positive adds stock; negative removes it (damaged, expired, used in the shop).
@@ -141,14 +141,14 @@ class CountLineIn(In):
     counted: Annotated[Decimal, Field(ge=0, le=10**9, max_digits=14, decimal_places=3)]
 
 
-class CountIn(In):
+class StockCountIn(In):
     branch_id: uuid.UUID | None = None
     counted_on: date | None = None
     lines: list[CountLineIn] = Field(min_length=1, max_length=2000)
     note: str | None = Field(default=None, max_length=1000)
 
 
-class CountOut(BaseModel):
+class StockCountOut(BaseModel):
     id: uuid.UUID
     branch_id: uuid.UUID | None
     counted_on: date
