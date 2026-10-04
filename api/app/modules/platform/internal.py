@@ -11,6 +11,7 @@ from app.core.config import get_settings
 from app.core.db import open_session
 from app.core.errors import NotFound
 from app.core.security.tokens import same_secret
+from app.modules.platform import webhooks
 
 router = APIRouter(prefix="/internal", tags=["internal"], include_in_schema=False)
 
@@ -30,6 +31,12 @@ async def dispatch_outbox(_: None = Depends(internal_only)) -> dict[str, int]:
     return {"delivered": await outbox.dispatch(limit=200)}
 
 
+@router.post("/webhooks/tick")
+async def webhooks_tick(_: None = Depends(internal_only)) -> dict[str, int]:
+    """Every minute: retry webhook deliveries that are due."""
+    return {"attempts": await webhooks.deliver_due()}
+
+
 @router.post("/maintenance/daily")
 async def daily_maintenance(_: None = Depends(internal_only)) -> dict[str, int]:
     """Clean up expired auth rows and delivered outbox events."""
@@ -41,6 +48,11 @@ async def daily_maintenance(_: None = Depends(internal_only)) -> dict[str, int]:
             ("email_tokens", "DELETE FROM email_tokens WHERE expires_at < now() - interval '7 days'"),
             ("outbox", "DELETE FROM outbox_events WHERE dispatched_at < now() - interval '14 days'"),
             ("rate_limits", "DELETE FROM rate_limits WHERE window_start < now() - interval '1 day'"),
+            ("idempotency", "DELETE FROM idempotency_keys WHERE created_at < now() - interval '1 day'"),
+            (
+                "webhook_deliveries",
+                "DELETE FROM webhook_deliveries WHERE created_at < now() - interval '30 days'",
+            ),
         ):
             result = await db.execute(text(sql))
             results[name] = int(getattr(result, "rowcount", 0) or 0)

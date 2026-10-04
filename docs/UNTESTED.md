@@ -109,3 +109,24 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   `<slug>.<NEXT_PUBLIC_WORKSPACE_DOMAIN>`. Tests: `test_onboarding.py`,
   `lib/address.test.ts`, isolation addition — none run. Needs the owner: wildcard DNS
   and Pages custom domains for `*.companymgmt.app`, and API CORS for those origins.
+- [ ] **API keys.** `/v1/api-keys` (create with chosen permissions, rate per minute,
+  allowed networks, expiry; edit; rotate with a grace period; revoke; daily usage;
+  grantable permissions), `cmk_<workspace>_<secret>` keys accepted by every `allow()`
+  route in `deps.py` (permissions = key's ∩ maker's now, minus owner-only; plan feature
+  `api`; account routes refuse keys), new permission `developers.manage`, migration
+  0023. `tests/test_developers.py` **was run once and passed (12 tests)**; the full
+  suite wasn't, so other tests may notice the new permission or tables (isolation test
+  has no API key / webhook ids yet; route-access audit not run).
+- [ ] **Workspace network allowlist.** `GET/PUT /v1/workspace/ip-allowlist` (owner,
+  plan feature `sso`, refuses lists that leave the owner out), enforced in
+  `_bind_workspace` for people and keys. Covered by the run above.
+- [ ] **Idempotency-Key.** `app/core/idempotency.py` (pure ASGI, 24 h, per API key or
+  session, 409 while running, 422 on reuse, 5xx not kept), table `idempotency_keys`,
+  daily clean-up. Covered by the run above; not tried with file uploads or streaming.
+- [ ] **Signed webhooks.** `app/modules/platform/webhooks.py` (public catalogue with
+  thin payloads, HMAC signatures, backoff 1 m → 24 h over 8 tries, endpoint switched
+  off after 40 failures in a row, DNS-pinned HTTPS to public addresses only) and
+  `/v1/webhooks` routes (CRUD, roll secret, test ping, delivery log, resend),
+  `/internal/webhooks/tick` (Cloud Scheduler job added to the runbook), new
+  `member.removed` event. Covered by the run above with a mock transport; never sent
+  to a real server (SNI pinning via `sni_hostname` unverified against real TLS).

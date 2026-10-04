@@ -84,6 +84,8 @@ class Tenant(IdMixin, TimestampMixin, Base):
     previous_slugs: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     # The owner hid the first-day checklist.
     checklist_dismissed_at: Mapped[datetime | None]
+    # Networks (CIDR) people and API keys may use the workspace from; empty = anywhere.
+    ip_allowlist: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
 
 
 class Subscription(IdMixin, TenantScoped, TimestampMixin, Base):
@@ -291,6 +293,88 @@ class JoinLink(IdMixin, TenantScoped, TimestampMixin, Base):
     uses: Mapped[int] = mapped_column(Integer, default=0)
     created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     revoked_at: Mapped[datetime | None]
+
+
+class ApiKey(IdMixin, TenantScoped, TimestampMixin, Base):
+    """A key for calling the API from another system. It acts as the member who made it,
+    with only the permissions chosen for it (and never more than that member has now)."""
+
+    __tablename__ = "api_keys"
+    __table_args__ = (UniqueConstraint("tenant_id", "id"),)
+
+    name: Mapped[str] = mapped_column(String(120))
+    # The first characters of the secret, so people can tell keys apart.
+    hint: Mapped[str] = mapped_column(String(8))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    # After a rotation the old secret keeps working until `previous_expires_at`.
+    previous_hash: Mapped[str | None] = mapped_column(String(64), unique=True)
+    previous_expires_at: Mapped[datetime | None]
+    membership_id: Mapped[uuid.UUID]
+    permissions: Mapped[list[str]] = mapped_column(ARRAY(String(60)), default=list)
+    rate_per_minute: Mapped[int] = mapped_column(Integer, default=120)
+    allowed_ips: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
+    expires_at: Mapped[datetime | None]
+    last_used_at: Mapped[datetime | None]
+    last_used_ip: Mapped[str | None] = mapped_column(String(64))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    revoked_at: Mapped[datetime | None]
+
+
+class ApiKeyUsage(TenantScoped, Base):
+    """Requests per key per day (UTC)."""
+
+    __tablename__ = "api_key_usage"
+
+    key_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    requests: Mapped[int] = mapped_column(Integer, default=0)
+    writes: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class WebhookEndpoint(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
+    """Where to send signed event notifications."""
+
+    __tablename__ = "webhook_endpoints"
+    __table_args__ = (UniqueConstraint("tenant_id", "id"),)
+
+    url: Mapped[str] = mapped_column(String(500))
+    description: Mapped[str | None] = mapped_column(String(200))
+    # Public event names, or ["*"] for every event.
+    events: Mapped[list[str]] = mapped_column(ARRAY(String(60)), default=list)
+    secret_enc: Mapped[str] = mapped_column(String(300))
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Deliveries that failed in a row; too many and the endpoint is switched off.
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+    disabled_reason: Mapped[str | None] = mapped_column(String(40))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+
+
+class WebhookDelivery(IdMixin, TenantScoped, Base):
+    __tablename__ = "webhook_deliveries"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "endpoint_id"],
+            ["webhook_endpoints.tenant_id", "webhook_endpoints.id"],
+            ondelete="CASCADE",
+        ),
+        Index("ix_webhook_deliveries_due", "status", "next_attempt_at"),
+        Index("ix_webhook_deliveries_endpoint", "tenant_id", "endpoint_id", "created_at"),
+    )
+
+    endpoint_id: Mapped[uuid.UUID]
+    event_id: Mapped[uuid.UUID]
+    event: Mapped[str] = mapped_column(String(60))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    # pending -> succeeded | failed (retried with backoff until it gives up)
+    status: Mapped[str] = mapped_column(String(10), default="pending")
+    attempts: Mapped[int] = mapped_column(SmallInteger, default=0)
+    next_attempt_at: Mapped[datetime | None]
+    response_status: Mapped[int | None] = mapped_column(SmallInteger)
+    response_ms: Mapped[int | None] = mapped_column(Integer)
+    error: Mapped[str | None] = mapped_column(String(300))
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    finished_at: Mapped[datetime | None]
 
 
 class Branch(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):

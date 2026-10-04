@@ -4,6 +4,10 @@ Every route depends on exactly one of:
 - `public()`: no sign-in needed (marked so the route audit test can tell it's deliberate),
 - `signed_in()`: any signed-in user, workspace optional,
 - `allow(permission, module=...)`: a member of the current workspace holding `permission`.
+
+API keys (`Authorization: Bearer cmk_...`) work on `allow()` routes only: they act as the
+member who made them, limited to the permissions chosen for the key. Account routes
+(`signed_in()`) refuse them.
 """
 
 from __future__ import annotations
@@ -15,15 +19,18 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import Depends, Request
-from sqlalchemy import select, update
+from sqlalchemy import and_, or_, select, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import context
+from app.core import context, ipnet, ratelimit
 from app.core.db import get_db, set_tenant
-from app.core.errors import Forbidden, Gone, PaymentRequired, Unauthorized
-from app.core.security.tokens import decode_access_token
+from app.core.errors import Forbidden, Gone, PaymentRequired, TooManyRequests, Unauthorized
+from app.core.security.tokens import decode_access_token, hash_secret
 from app.modules.platform import catalog
 from app.modules.platform.models import (
+    ApiKey,
+    ApiKeyUsage,
     AuthSession,
     Membership,
     Plan,
@@ -38,6 +45,7 @@ SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 DELETION_GRACE = timedelta(days=30)
 ADMIN_ROLES = ("owner", "admin")
 LAST_SEEN_EVERY = timedelta(minutes=5)
+API_KEY_PREFIX = "cmk_"
 
 
 @dataclass
@@ -69,6 +77,8 @@ class Ctx:
     permissions: frozenset[str] = frozenset()
     entitlements: Entitlements | None = None
     cache: dict[str, Any] = field(default_factory=dict)
+    # Set when the caller used an API key rather than signing in.
+    api_key: ApiKey | None = None
 
     @property
     def tenant_id(self) -> uuid.UUID:
@@ -128,8 +138,75 @@ async def load_entitlements(db: AsyncSession, tenant_id: uuid.UUID) -> Entitleme
     )
 
 
+def parse_api_key(token: str) -> tuple[uuid.UUID, str] | None:
+    """`cmk_<workspace id>_<secret>` -> (workspace id, secret)."""
+    if not token.startswith(API_KEY_PREFIX):
+        return None
+    workspace, _, secret = token[len(API_KEY_PREFIX) :].partition("_")
+    try:
+        tenant_id = uuid.UUID(hex=workspace)
+    except ValueError:
+        return None
+    if len(secret) < 20 or len(secret) > 100:
+        return None
+    return tenant_id, secret
+
+
+async def _authenticate_key(request: Request, db: AsyncSession, token: str) -> Ctx:
+    parsed = parse_api_key(token)
+    if parsed is None:
+        raise Unauthorized(code="api_key_invalid")
+    tenant_id, secret = parsed
+    await set_tenant(db, tenant_id)
+    digest = hash_secret(secret)
+    now = datetime.now(UTC)
+    key = await db.scalar(
+        select(ApiKey).where(
+            or_(
+                ApiKey.token_hash == digest,
+                and_(ApiKey.previous_hash == digest, ApiKey.previous_expires_at > now),
+            )
+        )
+    )
+    if key is None or key.revoked_at is not None or (key.expires_at and key.expires_at <= now):
+        raise Unauthorized("This API key isn't valid.", code="api_key_invalid")
+    ip = context.current().ip
+    if not ipnet.allowed(ip, list(key.allowed_ips or [])):
+        raise Forbidden("This API key can't be used from this address.", code="ip_not_allowed")
+    allowed, _, retry = await ratelimit.hit(ratelimit.Rule("api-key", key.rate_per_minute, 60), str(key.id))
+    if not allowed:
+        raise TooManyRequests(headers={"Retry-After": str(max(retry, 1))})
+    membership = await db.scalar(select(Membership).where(Membership.id == key.membership_id))
+    user = await db.get(User, membership.user_id) if membership else None
+    if membership is None or membership.status != "active" or user is None or user.disabled_at:
+        raise Unauthorized("The member this key belongs to has left.", code="api_key_owner_gone")
+    writing = request.method not in SAFE_METHODS
+    await db.execute(
+        insert(ApiKeyUsage)
+        .values(tenant_id=tenant_id, key_id=key.id, day=now.date(), requests=1, writes=int(writing))
+        .on_conflict_do_update(
+            index_elements=["key_id", "day"],
+            set_={
+                "requests": ApiKeyUsage.requests + 1,
+                "writes": ApiKeyUsage.writes + int(writing),
+            },
+        )
+    )
+    if key.last_used_at is None or now - key.last_used_at > timedelta(minutes=1) or key.last_used_ip != ip:
+        key.last_used_at, key.last_used_ip = now, ip
+    await db.commit()
+    info = context.current()
+    info.user_id = user.id
+    info.extra["api_key"] = str(key.id)
+    # A stand-in session, never saved: API keys don't sign in.
+    session = AuthSession(user_id=user.id, tenant_id=tenant_id, expires_at=now)
+    return Ctx(db=db, user=user, session=session, method=request.method, api_key=key)
+
+
 async def _authenticate(request: Request, db: AsyncSession) -> Ctx:
     token = _bearer(request)
+    if token and token.startswith(API_KEY_PREFIX):
+        return await _authenticate_key(request, db, token)
     claims = decode_access_token(token) if token else None
     if claims is None:
         raise Unauthorized()
@@ -184,11 +261,20 @@ async def _bind_workspace(ctx: Ctx) -> None:
     if row is None or row[0].status != "active":
         raise Forbidden("You're no longer a member of this workspace.", code="not_member")
     membership, role = row
+    if not ipnet.allowed(context.current().ip, list(tenant.ip_allowlist or [])):
+        raise Forbidden("This workspace can only be used from its company network.", code="ip_not_allowed")
     ctx.tenant = tenant
     ctx.membership = membership
     ctx.role = role
     ctx.permissions = catalog.resolve(role.key, role.is_builtin, list(role.permissions or []))
     ctx.entitlements = await load_entitlements(ctx.db, tenant_id)
+    if ctx.api_key is not None:
+        if not ctx.entitlements.feature("api"):
+            raise PaymentRequired("API access isn't included in this plan.", code="api_not_in_plan")
+        if ctx.api_key.membership_id != membership.id:
+            raise Unauthorized(code="api_key_invalid")
+        # Never more than the member has now; never owner-only powers.
+        ctx.permissions = ctx.permissions & frozenset(ctx.api_key.permissions or []) - catalog.owner_only()
     info = context.current()
     info.tenant_id = tenant_id
     info.membership_id = membership.id
@@ -265,6 +351,16 @@ def check_access(ctx: Ctx, permission: str | None, *, module: str | None, writin
 Dep = Callable[..., Awaitable[Ctx | None]]
 
 
+def _no_api_key(ctx: Ctx) -> None:
+    if ctx.api_key is not None:
+        raise Forbidden("API keys can't be used for account settings.", code="api_key_not_allowed")
+
+
+def people_only(ctx: Ctx) -> None:
+    """For routes only a person may use (managing API keys, security settings)."""
+    _no_api_key(ctx)
+
+
 def public() -> Callable[[], Awaitable[None]]:
     async def dep() -> None:
         return None
@@ -281,6 +377,7 @@ def signed_in(
 
     async def dep(request: Request, db: AsyncSession = Depends(get_db)) -> Ctx:
         ctx = await _authenticate(request, db)
+        _no_api_key(ctx)
         if ctx.user.must_change_password and not allow_password_change:
             raise Forbidden("Please set a new password first.", code="password_change_required")
         if ctx.session.tenant_id is not None:
@@ -318,6 +415,7 @@ def owner_of_deleted_workspace() -> Callable[..., Awaitable[Ctx]]:
 
     async def dep(request: Request, db: AsyncSession = Depends(get_db)) -> Ctx:
         ctx = await _authenticate(request, db)
+        _no_api_key(ctx)
         tenant = await db.get(Tenant, ctx.session.tenant_id) if ctx.session.tenant_id else None
         if tenant is None or tenant.status != "deleting":
             raise Forbidden("This workspace isn't scheduled for deletion.", code="not_deleting")

@@ -31,6 +31,9 @@ MEMBERS_MANAGE = perms.register(
 ROLES_MANAGE = perms.register("roles.manage", "Create and edit custom roles", module="platform")
 BRANCHES_MANAGE = perms.register("branches.manage", "Add and edit branches", module="platform")
 AUDIT_VIEW = perms.register("audit.view", "See the audit log", module="platform")
+DEVELOPERS_MANAGE = perms.register(
+    "developers.manage", "Manage API keys, webhooks and sign-in with your company account", module="platform"
+)
 
 
 # ---- Modules ------------------------------------------------------------------------
@@ -215,3 +218,7 @@ def resolve(role_key: str, is_builtin: bool, custom: list[str]) -> frozenset[str
     if "*-owner" in role.grants:
         return frozenset(p.key for p in everything if not p.owner_only)
     return frozenset(p for p in role.grants if perms.exists(p))
+
+
+def owner_only() -> frozenset[str]:
+    return frozenset(p.key for p in perms.catalog() if p.owner_only)

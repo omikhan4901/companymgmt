@@ -1,6 +1,6 @@
 """Imports every model so metadata is complete (for Alembic and the isolation tests)."""
 
-from app.core import audit, events, outbox, ratelimit  # noqa: F401
+from app.core import audit, events, idempotency, outbox, ratelimit  # noqa: F401
 from app.core.models import Base
 from app.modules.accounting import models as accounting_models  # noqa: F401
 from app.modules.announcements import models as announcements_models  # noqa: F401

@@ -216,6 +216,10 @@ Actions**:
    gcloud scheduler jobs create http companymgmt-automations --location asia-southeast1 \
      --schedule "*/15 * * * *" --uri "$API/internal/automations/tick" \
      --http-method POST --headers "X-Internal-Token=$TOKEN"
+   # Webhook deliveries that failed and are due another try.
+   gcloud scheduler jobs create http companymgmt-webhooks --location asia-southeast1 \
+     --schedule "* * * * *" --uri "$API/internal/webhooks/tick" \
+     --http-method POST --headers "X-Internal-Token=$TOKEN"
    ```
 
 3. The nightly jobs (`companymgmt-maintenance` purges deleted workspaces and old audit

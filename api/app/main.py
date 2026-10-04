@@ -16,6 +16,7 @@ from app.ai.routes import router as ai_router
 from app.core.config import get_settings
 from app.core.db import dispose_engine, open_session
 from app.core.errors import install_error_handlers
+from app.core.idempotency import IdempotencyMiddleware
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.modules.accounting.routes import router as accounting_router
@@ -38,7 +39,9 @@ from app.modules.platform.deps import public
 from app.modules.platform.internal import router as internal_router
 from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
+from app.modules.platform.routes_developers import router as developers_router
 from app.modules.platform.routes_join import router as join_router
+from app.modules.platform.routes_webhooks import router as webhooks_router
 from app.modules.platform.routes_workspace import router as workspace_router
 from app.modules.privacy.routes import router as privacy_router
 from app.modules.reports.routes import internal_router as reports_internal_router
@@ -74,6 +77,8 @@ ROUTERS = (
     ai_router,
     operator_router,
     join_router,
+    developers_router,
+    webhooks_router,
     welcome_router,
     internal_router,
     notifications_internal_router,
@@ -119,13 +124,21 @@ def create_app() -> FastAPI:
         openapi_url="/v1/openapi.json",
     )
     install_error_handlers(app)
+    # Innermost: replays need the request context (and its size limit) set up first.
+    app.add_middleware(IdempotencyMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["authorization", "content-type", "x-cm-client", "if-match", "idempotency-key"],
-        expose_headers=["etag", "x-request-id", "retry-after", "content-disposition"],
+        expose_headers=[
+            "etag",
+            "x-request-id",
+            "retry-after",
+            "content-disposition",
+            "idempotent-replayed",
+        ],
         max_age=600,
     )
     app.add_middleware(RequestContextMiddleware)
