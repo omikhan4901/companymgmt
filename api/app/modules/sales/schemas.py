@@ -56,13 +56,13 @@ class TaxRateOut(BaseModel):
     version: int
 
 
-class CategoryIn(In):
+class ProductCategoryIn(In):
     name: Annotated[str, Field(min_length=1, max_length=80)]
     color: Annotated[str, Field(pattern=r"^#[0-9a-fA-F]{6}$")] = "#0f766e"
     position: int = Field(default=0, ge=0, le=10000)
 
 
-class CategoryOut(BaseModel):
+class ProductCategoryOut(BaseModel):
     id: uuid.UUID
     name: str
     color: str
@@ -118,7 +118,7 @@ class CloseIn(In):
     note: str | None = Field(default=None, max_length=1000)
 
 
-class SessionOut(BaseModel):
+class DrawerOut(BaseModel):
     id: uuid.UUID
     branch_id: uuid.UUID | None
     opened_by_name: str | None
@@ -231,7 +231,7 @@ class TaxSummary(BaseModel):
     amount: int
 
 
-class ReceiptOut(BaseModel):
+class SaleReceiptOut(BaseModel):
     sale: SaleOut
     shop_name: str
     branch_name: str | None

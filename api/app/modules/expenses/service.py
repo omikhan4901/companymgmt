@@ -15,9 +15,9 @@ from app.core.time import today
 from app.modules.expenses import access
 from app.modules.expenses.models import Expense, ExpenseCategory
 from app.modules.expenses.schemas import (
-    CategoryIn,
-    CategoryOut,
     CategoryTotal,
+    ExpenseCategoryIn,
+    ExpenseCategoryOut,
     ExpenseIn,
     ExpenseOut,
     ExpensePatch,
@@ -257,17 +257,20 @@ async def receipt(ctx: Ctx, expense_id: uuid.UUID) -> tuple[bytes, str, str]:
     return loaded.receipt, loaded.receipt_name or "receipt", loaded.receipt_type or "application/octet-stream"
 
 
-async def categories(ctx: Ctx) -> list[CategoryOut]:
+async def categories(ctx: Ctx) -> list[ExpenseCategoryOut]:
     ctx.require(access.RECORD)
     rows = await ctx.db.scalars(
         select(ExpenseCategory).order_by(ExpenseCategory.position, ExpenseCategory.name)
     )
     return [
-        CategoryOut(id=r.id, name=r.name, code=r.code, active=r.active, position=r.position) for r in rows
+        ExpenseCategoryOut(id=r.id, name=r.name, code=r.code, active=r.active, position=r.position)
+        for r in rows
     ]
 
 
-async def save_category(ctx: Ctx, body: CategoryIn, category_id: uuid.UUID | None = None) -> CategoryOut:
+async def save_category(
+    ctx: Ctx, body: ExpenseCategoryIn, category_id: uuid.UUID | None = None
+) -> ExpenseCategoryOut:
     ctx.require(access.MANAGE)
     if category_id:
         row = await ctx.db.get(ExpenseCategory, category_id)
@@ -280,7 +283,9 @@ async def save_category(ctx: Ctx, body: CategoryIn, category_id: uuid.UUID | Non
         ctx.db.add(row)
     await ctx.db.flush()
     await ctx.db.commit()
-    return CategoryOut(id=row.id, name=row.name, code=row.code, active=row.active, position=row.position)
+    return ExpenseCategoryOut(
+        id=row.id, name=row.name, code=row.code, active=row.active, position=row.position
+    )
 
 
 async def drawer_expenses(db: AsyncSession, user_id: uuid.UUID, since: object, until: object | None) -> int:

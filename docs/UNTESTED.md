@@ -51,3 +51,13 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   parity and isolation additions — none run. Check: the isolation test now switches on
   seven modules (may exceed a plan's module limit); workspace export of
   `expenses.receipt` bytes and `sale_lines` JSON not checked.
+- [ ] **Shop web.** `/app/pos` (open/close drawer, item buttons by category, other
+  items, cart, customer on credit, cash and change, offline queue in localStorage
+  synced every 15 s), `/app/sales/receipt?id=` (80 mm receipt, browser print; app chrome
+  hidden with `print:`), `/app/sales` (sales by day with returns and voids, period
+  summary with tax table and print, items and categories, taxes and receipt settings,
+  drawers), `/app/customers` (dues list, statement, payments, adjustments, WhatsApp
+  reminder, print), `/app/expenses` (month view, receipt photo upload, petty cash).
+  Nav items. `lib/whatsapp.test.ts` written, not run. Never opened in a browser; no
+  e2e. Known gaps: a sale the server refuses while syncing stays in the offline queue
+  with no screen to fix it; cashier PINs (from the plan) not built.

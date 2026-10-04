@@ -15,10 +15,10 @@ from app.core.time import today
 from app.modules.customers import access
 from app.modules.customers.models import Customer, CustomerEntry
 from app.modules.customers.schemas import (
-    AdjustmentIn,
     CustomerIn,
     CustomerOut,
     CustomerPatch,
+    DuesAdjustmentIn,
     EntryOut,
     PaymentIn,
     StatementOut,
@@ -177,7 +177,7 @@ async def pay(ctx: Ctx, customer_id: uuid.UUID, body: PaymentIn) -> CustomerOut:
     return await get(ctx, customer_id)
 
 
-async def adjust(ctx: Ctx, customer_id: uuid.UUID, body: AdjustmentIn) -> CustomerOut:
+async def adjust(ctx: Ctx, customer_id: uuid.UUID, body: DuesAdjustmentIn) -> CustomerOut:
     ctx.require(access.MANAGE)
     if body.amount == 0:
         raise Invalid(errors=[{"field": "amount", "message": "Enter an amount."}])

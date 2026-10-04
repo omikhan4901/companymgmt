@@ -106,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
 
       {/* App rail (desktop) */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[84px] flex-col items-center gap-1.5 border-r border-border bg-rail py-4 lg:flex">
+      <aside className="print:hidden fixed inset-y-0 left-0 z-30 hidden w-[84px] flex-col items-center gap-1.5 border-r border-border bg-rail py-4 lg:flex">
         <Link href="/app" aria-label="CompanyMgmt" className="mb-3">
           <LogoMark size={40} />
         </Link>
@@ -133,8 +133,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <AppearanceMenu side="right" />
       </aside>
 
-      <div className="lg:pl-[84px]">
-        <header className="sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
+      <div className="lg:pl-[84px] print:pl-0">
+        <header className="print:hidden sticky top-0 z-20 border-b border-border bg-bg/85 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 md:px-7">
             <Link href="/app" aria-label="CompanyMgmt" className="lg:hidden">
               <LogoMark size={32} />
@@ -171,7 +171,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Tab bar (phones and tablets) */}
-      <nav aria-label={t("nav.main")} className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur lg:hidden">
+      <nav aria-label={t("nav.main")} className="print:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-lg justify-around px-1 pb-[env(safe-area-inset-bottom)]">
           {items.slice(0, 5).map((item) => {
             const active = isActive(pathname, item.href);

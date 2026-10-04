@@ -3348,6 +3348,25 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** AdjustmentIn */
+        AdjustmentIn: {
+            /** Days */
+            days: number | string;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /**
+             * Leave Type Id
+             * Format: uuid
+             */
+            leave_type_id: string;
+            /** Reason */
+            reason: string;
+            /** Year */
+            year: number;
+        };
         /** AdjustmentOut */
         AdjustmentOut: {
             /**
@@ -4379,6 +4398,52 @@ export interface components {
             /** Note */
             note: string;
         };
+        /** DrawerOut */
+        DrawerOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /** Cash Expenses */
+            cash_expenses: number;
+            /** Cash Refunds */
+            cash_refunds: number;
+            /** Cash Sales */
+            cash_sales: number;
+            /** Closed At */
+            closed_at: string | null;
+            /** Counted Cash */
+            counted_cash: number | null;
+            /** Difference */
+            difference: number | null;
+            /** Expected Cash */
+            expected_cash: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note: string | null;
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Opened By Name */
+            opened_by_name: string | null;
+            /** Opening Float */
+            opening_float: number;
+            /** Sales Count */
+            sales_count: number;
+        };
+        /** DuesAdjustmentIn */
+        DuesAdjustmentIn: {
+            /** Amount */
+            amount: number;
+            /** Note */
+            note: string;
+            /** Occurred On */
+            occurred_on?: string | null;
+        };
         /** EmployeeIn */
         EmployeeIn: {
             /** Branch Id */
@@ -4547,6 +4612,39 @@ export interface components {
              * @enum {string}
              */
             type: "event";
+        };
+        /** ExpenseCategoryIn */
+        ExpenseCategoryIn: {
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            /** Code */
+            code?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Position
+             * @default 0
+             */
+            position: number;
+        };
+        /** ExpenseCategoryOut */
+        ExpenseCategoryOut: {
+            /** Active */
+            active: boolean;
+            /** Code */
+            code: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Position */
+            position: number;
         };
         /** ExpenseIn */
         ExpenseIn: {
@@ -5714,6 +5812,35 @@ export interface components {
             /** Employee Name */
             employee_name: string;
         };
+        /** ProductCategoryIn */
+        ProductCategoryIn: {
+            /**
+             * Color
+             * @default #0f766e
+             */
+            color: string;
+            /** Name */
+            name: string;
+            /**
+             * Position
+             * @default 0
+             */
+            position: number;
+        };
+        /** ProductCategoryOut */
+        ProductCategoryOut: {
+            /** Color */
+            color: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Position */
+            position: number;
+        };
         /** ProductIn */
         ProductIn: {
             /**
@@ -5931,10 +6058,24 @@ export interface components {
             /** Password */
             password?: string | null;
         };
+        /** ReceiptOut */
+        ReceiptOut: {
+            /** Department */
+            department: string | null;
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Name */
+            name: string;
+            /** Read At */
+            read_at: string | null;
+        };
         /** ReceiptsOut */
         ReceiptsOut: {
             /** People */
-            people: components["schemas"]["app__modules__announcements__schemas__ReceiptOut"][];
+            people: components["schemas"]["ReceiptOut"][];
             /** Read */
             read: number;
             /** Total */
@@ -6444,6 +6585,28 @@ export interface components {
             /** Void Reason */
             void_reason: string | null;
         };
+        /** SaleReceiptOut */
+        SaleReceiptOut: {
+            /** Branch Address */
+            branch_address: string | null;
+            /** Branch Name */
+            branch_name: string | null;
+            /** Currency */
+            currency: string;
+            /** Footer */
+            footer: string | null;
+            /** Header */
+            header: string | null;
+            sale: components["schemas"]["SaleOut"];
+            /** Shop Name */
+            shop_name: string;
+            /** Tax Id */
+            tax_id: string | null;
+            /** Tax Id Label */
+            tax_id_label: string | null;
+            /** Taxes */
+            taxes: components["schemas"]["TaxSummary"][];
+        };
         /** ScheduleTrigger */
         ScheduleTrigger: {
             /**
@@ -6480,6 +6643,30 @@ export interface components {
             name: string;
             /** Total */
             total: number;
+        };
+        /** SessionOut */
+        SessionOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Current */
+            current: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Ip */
+            ip: string | null;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** User Agent */
+            user_agent: string | null;
         };
         /** SettingsIn */
         SettingsIn: {
@@ -7514,193 +7701,6 @@ export interface components {
         WriteOut: {
             /** Text */
             text: string;
-        };
-        /** ReceiptOut */
-        app__modules__announcements__schemas__ReceiptOut: {
-            /** Department */
-            department: string | null;
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /** Name */
-            name: string;
-            /** Read At */
-            read_at: string | null;
-        };
-        /** AdjustmentIn */
-        app__modules__customers__schemas__AdjustmentIn: {
-            /** Amount */
-            amount: number;
-            /** Note */
-            note: string;
-            /** Occurred On */
-            occurred_on?: string | null;
-        };
-        /** CategoryIn */
-        app__modules__expenses__schemas__CategoryIn: {
-            /**
-             * Active
-             * @default true
-             */
-            active: boolean;
-            /** Code */
-            code?: string | null;
-            /** Name */
-            name: string;
-            /**
-             * Position
-             * @default 0
-             */
-            position: number;
-        };
-        /** CategoryOut */
-        app__modules__expenses__schemas__CategoryOut: {
-            /** Active */
-            active: boolean;
-            /** Code */
-            code: string | null;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Position */
-            position: number;
-        };
-        /** AdjustmentIn */
-        app__modules__leave__schemas__AdjustmentIn: {
-            /** Days */
-            days: number | string;
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /**
-             * Leave Type Id
-             * Format: uuid
-             */
-            leave_type_id: string;
-            /** Reason */
-            reason: string;
-            /** Year */
-            year: number;
-        };
-        /** SessionOut */
-        app__modules__platform__routes_auth__SessionOut: {
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Current */
-            current: boolean;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Ip */
-            ip: string | null;
-            /**
-             * Last Seen At
-             * Format: date-time
-             */
-            last_seen_at: string;
-            /** User Agent */
-            user_agent: string | null;
-        };
-        /** CategoryIn */
-        app__modules__sales__schemas__CategoryIn: {
-            /**
-             * Color
-             * @default #0f766e
-             */
-            color: string;
-            /** Name */
-            name: string;
-            /**
-             * Position
-             * @default 0
-             */
-            position: number;
-        };
-        /** CategoryOut */
-        app__modules__sales__schemas__CategoryOut: {
-            /** Color */
-            color: string;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Position */
-            position: number;
-        };
-        /** ReceiptOut */
-        app__modules__sales__schemas__ReceiptOut: {
-            /** Branch Address */
-            branch_address: string | null;
-            /** Branch Name */
-            branch_name: string | null;
-            /** Currency */
-            currency: string;
-            /** Footer */
-            footer: string | null;
-            /** Header */
-            header: string | null;
-            sale: components["schemas"]["SaleOut"];
-            /** Shop Name */
-            shop_name: string;
-            /** Tax Id */
-            tax_id: string | null;
-            /** Tax Id Label */
-            tax_id_label: string | null;
-            /** Taxes */
-            taxes: components["schemas"]["TaxSummary"][];
-        };
-        /** SessionOut */
-        app__modules__sales__schemas__SessionOut: {
-            /** Branch Id */
-            branch_id: string | null;
-            /** Cash Expenses */
-            cash_expenses: number;
-            /** Cash Refunds */
-            cash_refunds: number;
-            /** Cash Sales */
-            cash_sales: number;
-            /** Closed At */
-            closed_at: string | null;
-            /** Counted Cash */
-            counted_cash: number | null;
-            /** Difference */
-            difference: number | null;
-            /** Expected Cash */
-            expected_cash: number;
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Note */
-            note: string | null;
-            /**
-             * Opened At
-             * Format: date-time
-             */
-            opened_at: string;
-            /** Opened By Name */
-            opened_by_name: string | null;
-            /** Opening Float */
-            opening_float: number;
-            /** Sales Count */
-            sales_count: number;
         };
     };
     responses: never;
@@ -9558,7 +9558,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__platform__routes_auth__SessionOut"][];
+                    "application/json": components["schemas"]["SessionOut"][];
                 };
             };
         };
@@ -10171,7 +10171,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__customers__schemas__AdjustmentIn"];
+                "application/json": components["schemas"]["DuesAdjustmentIn"];
             };
         };
         responses: {
@@ -10772,7 +10772,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__expenses__schemas__CategoryOut"][];
+                    "application/json": components["schemas"]["ExpenseCategoryOut"][];
                 };
             };
         };
@@ -10786,7 +10786,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__expenses__schemas__CategoryIn"];
+                "application/json": components["schemas"]["ExpenseCategoryIn"];
             };
         };
         responses: {
@@ -10796,7 +10796,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__expenses__schemas__CategoryOut"];
+                    "application/json": components["schemas"]["ExpenseCategoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -10821,7 +10821,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__expenses__schemas__CategoryIn"];
+                "application/json": components["schemas"]["ExpenseCategoryIn"];
             };
         };
         responses: {
@@ -10831,7 +10831,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__expenses__schemas__CategoryOut"];
+                    "application/json": components["schemas"]["ExpenseCategoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -11224,7 +11224,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__leave__schemas__AdjustmentIn"];
+                "application/json": components["schemas"]["AdjustmentIn"];
             };
         };
         responses: {
@@ -13830,7 +13830,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__CategoryOut"][];
+                    "application/json": components["schemas"]["ProductCategoryOut"][];
                 };
             };
         };
@@ -13844,7 +13844,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__sales__schemas__CategoryIn"];
+                "application/json": components["schemas"]["ProductCategoryIn"];
             };
         };
         responses: {
@@ -13854,7 +13854,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__CategoryOut"];
+                    "application/json": components["schemas"]["ProductCategoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -13879,7 +13879,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__sales__schemas__CategoryIn"];
+                "application/json": components["schemas"]["ProductCategoryIn"];
             };
         };
         responses: {
@@ -13889,7 +13889,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__CategoryOut"];
+                    "application/json": components["schemas"]["ProductCategoryOut"];
                 };
             };
             /** @description Validation Error */
@@ -13918,7 +13918,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__SessionOut"] | null;
+                    "application/json": components["schemas"]["DrawerOut"] | null;
                 };
             };
         };
@@ -13942,7 +13942,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__SessionOut"];
+                    "application/json": components["schemas"]["DrawerOut"];
                 };
             };
             /** @description Validation Error */
@@ -13975,7 +13975,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__SessionOut"];
+                    "application/json": components["schemas"]["DrawerOut"];
                 };
             };
             /** @description Validation Error */
@@ -14004,7 +14004,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__SessionOut"][];
+                    "application/json": components["schemas"]["DrawerOut"][];
                 };
             };
         };
@@ -14330,7 +14330,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["app__modules__sales__schemas__ReceiptOut"];
+                    "application/json": components["schemas"]["SaleReceiptOut"];
                 };
             };
             /** @description Validation Error */

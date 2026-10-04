@@ -51,7 +51,7 @@ class PaymentIn(In):
     note: str | None = Field(default=None, max_length=500)
 
 
-class AdjustmentIn(In):
+class DuesAdjustmentIn(In):
     # Positive adds to what they owe; negative forgives some.
     amount: Annotated[int, Field(ge=-(10**13), le=10**13)]
     note: Annotated[str, Field(min_length=1, max_length=500)]

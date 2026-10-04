@@ -11,10 +11,10 @@ from fastapi import APIRouter, Depends, Query, Request
 from app.core.http import check_if_match
 from app.modules.customers import access, service
 from app.modules.customers.schemas import (
-    AdjustmentIn,
     CustomerIn,
     CustomerOut,
     CustomerPatch,
+    DuesAdjustmentIn,
     PaymentIn,
     StatementOut,
 )
@@ -56,7 +56,7 @@ async def pay(customer_id: uuid.UUID, body: PaymentIn, ctx: Ctx = Manage) -> Cus
 
 
 @router.post("/{customer_id}/adjustments", response_model=CustomerOut)
-async def adjust(customer_id: uuid.UUID, body: AdjustmentIn, ctx: Ctx = Manage) -> CustomerOut:
+async def adjust(customer_id: uuid.UUID, body: DuesAdjustmentIn, ctx: Ctx = Manage) -> CustomerOut:
     return await service.adjust(ctx, customer_id, body)
 
 

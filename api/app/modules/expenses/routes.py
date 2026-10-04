@@ -13,8 +13,8 @@ from app.core.http import check_if_match, read_body
 from app.core.middleware import allow_upload
 from app.modules.expenses import access, service
 from app.modules.expenses.schemas import (
-    CategoryIn,
-    CategoryOut,
+    ExpenseCategoryIn,
+    ExpenseCategoryOut,
     ExpenseIn,
     ExpenseOut,
     ExpensePatch,
@@ -51,18 +51,20 @@ async def top_up(body: TopUpIn, ctx: Ctx = Manage) -> ExpenseOut:
     return await service.top_up(ctx, body)
 
 
-@router.get("/categories", response_model=list[CategoryOut])
-async def categories(ctx: Ctx = Record) -> list[CategoryOut]:
+@router.get("/categories", response_model=list[ExpenseCategoryOut])
+async def categories(ctx: Ctx = Record) -> list[ExpenseCategoryOut]:
     return await service.categories(ctx)
 
 
-@router.post("/categories", response_model=CategoryOut, status_code=201)
-async def create_category(body: CategoryIn, ctx: Ctx = Manage) -> CategoryOut:
+@router.post("/categories", response_model=ExpenseCategoryOut, status_code=201)
+async def create_category(body: ExpenseCategoryIn, ctx: Ctx = Manage) -> ExpenseCategoryOut:
     return await service.save_category(ctx, body)
 
 
-@router.put("/categories/{category_id}", response_model=CategoryOut)
-async def save_category(category_id: uuid.UUID, body: CategoryIn, ctx: Ctx = Manage) -> CategoryOut:
+@router.put("/categories/{category_id}", response_model=ExpenseCategoryOut)
+async def save_category(
+    category_id: uuid.UUID, body: ExpenseCategoryIn, ctx: Ctx = Manage
+) -> ExpenseCategoryOut:
     return await service.save_category(ctx, body, category_id)
 
 

@@ -11,18 +11,18 @@ from fastapi import APIRouter, Depends, Query, Response
 from app.modules.platform.deps import Ctx, allow
 from app.modules.sales import access, service
 from app.modules.sales.schemas import (
-    CategoryIn,
-    CategoryOut,
     CloseIn,
+    DrawerOut,
     OpenIn,
+    ProductCategoryIn,
+    ProductCategoryOut,
     ProductIn,
     ProductOut,
     ProductPatch,
-    ReceiptOut,
     ReturnIn,
     SaleIn,
     SaleOut,
-    SessionOut,
+    SaleReceiptOut,
     ShopSettingsIn,
     ShopSettingsOut,
     SummaryOut,
@@ -63,18 +63,20 @@ async def save_tax_rate(rate_id: uuid.UUID, body: TaxRateIn, ctx: Ctx = Manage) 
     return await service.save_tax_rate(ctx, body, rate_id)
 
 
-@router.get("/categories", response_model=list[CategoryOut])
-async def categories(ctx: Ctx = Sell) -> list[CategoryOut]:
+@router.get("/categories", response_model=list[ProductCategoryOut])
+async def categories(ctx: Ctx = Sell) -> list[ProductCategoryOut]:
     return await service.categories(ctx)
 
 
-@router.post("/categories", response_model=CategoryOut, status_code=201)
-async def create_category(body: CategoryIn, ctx: Ctx = Manage) -> CategoryOut:
+@router.post("/categories", response_model=ProductCategoryOut, status_code=201)
+async def create_category(body: ProductCategoryIn, ctx: Ctx = Manage) -> ProductCategoryOut:
     return await service.save_category(ctx, body)
 
 
-@router.put("/categories/{category_id}", response_model=CategoryOut)
-async def save_category(category_id: uuid.UUID, body: CategoryIn, ctx: Ctx = Manage) -> CategoryOut:
+@router.put("/categories/{category_id}", response_model=ProductCategoryOut)
+async def save_category(
+    category_id: uuid.UUID, body: ProductCategoryIn, ctx: Ctx = Manage
+) -> ProductCategoryOut:
     return await service.save_category(ctx, body, category_id)
 
 
@@ -95,24 +97,24 @@ async def update_product(product_id: uuid.UUID, body: ProductPatch, ctx: Ctx = M
     return await service.update_product(ctx, product_id, body)
 
 
-@router.get("/drawer", response_model=SessionOut | None)
-async def current_drawer(ctx: Ctx = Sell) -> SessionOut | None:
+@router.get("/drawer", response_model=DrawerOut | None)
+async def current_drawer(ctx: Ctx = Sell) -> DrawerOut | None:
     """Your open cash drawer, or nothing."""
     return await service.current_session(ctx)
 
 
-@router.post("/drawer/open", response_model=SessionOut, status_code=201)
-async def open_drawer(body: OpenIn, ctx: Ctx = Sell) -> SessionOut:
+@router.post("/drawer/open", response_model=DrawerOut, status_code=201)
+async def open_drawer(body: OpenIn, ctx: Ctx = Sell) -> DrawerOut:
     return await service.open_session(ctx, body)
 
 
-@router.post("/drawer/close", response_model=SessionOut)
-async def close_drawer(body: CloseIn, ctx: Ctx = Sell) -> SessionOut:
+@router.post("/drawer/close", response_model=DrawerOut)
+async def close_drawer(body: CloseIn, ctx: Ctx = Sell) -> DrawerOut:
     return await service.close_session(ctx, body)
 
 
-@router.get("/drawers", response_model=list[SessionOut])
-async def drawers(ctx: Ctx = View) -> list[SessionOut]:
+@router.get("/drawers", response_model=list[DrawerOut])
+async def drawers(ctx: Ctx = View) -> list[DrawerOut]:
     return await service.sessions(ctx)
 
 
@@ -144,8 +146,8 @@ async def get_sale(sale_id: uuid.UUID, ctx: Ctx = Sell) -> SaleOut:
     return await service.get_sale(ctx, sale_id)
 
 
-@router.get("/{sale_id}/receipt", response_model=ReceiptOut)
-async def receipt(sale_id: uuid.UUID, ctx: Ctx = Sell) -> ReceiptOut:
+@router.get("/{sale_id}/receipt", response_model=SaleReceiptOut)
+async def receipt(sale_id: uuid.UUID, ctx: Ctx = Sell) -> SaleReceiptOut:
     return await service.receipt(ctx, sale_id)
 
 

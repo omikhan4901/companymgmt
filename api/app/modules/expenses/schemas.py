@@ -14,14 +14,14 @@ Amount = Annotated[int, Field(gt=0, le=10**13)]
 PaidFrom = Literal["drawer", "petty_cash", "bank", "other"]
 
 
-class CategoryIn(In):
+class ExpenseCategoryIn(In):
     name: Annotated[str, Field(min_length=1, max_length=80)]
     code: str | None = Field(default=None, max_length=20)
     active: bool = True
     position: int = Field(default=0, ge=0, le=10000)
 
 
-class CategoryOut(BaseModel):
+class ExpenseCategoryOut(BaseModel):
     id: uuid.UUID
     name: str
     code: str | None

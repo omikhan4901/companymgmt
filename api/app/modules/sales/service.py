@@ -35,24 +35,24 @@ from app.modules.sales.models import (
     TaxRate,
 )
 from app.modules.sales.schemas import (
-    CategoryIn,
-    CategoryOut,
     CloseIn,
     DayTotal,
+    DrawerOut,
     LineIn,
     LineOut,
     LineTaxOut,
     OpenIn,
+    ProductCategoryIn,
+    ProductCategoryOut,
     ProductIn,
     ProductOut,
     ProductPatch,
     ProductTotal,
-    ReceiptOut,
     ReturnIn,
     SaleIn,
     SaleOut,
+    SaleReceiptOut,
     SellerTotal,
-    SessionOut,
     ShopSettingsIn,
     ShopSettingsOut,
     SummaryOut,
@@ -256,15 +256,17 @@ async def update_product(ctx: Ctx, product_id: uuid.UUID, body: ProductPatch) ->
     return _product_out(row)
 
 
-async def categories(ctx: Ctx) -> list[CategoryOut]:
+async def categories(ctx: Ctx) -> list[ProductCategoryOut]:
     ctx.require(access.SELL)
     rows = await ctx.db.scalars(
         select(ProductCategory).order_by(ProductCategory.position, ProductCategory.name)
     )
-    return [CategoryOut(id=r.id, name=r.name, color=r.color, position=r.position) for r in rows]
+    return [ProductCategoryOut(id=r.id, name=r.name, color=r.color, position=r.position) for r in rows]
 
 
-async def save_category(ctx: Ctx, body: CategoryIn, category_id: uuid.UUID | None = None) -> CategoryOut:
+async def save_category(
+    ctx: Ctx, body: ProductCategoryIn, category_id: uuid.UUID | None = None
+) -> ProductCategoryOut:
     ctx.require(access.MANAGE)
     if category_id:
         row = await ctx.db.get(ProductCategory, category_id)
@@ -277,7 +279,7 @@ async def save_category(ctx: Ctx, body: CategoryIn, category_id: uuid.UUID | Non
         ctx.db.add(row)
     await ctx.db.flush()
     await ctx.db.commit()
-    return CategoryOut(id=row.id, name=row.name, color=row.color, position=row.position)
+    return ProductCategoryOut(id=row.id, name=row.name, color=row.color, position=row.position)
 
 
 # ---- Cash drawer ----------------------------------------------------------------------
@@ -305,11 +307,11 @@ async def _session_totals(db: AsyncSession, s: CashSession) -> tuple[int, int, i
     return taken, refunded, spent, by.get("sale", (0, 0))[1]
 
 
-async def _session_out(db: AsyncSession, s: CashSession) -> SessionOut:
+async def _session_out(db: AsyncSession, s: CashSession) -> DrawerOut:
     taken, refunded, spent, count = await _session_totals(db, s)
     expected = s.opening_float + taken - refunded - spent if s.expected_cash is None else s.expected_cash
     name = await db.scalar(select(User.name).where(User.id == s.opened_by))
-    return SessionOut(
+    return DrawerOut(
         id=s.id,
         branch_id=s.branch_id,
         opened_by_name=name,
@@ -327,13 +329,13 @@ async def _session_out(db: AsyncSession, s: CashSession) -> SessionOut:
     )
 
 
-async def current_session(ctx: Ctx) -> SessionOut | None:
+async def current_session(ctx: Ctx) -> DrawerOut | None:
     ctx.require(access.SELL)
     found = await _open_session(ctx.db, ctx.user.id)
     return await _session_out(ctx.db, found) if found else None
 
 
-async def open_session(ctx: Ctx, body: OpenIn) -> SessionOut:
+async def open_session(ctx: Ctx, body: OpenIn) -> DrawerOut:
     ctx.require(access.SELL)
     if await _open_session(ctx.db, ctx.user.id):
         raise Conflict("Your cash drawer is already open.", code="drawer_open")
@@ -358,7 +360,7 @@ async def open_session(ctx: Ctx, body: OpenIn) -> SessionOut:
     return await _session_out(ctx.db, row)
 
 
-async def close_session(ctx: Ctx, body: CloseIn) -> SessionOut:
+async def close_session(ctx: Ctx, body: CloseIn) -> DrawerOut:
     ctx.require(access.SELL)
     row = await _open_session(ctx.db, ctx.user.id)
     if row is None:
@@ -391,7 +393,7 @@ async def close_session(ctx: Ctx, body: CloseIn) -> SessionOut:
     return await _session_out(ctx.db, row)
 
 
-async def sessions(ctx: Ctx, *, limit: int = 60) -> list[SessionOut]:
+async def sessions(ctx: Ctx, *, limit: int = 60) -> list[DrawerOut]:
     ctx.require(access.VIEW)
     rows = await ctx.db.scalars(select(CashSession).order_by(CashSession.opened_at.desc()).limit(limit))
     return [await _session_out(ctx.db, s) for s in rows]
@@ -835,14 +837,14 @@ def _tax_summary(lines: Sequence[SaleLine]) -> list[TaxSummary]:
     return [TaxSummary(**v) for v in sorted(totals.values(), key=lambda v: (v["name"], v["percent"]))]
 
 
-async def receipt(ctx: Ctx, sale_id: uuid.UUID) -> ReceiptOut:
+async def receipt(ctx: Ctx, sale_id: uuid.UUID) -> SaleReceiptOut:
     sale = await get_sale(ctx, sale_id)
     assert ctx.tenant is not None
     settings = await _settings(ctx.db)
     row = await ctx.db.get(Sale, sale_id)
     branch = await ctx.db.get(Branch, row.branch_id) if row and row.branch_id else None
     lines = list(await ctx.db.scalars(select(SaleLine).where(SaleLine.sale_id == sale_id)))
-    return ReceiptOut(
+    return SaleReceiptOut(
         sale=sale,
         shop_name=ctx.tenant.name,
         branch_name=branch.name if branch else None,
