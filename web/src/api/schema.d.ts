@@ -38,84 +38,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/scim/v2/ResourceTypes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Resource Types */
-        get: operations["resource_types_scim_v2_ResourceTypes_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/scim/v2/ServiceProviderConfig": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Service Provider Config */
-        get: operations["service_provider_config_scim_v2_ServiceProviderConfig_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/scim/v2/Users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Users */
-        get: operations["list_users_scim_v2_Users_get"];
-        put?: never;
-        /** Create User */
-        post: operations["create_user_scim_v2_Users_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/scim/v2/Users/{user_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Scim Get User */
-        get: operations["scim_get_user_scim_v2_Users__user_id__get"];
-        /** Replace User */
-        put: operations["replace_user_scim_v2_Users__user_id__put"];
-        post?: never;
-        /**
-         * Delete User
-         * @description Removes them from the workspace (their account and history stay).
-         */
-        delete: operations["delete_user_scim_v2_Users__user_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Patch User
-         * @description The operations identity providers send: replace `active`, the name, `externalId`.
-         */
-        patch: operations["patch_user_scim_v2_Users__user_id__patch"];
-        trace?: never;
-    };
     "/v1/accounting/accounts": {
         parameters: {
             query?: never;
@@ -3971,6 +3893,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/scim/v2/ResourceTypes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resource Types */
+        get: operations["resource_types_v1_scim_v2_ResourceTypes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/scim/v2/ServiceProviderConfig": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Service Provider Config */
+        get: operations["service_provider_config_v1_scim_v2_ServiceProviderConfig_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/scim/v2/Users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users_v1_scim_v2_Users_get"];
+        put?: never;
+        /** Create User */
+        post: operations["create_user_v1_scim_v2_Users_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/scim/v2/Users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Scim Get User */
+        get: operations["scim_get_user_v1_scim_v2_Users__user_id__get"];
+        /** Replace User */
+        put: operations["replace_user_v1_scim_v2_Users__user_id__put"];
+        post?: never;
+        /**
+         * Delete User
+         * @description Removes them from the workspace (their account and history stay).
+         */
+        delete: operations["delete_user_v1_scim_v2_Users__user_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Patch User
+         * @description The operations identity providers send: replace `active`, the name, `externalId`.
+         */
+        patch: operations["patch_user_v1_scim_v2_Users__user_id__patch"];
+        trace?: never;
+    };
     "/v1/sso/callback": {
         parameters: {
             query?: never;
@@ -7091,6 +7091,19 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** LoginIn */
+        LoginIn: {
+            /** Captcha Token */
+            captcha_token?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Password */
+            password: string;
+            /** Username */
+            username?: string | null;
+            /** Workspace */
+            workspace?: string | null;
+        };
         /** LoginOut */
         LoginOut: {
             /** Access Token */
@@ -7373,18 +7386,6 @@ export interface components {
             /** Operator */
             operator: boolean;
         };
-        /** OptionsOut */
-        OptionsOut: {
-            /**
-             * Challenge Id
-             * Format: uuid
-             */
-            challenge_id: string;
-            /** Options */
-            options: {
-                [key: string]: unknown;
-            };
-        };
         /** OverviewOut */
         OverviewOut: {
             attendance: components["schemas"]["AttendanceSummary"] | null;
@@ -7455,6 +7456,32 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** PasskeyLoginIn */
+        PasskeyLoginIn: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Credential */
+            credential: {
+                [key: string]: unknown;
+            };
+            /** Workspace */
+            workspace?: string | null;
+        };
+        /** PasskeyOptionsOut */
+        PasskeyOptionsOut: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Options */
+            options: {
+                [key: string]: unknown;
+            };
+        };
         /** PasskeyOut */
         PasskeyOut: {
             /** Backed Up */
@@ -7472,6 +7499,23 @@ export interface components {
             /** Last Used At */
             last_used_at: string | null;
             /** Name */
+            name: string;
+        };
+        /** PasskeyRegisterIn */
+        PasskeyRegisterIn: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Credential */
+            credential: {
+                [key: string]: unknown;
+            };
+            /**
+             * Name
+             * @default Passkey
+             */
             name: string;
         };
         /** PasswordChangeIn */
@@ -8279,23 +8323,6 @@ export interface components {
         RecoveryCodesOut: {
             /** Recovery Codes */
             recovery_codes: string[];
-        };
-        /** RegisterIn */
-        RegisterIn: {
-            /**
-             * Challenge Id
-             * Format: uuid
-             */
-            challenge_id: string;
-            /** Credential */
-            credential: {
-                [key: string]: unknown;
-            };
-            /**
-             * Name
-             * @default Passkey
-             */
-            name: string;
         };
         /** ReportRow */
         ReportRow: {
@@ -10301,33 +10328,6 @@ export interface components {
             /** Text */
             text: string;
         };
-        /** LoginIn */
-        app__modules__platform__passkeys__LoginIn: {
-            /**
-             * Challenge Id
-             * Format: uuid
-             */
-            challenge_id: string;
-            /** Credential */
-            credential: {
-                [key: string]: unknown;
-            };
-            /** Workspace */
-            workspace?: string | null;
-        };
-        /** LoginIn */
-        app__modules__platform__routes_auth__LoginIn: {
-            /** Captcha Token */
-            captcha_token?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Password */
-            password: string;
-            /** Username */
-            username?: string | null;
-            /** Workspace */
-            workspace?: string | null;
-        };
     };
     responses: never;
     parameters: never;
@@ -10377,248 +10377,6 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
-                };
-            };
-        };
-    };
-    resource_types_scim_v2_ResourceTypes_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    service_provider_config_scim_v2_ServiceProviderConfig_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    list_users_scim_v2_Users_get: {
-        parameters: {
-            query?: {
-                filter?: string | null;
-                startIndex?: number;
-                count?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_user_scim_v2_Users_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    scim_get_user_scim_v2_Users__user_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    replace_user_scim_v2_Users__user_id__put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_user_scim_v2_Users__user_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    patch_user_scim_v2_Users__user_id__patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -12865,7 +12623,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__platform__routes_auth__LoginIn"];
+                "application/json": components["schemas"]["LoginIn"];
             };
         };
         responses: {
@@ -13111,7 +12869,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__platform__passkeys__LoginIn"];
+                "application/json": components["schemas"]["PasskeyLoginIn"];
             };
         };
         responses: {
@@ -13150,7 +12908,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OptionsOut"];
+                    "application/json": components["schemas"]["PasskeyOptionsOut"];
                 };
             };
         };
@@ -13164,7 +12922,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RegisterIn"];
+                "application/json": components["schemas"]["PasskeyRegisterIn"];
             };
         };
         responses: {
@@ -13203,7 +12961,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OptionsOut"];
+                    "application/json": components["schemas"]["PasskeyOptionsOut"];
                 };
             };
         };
@@ -19094,6 +18852,248 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resource_types_v1_scim_v2_ResourceTypes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    service_provider_config_v1_scim_v2_ServiceProviderConfig_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_users_v1_scim_v2_Users_get: {
+        parameters: {
+            query?: {
+                filter?: string | null;
+                startIndex?: number;
+                count?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_user_v1_scim_v2_Users_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scim_get_user_v1_scim_v2_Users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replace_user_v1_scim_v2_Users__user_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_user_v1_scim_v2_Users__user_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_user_v1_scim_v2_Users__user_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

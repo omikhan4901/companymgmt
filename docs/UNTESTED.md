@@ -137,7 +137,7 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   used by webhooks), `PUT/DELETE /v1/ai/own-key`, `GET /v1/audit/export` (JSONL/CSV with
   the hash chain), migration 0024. `tests/test_sso.py` **run once and passed (6 tests)**
   against a pretend provider; never tried with a real Google/Entra/Okta tenant.
-- [ ] **SCIM 2.0 and sandbox workspaces.** `app/modules/platform/scim.py` (`/scim/v2`
+- [ ] **SCIM 2.0 and sandbox workspaces.** `app/modules/platform/scim.py` (`/v1/scim/v2`
   Users with filter, create, replace, Okta- and Entra-style PATCH, delete; owner
   protected; API key needs members.invite + members.manage; plan feature `sso`),
   `memberships.external_id`, `POST /v1/workspace/sandbox` (`tenants.sandbox_of`, same

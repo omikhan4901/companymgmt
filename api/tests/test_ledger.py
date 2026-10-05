@@ -128,3 +128,13 @@ def test_stock_always_reconciles(ops: list[tuple[str, Decimal, Decimal]]) -> Non
             value = Decimal(0)
         else:
             assert abs(p.value - value) < Decimal("0.0001")
+
+
+def test_stock_sold_before_its_delivery_is_recosted() -> None:
+    """Sold 2 ahead at the old average (10); the delivery costs 12: those 2 cost 4 more."""
+    p, _ = costing.receive(costing.EMPTY, Decimal(1), Decimal(10))
+    p, sold = costing.move(p, Decimal(-3))
+    assert (p.quantity, sold) == (Decimal(-2), Decimal(-30))
+    p, change = costing.receive(p, Decimal(5), Decimal(12))
+    assert (p.quantity, p.average, p.value) == (Decimal(3), Decimal(12), Decimal(36))
+    assert costing.correction(Decimal(5), Decimal(12), change) == Decimal(-4)

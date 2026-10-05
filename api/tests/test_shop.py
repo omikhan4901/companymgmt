@@ -71,7 +71,8 @@ async def test_selling_at_the_till(client: httpx.AsyncClient) -> None:
     loose = await sale(
         cashier, [{"name": "Loose biscuits", "unit_price": 500, "quantity": "0.5"}], paid_cash=500
     )
-    assert loose.json()["total"] == 288  # 2.50 + 15% VAT (the default) = 2.875, rounded
+    # Prices include VAT, typed-in ones too: 2.50 in total, of which 15% VAT is 0.33.
+    assert (loose.json()["total"], loose.json()["tax"]) == (250, 33)
 
 
 async def test_offline_sales_are_kept_once(client: httpx.AsyncClient) -> None:

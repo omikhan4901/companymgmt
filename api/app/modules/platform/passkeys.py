@@ -105,7 +105,7 @@ async def _take_challenge(db: AsyncSession, challenge_id: uuid.UUID, purpose: st
     return row
 
 
-class OptionsOut(BaseModel):
+class PasskeyOptionsOut(BaseModel):
     challenge_id: uuid.UUID
     # PublicKeyCredentialCreationOptionsJSON / RequestOptionsJSON for the browser.
     options: dict[str, Any]
@@ -135,8 +135,8 @@ async def list_passkeys(ctx: Ctx = Depends(signed_in())) -> list[PasskeyOut]:
     ]
 
 
-@router.post("/register/options", response_model=OptionsOut)
-async def register_options(ctx: Ctx = Depends(signed_in())) -> OptionsOut:
+@router.post("/register/options", response_model=PasskeyOptionsOut)
+async def register_options(ctx: Ctx = Depends(signed_in())) -> PasskeyOptionsOut:
     require_recent_auth(ctx)
     existing = list(await ctx.db.scalars(select(Passkey).where(Passkey.user_id == ctx.user.id)))
     if len(existing) >= MAX_PASSKEYS:
@@ -156,17 +156,17 @@ async def register_options(ctx: Ctx = Depends(signed_in())) -> OptionsOut:
     )
     challenge_id = await _challenge(ctx.db, "register", options.challenge, ctx.user.id)
     await ctx.db.commit()
-    return OptionsOut(challenge_id=challenge_id, options=json.loads(options_to_json(options)))
+    return PasskeyOptionsOut(challenge_id=challenge_id, options=json.loads(options_to_json(options)))
 
 
-class RegisterIn(In):
+class PasskeyRegisterIn(In):
     challenge_id: uuid.UUID
     credential: dict[str, Any]
     name: Annotated[str, StringConstraints(min_length=1, max_length=80, strip_whitespace=True)] = "Passkey"
 
 
 @router.post("/register", response_model=PasskeyOut, status_code=201)
-async def register(body: RegisterIn, request: Request, ctx: Ctx = Depends(signed_in())) -> PasskeyOut:
+async def register(body: PasskeyRegisterIn, request: Request, ctx: Ctx = Depends(signed_in())) -> PasskeyOut:
     require_recent_auth(ctx)
     challenge = await _take_challenge(ctx.db, body.challenge_id, "register")
     if challenge.user_id != ctx.user.id:
@@ -232,8 +232,8 @@ async def remove(passkey_id: uuid.UUID, ctx: Ctx = Depends(signed_in())) -> None
 # ---- Signing in ----------------------------------------------------------------------------
 
 
-@router.post("/login/options", response_model=OptionsOut)
-async def login_options(db: AsyncSession = Depends(get_db), _: None = Depends(public())) -> OptionsOut:
+@router.post("/login/options", response_model=PasskeyOptionsOut)
+async def login_options(db: AsyncSession = Depends(get_db), _: None = Depends(public())) -> PasskeyOptionsOut:
     await ratelimit.enforce(ratelimit.LOGIN_IP, context.current().ip or "unknown")
     rp_id, _name = relying_party()
     options = generate_authentication_options(
@@ -241,10 +241,10 @@ async def login_options(db: AsyncSession = Depends(get_db), _: None = Depends(pu
     )
     challenge_id = await _challenge(db, "login", options.challenge, None)
     await db.commit()
-    return OptionsOut(challenge_id=challenge_id, options=json.loads(options_to_json(options)))
+    return PasskeyOptionsOut(challenge_id=challenge_id, options=json.loads(options_to_json(options)))
 
 
-class LoginIn(In):
+class PasskeyLoginIn(In):
     challenge_id: uuid.UUID
     credential: dict[str, Any]
     # The workspace to open (code or id); otherwise the last one used.
@@ -253,7 +253,7 @@ class LoginIn(In):
 
 @router.post("/login", response_model=TokenOut)
 async def login(
-    body: LoginIn,
+    body: PasskeyLoginIn,
     request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db),

@@ -109,7 +109,7 @@ class StockMovement(IdMixin, TenantScoped, TimestampMixin, Base):
         ForeignKeyConstraint(["tenant_id", "product_id"], ["products.tenant_id", "products.id"]),
         CheckConstraint(
             "kind IN ('opening', 'purchase', 'sale', 'return', 'void', 'adjustment', 'count',"
-            " 'transfer_out', 'transfer_in')",
+            " 'transfer_out', 'transfer_in', 'revalue')",
             name="kind",
         ),
         Index("ix_stock_movements_product", "tenant_id", "product_id", "occurred_at"),

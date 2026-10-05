@@ -1,4 +1,4 @@
-"""The public API contract: refuse breaking changes to /v1 and /scim/v2.
+"""The public API contract: refuse breaking changes to /v1 (SCIM lives at /v1/scim/v2).
 
 `docs/api/openapi-v1.json` is the published contract. `check` compares the running app
 against it and lists anything that would break a client:
@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any
 
 SNAPSHOT = Path(__file__).resolve().parents[2] / "docs" / "api" / "openapi-v1.json"
-PUBLIC = ("/v1/", "/scim/v2/")
+PUBLIC = ("/v1/",)
 METHODS = ("get", "post", "put", "patch", "delete")
 # Internal or app-only: not part of the promise to integrations.
 PRIVATE = ("/v1/auth/", "/v1/operator/", "/v1/public/", "/v1/join", "/v1/sso/")

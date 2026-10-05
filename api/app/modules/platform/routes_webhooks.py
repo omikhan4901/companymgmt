@@ -244,6 +244,8 @@ async def list_deliveries(
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
     ctx: Ctx = Developer,
 ) -> list[DeliveryOut]:
+    if await ctx.db.get(WebhookEndpoint, endpoint_id) is None:
+        raise NotFound()
     query = select(WebhookDelivery).where(WebhookDelivery.endpoint_id == endpoint_id)
     if status:
         query = query.where(WebhookDelivery.status == status)

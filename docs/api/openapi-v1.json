@@ -2589,6 +2589,25 @@
     "title": "CalendarEntry",
     "type": "object"
    },
+   "CashierOut": {
+    "properties": {
+     "membership_id": {
+      "format": "uuid",
+      "title": "Membership Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "membership_id",
+     "name"
+    ],
+    "title": "CashierOut",
+    "type": "object"
+   },
    "CategoryTotal": {
     "properties": {
      "category_id": {
@@ -3367,6 +3386,11 @@
      "role_key": {
       "title": "Role Key",
       "type": "string"
+     },
+     "sandbox": {
+      "default": false,
+      "title": "Sandbox",
+      "type": "boolean"
      },
      "scope_department_id": {
       "anyOf": [
@@ -7782,70 +7806,6 @@
     "title": "LoanOut",
     "type": "object"
    },
-   "LoginIn": {
-    "additionalProperties": false,
-    "properties": {
-     "captcha_token": {
-      "anyOf": [
-       {
-        "maxLength": 4096,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Captcha Token"
-     },
-     "email": {
-      "anyOf": [
-       {
-        "format": "email",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Email"
-     },
-     "password": {
-      "maxLength": 128,
-      "minLength": 1,
-      "title": "Password",
-      "type": "string"
-     },
-     "username": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Username"
-     },
-     "workspace": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Workspace"
-     }
-    },
-    "required": [
-     "password"
-    ],
-    "title": "LoginIn",
-    "type": "object"
-   },
    "LoginOut": {
     "properties": {
      "access_token": {
@@ -8656,6 +8616,26 @@
     "title": "OperatorMe",
     "type": "object"
    },
+   "OptionsOut": {
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "options": {
+      "additionalProperties": true,
+      "title": "Options",
+      "type": "object"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "options"
+    ],
+    "title": "OptionsOut",
+    "type": "object"
+   },
    "OverviewOut": {
     "properties": {
      "attendance": {
@@ -8887,6 +8867,49 @@
      "link"
     ],
     "title": "PassageOut",
+    "type": "object"
+   },
+   "PasskeyOut": {
+    "properties": {
+     "backed_up": {
+      "title": "Backed Up",
+      "type": "boolean"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_used_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Used At"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "created_at",
+     "last_used_at",
+     "backed_up"
+    ],
+    "title": "PasskeyOut",
     "type": "object"
    },
    "PasswordChangeIn": {
@@ -9456,6 +9479,46 @@
      "name"
     ],
     "title": "PersonRef",
+    "type": "object"
+   },
+   "PinIn": {
+    "additionalProperties": false,
+    "properties": {
+     "pin": {
+      "pattern": "^\\d{4,8}$",
+      "title": "Pin",
+      "type": "string"
+     }
+    },
+    "required": [
+     "pin"
+    ],
+    "title": "PinIn",
+    "type": "object"
+   },
+   "PinStatus": {
+    "properties": {
+     "has_pin": {
+      "title": "Has Pin",
+      "type": "boolean"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     }
+    },
+    "required": [
+     "has_pin"
+    ],
+    "title": "PinStatus",
     "type": "object"
    },
    "PlanOut": {
@@ -11352,6 +11415,34 @@
      "recovery_codes"
     ],
     "title": "RecoveryCodesOut",
+    "type": "object"
+   },
+   "RegisterIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "name": {
+      "default": "Passkey",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "RegisterIn",
     "type": "object"
    },
    "ReportRow": {
@@ -14790,6 +14881,57 @@
     "title": "SupplierPaymentIn",
     "type": "object"
    },
+   "SupportIn": {
+    "additionalProperties": false,
+    "properties": {
+     "message": {
+      "maxLength": 4000,
+      "minLength": 5,
+      "title": "Message",
+      "type": "string"
+     },
+     "page": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Page"
+     },
+     "topic": {
+      "enum": [
+       "question",
+       "problem",
+       "idea"
+      ],
+      "title": "Topic",
+      "type": "string"
+     }
+    },
+    "required": [
+     "topic",
+     "message"
+    ],
+    "title": "SupportIn",
+    "type": "object"
+   },
+   "SupportOut": {
+    "properties": {
+     "reference": {
+      "title": "Reference",
+      "type": "string"
+     }
+    },
+    "required": [
+     "reference"
+    ],
+    "title": "SupportOut",
+    "type": "object"
+   },
    "SwitchIn": {
     "additionalProperties": false,
     "properties": {
@@ -16065,6 +16207,126 @@
     "title": "TemplateOut",
     "type": "object"
    },
+   "TillIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "name": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "TillIn",
+    "type": "object"
+   },
+   "TillInfo": {
+    "properties": {
+     "cashiers": {
+      "items": {
+       "$ref": "#/components/schemas/CashierOut"
+      },
+      "title": "Cashiers",
+      "type": "array"
+     },
+     "till": {
+      "title": "Till",
+      "type": "string"
+     },
+     "workspace": {
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "till",
+     "workspace",
+     "cashiers"
+    ],
+    "title": "TillInfo",
+    "type": "object"
+   },
+   "TillOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "hint": {
+      "title": "Hint",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_seen_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Seen At"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "revoked": {
+      "title": "Revoked",
+      "type": "boolean"
+     },
+     "token": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Token"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "branch_id",
+     "hint",
+     "last_seen_at",
+     "revoked"
+    ],
+    "title": "TillOut",
+    "type": "object"
+   },
    "TimesheetOut": {
     "properties": {
      "end": {
@@ -16331,6 +16593,63 @@
     "title": "TrialBalanceOut",
     "type": "object"
    },
+   "UnlockIn": {
+    "additionalProperties": false,
+    "properties": {
+     "membership_id": {
+      "format": "uuid",
+      "title": "Membership Id",
+      "type": "string"
+     },
+     "pin": {
+      "pattern": "^\\d{4,8}$",
+      "title": "Pin",
+      "type": "string"
+     }
+    },
+    "required": [
+     "membership_id",
+     "pin"
+    ],
+    "title": "UnlockIn",
+    "type": "object"
+   },
+   "UnlockOut": {
+    "properties": {
+     "access_token": {
+      "title": "Access Token",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "expires_session_at": {
+      "description": "When the cashier is signed out of the till",
+      "format": "date-time",
+      "title": "Expires Session At",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "access_token",
+     "expires_at",
+     "name",
+     "expires_session_at"
+    ],
+    "title": "UnlockOut",
+    "type": "object"
+   },
    "UnreadOut": {
     "properties": {
      "unread": {
@@ -16366,6 +16685,60 @@
      "writes"
     ],
     "title": "UsageDay",
+    "type": "object"
+   },
+   "UsageOut": {
+    "properties": {
+     "days": {
+      "title": "Days",
+      "type": "integer"
+     },
+     "events": {
+      "items": {
+       "$ref": "#/components/schemas/UsageRow"
+      },
+      "title": "Events",
+      "type": "array"
+     },
+     "workspaces_new": {
+      "title": "Workspaces New",
+      "type": "integer"
+     },
+     "workspaces_total": {
+      "title": "Workspaces Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "days",
+     "workspaces_total",
+     "workspaces_new",
+     "events"
+    ],
+    "title": "UsageOut",
+    "type": "object"
+   },
+   "UsageRow": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "event": {
+      "title": "Event",
+      "type": "string"
+     },
+     "workspaces": {
+      "title": "Workspaces",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "event",
+     "count",
+     "workspaces"
+    ],
+    "title": "UsageRow",
     "type": "object"
    },
    "ValidationError": {
@@ -16849,6 +17222,103 @@
     ],
     "title": "WriteOut",
     "type": "object"
+   },
+   "app__modules__platform__passkeys__LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "LoginIn",
+    "type": "object"
+   },
+   "app__modules__platform__routes_auth__LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "password"
+    ],
+    "title": "LoginIn",
+    "type": "object"
    }
   }
  },
@@ -16905,329 +17375,6 @@
     "summary": "Readyz",
     "tags": [
      "ops"
-    ]
-   }
-  },
-  "/scim/v2/ResourceTypes": {
-   "get": {
-    "operationId": "resource_types_scim_v2_ResourceTypes_get",
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     }
-    },
-    "summary": "Resource Types",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/ServiceProviderConfig": {
-   "get": {
-    "operationId": "service_provider_config_scim_v2_ServiceProviderConfig_get",
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     }
-    },
-    "summary": "Service Provider Config",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/Users": {
-   "get": {
-    "operationId": "list_users_scim_v2_Users_get",
-    "parameters": [
-     {
-      "in": "query",
-      "name": "filter",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "maxLength": 300,
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Filter"
-      }
-     },
-     {
-      "in": "query",
-      "name": "startIndex",
-      "required": false,
-      "schema": {
-       "default": 1,
-       "minimum": 1,
-       "title": "Startindex",
-       "type": "integer"
-      }
-     },
-     {
-      "in": "query",
-      "name": "count",
-      "required": false,
-      "schema": {
-       "default": 100,
-       "maximum": 200,
-       "minimum": 0,
-       "title": "Count",
-       "type": "integer"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "List Users",
-    "tags": [
-     "scim"
-    ]
-   },
-   "post": {
-    "operationId": "create_user_scim_v2_Users_post",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Create User",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/Users/{user_id}": {
-   "delete": {
-    "description": "Removes them from the workspace (their account and history stay).",
-    "operationId": "delete_user_scim_v2_Users__user_id__delete",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Delete User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "get": {
-    "operationId": "scim_get_user_scim_v2_Users__user_id__get",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Scim Get User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "patch": {
-    "description": "The operations identity providers send: replace `active`, the name, `externalId`.",
-    "operationId": "patch_user_scim_v2_Users__user_id__patch",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Patch User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "put": {
-    "operationId": "replace_user_scim_v2_Users__user_id__put",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Replace User",
-    "tags": [
-     "scim"
     ]
    }
   },
@@ -20480,7 +20627,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/LoginIn"
+        "$ref": "#/components/schemas/app__modules__platform__routes_auth__LoginIn"
        }
       }
      },
@@ -20714,6 +20861,191 @@
      }
     },
     "summary": "Mfa Verify",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys": {
+   "get": {
+    "operationId": "list_passkeys_v1_auth_passkeys_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PasskeyOut"
+         },
+         "title": "Response List Passkeys V1 Auth Passkeys Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Passkeys",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/login": {
+   "post": {
+    "operationId": "login_v1_auth_passkeys_login_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__platform__passkeys__LoginIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Login",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/login/options": {
+   "post": {
+    "operationId": "login_options_v1_auth_passkeys_login_options_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OptionsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Login Options",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/register": {
+   "post": {
+    "operationId": "register_v1_auth_passkeys_register_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RegisterIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PasskeyOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Register",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/register/options": {
+   "post": {
+    "operationId": "register_options_v1_auth_passkeys_register_options_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OptionsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Register Options",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/{passkey_id}": {
+   "delete": {
+    "operationId": "remove_v1_auth_passkeys__passkey_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "passkey_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Passkey Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove",
     "tags": [
      "auth"
     ]
@@ -25905,6 +26237,52 @@
     ]
    }
   },
+  "/v1/operator/usage": {
+   "get": {
+    "description": "Product analytics for operators: event counts across workspaces, nothing personal.",
+    "operationId": "usage_v1_operator_usage_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "days",
+      "required": false,
+      "schema": {
+       "default": 30,
+       "maximum": 365,
+       "minimum": 1,
+       "title": "Days",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UsageOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Usage",
+    "tags": [
+     "operator"
+    ]
+   }
+  },
   "/v1/payroll/loans": {
    "get": {
     "operationId": "loans_v1_payroll_loans_get",
@@ -28301,6 +28679,79 @@
     ]
    }
   },
+  "/v1/sales/my-pin": {
+   "delete": {
+    "operationId": "remove_pin_v1_sales_my_pin_delete",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Remove Pin",
+    "tags": [
+     "sales"
+    ]
+   },
+   "get": {
+    "operationId": "my_pin_v1_sales_my_pin_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PinStatus"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Pin",
+    "tags": [
+     "sales"
+    ]
+   },
+   "put": {
+    "description": "Set (or change) your till PIN. Only from a full sign-in, not from a till.",
+    "operationId": "set_pin_v1_sales_my_pin_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PinIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PinStatus"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Set Pin",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
   "/v1/sales/products": {
    "get": {
     "operationId": "products_v1_sales_products_get",
@@ -28687,6 +29138,107 @@
     ]
    }
   },
+  "/v1/sales/tills": {
+   "get": {
+    "operationId": "list_tills_v1_sales_tills_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TillOut"
+         },
+         "title": "Response List Tills V1 Sales Tills Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Tills",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "description": "Run this on the till itself: the browser keeps the returned token.",
+    "operationId": "register_till_v1_sales_tills_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TillIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TillOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Register Till",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/tills/{till_id}": {
+   "delete": {
+    "operationId": "revoke_till_v1_sales_tills__till_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "till_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Till Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Revoke Till",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
   "/v1/sales/{sale_id}": {
    "get": {
     "operationId": "get_sale_v1_sales__sale_id__get",
@@ -28879,6 +29431,329 @@
     ]
    }
   },
+  "/v1/scim/v2/ResourceTypes": {
+   "get": {
+    "operationId": "resource_types_v1_scim_v2_ResourceTypes_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Resource Types",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/ServiceProviderConfig": {
+   "get": {
+    "operationId": "service_provider_config_v1_scim_v2_ServiceProviderConfig_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Service Provider Config",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/Users": {
+   "get": {
+    "operationId": "list_users_v1_scim_v2_Users_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "filter",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 300,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Filter"
+      }
+     },
+     {
+      "in": "query",
+      "name": "startIndex",
+      "required": false,
+      "schema": {
+       "default": 1,
+       "minimum": 1,
+       "title": "Startindex",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "count",
+      "required": false,
+      "schema": {
+       "default": 100,
+       "maximum": 200,
+       "minimum": 0,
+       "title": "Count",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Users",
+    "tags": [
+     "scim"
+    ]
+   },
+   "post": {
+    "operationId": "create_user_v1_scim_v2_Users_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create User",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/Users/{user_id}": {
+   "delete": {
+    "description": "Removes them from the workspace (their account and history stay).",
+    "operationId": "delete_user_v1_scim_v2_Users__user_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "get": {
+    "operationId": "scim_get_user_v1_scim_v2_Users__user_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Scim Get User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "patch": {
+    "description": "The operations identity providers send: replace `active`, the name, `externalId`.",
+    "operationId": "patch_user_v1_scim_v2_Users__user_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Patch User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "put": {
+    "operationId": "replace_user_v1_scim_v2_Users__user_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Replace User",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
   "/v1/sso/callback": {
    "post": {
     "operationId": "callback_v1_sso_callback_post",
@@ -29031,6 +29906,48 @@
     "summary": "Start",
     "tags": [
      "sso"
+    ]
+   }
+  },
+  "/v1/support": {
+   "post": {
+    "description": "Send a question, problem or idea to the team. The reply goes to your email.",
+    "operationId": "contact_support_v1_support_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SupportIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SupportOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Contact Support",
+    "tags": [
+     "support"
     ]
    }
   },
@@ -29707,6 +30624,115 @@
     "summary": "Move Task",
     "tags": [
      "tasks"
+    ]
+   }
+  },
+  "/v1/till": {
+   "get": {
+    "description": "Who can unlock this till (names only).",
+    "operationId": "till_info_v1_till_get",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "x-till-token",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Till-Token"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TillInfo"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Till Info",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/till/unlock": {
+   "post": {
+    "operationId": "unlock_v1_till_unlock_post",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "x-till-token",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Till-Token"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UnlockIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UnlockOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Unlock",
+    "tags": [
+     "sales"
     ]
    }
   },

@@ -225,7 +225,7 @@ Enterprise plan. Your identity provider adds people when they're hired and remov
 when they leave.
 
 1. Make an API key with **members.view, members.invite and members.manage**.
-2. In the provider: SCIM base URL `https://companymgmt.app/scim/v2`, authentication
+2. In the provider: SCIM base URL `https://companymgmt.app/v1/scim/v2`, authentication
    "HTTP header / bearer token" with the key.
 3. Supported: `Users` (list with `filter=userName eq "..."` / `externalId eq "..."`,
    create, replace, PATCH `active`/`displayName`/`externalId`, delete). Groups aren't yet.

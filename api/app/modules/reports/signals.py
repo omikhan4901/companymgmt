@@ -162,7 +162,10 @@ async def _workload(ctx: Ctx, now: date) -> list[SignalOut]:
     if len(rows) < 3:
         return []
     loads = [int(n) for _, _, n in rows]
-    limit = max(8.0, statistics.mean(loads) + 2 * statistics.pstdev(loads))
+    # At least 8 open tasks and more than twice what's typical in the team. (A rule based
+    # on standard deviations can't fire in small teams: with four people one outlier is
+    # never more than 1.7 deviations above the mean.)
+    limit = max(8.0, 2 * statistics.median(loads))
     week = now.isocalendar()
     return [
         SignalOut(

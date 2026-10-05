@@ -448,6 +448,7 @@ async def test_actions_can_be_cancelled_fail_cleanly_and_expire(
     await switch_on(owner, ["ask", "actions"])
 
     # Expired offers can't be confirmed.
+    owner_sql.execute("SELECT set_config('app.tenant_id', %s, false)", (owner.tenant_id,))
     owner_sql.execute("UPDATE ai_proposals SET expires_at = now() - interval '1 minute'")
     expired = await staff.post(f"/v1/ai/actions/{second['id']}/confirm")
     assert (expired.status_code, expired.json()["code"]) == (409, "action_expired")
@@ -515,7 +516,8 @@ async def test_document_summaries_only_for_documents_you_can_open(
     secret = await make(owner, "Design pay", visibility="departments", visibility_ids=[o["design"]])
     await upload(owner, secret["id"], b"Designers earn a lot.", "pay.txt")
     empty = await make(owner, "Scan")
-    await upload(owner, empty["id"], b"\x89PNG", "scan.png")
+    scanned = await upload(owner, empty["id"], b"\x89PNG\r\n\x1a\n" + bytes(64), "scan.png")
+    assert scanned.status_code == 201, scanned.text
 
     summary = await o["seller"].post(f"/v1/ai/documents/{policy['id']}/summary")
     assert summary.status_code == 200, summary.text
@@ -523,4 +525,4 @@ async def test_document_summaries_only_for_documents_you_can_open(
     assert "Leave policy" in fake.calls[-1][0]
     assert (await o["seller"].post(f"/v1/ai/documents/{secret['id']}/summary")).status_code == 404
     no_text = await o["seller"].post(f"/v1/ai/documents/{empty['id']}/summary")
-    assert (no_text.status_code, no_text.json()["code"]) == (422, "no_text")
+    assert (no_text.status_code, no_text.json()["code"]) == (422, "no_text"), no_text.text

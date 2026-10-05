@@ -150,4 +150,4 @@ async def ai_allowance_changed(db: AsyncSession, event: events.Event) -> None:
 async def stock_low(db: AsyncSession, event: events.Event) -> None:
     """An item fell to its reorder level: tell the people who reorder stock."""
     people = await holders(db, "inventory.manage")
-    await notify(db, event, people, link="/app/inventory?low=1")
+    await notify(db, event, people, link="/app/inventory?low=1", include_actor=True)

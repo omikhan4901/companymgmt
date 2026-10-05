@@ -7806,6 +7806,70 @@
     "title": "LoanOut",
     "type": "object"
    },
+   "LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "password"
+    ],
+    "title": "LoginIn",
+    "type": "object"
+   },
    "LoginOut": {
     "properties": {
      "access_token": {
@@ -8616,26 +8680,6 @@
     "title": "OperatorMe",
     "type": "object"
    },
-   "OptionsOut": {
-    "properties": {
-     "challenge_id": {
-      "format": "uuid",
-      "title": "Challenge Id",
-      "type": "string"
-     },
-     "options": {
-      "additionalProperties": true,
-      "title": "Options",
-      "type": "object"
-     }
-    },
-    "required": [
-     "challenge_id",
-     "options"
-    ],
-    "title": "OptionsOut",
-    "type": "object"
-   },
    "OverviewOut": {
     "properties": {
      "attendance": {
@@ -8869,6 +8913,59 @@
     "title": "PassageOut",
     "type": "object"
    },
+   "PasskeyLoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "PasskeyLoginIn",
+    "type": "object"
+   },
+   "PasskeyOptionsOut": {
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "options": {
+      "additionalProperties": true,
+      "title": "Options",
+      "type": "object"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "options"
+    ],
+    "title": "PasskeyOptionsOut",
+    "type": "object"
+   },
    "PasskeyOut": {
     "properties": {
      "backed_up": {
@@ -8910,6 +9007,34 @@
      "backed_up"
     ],
     "title": "PasskeyOut",
+    "type": "object"
+   },
+   "PasskeyRegisterIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "name": {
+      "default": "Passkey",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "PasskeyRegisterIn",
     "type": "object"
    },
    "PasswordChangeIn": {
@@ -11415,34 +11540,6 @@
      "recovery_codes"
     ],
     "title": "RecoveryCodesOut",
-    "type": "object"
-   },
-   "RegisterIn": {
-    "additionalProperties": false,
-    "properties": {
-     "challenge_id": {
-      "format": "uuid",
-      "title": "Challenge Id",
-      "type": "string"
-     },
-     "credential": {
-      "additionalProperties": true,
-      "title": "Credential",
-      "type": "object"
-     },
-     "name": {
-      "default": "Passkey",
-      "maxLength": 80,
-      "minLength": 1,
-      "title": "Name",
-      "type": "string"
-     }
-    },
-    "required": [
-     "challenge_id",
-     "credential"
-    ],
-    "title": "RegisterIn",
     "type": "object"
    },
    "ReportRow": {
@@ -17222,103 +17319,6 @@
     ],
     "title": "WriteOut",
     "type": "object"
-   },
-   "app__modules__platform__passkeys__LoginIn": {
-    "additionalProperties": false,
-    "properties": {
-     "challenge_id": {
-      "format": "uuid",
-      "title": "Challenge Id",
-      "type": "string"
-     },
-     "credential": {
-      "additionalProperties": true,
-      "title": "Credential",
-      "type": "object"
-     },
-     "workspace": {
-      "anyOf": [
-       {
-        "maxLength": 64,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Workspace"
-     }
-    },
-    "required": [
-     "challenge_id",
-     "credential"
-    ],
-    "title": "LoginIn",
-    "type": "object"
-   },
-   "app__modules__platform__routes_auth__LoginIn": {
-    "additionalProperties": false,
-    "properties": {
-     "captcha_token": {
-      "anyOf": [
-       {
-        "maxLength": 4096,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Captcha Token"
-     },
-     "email": {
-      "anyOf": [
-       {
-        "format": "email",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Email"
-     },
-     "password": {
-      "maxLength": 128,
-      "minLength": 1,
-      "title": "Password",
-      "type": "string"
-     },
-     "username": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Username"
-     },
-     "workspace": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Workspace"
-     }
-    },
-    "required": [
-     "password"
-    ],
-    "title": "LoginIn",
-    "type": "object"
    }
   }
  },
@@ -17375,329 +17375,6 @@
     "summary": "Readyz",
     "tags": [
      "ops"
-    ]
-   }
-  },
-  "/scim/v2/ResourceTypes": {
-   "get": {
-    "operationId": "resource_types_scim_v2_ResourceTypes_get",
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     }
-    },
-    "summary": "Resource Types",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/ServiceProviderConfig": {
-   "get": {
-    "operationId": "service_provider_config_scim_v2_ServiceProviderConfig_get",
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     }
-    },
-    "summary": "Service Provider Config",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/Users": {
-   "get": {
-    "operationId": "list_users_scim_v2_Users_get",
-    "parameters": [
-     {
-      "in": "query",
-      "name": "filter",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "maxLength": 300,
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Filter"
-      }
-     },
-     {
-      "in": "query",
-      "name": "startIndex",
-      "required": false,
-      "schema": {
-       "default": 1,
-       "minimum": 1,
-       "title": "Startindex",
-       "type": "integer"
-      }
-     },
-     {
-      "in": "query",
-      "name": "count",
-      "required": false,
-      "schema": {
-       "default": 100,
-       "maximum": 200,
-       "minimum": 0,
-       "title": "Count",
-       "type": "integer"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "List Users",
-    "tags": [
-     "scim"
-    ]
-   },
-   "post": {
-    "operationId": "create_user_scim_v2_Users_post",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Create User",
-    "tags": [
-     "scim"
-    ]
-   }
-  },
-  "/scim/v2/Users/{user_id}": {
-   "delete": {
-    "description": "Removes them from the workspace (their account and history stay).",
-    "operationId": "delete_user_scim_v2_Users__user_id__delete",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "204": {
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Delete User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "get": {
-    "operationId": "scim_get_user_scim_v2_Users__user_id__get",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Scim Get User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "patch": {
-    "description": "The operations identity providers send: replace `active`, the name, `externalId`.",
-    "operationId": "patch_user_scim_v2_Users__user_id__patch",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Patch User",
-    "tags": [
-     "scim"
-    ]
-   },
-   "put": {
-    "operationId": "replace_user_scim_v2_Users__user_id__put",
-    "parameters": [
-     {
-      "in": "path",
-      "name": "user_id",
-      "required": true,
-      "schema": {
-       "title": "User Id",
-       "type": "string"
-      }
-     }
-    ],
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "additionalProperties": true,
-        "title": "Body",
-        "type": "object"
-       }
-      }
-     },
-     "required": true
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      },
-      "description": "Successful Response"
-     },
-     "422": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      },
-      "description": "Validation Error"
-     }
-    },
-    "summary": "Replace User",
-    "tags": [
-     "scim"
     ]
    }
   },
@@ -20950,7 +20627,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__platform__routes_auth__LoginIn"
+        "$ref": "#/components/schemas/LoginIn"
        }
       }
      },
@@ -21221,7 +20898,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__platform__passkeys__LoginIn"
+        "$ref": "#/components/schemas/PasskeyLoginIn"
        }
       }
      },
@@ -21263,7 +20940,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/OptionsOut"
+         "$ref": "#/components/schemas/PasskeyOptionsOut"
         }
        }
       },
@@ -21283,7 +20960,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/RegisterIn"
+        "$ref": "#/components/schemas/PasskeyRegisterIn"
        }
       }
      },
@@ -21325,7 +21002,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/OptionsOut"
+         "$ref": "#/components/schemas/PasskeyOptionsOut"
         }
        }
       },
@@ -29751,6 +29428,329 @@
     "summary": "Void",
     "tags": [
      "sales"
+    ]
+   }
+  },
+  "/v1/scim/v2/ResourceTypes": {
+   "get": {
+    "operationId": "resource_types_v1_scim_v2_ResourceTypes_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Resource Types",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/ServiceProviderConfig": {
+   "get": {
+    "operationId": "service_provider_config_v1_scim_v2_ServiceProviderConfig_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Service Provider Config",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/Users": {
+   "get": {
+    "operationId": "list_users_v1_scim_v2_Users_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "filter",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 300,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Filter"
+      }
+     },
+     {
+      "in": "query",
+      "name": "startIndex",
+      "required": false,
+      "schema": {
+       "default": 1,
+       "minimum": 1,
+       "title": "Startindex",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "count",
+      "required": false,
+      "schema": {
+       "default": 100,
+       "maximum": 200,
+       "minimum": 0,
+       "title": "Count",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Users",
+    "tags": [
+     "scim"
+    ]
+   },
+   "post": {
+    "operationId": "create_user_v1_scim_v2_Users_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create User",
+    "tags": [
+     "scim"
+    ]
+   }
+  },
+  "/v1/scim/v2/Users/{user_id}": {
+   "delete": {
+    "description": "Removes them from the workspace (their account and history stay).",
+    "operationId": "delete_user_v1_scim_v2_Users__user_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "get": {
+    "operationId": "scim_get_user_v1_scim_v2_Users__user_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Scim Get User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "patch": {
+    "description": "The operations identity providers send: replace `active`, the name, `externalId`.",
+    "operationId": "patch_user_v1_scim_v2_Users__user_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Patch User",
+    "tags": [
+     "scim"
+    ]
+   },
+   "put": {
+    "operationId": "replace_user_v1_scim_v2_Users__user_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "user_id",
+      "required": true,
+      "schema": {
+       "title": "User Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "additionalProperties": true,
+        "title": "Body",
+        "type": "object"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Replace User",
+    "tags": [
+     "scim"
     ]
    }
   },

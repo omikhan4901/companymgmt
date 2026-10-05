@@ -23,9 +23,12 @@ import pytest
 from app.ai import provider
 from app.ai.fake import FakeModel
 from app.ai.provider import Reply, ToolCall
+from app.core import safehttp
 from app.core.config import get_settings
 from app.main import api_routes
 from app.models_registry import metadata
+from app.modules.platform import catalog
+from tests.conftest import owner_dsn
 from tests.helpers import Account, add_staff, if_match, invite_and_join, role_id, signup
 
 # Global tables, each with the reason it has no tenant_id.
@@ -42,6 +45,10 @@ GLOBAL_TABLES = {
     "auth_events": "per user security history",
     "outbox_events": "read across tenants by the delivery job only",
     "rate_limits": "counters keyed by IP or account",
+    "idempotency_keys": "keyed by the hash of the caller's API key or session",
+    "passkeys": "per user, looked up by credential id",
+    "webauthn_challenges": "per user or sign-in attempt, single use",
+    "sso_states": "a sign-in in progress, looked up by the hash of a secret",
 }
 
 
@@ -87,6 +94,17 @@ def test_app_role_cannot_bypass_rls(owner_sql: psycopg.Connection) -> None:
 async def _two_workspaces(client: httpx.AsyncClient) -> tuple[Account, Account]:
     a = await signup(client, business="Alpha Traders")
     b = await signup(client, business="Beta Foods")
+    # Enterprise, so plan-gated routes (API keys, webhooks, SCIM) reach their id checks.
+    with psycopg.connect(owner_dsn(), autocommit=True) as conn:
+        for account in (a, b):
+            conn.execute("SELECT set_config('app.tenant_id', %s, false)", (account.tenant_id,))
+            conn.execute(
+                "UPDATE subscriptions SET plan_key = 'enterprise', status = 'active', trial_plan_key = NULL"
+            )
+    every = [k for k, m in catalog.MODULES.items() if not m.core and m.available]
+    for account in (a, b):
+        switched = await account.put("/v1/workspace/modules", json={"modules": every})
+        assert switched.status_code == 200, switched.text
     return a, b
 
 
@@ -332,6 +350,28 @@ async def _resources(owner: Account) -> dict[str, str]:
     ids["template_id"] = template.json()["id"]
     link = await owner.post("/v1/join-links", json={"role_id": await role_id(owner, "employee")})
     ids["link_id"] = link.json()["id"]
+
+    key = await owner.post("/v1/api-keys", json={"name": "Sync", "permissions": ["members.view"]})
+    ids["key_id"] = key.json()["id"]
+    till = await owner.post("/v1/sales/tills", json={"name": "Counter"})
+    ids["till_id"] = till.json()["id"]
+    endpoint = await owner.post("/v1/webhooks", json={"url": "https://hooks.example.com/x", "events": ["*"]})
+    ids["endpoint_id"] = endpoint.json()["id"]
+
+    async def public_dns(host: str, port: int) -> list[str]:
+        return ["93.184.216.34"]
+
+    saved = safehttp.transport, safehttp.resolve
+    safehttp.transport = httpx.MockTransport(lambda r: httpx.Response(200))
+    safehttp.resolve = public_dns  # type: ignore[assignment]
+    try:
+        ping = await owner.post(f"/v1/webhooks/{ids['endpoint_id']}/test")
+    finally:
+        safehttp.transport, safehttp.resolve = saved  # type: ignore[assignment]
+    ids["delivery_id"] = ping.json()["id"]
+    scim = (await owner.get("/v1/scim/v2/Users")).json()["Resources"]
+    ids["user_id"] = scim[0]["id"]
+    ids["passkey_id"] = str(uuid.uuid4())  # A's passkeys are personal; any id must 404 for B
     assert all(ids.values()), ids
     return ids
 

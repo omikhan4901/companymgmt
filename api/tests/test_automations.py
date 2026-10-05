@@ -4,7 +4,7 @@ looping, and drafted from plain words by the assistant for review."""
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -52,9 +52,8 @@ def test_schedules_land_on_the_right_local_time() -> None:
     # Workdays skip the workspace's weekly days off (Friday and Saturday here).
     friday = datetime(2026, 10, 8, 23, 0, tzinfo=UTC)  # Friday 05:00 in Dhaka
     workdays = ScheduleTrigger(every="workdays", time="09:00")
-    assert next_run(workdays, "Asia/Dhaka", friday, [5, 6]).date() == date(
-        2026, 10, 10
-    )  # Sunday 09:00 = Sun 03:00Z
+    # Friday 9 and Saturday 10 October are off: Sunday 11th, 09:00 in Dhaka (03:00Z).
+    assert next_run(workdays, "Asia/Dhaka", friday, [5, 6]) == datetime(2026, 10, 11, 3, 0, tzinfo=UTC)
     monthly = ScheduleTrigger(every="month", day=1, time="08:00")
     assert next_run(monthly, "Asia/Dhaka", after, []) == datetime(2026, 11, 1, 2, 0, tzinfo=UTC)
 
@@ -191,6 +190,7 @@ async def test_runaway_and_orphaned_automations_pause_themselves(
 ) -> None:
     owner = await signup(client)
     automation = (await owner.post("/v1/automations", json=OVERDUE)).json()
+    owner_sql.execute("SELECT set_config('app.tenant_id', %s, false)", (owner.tenant_id,))
     owner_sql.execute(
         "INSERT INTO automation_runs"
         " (id, tenant_id, automation_id, status, cause, detail, created_at, updated_at)"
@@ -212,6 +212,7 @@ async def test_the_tick_runs_what_is_due_and_reschedules(
 ) -> None:
     owner = await signup(client)
     automation = (await owner.post("/v1/automations", json=OVERDUE)).json()
+    owner_sql.execute("SELECT set_config('app.tenant_id', %s, false)", (owner.tenant_id,))
     owner_sql.execute("UPDATE automations SET next_run_at = now() - interval '1 minute'")
     assert await tick() == 1
     after = (await owner.get(f"/v1/automations/{automation['id']}")).json()

@@ -47,10 +47,10 @@ async def test_provisioning_lifecycle(client: httpx.AsyncClient, owner_sql: psyc
     on_plan(owner_sql, owner)
     headers = await scim_key(owner)
 
-    config = await client.get("/scim/v2/ServiceProviderConfig", headers=headers)
+    config = await client.get("/v1/scim/v2/ServiceProviderConfig", headers=headers)
     assert config.json()["patch"]["supported"] is True
 
-    created = await client.post("/scim/v2/Users", json=user("nadia@acme.example"), headers=headers)
+    created = await client.post("/v1/scim/v2/Users", json=user("nadia@acme.example"), headers=headers)
     assert created.status_code == 201, created.text
     assert created.headers["content-type"].startswith(SCIM)
     member = created.json()
@@ -60,21 +60,21 @@ async def test_provisioning_lifecycle(client: httpx.AsyncClient, owner_sql: psyc
         "Nadia Rahman",
     )
 
-    again = await client.post("/scim/v2/Users", json=user("nadia@acme.example"), headers=headers)
+    again = await client.post("/v1/scim/v2/Users", json=user("nadia@acme.example"), headers=headers)
     assert again.status_code == 409
 
     found = await client.get(
-        "/scim/v2/Users", params={"filter": 'userName eq "NADIA@acme.example"'}, headers=headers
+        "/v1/scim/v2/Users", params={"filter": 'userName eq "NADIA@acme.example"'}, headers=headers
     )
     assert found.json()["totalResults"] == 1
     by_external = await client.get(
-        "/scim/v2/Users", params={"filter": 'externalId eq "00u1"'}, headers=headers
+        "/v1/scim/v2/Users", params={"filter": 'externalId eq "00u1"'}, headers=headers
     )
     assert by_external.json()["Resources"][0]["id"] == member["id"]
 
     # Entra's way of switching someone off: no path, a value object.
     off = await client.patch(
-        f"/scim/v2/Users/{member['id']}",
+        f"/v1/scim/v2/Users/{member['id']}",
         json={
             "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
             "Operations": [{"op": "Replace", "value": {"active": False}}],
@@ -87,14 +87,14 @@ async def test_provisioning_lifecycle(client: httpx.AsyncClient, owner_sql: psyc
 
     # Okta's way back on.
     on = await client.patch(
-        f"/scim/v2/Users/{member['id']}",
+        f"/v1/scim/v2/Users/{member['id']}",
         json={"Operations": [{"op": "replace", "path": "active", "value": "true"}]},
         headers=headers,
     )
     assert on.json()["active"] is True
-    assert (await client.delete(f"/scim/v2/Users/{member['id']}", headers=headers)).status_code == 204
-    assert (await client.get(f"/scim/v2/Users/{member['id']}", headers=headers)).json()["active"] is False
-    assert (await client.get("/scim/v2/Users/not-an-id", headers=headers)).status_code == 404
+    assert (await client.delete(f"/v1/scim/v2/Users/{member['id']}", headers=headers)).status_code == 204
+    assert (await client.get(f"/v1/scim/v2/Users/{member['id']}", headers=headers)).json()["active"] is False
+    assert (await client.get("/v1/scim/v2/Users/not-an-id", headers=headers)).status_code == 404
 
 
 async def test_the_owner_cant_be_deprovisioned(
@@ -103,9 +103,9 @@ async def test_the_owner_cant_be_deprovisioned(
     owner = await signup(client)
     on_plan(owner_sql, owner)
     headers = await scim_key(owner)
-    listed = (await client.get("/scim/v2/Users", headers=headers)).json()["Resources"]
+    listed = (await client.get("/v1/scim/v2/Users", headers=headers)).json()["Resources"]
     owner_id = listed[0]["id"]
-    refused = await client.delete(f"/scim/v2/Users/{owner_id}", headers=headers)
+    refused = await client.delete(f"/v1/scim/v2/Users/{owner_id}", headers=headers)
     assert refused.status_code == 403
 
 
@@ -113,7 +113,7 @@ async def test_scim_needs_the_plan(client: httpx.AsyncClient, owner_sql: psycopg
     owner = await signup(client)
     on_plan(owner_sql, owner, "business")
     headers = await scim_key(owner)
-    assert (await client.get("/scim/v2/Users", headers=headers)).status_code == 402
+    assert (await client.get("/v1/scim/v2/Users", headers=headers)).status_code == 402
 
 
 async def test_sandbox(client: httpx.AsyncClient, owner_sql: psycopg.Connection) -> None:

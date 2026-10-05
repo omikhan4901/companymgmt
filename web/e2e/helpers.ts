@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process";
+
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Browser, type Page } from "@playwright/test";
 
@@ -32,7 +34,7 @@ export function watchCsp(page: Page): string[] {
   return violations;
 }
 
-export async function signUp(page: Page, opts: { name?: string; business?: string; email?: string } = {}) {
+export async function signUp(page: Page, opts: { name?: string; business?: string; email?: string; type?: RegExp } = {}) {
   const email = opts.email ?? uniqueEmail();
   await page.goto("/signup");
   await page.getByRole("button", { name: "English" }).click();
@@ -41,7 +43,7 @@ export async function signUp(page: Page, opts: { name?: string; business?: strin
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: "Next" }).click();
   await page.getByLabel("Business name").fill(opts.business ?? "Cha Ghor");
-  await page.getByRole("radio", { name: /Office or services/ }).click();
+  await page.getByRole("radio", { name: opts.type ?? /Office or services/ }).click();
   await page.getByRole("button", { name: "Create workspace" }).click();
   await expect(page).toHaveURL(/\/app$/);
   return email;
@@ -86,4 +88,17 @@ export async function staffSignIn(browser: Browser, code: string, username: stri
   await staff.getByRole("button", { name: "Save" }).click();
   await expect(staff.getByRole("heading", { name: /Hi/ })).toBeVisible();
   return { context, staff };
+}
+
+
+/** Puts the workspace owned by `email` on a plan directly in the database (plans with
+ * the API, SSO and so on can't be bought yet). */
+export function setPlan(email: string, plan: string): void {
+  const url = process.env.E2E_OWNER_DATABASE_URL ?? "postgresql://cm_owner:cm_owner@localhost:5432/companymgmt";
+  const safe = email.replace(/'/g, "");
+  const sql = [
+    `SELECT set_config('app.tenant_id', (SELECT m.tenant_id::text FROM memberships m JOIN users u ON u.id = m.user_id WHERE u.email = '${safe}' LIMIT 1), false)`,
+    `UPDATE subscriptions SET plan_key = '${plan}', status = 'active', trial_plan_key = NULL`,
+  ].join("; ");
+  execSync(`psql "${url}" -v ON_ERROR_STOP=1 -c "${sql}"`, { stdio: "ignore" });
 }

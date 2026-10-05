@@ -13,7 +13,10 @@ const faq = [
   { q: "Is the location check on every plan?", a: "Yes. Place your branches on the map and choose whether location is required, recorded only, or off." },
   { q: "Can I pay in taka?", a: "Online payment is coming soon, in US dollars by card. Until then, contact us and we'll set up your plan." },
   { q: "Can I export my data?", a: "Yes. Download your whole workspace at any time, or attendance and timesheets as spreadsheets. You can also bring your team in from a spreadsheet." },
-  { q: "Do I need every module?", a: "No. Switch on only what you use: attendance, leave, payroll, tasks, announcements, documents. Your plan sets how many." },
+  { q: "Do I need every module?", a: "No. Switch on only what you use: attendance, leave, payroll, point of sale, customers and dues, expenses, inventory, accounting, tasks, announcements, documents. Your plan sets how many." },
+  { q: "Is the AI assistant included?", a: "Paid plans include a monthly number of questions. It's off until the workspace owner switches it on, and it never sees more than the person asking. Enterprise workspaces can use their own Gemini key." },
+  { q: "Do you calculate my taxes?", a: "You or your accountant set the tax rates, payroll tax table and tax-return templates; CompanyMgmt applies them consistently. We don't give tax advice." },
+  { q: "Can I connect other systems?", a: "Business and Enterprise include API keys, signed webhooks and a sandbox workspace. Enterprise adds company sign-in with Google, Microsoft or Okta, SCIM provisioning and network restrictions." },
 ];
 
 export default function PricingPage() {

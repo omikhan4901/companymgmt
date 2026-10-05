@@ -13,6 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel
 from sqlalchemy import delete, func, select, text
+from sqlalchemy.exc import IntegrityError
 
 from app.core import audit
 from app.core.errors import Conflict
@@ -146,22 +147,26 @@ async def remove_sample(ctx: Ctx) -> SampleOut:
     """Remove everything sample data added (what people did with it, like sales of a
     sample item, stays; those rows keep their names)."""
     ctx.require(WORKSPACE_MANAGE)
-    rows = list(await ctx.db.scalars(select(SampleRecord).order_by(SampleRecord.position.desc())))
-    for record in rows:
-        model = MODELS.get(record.table_name)
+    rows = [
+        (r.table_name, r.record_id)
+        for r in await ctx.db.scalars(select(SampleRecord).order_by(SampleRecord.position.desc()))
+    ]
+    for table_name, record_id in rows:
+        model = MODELS.get(table_name)
         if model is None:
             continue
-        async with ctx.db.begin_nested():
-            try:
-                if model is Product:
-                    # Products can be on past sales: switch them off instead of deleting.
-                    product = await ctx.db.get(Product, record.record_id)
-                    if product is not None:
-                        product.active = False
-                    continue
-                await ctx.db.execute(delete(model).where(model.id == record.record_id))
-            except Exception:
-                await ctx.db.rollback()
+        if model is Product:
+            # Products can be on past sales: switch them off instead of deleting.
+            product = await ctx.db.get(Product, record_id)
+            if product is not None:
+                product.active = False
+            continue
+        try:
+            async with ctx.db.begin_nested():
+                await ctx.db.execute(delete(model).where(model.id == record_id))
+        except IntegrityError:
+            # Real records now point at it (a sale to the sample customer, say): keep it.
+            continue
     await ctx.db.execute(delete(SampleRecord))
     await audit.record(
         ctx.db, "workspace.sample_removed", target_type="workspace", data={"records": len(rows)}

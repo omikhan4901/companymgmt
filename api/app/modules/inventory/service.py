@@ -99,9 +99,13 @@ async def record(
     item = await _item(db, product_id)
     assert item is not None
     position = costing.Position(Decimal(item.quantity), Decimal(item.value), Decimal(item.average_cost))
+    fix = Decimal(0)
     if unit_cost is not None:
         position, value = costing.receive(position, quantity, unit_cost)
         cost = unit_cost
+        # Stock sold ahead of this delivery is re-costed: booked as its own movement.
+        fix = costing.correction(quantity, unit_cost, value)
+        value -= fix
     else:
         position, value = costing.move(position, quantity)
         cost = position.average
@@ -138,6 +142,37 @@ async def record(
             "ref_id": ref_id,
         },
     )
+    if fix:
+        revalue = StockMovement(
+            product_id=product_id,
+            branch_id=branch_id,
+            kind="revalue",
+            quantity=Decimal(0),
+            unit_cost=cost,
+            value=fix,
+            occurred_at=when or utcnow(),
+            ref_type=ref_type,
+            ref_id=ref_id,
+            note="Cost of stock sold before this delivery",
+            created_by=user_id,
+        )
+        db.add(revalue)
+        await db.flush()
+        await events.emit(
+            db,
+            "stock.moved",
+            subject_type="stock_movement",
+            subject_id=revalue.id,
+            data={
+                "kind": "revalue",
+                "product_id": product_id,
+                "branch_id": branch_id,
+                "quantity": "0",
+                "value": costing.money(fix),
+                "ref_type": ref_type,
+                "ref_id": ref_id,
+            },
+        )
     await _check_low(db, item, level)
     return movement
 
@@ -297,6 +332,8 @@ async def stock(
 
 async def movements(ctx: Ctx, product_id: uuid.UUID, *, limit: int = 200) -> list[MovementOut]:
     ctx.require(access.VIEW)
+    if await ctx.db.get(Product, product_id) is None:
+        raise NotFound()
     rows = await ctx.db.scalars(
         select(StockMovement)
         .where(StockMovement.product_id == product_id)

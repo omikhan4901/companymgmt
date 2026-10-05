@@ -19,8 +19,8 @@ function features(p: SitePlan) {
   out.push({ text: p.max_modules === null ? "Every module" : `Any ${p.max_modules} modules` });
   out.push({ text: "Location-checked clock-in" });
   if (p.features.custom_roles) out.push({ text: "Custom roles" });
-  if (p.features.api) out.push({ text: "API access", soon: true });
-  if (p.features.sso) out.push({ text: "Single sign-on", soon: true });
+  if (p.features.api) out.push({ text: "API keys, webhooks and a sandbox" });
+  if (p.features.sso) out.push({ text: "Company sign-in (SSO), provisioning (SCIM) and network limits" });
   return out;
 }
 

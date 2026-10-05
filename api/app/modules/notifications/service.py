@@ -81,9 +81,11 @@ async def notify(
     *,
     link: str | None,
     data: dict[str, Any] | None = None,
+    include_actor: bool = False,
 ) -> int:
-    """One notification per recipient, never to the person who caused it."""
-    people = {r for r in recipients if r is not None and r != event.actor_user_id}
+    """One notification per recipient, never to the person who caused it, unless it's an
+    alert about the state of things (stock running low) rather than news of their action."""
+    people = {r for r in recipients if r is not None and (include_actor or r != event.actor_user_id)}
     if not people:
         return 0
     actor = await db.get(User, event.actor_user_id) if event.actor_user_id else None

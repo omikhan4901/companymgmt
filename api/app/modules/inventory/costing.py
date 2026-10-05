@@ -28,13 +28,30 @@ def money(value: Decimal) -> int:
 
 
 def receive(p: Position, quantity: Decimal, unit_cost: Decimal) -> tuple[Position, Decimal]:
-    """Stock in at a cost. Returns the new position and the value added."""
-    added = quantity * unit_cost
+    """Stock in at a cost. Returns the new position and the total change in value.
+
+    If stock was below zero (sold before the delivery was recorded), the units sold early
+    are re-costed at this delivery's cost: the total change is then the purchase itself
+    plus a cost correction (`correction()` gives that part), and the average never goes
+    negative."""
     q = p.quantity + quantity
-    v = p.value + added
-    # Below zero, the last known cost stands until stock is positive again.
-    average = v / q if q > 0 else (unit_cost if quantity > 0 else p.average)
-    return Position(q, v if q != 0 else Decimal(0), average), added
+    if p.quantity < 0:
+        # Sold ahead: what arrives covers the shortfall first, at its real cost.
+        if q > 0:
+            value, average = q * unit_cost, unit_cost
+        else:
+            value, average = q * p.average, p.average
+    else:
+        value = p.value + quantity * unit_cost
+        average = value / q if q > 0 else p.average
+    if q == 0:
+        value = Decimal(0)
+    return Position(q, value, average), value - p.value
+
+
+def correction(quantity: Decimal, unit_cost: Decimal, change: Decimal) -> Decimal:
+    """The part of `receive`'s change that re-costs stock sold ahead (0 normally)."""
+    return change - quantity * unit_cost
 
 
 def move(p: Position, quantity: Decimal) -> tuple[Position, Decimal]:

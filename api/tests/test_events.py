@@ -60,7 +60,7 @@ async def test_leave_flow_is_logged(client: httpx.AsyncClient, owner_sql: psycop
     _, staff = await add_staff(owner, name="Rahim")
     first = await ask_leave(staff)
     assert (await manager.post(f"/v1/leave/requests/{first['id']}/approve", json={})).status_code == 200
-    rows = logged(owner_sql, owner.tenant_id)
+    rows = [r for r in logged(owner_sql, owner.tenant_id) if r[0].startswith("leave.")]
     assert [r[0] for r in rows] == ["leave.requested", "leave.approved"]
     _, subject_type, subject_id, actor, data = rows[1]
     assert (subject_type, subject_id) == ("leave_request", first["id"])
@@ -90,7 +90,9 @@ async def test_subscribers_run_in_the_transaction(
     with pytest.raises(RuntimeError):
         await ask_leave(owner, offset=7)
     assert len((await owner.get("/v1/leave/requests")).json()) == 1
-    assert [r[0] for r in logged(owner_sql, owner.tenant_id)] == ["leave.requested"]
+    assert [r[0] for r in logged(owner_sql, owner.tenant_id) if r[0].startswith("leave.")] == [
+        "leave.requested"
+    ]
 
 
 async def test_later_subscribers_go_through_the_outbox(client: httpx.AsyncClient, subscribers: None) -> None:

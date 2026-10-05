@@ -32,7 +32,7 @@ from app.modules.platform.deps import Ctx, allow
 from app.modules.platform.models import Membership, Role, SsoConnection, User
 from app.modules.platform.tokens import revoke_user_sessions
 
-router = APIRouter(prefix="/scim/v2", tags=["scim"])
+router = APIRouter(prefix="/v1/scim/v2", tags=["scim"])
 
 USER_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:User"
 LIST_SCHEMA = "urn:ietf:params:scim:api:messages:2.0:ListResponse"

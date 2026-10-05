@@ -1,18 +1,22 @@
 import {
   BarChart3,
   Banknote,
-  CalendarClock,
+  BookOpenCheck,
+  BookUser,
+  Boxes,
   Check,
-  ClipboardList,
-  FileSpreadsheet,
-  FileText,
+  Code2,
   Inbox,
   Languages,
   ListChecks,
   MapPin,
   Megaphone,
+  Receipt,
   ShieldCheck,
+  ShoppingBasket,
+  Sparkles,
   TreePalm,
+  Workflow,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -21,24 +25,28 @@ import type { ReactNode } from "react";
 import { PlanGrid } from "@/components/plan-grid";
 
 export const metadata: Metadata = {
-  title: { absolute: "CompanyMgmt: people, attendance, payroll and work in one place" },
+  title: { absolute: "CompanyMgmt: run your people, shop and books in one place" },
   description:
-    "Location-checked clock-ins, leave, payroll with Bangla payslips, tasks, announcements, policies and reports for businesses of any size. Free for up to 5 people.",
+    "Location-checked clock-ins, leave, payroll with Bangla payslips, a till with dues, stock and self-posting books, tasks, policies, an AI assistant and an API. Free for up to 5 people.",
 };
 
 const modules: { icon: ReactNode; title: string; text: string }[] = [
-  { icon: <MapPin />, title: "Attendance at work", text: "One-tap clock-in from any phone, checked against each branch's area on the map. Night shifts and time zones handled." },
+  { icon: <MapPin />, title: "Attendance at work", text: "One-tap clock-in from any phone, checked against each branch's area on the map. Night shifts, time zones and fair time fixes." },
   { icon: <TreePalm />, title: "Leave", text: "Balances that add up, requests in two taps, a team calendar, and holidays per branch." },
   { icon: <Banknote />, title: "Payroll", text: "Monthly pay runs with allowances, advances and deductions, and payslips in English or বাংলা." },
+  { icon: <ShoppingBasket />, title: "Point of sale", text: "A fast till that keeps selling offline, receipts, returns and voids, cash drawers, and shared tills unlocked with a cashier PIN." },
+  { icon: <BookUser />, title: "Customers and dues", text: "Sell on account, take payments, send a WhatsApp reminder, and print a statement for every customer." },
+  { icon: <Receipt />, title: "Expenses", text: "Record spending with a photo of the receipt, from the drawer or petty cash, by category." },
+  { icon: <Boxes />, title: "Stock and purchases", text: "Purchases, suppliers, transfers between branches and stock counts, with average cost and low-stock alerts." },
+  { icon: <BookOpenCheck />, title: "Books that keep themselves", text: "Every sale, purchase, expense and pay run posts to double-entry books: profit and loss, balance sheet, cash book, tax-return templates." },
   { icon: <ListChecks />, title: "Tasks and projects", text: "Boards per project, checklists and comments, and a My work list everyone can follow." },
-  { icon: <Megaphone />, title: "Announcements", text: "Post to everyone, a branch or a team, and see who has read it." },
-  { icon: <FileText />, title: "Documents and policies", text: "Handbooks and policies with versions, and a record of who acknowledged each one." },
-  { icon: <Inbox />, title: "One approvals inbox", text: "Leave and time fixes from your own team, longest-waiting first, decided in one place." },
-  { icon: <ClipboardList />, title: "Onboarding checklists", text: "A new joiner's first days, started by itself, with items for them and their manager." },
+  { icon: <Megaphone />, title: "Announcements and policies", text: "Post to everyone or a team and see who has read it; publish policies and record who acknowledged them." },
+  { icon: <Inbox />, title: "Approvals and onboarding", text: "One inbox for leave and time fixes; a new joiner's first days started by themselves." },
   { icon: <BarChart3 />, title: "Reports", text: "Attendance rate, late arrivals, leave taken and overdue work, by period and department, by email if you like." },
-  { icon: <FileSpreadsheet />, title: "Import from a spreadsheet", text: "Bring the whole team in from a CSV. Every row is checked first, with problems explained line by line." },
-  { icon: <CalendarClock />, title: "Fair time fixes", text: "Forgot to clock out? People ask, a manager approves, and the change is recorded." },
-  { icon: <Languages />, title: "English and বাংলা", text: "Every screen, email and payslip in both languages. Names in any script, everywhere." },
+  { icon: <Sparkles />, title: "An assistant that knows your business", text: "Ask in plain words and get answers with sources, drafts, summaries and a weekly brief. It only sees what you may see." },
+  { icon: <Workflow />, title: "Automations", text: "\"Every Monday, remind managers about overdue tasks\": write it in plain words or build it step by step." },
+  { icon: <Code2 />, title: "API and integrations", text: "API keys, signed webhooks, company sign-in with Google, Microsoft or Okta, and automatic provisioning." },
+  { icon: <Languages />, title: "English and বাংলা", text: "Every screen, email, receipt and payslip in both languages. Names in any script, everywhere." },
 ];
 
 const showcase: { title: string; text: string; points: string[]; image: string; alt: string; phone?: boolean }[] = [
@@ -65,6 +73,13 @@ const showcase: { title: string; text: string; points: string[]; image: string; 
     alt: "Reports for a 30-person agency's week",
   },
   {
+    title: "A till that keeps going",
+    text: "Sell from any phone or tablet. If the internet drops, sales wait on the device and go through when it's back. The books, stock and dues update themselves.",
+    points: ["Taxes and receipts set by you or your accountant", "Shared tills open with each cashier's PIN", "Close the drawer and see any difference"],
+    image: "/screens/pos.png",
+    alt: "The till: items on the left, the sale and payment on the right",
+  },
+  {
     title: "Policies everyone has actually read",
     text: "Share the handbook and policies, ask people to acknowledge the ones that matter, and see who hasn't yet.",
     points: ["Every version kept", "Choose who sees each document", "New joiners get them in their checklist"],
@@ -75,20 +90,22 @@ const showcase: { title: string; text: string; points: string[]; image: string; 
 
 const steps = [
   { title: "Create your workspace", text: "Pick your language and business type. We switch on only what you need." },
-  { title: "Add your people", text: "Import a spreadsheet, invite by email, or give staff a username with no email needed." },
-  { title: "Run the day from one place", text: "Clock-ins, leave, pay, work and news, on any phone or computer." },
+  { title: "Add your people", text: "Import a spreadsheet, invite by email, or share a join link or QR code. Staff don't need an email." },
+  { title: "Run the day from one place", text: "Clock-ins, leave, pay, sales, stock, the books, work and news, on any phone or computer." },
 ];
 
 const security = [
   "Each business's data is kept apart inside the database itself, not only by the app.",
-  "Two-step sign-in with an authenticator app, and a list of every signed-in device.",
-  "An audit log nobody can edit, with a built-in integrity check.",
-  "National ID and bank numbers encrypted; passwords hashed with Argon2.",
+  "Passkeys, two-step sign-in, company sign-in, and an email when your account is opened on a new device.",
+  "A tamper-evident audit log with a built-in integrity check, exportable any time.",
+  "National ID numbers and secrets encrypted; passwords hashed with Argon2 and checked against known breaches.",
   "Locations saved only at clock-in and clock-out, rounded to about 11 m.",
+  "The assistant can't see more than you, and nothing it suggests happens until you confirm.",
   "Export everything, or delete your workspace, whenever you want.",
+  "Report a security issue to security@companymgmt.app: we answer within 3 working days.",
 ];
 
-const next = ["An assistant that answers from your own data", "Point of sale and dues", "Inventory and accounting", "Single sign-on"];
+const next = ["Online payment in taka and dollars", "Your own domain for your workspace", "Approval chains with several steps"];
 
 function Screenshot({ src, alt, phone }: { src: string; alt: string; phone?: boolean }) {
   if (phone) {
@@ -120,10 +137,10 @@ export default function Landing() {
         <div className="relative mx-auto max-w-[1200px] px-5 pb-10 pt-16 text-center md:px-8 md:pt-24">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-medium text-brand-dark shadow-sm">Free for up to 5 people</span>
           <h1 className="mx-auto mt-5 max-w-3xl font-site-display text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-            Run your whole team from <span className="text-brand">one place</span>
+            Run your people, shop and books from <span className="text-brand">one place</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
-            Attendance checked at the branch, leave that adds up, payroll with Bangla payslips, and the day&apos;s work, news and policies, from a tea stall to a company with branches.
+            Attendance checked at the branch, payroll with Bangla payslips, a till that works offline, stock and books that keep themselves, and an assistant that answers from your own data. From a tea stall to a company with branches.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/signup" className="rounded-[10px] bg-brand px-6 py-3 font-semibold text-white shadow-[0_6px_16px_-6px_rgba(0,123,123,.5)] hover:bg-brand-dark">
@@ -195,7 +212,7 @@ export default function Landing() {
         <div className="mt-10 grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 md:grid-cols-2 md:items-center md:p-8">
           <div>
             <h3 className="font-site-display text-2xl font-bold text-ink">Simple for a shop. Ready for a company.</h3>
-            <p className="mt-2 text-slate-600">Big buttons and plain words for a team of three. Branches, departments, managers who see only their own people, and custom roles when you grow. Nothing to move, nothing to re-learn.</p>
+            <p className="mt-2 text-slate-600">Big buttons and plain words for a team of three. Branches, departments, managers who see only their own people, custom roles, an API and company sign-in when you grow. Nothing to move, nothing to re-learn.</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-600">Coming next</p>
@@ -224,6 +241,9 @@ export default function Landing() {
               </li>
             ))}
           </ul>
+          <Link href="/security" className="mt-8 inline-block font-semibold text-brand-200 hover:underline">
+            How we protect your data
+          </Link>
         </div>
       </section>
 

@@ -92,8 +92,8 @@ def stock(kind: str, value: int, name: str) -> Posting | None:
     to nothing)."""
     if kind in ("purchase", "transfer_out", "transfer_in") or not value:
         return None
-    if kind in ("sale", "return", "void"):
-        p = Posting(f"Cost of goods: {name}")
+    if kind in ("sale", "return", "void", "revalue"):
+        p = Posting(f"{'Cost correction' if kind == 'revalue' else 'Cost of goods'}: {name}")
         p.add("inventory", value)
         p.add("cogs", -value)
         return p

@@ -162,10 +162,14 @@ def _link(capability: str, result: Any) -> str | None:
     }.get(capability)
 
 
-async def _mine(ctx: Ctx, proposal_id: uuid.UUID) -> Proposal:
-    assert ctx.membership is not None
+async def _mine(ctx: Ctx, proposal_id: uuid.UUID, membership_id: uuid.UUID | None = None) -> Proposal:
+    """The proposal, if it was made for this person. Pass `membership_id` after a rollback
+    (the context's rows are expired then)."""
+    if membership_id is None:
+        assert ctx.membership is not None
+        membership_id = ctx.membership.id
     found = await ctx.db.scalar(select(Proposal).where(Proposal.id == proposal_id).with_for_update())
-    if found is None or found.membership_id != ctx.membership.id:
+    if found is None or found.membership_id != membership_id:
         raise NotFound()
     return found
 
@@ -180,7 +184,7 @@ async def confirm(ctx: Ctx, proposal_id: uuid.UUID) -> ActionOut:
     if not row.enabled or FEATURE not in (row.features or []):
         raise Forbidden("Actions are switched off in this workspace.", code="ai_feature_off")
     pid, capability, args = proposal.id, proposal.capability, proposal.args
-    conversation_id = proposal.conversation_id
+    conversation_id, mid = proposal.conversation_id, proposal.membership_id
     proposal.status = "done"
     proposal.decided_at = utcnow()
     await audit.record(
@@ -195,13 +199,13 @@ async def confirm(ctx: Ctx, proposal_id: uuid.UUID) -> ActionOut:
         result = await invoke(ctx, capability, args, allow_writes=True)
     except AppError as exc:
         await ctx.db.rollback()
-        failed = await _mine(ctx, pid)
+        failed = await _mine(ctx, pid, mid)
         failed.status = "failed"
         failed.decided_at = utcnow()
         failed.error = exc.detail
         await ctx.db.commit()
         return out(failed)
-    done = await _mine(ctx, pid)
+    done = await _mine(ctx, pid, mid)
     done.link = _link(capability, result)
     await ctx.db.commit()
     return out(done)
