@@ -3,7 +3,7 @@
 Multi-tenant company management SaaS (HR, attendance, payroll, POS, inventory, accounting).
 The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
 `docs/PROGRESS.md`. Read both before starting work, and update `PROGRESS.md` as you go.
-`docs/GUIDE.md` explains how everything works (keep it true when you change how things work).
+`docs/handbook/` explains how everything works (keep it true when you change how things work).
 
 ## Conventions
 

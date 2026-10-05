@@ -1,276 +1,165 @@
 # CompanyMgmt
 
-**One place to run a company: people, attendance, leave, payroll, tasks and projects, for
-every business from a tea stall with two staff to an agency with many branches.**
-Multi-tenant SaaS in English and বাংলা, with clock-ins checked against each branch's
-location, and an AI assistant that only ever sees what the person asking may see.
+**One place to run a company: people, attendance, leave, payroll, tasks, a till, customers'
+dues, stock and the books — for every business from a tea stall with two staff to a
+company with many branches.** Multi-tenant SaaS in English and বাংলা, with clock-ins
+checked against each branch's location, double-entry books that keep themselves, an AI
+assistant that only sees what the person asking may see, and an API for other systems.
 
 ![Home](docs/screenshots/home.png)
 
-> **Status (October 2026): paused at a stable, fully tested point.** Milestones 1 to 3
-> are done: accounts, people, attendance, leave, payroll, data rights, notifications,
-> tasks and projects, announcements, documents and policies, the approvals inbox and
-> onboarding checklists. From the pilot milestone (M4), the spreadsheet import and
-> reports (with weekly and monthly report emails) are done. M6, the read-only AI
-> copilot, is done and switches itself on when a Gemini API key is set.
-> A 30-person sample agency runs a whole week in the product, in a test. It isn't live
-> yet: deployment is scripted and waits on cloud accounts. See [Future work](#future-work).
+> **Status (5 October 2026): feature-complete and tested, not yet live.** Every planned
+> milestone is built except billing (M5, on hold by the owner's decision). 321 API tests
+> on a real Postgres at 91% coverage, 33 web unit tests, and browser journeys on desktop
+> and phone with accessibility and CSP checks. Going live takes about an hour with the
+> owner's cloud accounts and costs about $1 a month until there are customers.
 >
-> **New to the code? Start with the [developer guide](docs/GUIDE.md)**: running it
-> locally, how every part works, and what to learn.
+> **Start with the [handbook](docs/handbook/README.md)**: running it, how every part
+> works, the user flows, going live cheaply, and adding features yourself.
 
-## What it does today
+## What it does
 
-- **Sign up in two minutes.** Pick your language and business type; the workspace switches
-  on only what you need, with a 14-day trial of the Growth plan.
-- **Clock in from any phone, at work.** One big button. Each branch has an area on the
-  map; clock-ins outside it are refused or flagged (the owner chooses), with a clear
-  message such as "You're about 1.2 km from Gulshan kiosk". Locations are saved only at
-  clock-in and clock-out, rounded to about 11 m. Overnight shifts count towards the day
-  they started, and every branch keeps its own time zone.
-- **Fair fixes.** Forgot to clock out? People ask for a correction; a manager approves or
-  rejects it; everything is recorded. Nobody can approve their own request.
-- **Monthly timesheets** per person per day, with a spreadsheet export that is safe to open
-  in Excel (Bangla names intact, formulas neutralised).
-- **Leave.** People ask for leave from their phone and see what's left before they send it.
-  Managers approve in one tap; the team calendar shows who is away (colleagues see that
-  someone is away, not why). Balances handle mid-year joiners, monthly accrual and
-  carry-over; the work week and public holidays don't count. Bangladesh workspaces start
-  near the Labour Act 2006 (casual, sick, earned, maternity), Friday off.
-- **Payroll.** Salaries (basic, house rent, medical, conveyance; monthly, hourly or daily)
-  paid by cash, bank or bKash-style wallets. Each month is a pay run: draft → approval →
-  finalized → paid, built from attendance (overtime), unpaid leave, festival bonuses,
-  advances and one-off items. Whoever prepares it can't finalize it. Payslips download as
-  PDF in English or Bangla; a transfer sheet lists who to pay where. Salary tax is an
-  editable table, off until the owner checks it.
-- **Tasks and projects.** Projects with members and a home department, planned on a board
-  (To do, Doing, Done) with drag and drop and a keyboard-friendly move menu. Tasks have an
-  assignee, due date, priority, checklist and comments. "My work" lists each person's open
-  tasks, overdue first, on its own page and on the home screen. Members work on their
-  projects; managers run the projects of their own departments.
-- **Announcements.** Post news to everyone, some branches or some departments, pin what
-  matters, and see who has read it ("read by 12 of 30", and who hasn't yet). Managers post
-  to their own teams only.
-- **Documents and policies.** Publish the handbook, policies, how-tos and forms, choose
-  who reads each (everyone, some roles, some departments), keep every version, and ask
-  people to acknowledge the policies that matter ("acknowledged by 12 of 30"). Uploads
-  are checked by their content and always download as files.
-- **Reports.** For any period and department: headcount, attendance rate, late
-  arrivals (against your own start time and grace period), leave taken by type, and
-  overdue tasks, with who is late or overdue most often. Managers see their own teams.
-  Anyone who can see reports can get them by email every week or every month.
-- **Import from a spreadsheet.** Bring the whole team in from a CSV (English or Bangla
-  headers): people, departments and the leave days each person has left. Every row is
-  checked first, with problems explained line by line; nothing is saved until the file
-  is clean.
-- **Onboarding checklists.** Write down a new joiner's first days once: items for them
-  and for their manager, due some days after they start, some pointing at a policy to
-  read. Start it for someone (or let it start by itself when anyone joins); the items
-  become tasks in their My work, reading the policy ticks its item off, and managers see
-  how far along each joiner is.
-- **One approvals inbox.** Leave and time-fix requests from a manager's own departments,
-  oldest first, approved or turned down (with a note) in one place.
-- **Notifications.** A bell in the header tells people what needs them and what was decided:
-  leave and time-fix requests go to whoever can approve them for that person's department,
-  decisions go back to the person, payslips announce themselves (without the run's totals),
-  and tasks tell their assignee and their creator. Nobody is told about their own actions.
-  A daily email lists what someone hasn't read yet, in their language, and can be turned off.
-- **People and departments.** Profiles, a department tree and branches. Managers see only
-  their own part of the tree.
-- **Staff without email.** Add a cashier with a username; they sign in with the workspace
-  code and must choose their own password on first sign-in.
-- **Roles.** Owner, Admin, Manager, Accountant, Cashier, Employee, plus custom roles.
-  Nobody can grant a permission they don't hold.
-- **Security you can see.** Two-step verification (which a workspace can require for
-  owners and admins), a list of signed-in devices, and an audit log with a built-in
-  integrity check.
-- **Your data stays yours.** Owners export everything as a ZIP and can restore it into a
-  new workspace; everyone can download what a workspace holds about them. Deleting a
-  workspace can be undone for 30 days, then everything is erased and the owner gets a
-  signed certificate. Nightly encrypted backups are kept for 30 days.
-- **Your look.** Light by default, dark mode, and four accent colours; every screen
-  passes WCAG 2.2 AA checks in both modes.
+**People and time**
+- **Clock in from any phone, at work.** Each branch has an area on the map; clock-ins
+  outside it are refused or flagged ("You're about 1.2 km from Gulshan kiosk"). Locations
+  are saved only at clock-in and clock-out. Overnight shifts, time zones, fair time fixes
+  with approval, monthly timesheets.
+- **Leave** with balances that explain themselves (accrual, carry-over, mid-year joiners),
+  a team calendar that shows who is away but not why, and Bangladesh Labour Act defaults.
+- **Payroll** from attendance, leave, bonuses and advances; draft → approval → finalized →
+  paid with four eyes; payslip PDFs in English or Bangla; a transfer sheet for cash, bank or
+  mobile wallets.
+
+**Work**
+- **Tasks and projects** on boards, "My work" for everyone, **onboarding checklists** that
+  start themselves when someone joins.
+- **Announcements** with read receipts; **documents and policies** with versions and
+  acknowledgements; **one approvals inbox**; **reports** (attendance rate, lateness, leave,
+  overdue work) by email weekly or monthly, with early-warning **signals**.
+- **Automations**: "every working day at 10, tell managers who hasn't clocked in"; "when
+  someone joins, create their laptop task".
+
+**The shop and the books**
+- **A till** that works offline, prints receipts from the browser, handles returns, voids
+  and cash drawers, and runs on a shared device with **cashier PINs**.
+- **Taxes are the workspace's own** (names, rates, inclusive or exclusive, compound): no
+  country's rules are guessed.
+- **Customers' dues** ("baki khata") with credit limits, statements and WhatsApp reminders;
+  **expenses** with receipt photos and petty cash.
+- **Stock** per branch with weighted average cost, purchases, suppliers, transfers and counts.
+- **Double-entry books** that post themselves from every sale, purchase, payment, expense and
+  pay run: trial balance, profit and loss, balance sheet, ledgers, and tax-return templates
+  the workspace's accountant designs.
+
+**AI, optional and contained**
+- Switched on by one key (Gemini), then by each workspace's owner, feature by feature.
+- "Ask my company" answers with numbered sources, using only what the asker may see.
+- It can **propose** tasks, leave or posts; nothing happens until the person confirms.
+- Writing help in both languages, document summaries, a weekly brief, automation drafts.
+
+**For larger companies and developers**
+- API keys with chosen permissions, signed webhooks, idempotency keys, a stable versioned
+  API with TypeScript and Python SDKs ([developer guide](docs/api/README.md)).
+- Company sign-in (OpenID Connect), SCIM provisioning, passkeys, a network allowlist,
+  audit log export, sandbox workspaces.
+
+**Everyone's data stays theirs**
+- Exports and restores, personal data downloads, deletion with a 30-day undo and a signed
+  certificate, nightly encrypted backups.
 
 | | |
 |---|---|
+| ![The till: items, cart and cash](docs/screenshots/pos.png) | ![The books after a day's sales](docs/screenshots/books.png) |
+| ![Sales summary with tax by rate](docs/screenshots/sales-summary.png) | ![Developer settings: API keys and webhooks](docs/screenshots/developers.png) |
 | ![Attendance records with where each clock-in happened](docs/screenshots/attendance-records.png) | ![Placing a branch on the map](docs/screenshots/branch-location.png) |
 | ![Monthly timesheet](docs/screenshots/timesheet.png) | ![Home in dark mode with the Saffron accent](docs/screenshots/home-dark.png) |
-| ![Who is away this month](docs/screenshots/leave-calendar.png) | ![Leave requests waiting for approval](docs/screenshots/leave-requests.png) |
-| ![A finalized pay run](docs/screenshots/payroll-run.png) | ![A payslip PDF in Bangla](docs/screenshots/payslip-pdf-bangla.png) |
-| ![A project board with tasks to do, in progress and done](docs/screenshots/tasks-board.png) | ![A task with its checklist and comments](docs/screenshots/task-panel.png) |
-| ![The notification list in the header](docs/screenshots/notifications.png) | ![A 30-person agency's campaign board at the end of the week](docs/screenshots/agency-board.png) |
+| ![Who is away this month](docs/screenshots/leave-calendar.png) | ![A finalized pay run](docs/screenshots/payroll-run.png) |
+| ![A project board](docs/screenshots/tasks-board.png) | ![A payslip PDF in Bangla](docs/screenshots/payslip-pdf-bangla.png) |
 | ![The code of conduct, acknowledged by 30 of 30](docs/screenshots/policy-acknowledged.png) | ![Reports for a 30-person agency's week](docs/screenshots/reports.png) |
+| ![The help centre](docs/screenshots/help.png) | ![The notification list in the header](docs/screenshots/notifications.png) |
 
 <p align="center">
-  <img src="docs/screenshots/phone-too-far-bangla.png" width="240" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
-  <img src="docs/screenshots/phone-home-bangla.png" width="240" alt="Staff home screen on a phone, in Bangla, clocked in at the branch" />
-  <img src="docs/screenshots/phone-attendance-bangla.png" width="240" alt="Attendance on a phone, in Bangla" />
-  <img src="docs/screenshots/phone-leave-ask-bangla.png" width="240" alt="Asking for a day of leave on a phone, in Bangla, with the days left shown" />
-  <img src="docs/screenshots/phone-my-work-bangla.png" width="240" alt="My work on a phone, in Bangla: the tasks due this week" />
+  <img src="docs/screenshots/phone-too-far-bangla.png" width="200" alt="A staff member 2 km away is told to clock in at the branch, in Bangla" />
+  <img src="docs/screenshots/phone-home-bangla.png" width="200" alt="Staff home screen on a phone, in Bangla" />
+  <img src="docs/screenshots/phone-leave-ask-bangla.png" width="200" alt="Asking for leave on a phone, in Bangla" />
+  <img src="docs/screenshots/phone-my-work-bangla.png" width="200" alt="My work on a phone, in Bangla" />
 </p>
+
+## Plans
+
+| Free | Starter | Growth | Business | Enterprise |
+|---|---|---|---|---|
+| $0 · 5 people · 2 modules | $9/mo · 15 people · 4 modules | $29/mo · 50 people · all modules · custom roles | $79/mo · 150 people included · API & webhooks | by agreement · company sign-in & SCIM |
+
+Every workspace starts with a 14-day Growth trial. (Online payment, milestone M5, is on
+hold; plans and limits are enforced.)
 
 ## How it's built
 
 ```mermaid
 flowchart LR
   U[Browser / phone] --> CF[Cloudflare: DNS, TLS, WAF]
-  CF --> P[Static Next.js export: site + app,<br/>per-page CSP]
-  CF --> R[Cloud Run: FastAPI, scales to zero]
-  R -->|"SET LOCAL app.tenant_id"| DB[(Neon Postgres<br/>row-level security)]
-  R --> SM[Secret Manager]
-  GH[GitHub Actions] -->|OIDC, no keys| R
+  CF --> P[Pages: static Next.js site + app,<br/>per-page CSP]
+  CF --> F[Pages Function /v1]
+  F -->|proxy token| R[Cloud Run: FastAPI, scales to zero]
+  R -->|"SET LOCAL app.tenant_id"| DB[(Neon Postgres 16<br/>forced row-level security)]
+  R --> G[Gemini, optional]
+  S[Cloud Scheduler] -->|internal token| R
+  R -.nightly encrypted dump.-> B[(R2)]
 ```
 
-| Layer | Choice | Why |
-|---|---|---|
-| API | Python 3.12, FastAPI, SQLAlchemy 2 (async, psycopg 3), Alembic | Typed, fast to build, generates an OpenAPI contract |
-| Data | PostgreSQL 16 with **forced row-level security** on every tenant table | Isolation enforced by the database, not only by code |
-| Web | Next.js 16 (App Router, static export), React 19, TypeScript, Tailwind 4, Radix primitives, TanStack Query, i18next | One app for the site and the product; static files, so free to host; typed client generated from the API |
-| Hosting | Cloud Run + Neon + Cloudflare Pages | Everything scales to zero: about $1/month with no customers (the domain) |
-| Infra | OpenTofu, GitHub OIDC → least-privilege service accounts | Reproducible, no long-lived keys |
+| Layer | Choice |
+|---|---|
+| API | Python 3.12, FastAPI, SQLAlchemy 2 async, Alembic — a modular monolith of 20 modules with import boundaries enforced |
+| Data | PostgreSQL 16 with **forced row-level security** on every tenant table, a non-owner app role, composite foreign keys |
+| Events | an append-only domain event log and a transactional outbox: modules react to each other without depending on each other |
+| Web | Next.js 16 static export, React 19, TypeScript, Tailwind 4, Radix, TanStack Query, i18next; types generated from the API |
+| AI | Gemini behind a provider port; the model only reaches data through permission-checked capabilities, as the asker |
+| Hosting | Cloud Run + Neon + Cloudflare Pages + R2: about **$1/month** with no customers |
+| Infra | OpenTofu, least-privilege service accounts, Secret Manager, budget alerts |
 
-A modular monolith: `platform` (accounts, workspaces, roles, plans), `people`,
-`attendance`, `leave`, `payroll`, `tasks`, `announcements`, `documents`, `approvals`, `notifications` and `privacy` (exports,
-imports, deletion). Each module only depends on the ones below it, and none depends on the
-AI layer; import-linter enforces both in CI. Business logic lives in typed service
-functions that the routes call.
+**Security** (OWASP ASVS 5.0 level 2 target, [evidence](docs/security/asvs-l2.md)):
+three layers of tenant isolation proven by a test that calls every id route with another
+workspace's ids; Argon2id with a breached-password check; 10-minute EdDSA tokens in memory
+and rotating httpOnly refresh cookies with theft detection; TOTP, passkeys and OIDC;
+step-up for sensitive actions; rate limits with a CAPTCHA; a hash-chained audit log;
+AES-256-GCM field encryption; SSRF-safe webhooks; per-page CSP; formula-safe exports.
 
-### The AI assistant (M6)
-
-The assistant never touches the database. It sees what the person asking may see, and
-nothing else:
-
-- **Capability registry.** Every module describes what it can do as typed capabilities
-  (`people.search`, `leave.balances`, `tasks.my_work`, `documents.search`…), each with
-  input and output schemas, the permission and module it needs, and whether it reads or
-  changes data. The model is offered only the read capabilities the asker can use, and
-  each call runs as them, with the same checks as the API.
-- **A test proves it:** every read capability gives exactly the same answer, or the same
-  refusal, as its REST route for an owner, a department-scoped manager and an employee.
-- **Switched on by a key, chosen by the workspace.** Setting `GEMINI_API_KEY` turns it on
-  for the server (Gemini Flash over REST, behind a provider port). Each workspace's owner
-  accepts the AI terms, and its admins tick what it helps with: questions, documents and
-  policies, a weekly brief. Questions per month come from the plan, set by platform
-  operators; workspaces are notified when that changes.
-- **Answers cite sources.** Each fact is numbered and links to the page it came from.
-  Tool results are treated as data, never instructions. Conversations are private to the
-  person and can be deleted.
-- **Domain events.** Important changes are written to an append-only event log in the same
-  transaction as the change. Notifications are built from it; automations (M7) will be.
-
-### Tenant isolation, three layers
-
-1. **App:** the workspace comes from the signed token, and membership and role are
-   reloaded on every request (so a role change applies immediately).
-2. **Database:** every tenant table has `FORCE ROW LEVEL SECURITY` with a policy on
-   `app.tenant_id`, set per transaction. The API's database role doesn't own the tables
-   and can't bypass RLS. With no workspace set, queries return nothing.
-3. **References:** composite foreign keys `(tenant_id, id)`, so a row can never point at
-   another workspace's row.
-
-A test calls **every API route that takes an id** with another workspace's ids (the routes
-are discovered automatically, so new ones are covered) and checks that nothing leaks or
-changes.
-
-### Security (OWASP ASVS 5.0 Level 2 target)
-
-Argon2id passwords checked against 100k breached passwords · 10-minute EdDSA access tokens
-kept in memory · rotating refresh tokens in an httpOnly, SameSite=Strict cookie, where
-reusing an old one ends the session · TOTP two-step verification with recovery codes ·
-step-up confirmation for sensitive actions · rate limits with a CAPTCHA after repeated
-failures · append-only, hash-chained audit log · AES-256-GCM field encryption bound to
-each record · strict security headers and CSP · CSV formula-injection protection. Status
-and evidence for each item: [docs/security/asvs-l2.md](docs/security/asvs-l2.md).
-
-### Tests
-
-- **232 API tests**, 93% line and branch coverage (CI gate: 85%), all against a real
-  Postgres: auth, isolation, workspaces, people, attendance, location checks, leave,
-  payroll (pay maths checked with Hypothesis; 500 people run in about a second), data
-  export, import, deletion and audit retention, plans, notifications and the daily
-  digest, domain events, tasks and projects, announcements, documents (including unsafe uploads), onboarding checklists, a 30-person agency's week, spreadsheet import, reports (attendance rate and lateness worked out from a known week), and capability
-  parity with the API.
-- **Browser journeys** (Playwright) on desktop and phone, against the production build
-  with its real security headers: sign up → add staff → staff signs in in Bangla and
-  clocks in → owner sees the timesheet; a staff member 2 km away is refused and let in at
-  the branch; staff ask for leave and the owner approves it (and hears about it from the
-  bell); the owner runs payroll and staff download their payslip; a manager plans a project
-  on a board and staff work through their tasks; an owner posts news and sees who has read it; staff read and acknowledge a policy; a manager decides leave and a time fix from the inbox; a checklist starts for a new joiner, who reads the policy it points at and sees it ticked off; a 30-person agency's week is played through the API and finished in the browser (the last acknowledgement, the last approval); an owner imports the team from a spreadsheet, fixing the file first; an owner sets working hours and reads the reports; an owner exports, imports, deletes and
-  restores a workspace; forms keep what was typed on a slow connection; dark mode and
-  accents. 18 scenarios on desktop and phone (the agency week on desktop only, as seeding thirty people takes a while). **axe WCAG 2.2 AA** checks, a
-  no-sideways-scrolling check and a CSP-violation check run on every page visited.
-- Edge cases (overnight shifts, daylight saving, leap days, double clicks, stale edits,
-  Bangla and RTL names, replayed tokens…) are mapped to their tests in
-  [docs/testing/edge-cases.md](docs/testing/edge-cases.md).
-- 25 web unit tests (Vitest) for dates, time zones, money, location and the API client.
-- CI also runs ruff, mypy `--strict`, ESLint, TypeScript, a migration drift
-  check, an API contract check, gitleaks, pip-audit, npm audit, Trivy and CodeQL.
+**Tests:** 321 API tests on a real Postgres (91% line and branch coverage; property tests
+for pay maths and for the books always balancing), capability parity between the AI and
+the REST API, a public-API breaking-change check, 33 web unit tests, and Playwright
+journeys on desktop and phone (a 30-person agency's week, a shop day from the till to the
+books, and more) with axe WCAG 2.2 AA and CSP checks on every page. Status and what still
+needs real services: [docs/UNTESTED.md](docs/UNTESTED.md).
 
 ## Run it locally
 
-Step by step, with what to install and what to do when something goes wrong:
-[developer guide, section 1](docs/GUIDE.md#1-run-it-on-your-computer). The short version,
-on Linux or a Mac with Python 3.12 + [uv](https://docs.astral.sh/uv/), Node 22 and
-PostgreSQL 16 running:
+Python 3.12 + [uv](https://docs.astral.sh/uv/), Node 22 and PostgreSQL 16 (details and
+troubleshooting: [handbook chapter 2](docs/handbook/02-run-locally.md)):
 
 ```bash
 cp .env.example .env
 scripts/dev-db.sh                                   # local roles and databases
 cd api && uv sync && uv run alembic upgrade head
-uv run uvicorn app.main:app --reload                # http://localhost:8000
+uv run uvicorn app.main:app --reload                # http://localhost:8000/docs
 uv run python -m scripts.demo_seed                  # optional: a demo tea house
-uv run python -m scripts.agency_week                # optional: a 30-person agency's week
 cd ../web && npm install && npm run dev             # http://localhost:3000
 ```
 
-Then open http://localhost:3000 (the app) and http://localhost:8000/docs (every API
-endpoint). Before pushing, run everything CI runs: `scripts/check.sh` (add `E2E=1` for
-the browser tests).
+Before every push: `scripts/check.sh` (add `E2E=1` for the browser journeys). It's the
+only gate: GitHub Actions are switched off.
 
-## Future work
+## Documentation
 
-What's left, in the order of the [roadmap](docs/IMPLEMENTATION_PLAN.md#9-phased-roadmap).
-
-**Needs you first (nothing more can be built for these without your input):**
-- **Go live.** Create the Google Cloud, Neon, Cloudflare and email accounts, then follow
-  the [deploy runbook](docs/runbooks/deploy.md) (about an hour). Schedule the four jobs
-  listed there (outbox, maintenance, notification digest, report emails) and run a
-  restore drill ([restore runbook](docs/runbooks/restore.md)).
-- **Legal review** of the privacy policy and terms before real customers sign up.
-- **Payroll tax:** check the Bangladesh salary tax table (Payroll → Settings) against the
-  current Finance Ordinance with a tax adviser before switching tax deduction on.
-- **Pilot companies:** 3–5 agencies in Bangladesh to use it for a month (plan Q8).
-
-**M4, pilot release (the rest):**
-- In-app help: a short help centre and "contact support" from any screen.
-- Product analytics without personal data, an uptime check and a status page.
-- A pilot playbook (setup call, week-1 check-in, week-4 review) and a feedback channel.
-- Excel (.xlsx) files in the import, not only CSV.
-
-**Later milestones:**
-- **M5 Billing** with Paddle: checkout, renewals, dunning (plans and limits already exist).
-- **M7 AI actions and automation:** the AI proposes, a person confirms; plain-language
-  automations; early-warning signals.
-- **M3 leftovers:** approval chains with several steps (they arrive with expenses and
-  purchases, the first requests that need them).
-- **M8 Shop pack** (point of sale, dues/"baki khata", expenses), **M9 inventory and
-  accounting** (stock, purchases, double-entry books), **M10 enterprise** (SSO, SCIM, API
-  keys, a dedicated database, bring-your-own AI model), **M11 launch hardening** (full
-  ASVS L2 sign-off, restore drill, status page).
-
-**Known limits today:** reports are worked out on every request (fine up to a few hundred
-people; larger workspaces will want stored daily totals); lateness uses one start time per
-workspace, not per branch or shift; the weekly days off are one setting per workspace;
-the spreadsheet import reads CSV only; the assistant hasn't been tried against the real
-Gemini yet (no key configured), and document search is full-text, not semantic.
-
-## Project documents
-
-- [Implementation plan](docs/IMPLEMENTATION_PLAN.md): audit of the original university
-  project, product scope, architecture, security, testing, billing, costs, roadmap.
-- [Developer guide](docs/GUIDE.md): run it, understand it, change it.
-- [Progress](docs/PROGRESS.md) · [Deploy runbook](docs/runbooks/deploy.md) ·
-  [Restore runbook](docs/runbooks/restore.md)
+| | |
+|---|---|
+| [Handbook](docs/handbook/README.md) | the complete guide: run, understand, operate, extend |
+| [Implementation plan](docs/IMPLEMENTATION_PLAN.md) | the original plan, and §12: what each milestone built and why |
+| [Progress](docs/PROGRESS.md) | dated log, owner decisions, what's blocked on the owner |
+| [Going live](docs/handbook/10-production.md) · [Deploy runbook](docs/runbooks/deploy.md) | production at the lowest cost |
+| [API guide](docs/api/README.md) · [SDKs](sdk/README.md) | for customers' developers |
+| [Security policy](SECURITY.md) · [ASVS checklist](docs/security/asvs-l2.md) · [AI threat model](docs/security/ai.md) | security |
+| [Legal review](docs/legal/REVIEW.md) | the drafts' gaps and questions for a lawyer |
 
 This started as a group project for CSE327 at North South University (the original is
 preserved in [327_Company_Management_System](https://github.com/omikhan4901/327_Company_Management_System)).
@@ -278,5 +167,4 @@ CompanyMgmt is a ground-up rewrite as a real product.
 
 ## License
 
-Copyright © 2026 Mehboob Ehsan Khan. All rights reserved. The source is public for
-portfolio purposes; it is not open-source licensed.
+Copyright © 2026 Mehboob Ehsan Khan. All rights reserved. Not open-source licensed.

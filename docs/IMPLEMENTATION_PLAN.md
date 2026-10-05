@@ -1,8 +1,9 @@
 # Implementation Plan: Company Management SaaS
 
-Status: **Approved by the owner on 30 September 2026. M1, M1.5, M1.6, M2 and M3 are done
-(M3's multi-step approval chains wait for expenses and purchases); M4, the pilot release,
-waits on cloud accounts; its import and reports are built.** See §9 for every milestone.
+Status: **Approved by the owner on 30 September 2026. Every milestone is built and tested
+(M1–M4, M6–M11) except M5, billing, which is on hold by the owner's decision. Going live
+waits on the owner's cloud accounts.** §9 is the plan as written; **§12 records what was
+actually built in each milestone and every decision made along the way.**
 Progress is tracked in [`PROGRESS.md`](PROGRESS.md).
 Product name: **CompanyMgmt** (repo `companymgmt`). The owner wants a global product, so
 the name is in plain English. It can be renamed before launch.
@@ -50,6 +51,7 @@ Changes made after M1, at the owner's request:
 9. [Phased roadmap](#9-phased-roadmap)
 10. [Scope honesty: what to cut or defer](#10-scope-honesty-what-to-cut-or-defer)
 11. [Risks and open questions](#11-risks-and-open-questions)
+12. [What was built, milestone by milestone, and why](#12-what-was-built-milestone-by-milestone-and-why)
 
 ---
 
@@ -1146,7 +1148,7 @@ work, not from home.
 Cloudflare Pages Function, so the sign-in cookie is first-party and the API can refuse
 direct calls.
 
-### M2: Leave, payroll and data rights
+### M2: Leave, payroll and data rights: **Done**
 
 **Why.** After attendance, time off and pay are the next things every employer handles
 every month. They are also where mistakes cost real money, so they come before anything
@@ -1182,7 +1184,7 @@ New modules follow the AI-ready service pattern (§3.7) from the start.
 
 **Effort**: 15–20 days.
 
-### M3: Work and knowledge
+### M3: Work and knowledge: **Done**
 
 **Why.** A 30-person agency runs on tasks, announcements and shared documents as much as
 on HR. Having them in the same place as people and attendance is what turns separate
@@ -1226,7 +1228,7 @@ layer (M6–M7) needs to be useful, so the foundations for it are laid here.
 
 **Effort**: 15–20 days.
 
-### M4: Pilot release
+### M4: Pilot release: **Done** (deploy waits on the owner)
 
 **Why.** Real companies will show what matters faster than more building. Offer 3–5
 companies a free month: "We'll set up your company for free for a month; let's see if it
@@ -1256,7 +1258,7 @@ through the owner's network (open question Q8).
 
 **Effort**: 8–12 days, plus the pilot weeks, which run in parallel with M5.
 
-### M5: Billing with Paddle
+### M5: Billing with Paddle: **On hold** (owner, 4 Oct)
 
 **Why.** Pilots that find value should be able to pay without talking to anyone. Billing
 comes before the AI because AI has a running cost per use, so it has to sit on paid
@@ -1277,7 +1279,7 @@ test subscriptions shows zero reconciliation mismatches.
 
 **Effort**: 8–12 days.
 
-### M6: AI copilot (read-only)
+### M6: AI copilot (read-only): **Done**
 
 **Why.** This is where the product becomes more than "Zoho for small teams". An owner
 can ask a question instead of clicking through five screens. The answer comes from the
@@ -1317,7 +1319,7 @@ read-only first, so trust is earned before the AI can change anything.
 
 **Effort**: 12–16 days.
 
-### M7: AI actions and automation
+### M7: AI actions and automation: **Done**
 
 **Why.** Once people trust the answers, let the AI save them work, always with a person
 confirming.
@@ -1354,7 +1356,7 @@ confirming.
 
 **Effort**: 15–20 days.
 
-### M8: Shop pack
+### M8: Shop pack: **Done**
 
 **Why.** The product is meant to work from a tea stall up. Small shops need selling and
 dues more than HR, and Simple mode (§8.7) is designed for them.
@@ -1378,7 +1380,7 @@ without help.
 
 **Effort**: 15–20 days.
 
-### M9: Inventory and accounting
+### M9: Inventory and accounting: **Done**
 
 **Why.** Growing shops and companies need stock and books. Both sit on top of sales,
 purchases, expenses and payroll, so they come after those exist.
@@ -1400,7 +1402,7 @@ reconciles across 10,000 random operations.
 
 **Effort**: 20–25 days.
 
-### M10: Enterprise
+### M10: Enterprise: **Done** (owner items in §12)
 
 **Why.** Large companies need central sign-in, automatic user provisioning, integrations
 and stronger isolation, and some need their data to never leave their environment.
@@ -1423,7 +1425,7 @@ workspace. Load tests at 10,000 employees.
 
 **Effort**: 20–30 days.
 
-### M11: Launch hardening
+### M11: Launch hardening: **Done** (owner items in §12)
 
 **Why.** Before marketing broadly, everything should hold up to an outside review.
 
@@ -1499,3 +1501,257 @@ prices (§2.4). Module order: build all of them, in the order of §9. Still open
 10. **Cloud accounts.** OK to use your existing Google Cloud billing account (with budget
     alerts) and create new Neon and Cloudflare accounts/projects? I'll give exact click
     paths and least-privilege roles, and never need your passwords.
+
+---
+
+## 12. What was built, milestone by milestone, and why
+
+§9 is the plan as approved. This section is the record of what was actually built, the
+decisions made while building (by the owner, or by me where the owner delegated), and where
+the result differs from the plan. Dates are 2026. The day-by-day log is in
+[`PROGRESS.md`](PROGRESS.md); the code-level explanation is the
+[handbook](handbook/README.md).
+
+### Summary
+
+| Milestone | Status | Built | Tests at the end |
+|---|---|---|---|
+| M1 Demoable slice | Done 30 Sep | API foundation with RLS, auth, workspaces, roles, people, attendance, web app, site, CI, infra | 105 API tests, 90% |
+| M1.5 Marketing kit | Done 30 Sep | README, screenshots, demo script, case study | — |
+| M1.6 New design, Next.js, location attendance | Done 1 Oct | Atlas design, one Next.js app, geofenced clock-in, same-origin `/v1` | 119 API, 6 journeys × 2 devices |
+| M2 Leave, payroll, data rights | Done 1 Oct | leave, payroll with PDFs, export/import/delete, backups | 168 API, 92% |
+| M3 Work and knowledge | Done 1 Oct | capabilities, events, notifications, tasks, announcements, documents, approvals, onboarding, agency week | ~230 API |
+| M4 Pilot release | Done (deploy waits on owner) | spreadsheet import, reports, report emails, help centre, support, usage counts, pilot playbook | 232 API, 93% |
+| M5 Billing with Paddle | **On hold** (owner, 4 Oct) | nothing; plans and limits enforced, subscription model ready for a provider | — |
+| M6 AI copilot | Done 4 Oct | Gemini behind a port, per-workspace opt-in, allowances, Ask with sources, document search, weekly brief | — |
+| M7 AI actions and automation | Done 4 Oct (tested 5 Oct) | propose-and-confirm actions, writing help, automations, signals | — |
+| M8 Shop pack | Done 4 Oct (tested 5 Oct) | POS with offline sales, configurable taxes, dues, expenses | — |
+| M9 Inventory and accounting | Done 4 Oct (tested 5 Oct) | stock with weighted average cost, self-posting double-entry books, tax-return templates | — |
+| M10 Enterprise | Done 5 Oct | easy onboarding, API keys, webhooks, idempotency, OIDC SSO, SCIM, allowlist, audit export, own AI key, sandbox, API contract, SDKs | — |
+| M11 Launch hardening | Done 5 Oct (owner items left) | till PINs, passkeys, new-device alerts, security policy, runbooks, legal review and new drafts | — |
+| Test-and-fix pass | Done 5 Oct | full suite on everything built in speed mode; 9 bugs fixed | **321 API, 91%; 33 web unit; 19 + new browser journeys** |
+| Packaging and handbook | Done 5 Oct | README, site, `docs/handbook/` | — |
+
+### Decisions that shape everything
+
+| Decision | When, by whom | Why |
+|---|---|---|
+| Rewrite in a new repository (`companymgmt`), keep the domain knowledge from the CSE327 project | 30 Sep, owner | fresh history; the old code was a teaching project (§1) |
+| Modular monolith, FastAPI + SQLAlchemy async + Postgres | 30 Sep, plan | one person can run it; typed; OpenAPI contract for the web types |
+| **Forced row-level security on every tenant table**, API as a non-owner role, composite foreign keys | 30 Sep, plan | a forgotten `WHERE` can't leak another company's data; proven by an automatic sweep over every id route |
+| Scale-to-zero hosting: Cloud Run + Neon + Cloudflare Pages | 30 Sep, plan | about $1/month with no customers |
+| Prices set from competitors: Free, Starter $9, Growth $29, Business $79, Enterprise | 30 Sep, owner delegated | §2.4 |
+| Payments after the product works (now M5), then on hold | 30 Sep / 4 Oct, owner | no spending until there are customers |
+| Atlas design (white, dark mode, four accents) and one Next.js app for site + product | 30 Sep–1 Oct, owner chose direction C | replaced the ResumeX-styled SPA and Astro site |
+| Static export + per-page CSP with script hashes; no inline scripts | 1 Oct | free hosting, strict security, nothing to patch |
+| Same-origin `/v1` through a Pages Function with a shared proxy token | 1 Oct | first-party refresh cookie (works on `*.pages.dev`), no CORS, closes per-IP rate-limit spoofing |
+| First market: 20–100 person agencies in Bangladesh; English and Bangla everywhere | 30 Sep, owner | roadmap reordered for them |
+| Public site restyled in the ResumeX look; product keeps Atlas; the site only claims what's built | 4 Oct, owner | marketing consistency with the owner's other product |
+| Speed mode (lint and types only) for M7–M11, then a full test-and-fix pass | 4–5 Oct, owner | faster building; every speed-mode feature was then tested |
+| GitHub Actions (CI, CodeQL, Deploy) switched off; `scripts/check.sh` locally is the only gate | 5 Oct, owner | cost, repository going private |
+
+### M1: Demoable slice — done 30 Sep
+
+**Built:** settings, async DB layer, migrations with RLS helpers, three database roles,
+tenant context per transaction, RFC 9457 errors, test harness on real Postgres; sign-up with
+a workspace, email verification, sign-in, rotating refresh tokens with reuse detection,
+sessions, password reset, TOTP with recovery codes, step-up, rate limits, Turnstile;
+permissions, built-in and custom roles, members, invites, staff accounts without email,
+branches, plans and module switches, a hash-chained audit log; people with an encrypted
+national ID and a department tree; attendance with overnight shifts, time zones,
+corrections, timesheets and CSV export; the web app and site; Playwright with axe; CI,
+Dockerfile, OpenTofu, deploy workflow, runbooks.
+**Decisions:** People is always on and not counted as a module; every member gets a People
+profile (counts towards the limit); scoped roles without a department see everything (the
+UI asks for one when inviting managers); a shift open more than 24 hours needs a fix
+instead of a clock-out; internal endpoints use a shared-secret header, not OIDC (free tier,
+simpler); base images from `mirror.gcr.io`.
+**Left for the owner:** the deploy itself; after it, a k6 baseline and an idle-cost
+measurement.
+
+### M1.5: Marketing kit — done 30 Sep
+
+README with real screenshots from `demo_seed.py`; `docs/marketing/` (demo script, case
+study, resume bullets, LinkedIn post, architecture one-pager). Only built features and
+measured numbers.
+
+### M1.6: New design, Next.js, location-based attendance — done 1 Oct
+
+**Built:** branch geofences; workspace setting off / record / require (default require);
+positions rounded to ~11 m and saved only at clock events; clock-out never blocked; owners
+place branches with their device's location. Atlas tokens, dark mode, four accents applied
+before first paint. One Next.js app replacing the Vite SPA and the Astro site.
+**Decisions:** same-origin `/v1` proxy with `PROXY_TOKEN` (see above); clock-out never
+refused so nobody is stuck "clocked in".
+
+### M2: Leave, payroll, data rights — done 1 Oct
+
+**Built:** leave types, work week, holidays, balances (joining-date share, monthly accrual,
+carry-over), approvals, team calendar, adjustments; payroll with salaries by effective
+date, advances, runs draft → review → finalized → paid, overtime from attendance, unpaid
+leave, festival bonuses, shortfalls carried as advances, transfer sheet, payslip PDFs in
+both languages; workspace export (ZIP) and import into a new workspace, personal data
+download, deletion with a 30-day restore and a signed certificate, audit retention with
+anchors, a policy to require two-step for admins; nightly maintenance and encrypted
+backups (pg_dump → age → R2, 30 days).
+**Decisions:** Bangladesh defaults near the Labour Act 2006 (casual, sick, earned,
+maternity; Friday off); balances re-checked at approval; colleagues see that someone is
+away, never why; four-eyes on payroll (preparer can't finalize) with a recent sign-in;
+salary tax is an editable table, **off** until the owner checks it with an adviser;
+payslip notices never include run totals; fonts bundled for Bangla PDFs.
+
+### M3: Work and knowledge — done 1 Oct
+
+**Built:** the capability registry and a parity test against REST routes; the context
+builder; the append-only domain event log with in-transaction and outbox subscribers;
+notifications (bell and daily digest); tasks and projects with a board; announcements with
+read receipts; documents and policies with versions and acknowledgements; the approvals
+inbox for leave and time fixes; onboarding checklists; a 30-person agency's week played
+through the API and finished in the browser.
+**Decisions:** requests notify whoever can decide them **in that person's department**;
+nobody hears about their own actions; documents stored in Postgres up to 10 MB, checked by
+content, always downloaded as attachments; onboarding items are ordinary tasks; the
+per-address sign-in limit became a setting (`LOGIN_LIMIT_PER_IP`). **Deferred:**
+multi-step approval chains, until a module needs them.
+**Found and fixed:** a duplicate `RunOut` schema mangled payroll type names (now a test
+keeps schema names unique); workspace imports over 1 MB were refused.
+
+### M4: Pilot release — done (deploy waits on the owner)
+
+**Built:** CSV import of people, departments and leave left (English or Bangla headers,
+day-first dates, preview with row problems, all or nothing); the reports dashboard
+(attendance rate, lateness with a start time and grace, leave, overdue tasks); weekly and
+monthly report emails computed as each subscriber; help centre in both languages; "Contact
+support"; operator usage counts with nothing personal; `docs/pilot-playbook.md`.
+**Decisions:** reports computed per request (fine to a few hundred people); report emails
+use `member_ctx` so they show only what the subscriber may see; people without a joining
+date count from when they were added.
+**Not built:** Excel (.xlsx) import (CSV only); a status page (needs an account).
+
+### M5: Billing with Paddle — on hold
+
+The owner put it on hold on 4 October (no spending, no Paddle work). What exists: plans,
+limits, trials, read-only state, module locks, and a `subscriptions` table with
+`provider`/`provider_ref` ready for a payment provider. Chapter 12.4 of the handbook says
+where it plugs in.
+
+### M6: AI copilot (read-only) — done 4 Oct
+
+**Built:** a provider port with Gemini over REST and a scripted fake; per-workspace
+opt-in (the owner accepts the AI terms) and per-feature switches; allowances per plan set
+by platform operators, with notifications on change; "Ask my company" with numbered,
+linked sources; document text extraction and full-text search under the same visibility
+rules; the weekly brief.
+**Decisions (owner):** Gemini Flash; switched on by setting `GEMINI_API_KEY`, cleanly off
+without it; allowances are an operator setting, not code (starting at Free 0, Starter 100,
+Growth 500, Business 2,000, Enterprise unlimited). **(Mine):** the model only gets the
+asker's **read** capabilities, run as the asker; tool results are data, never
+instructions; six steps at most; conversations private and in the person's own export
+only; full-text search instead of embeddings for now (works in both languages with no
+extra service). **Not verified:** real Gemini answers (no key, no spending).
+
+### M7: AI actions and automation — done 4 Oct, tested 5 Oct
+
+**Built:** actions (tasks, comments, leave, announcements) proposed by the assistant and
+confirmed by the asker within an hour, audited "via the assistant"; writing help (draft,
+improve, shorten, translate); automations with schedule or event triggers, conditions,
+notify/create-task steps, recipients by role, department, people or situation; signals
+(attendance dropping, projects slipping, overloaded people).
+**Decisions (owner):** AI everywhere but each feature off until admins tick it; the AI
+proposes, a person confirms. **(Mine):** automations run as their owner, pause when they
+run too often or the owner leaves, and never trigger each other (`origin` on events);
+the automation editor works without AI.
+**Fixed in the test pass:** the workload signal could never fire in a small team (now "at
+least 8 open tasks and more than twice the team's median"); a failed AI action crashed
+while recording the failure.
+
+### M8: Shop pack — done 4 Oct, tested 5 Oct
+
+**Built:** the till with drawers, floats, item buttons, cash and change, credit to
+customers, browser-printed 80 mm receipts, offline sales sent later; returns and voids;
+period summary with tax by rate; customers and dues with statements and WhatsApp reminders;
+expenses with receipt photos and petty cash.
+**Decisions (owner):** taxes fully configurable per workspace (names, codes, inclusive or
+exclusive, compound, rounding), **no country rules built in**; cash only for now; browser
+printing now, Bluetooth/USB later. **(Mine):** offline sales carry a `client_id` and are
+kept once; returns and voids add records, never delete.
+
+### M9: Inventory and accounting — done 4 Oct, tested 5 Oct
+
+**Built:** stock per branch from a movement ledger, weighted average cost, purchases with
+reclaimable input tax and supplier balances, transfers, counts, adjustments, low-stock
+alerts; a plain chart of accounts with roles; automatic postings from sales, returns,
+voids, stock, purchases, payments, dues, expenses and payroll; backfill when switched on
+later; hand entries, reversals, lock date; trial balance, P&L, balance sheet, ledgers, cash
+book; tax-return templates built by the workspace's accountant.
+**Decisions (owner):** double-entry; VAT/tax returns are customisable templates, not
+built-in rules for any country. **(Mine):** stock moves in the sale's transaction; postings
+happen after commit through the outbox, once per source.
+**Fixed in the test pass:** selling stock before its delivery was recorded could produce a
+negative average cost; now the early units are re-costed at the delivery's cost and posted
+as a separate "cost correction" (migration 0029), found by the property test.
+
+### M10: Enterprise and developer platform — done 5 Oct
+
+**Built:** workspace addresses reserved and checked, join links with QR codes and WhatsApp
+sharing, sample data, a first-day checklist; API keys (scoped, rate-limited, network
+ranges, expiry, rotation, usage); signed webhooks with a public event catalogue, retries,
+auto-disable, delivery log, resend and test; `Idempotency-Key` on every write; company
+sign-in with OpenID Connect; SCIM 2.0; network allowlist; audit export; a workspace's own
+Gemini key; sandbox workspaces; a public API contract with a breaking-change check;
+deprecation headers; TypeScript and Python SDKs; developer docs and the `/developers` page.
+**Decisions (owner):** build everything that needs no owner intervention; a developer
+platform as a feature, not a pivot. **(Mine):** API keys never exceed what their maker
+holds now and never carry owner-only powers; account routes refuse keys; webhook payloads
+are thin (ids, not personal data) and only go to public HTTPS addresses pinned to the
+checked IP; SCIM lives at `/v1/scim/v2` (moved in the test pass, because the web origin
+only forwards `/v1`).
+**Not built (needs the owner or real load):** SAML, wildcard DNS for workspace
+addresses, a dedicated database per customer, partitioning and replicas, load tests,
+publishing the SDKs.
+
+### M11: Launch hardening — done 5 Oct (owner items left)
+
+**Built:** till PINs only on registered devices (lockout, selling-only 12-hour sessions,
+revocation ends them); passkeys; new-device sign-in emails; a year's retention for sign-in
+records; abuse limits on webhook tests and key creation; `SECURITY.md`, `security.txt`,
+the `/security` page, the AI threat model, the incident runbook, the ASVS table; a legal
+review (`docs/legal/REVIEW.md`) with new drafts of the terms, privacy policy, DPA and
+sub-processors page.
+**Left for the owner:** a lawyer's review, a ZAP scan and penetration test against a real
+deployment, a status page.
+
+### Test-and-fix pass — 5 Oct
+
+Everything built in speed mode was run: the full API suite, the web unit tests, the build,
+and browser journeys for every new screen. **Bugs found and fixed:** the isolation sweep
+caught two routes answering an empty 200 instead of 404 for another workspace's ids (no
+data leaked; RLS hid it); removing sample data crashed when a sample row was referenced;
+the negative-cost stock case; the workload signal; low-stock alerts skipped the seller;
+the AI-action failure path; SCIM's unreachable path; plus tests that were wrong rather
+than the code. Detail: [`UNTESTED.md`](UNTESTED.md).
+
+**One design change from testing:** the books showed nothing right after a sale, because
+the outbox only drained on the 10-minute schedule. A `FlushMiddleware` now delivers each
+request's outbox events just before its response; the scheduled job only retries.
+Webhooks were made queue-only (sent by their own per-minute job) so a slow customer server
+never slows a request.
+
+### Packaging and documentation — 5 Oct
+
+README rewritten for the finished product; the public site lists every built module, a
+security page, a developer page and pricing FAQs; the [handbook](handbook/README.md) (13
+chapters: running it, architecture, every module, user flows, security, testing, going
+live at the lowest cost, operations, adding features, reference) replaces the earlier
+developer guide.
+
+### What's left, all of it needing the owner
+
+1. Cloud accounts and the first deploy (handbook chapter 10, `runbooks/deploy.md`).
+2. Make the repository private (GitHub Settings → Danger zone).
+3. A lawyer's review of the legal drafts; a tax adviser's check of the salary tax table.
+4. A Gemini paid-tier key, then 20–30 real questions in both languages before customers.
+5. Pilot companies (`pilot-playbook.md`).
+6. A domain, then wildcard DNS for workspace addresses.
+7. A ZAP scan and penetration test; a status page; a restore drill on the real database.
+8. Decide when to resume M5 (billing).

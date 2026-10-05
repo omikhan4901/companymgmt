@@ -192,7 +192,10 @@ Actions**:
    prints the API address. Add it as `API_ORIGIN` in the Pages project's variables
    (step 3.3). No redeploy is needed: the function reads it on each request. From then on
    the API answers `/v1` only through the web address.
-2. Scheduled jobs (retries for emails, daily clean-up, the daily email summary):
+2. Scheduled jobs (retries for emails, daily clean-up, the daily email summary). **For the
+   lowest cost** use `*/30` for the outbox and automations jobs and skip the webhooks job
+   until a customer uses webhooks: each wake-up keeps Neon running for ~5 minutes
+   (handbook chapter 10.2–10.3).
 
    ```bash
    API=$(gcloud run services describe companymgmt-api --region asia-southeast1 --format 'value(status.url)')

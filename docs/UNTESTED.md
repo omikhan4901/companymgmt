@@ -8,9 +8,9 @@ from here.
 
 | Suite | Result |
 |---|---|
-| API (pytest, real Postgres) | **321 passed**, 90% line and branch coverage (gate 85%) |
+| API (pytest, real Postgres) | **321 passed**, 91% line and branch coverage (gate 85%) |
 | Public API contract check | no breaking changes against `docs/api/openapi-v1.json` |
-| Web unit tests (Vitest) | 35 passed |
+| Web unit tests (Vitest) | 33 passed |
 | Web lint and types | clean |
 | Static build | 43 pages with per-page security headers |
 | Browser (Playwright, desktop) | 19 existing journeys passed |

@@ -1,12 +1,11 @@
 # Progress
 
-Current work: **the owner's 2026-10-04 plan** (below): marketing site → M6 → M7 → M8 →
-M9 → M10 → M11, then a legal review. The marketing site and M6 (AI copilot) are done
-and tested. M7, M8, M9 and M10 are built; M10's new tests were run, the rest wait for
-the test-and-fix pass (`docs/UNTESTED.md`). Now: M11 security, the legal review, then the
-full test-and-fix pass. M5 (Paddle billing) is on hold. Going live still waits on the
-owner's cloud accounts (`runbooks/deploy.md`). CI, CodeQL and Deploy workflows are
-switched off on GitHub (owner, 2026-10-05: the repository is going private).
+Current state (5 October 2026): **every milestone is built and tested except M5 (Paddle
+billing), which is on hold.** The test-and-fix pass is done (321 API tests, 91% coverage),
+the README and site are repackaged, and the [handbook](handbook/README.md) documents
+everything. What each milestone built and why: `IMPLEMENTATION_PLAN.md` §12. Going live
+waits on the owner's cloud accounts (`handbook/10-production.md`). CI, CodeQL and Deploy
+workflows are switched off on GitHub (owner, 2026-10-05); `scripts/check.sh` is the gate.
 
 ## Owner decisions, 2026-10-04 (follow these)
 
@@ -428,3 +427,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-05: M10 developer platform: API keys, webhooks, idempotency, OIDC sign-in, SCIM, allowlist, audit export, own AI key, sandbox, API contract, SDKs and web screens. Repository workflows switched off (owner).
 - 2026-10-05: M11: till PINs on registered devices, passkeys, new-device alerts, security policy and runbooks. Legal review with new draft terms, privacy, DPA and sub-processors pages.
 - 2026-10-05: M4.3 help centre, contact support, usage counts and the pilot playbook. Every milestone except M5 (billing, on hold) is built. Test-and-fix pass started.
+- 2026-10-05: Test-and-fix pass done (9 bugs fixed; outbox events now delivered before each response). README and site repackaged. Handbook (13 chapters) replaces the developer guide; implementation plan §12 records every milestone and decision.
