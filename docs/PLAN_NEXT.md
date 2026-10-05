@@ -102,6 +102,7 @@ systematic instead of hopeful.
 | **Volume** | 5 records vs 50,000; a 300-line purchase; a 2,000-person payroll; a year of daily sales on the reports page; long names; 50 branches |
 | **Language and devices** | Bangla digits typed into amounts; mixed-script names; right-to-left text pasted in; a 360 px phone; a shared tablet; printing on 58 mm and 80 mm |
 | **Lifecycle** | a module switched off and on again; the plan dropping to Free; a workspace restored from export; sample data removed after real data was added; a branch closed |
+<!-- Omi's Comment: Missing an 11th axis — Security. Things like: SQL injection in search fields, XSS in user-entered names/notes, CSRF on state-changing actions, IDOR (accessing another tenant's sale by guessing the ID), file upload exploits (receipt photos), rate limiting on login/PIN, session fixation on shared devices, and what happens when someone inspects the API from the browser console. Every screen should be tested for these too. -->
 
 ### 1.3 Exit criteria for a screen
 
@@ -114,6 +115,7 @@ systematic instead of hopeful.
 - Empty states teach: they say what this screen is for and what to do first.
 - Help article updated; handbook chapters 5 and 7 updated.
 - `E2E=1 scripts/check.sh` passes.
+<!-- Omi's Comment: Exit criteria should also include: (1) the screen is keyboard-navigable and passes basic a11y checks (contrast, ARIA labels, screen reader announces actions), (2) the screen loads under 2 seconds on a 3G connection with realistic data volume, (3) every error state has a clear, localized message and a recovery path (not just a red toast that disappears), and (4) printing works where applicable (receipt, payslip, report). -->
 
 ### 1.4 Testing additions
 
@@ -125,6 +127,7 @@ systematic instead of hopeful.
   routine, not accidents like the books-test failure found on 5 October.
 - **Visual walkthrough**: a Playwright script that screenshots every screen per persona in
   both languages and both sizes, for the owner to review in one place.
+- <!-- Omi's Comment: Testing additions should also include: (1) Cross-tenant isolation tests — a test suite that creates two tenants and verifies every API endpoint, report, export, and AI query returns ZERO data from the other tenant. (2) Accessibility audit per screen — automated axe-core checks in Playwright plus a manual checklist for keyboard and screen reader. (3) Performance regression tests — key pages benchmarked with realistic data (10k sales, 500 people) and compared against a budget. (4) Offline resilience tests — simulate network drop mid-action and verify data integrity on reconnect. -->
 
 ---
 
@@ -141,6 +144,7 @@ Two to three days before Phase 1 starts. Small, but makes everything after it fa
 | 0.5 | **Clock control** in tests | a fixture to freeze time in any zone |
 | 0.6 | **Walkthrough screenshots** of every screen per persona | a folder the owner reviews before Phase 1 starts |
 | 0.7 | Fix the **verify** items in Appendix A: confirm or strike each | updated Appendix A |
+<!-- Omi's Comment: Phase 0 should also include: (0.8) Technical debt audit — identify any architectural shortcuts that will block Phase 1/2 work: are services properly isolated? Is the event system reliable (at-least-once delivery, dead letter queue)? Are database indexes adequate for the volume axis? Is the offline queue in the browser resilient to crashes? This is cheaper to fix now than mid-Phase 1. (0.9) Security baseline — run a basic OWASP ZAP scan on the existing app and fix anything critical before building more surface area. -->
 
 ---
 
@@ -378,6 +382,7 @@ data in a new chart.
 **Likely build items.** Plain-language P&L ("you earned ৳…, spent ৳…, kept ৳…"); opening
 balances; bank reconciliation; dimensions (branch, project); fixed assets and depreciation;
 "where did this number come from" drill-down everywhere.
+<!-- Omi's Comment: The "plain-language P&L" is a perfect candidate for the AI chatbot to own. Instead of building a separate simplified view, the owner should be able to ask "did I make money this month?" in the chatbot and get a beautifully formatted, contextual answer with drill-down links. This is where the AI-as-primary-interface vision starts — the Books module feeds data, the AI presents it in human words. Also: Books must enforce immutability — no hard delete of posted journal entries, only reversals. External auditors at S4/S5 will need a read-only export of the full journal with timestamps and who posted each entry. -->
 
 ---
 
@@ -442,6 +447,7 @@ after people clocked in; GPS accuracy 300 m in a dense area; phone clock wrong b
 (server time wins); two clock-ins from two devices at once; a branch moved (new location
 area) with historic records; a person transferred mid-month (which branch's rules?);
 daylight saving for a branch abroad; a kiosk tablet offline for a shift.
+<!-- Omi's Comment: Kiosk mode needs serious security thought. If the shared tablet is at the counter, what stops someone from exiting the kiosk app and browsing the owner's data? The kiosk should be a locked-down mode: no URL bar, no back button to the main app, only PIN entry and clock in/out. Think of it like the till's PIN session but for attendance. Also: what if the tablet is stolen? Remote wipe or lock of the kiosk device. And biometrics — many cheap Androids have fingerprint readers, could we use that instead of PINs for faster clock-in? -->
 
 **Likely build items.** Shifts and rosters; per-branch and per-shift lateness rules; kiosk
 mode with PINs or QR; overtime approval; breaks; bulk corrections; Ramadan/seasonal
@@ -511,6 +517,7 @@ finalized run after payslips were seen; currency change; 2,000 people in one run
 **Likely build items.** Pay frequencies (daily/weekly/monthly) and pay groups; paid-from
 account; piece rate; provident fund and gratuity; arrears; final settlement; bank and wallet
 file formats; payslip delivery by WhatsApp/email.
+<!-- Omi's Comment: Payroll is the module where regulatory compliance is non-negotiable. Bangladesh Labour Act 2006 has specific rules: minimum wage by sector, overtime caps (2 hours/day), maternity leave (16 weeks), gratuity formula, festival bonus norms, and mandatory registers (wage register, leave register, etc.) that a labour inspector can ask for. The payroll module should generate these statutory registers, not just payslips. Also: tax deduction at source (TDS) for salaried employees above the threshold — the editable tax table exists but is off by default, meaning nobody's using it. This needs to be on by default with the current Bangladesh tax slabs, with the owner able to override. -->
 
 ---
 
@@ -597,6 +604,7 @@ waiting, birthdays and work anniversaries. Mr. Chowdhury: a group dashboard.
 
 **Build.** Cards per module and role, arranged by stage and permissions; owner can pin and
 reorder; numbers link to their source; a branch switcher for multi-branch owners.
+<!-- Omi's Comment: Home is the most important screen in the entire product — it's the first thing every user sees every day. It should feel like a personal command center, not a generic dashboard. Think widget system: each module registers the cards it can show, the user drags and resizes them, and the layout is saved per person. There should be a "quick actions" bar at the top (open drawer, clock in, approve requests, record expense) that changes based on role and context (time of day, what's pending). Home is also where the AI chatbot should be most prominent — a floating assistant that greets you with "3 things to know today" and lets you ask anything. -->
 
 #### 1D.2 Reports (`/app/reports`)
 
@@ -607,6 +615,7 @@ with weekly/monthly emails and signals. Shop reports live in Sales and Books.
 sellers, margin), Money (P&L in plain words, cash flow, dues ageing, supplier dues), Stock
 (value, slow movers, wastage), People (existing), Work (project time and profitability);
 comparisons (this week vs last); export to Excel; every report schedulable by email.
+<!-- Omi's Comment: Reports should also support: (1) Saved/custom reports — let the owner define their own filters, columns, and groupings and save them with a name ("My Friday comparison"). (2) Shared reports — an owner creates a report and shares it with a manager, who sees only the data their permissions allow. (3) Report builder for advanced users (S4/S5) — pick dimensions, measures, filters, chart type, like a simple BI tool inside the app. (4) Goal tracking — "I want to make ৳50,000 this month" with a progress bar on Home and Reports. This makes Reports not just backwards-looking but motivational. -->
 
 #### 1D.3 Ask (AI), 1D.4 Automations, 1D.5 Notifications
 
@@ -656,6 +665,7 @@ cup within five; Nasrin imports her item list from Excel; Farhana imports 30 peo
 sell; office: add people → set leave → invite); sample data marked "sample" everywhere with
 "replace with my own"; import from Excel for items, customers, suppliers and opening stock,
 not only people.
+<!-- Omi's Comment: Sign-up and first day is make-or-break. If Rahim can't sell his first cup in 5 minutes, he'll never come back. This needs to be obsessively mobile-first — most Bangladeshi small business owners will sign up on a phone, not a laptop. The entire first-day flow should work flawlessly on a 360px screen in Bangla. Also: the Marketplace concept connects here — after the first-day flow, there should be a "What else can you do?" screen showing available modules with one-tap enable, not buried in Settings. Think app store, not enterprise configuration. And: what about a demo mode? Let someone try the product WITHOUT signing up — a read-only sample business they can tap around in. That's how you get someone who's never used software before to trust it. -->
 
 #### 1E.5 Help and the public site
 
@@ -683,6 +693,7 @@ a product that grows with its customer.
 | **S3 Office / agency** | 30-person agency | 20–60 | 1–2 | leave, payroll, projects, documents, approvals, an accountant |
 | **S4 Multi-branch company** | retailer or factory | 100–500 | 5–30 | regions, HR team, approval chains, rosters, budgets, audits |
 | **S5 Enterprise / group** | group of companies | 500–5,000 | many | several legal entities, consolidated reports, SSO/SCIM, API, strict access, data export to their systems |
+<!-- Omi's Comment: Missing stages for real life: (1) Seasonal business — a business that scales up massively for Eid/Ramadan/Pohela Boishakh and scales back down. Temporary staff, temporary branches (pop-up stalls), temporary inventory. What happens to those records after the season? (2) Business closure — the sad path. An owner shuts down: final settlements for all staff, final supplier payments, close the books, export everything, cancel the plan. The product should handle this gracefully, not leave orphan data. (3) Business pivot — a tea stall becomes a restaurant, an agency becomes a consultancy. The business type changes but the history stays. This connects to the "downgrade path" comment at the end. -->
 
 ### 4.3 For each stage, the deliverables
 
@@ -855,7 +866,7 @@ reports across companies, inter-company transfers, and group-level roles (a CFO 
 companies' books). A design question, not a quick build; may move to Phase 4.
 
 ---
-
+<!-- Omi's Comment: this section is good, but we also need to think of the inverse situation. Where a company keeps tanking profit and downsizes. -->
 ## 5. Phase 2 track — Access you can shape person by person
 
 The owner asked for "very, very highly configurable" permissions when adding a member,
@@ -866,7 +877,7 @@ scope per member.
 
 **Effective access = role template + this person's changes, within their scopes, under their
 limits.**
-
+<!-- Omi's Comment: Think of it like discord permissions. Role permissions are good, but personal permissions override role permissions. -->
 1. **Role templates** stay (Owner, Admin, Manager, Accountant, Cashier, Employee, custom), now
    with sensible versions per business type ("Shop manager", "Head cashier", "HR officer").
 2. **Per-person changes**: grant or remove any permission for one person, on top of the role,
@@ -977,6 +988,7 @@ Rough working days for one developer with AI help; revised after Phase 0's audit
 | 2 | Access you can shape | 8–12 d | add five people with different access; "view as" each |
 | 3 | Go live and get paid | 5–10 d + pilots' calendar time | first paying pilot |
 | 4 | Scale and reach | as pilots require | — |
+<!-- Omi's Comment: These estimates are optimistic for a "finished product" standard. 1A alone lists payment methods, pay-outs, shift handover, variants, modifiers, per-branch prices, barcodes, stock-out reasons — that's not 12-18 days of polished, tested, accessible, bilingual work. Be honest about this: either the scope per phase needs trimming (ship a subset, then iterate), or the estimates need doubling. I'd rather have realistic estimates and know the true timeline than hit week 3 of 1A and realize we're 40% done. Also: these estimates don't include any of the new items from my comments (error UX standards, a11y, printing, module marketplace, etc.). Those need their own line items or the estimates are meaningless. -->
 
 **Rules that carry over:** English and Bangla everywhere; logic in services; modules never
 import the AI layer; every route declares access; every tenant table has RLS; the public site
@@ -997,21 +1009,40 @@ Answer these in this file (write under each) before or during Phase 1.
 
 1. **Order of Phase 1 clusters**: is 1A (shop) → 1B (people) → 1C (work) → 1D → 1E right, or
    should offices (1B/1C) come first for the agency market chosen in §2.0 of the first plan?
+   <!-- Omi's Comment: If i'm being honest, both are very important to me. there shouldn't be like a linear progression. like a shop owner might also need HR features for his shop, and a factory worker might also need some retail features. In the end, it needs to be highly customizable for everyone's business. think of it as, "Adding modules to my company". If i wanna keep stock, i'll add the stock module. If i wanna keep employees, i'll add the employees module. etc etc. The "Tea shop", "Office" etc are just presets. The main goal is to let the user choose what features they want for their business. -->
 2. **Payment methods at the till**: recorded methods only (cash, bKash, Nagad, card, bank)
    for now, real integrations in Phase 4?
+   <!-- Omi's Comment: I want to probably add something like a bkash api or a bank api, but honestly getting access for those things are hard. If i ever set up this, for the first few companies, i might set it up just for them privately. So while we are making this as a saas, do give me some notes on how to pull some strings and code to make it just for one company in the future.  -->
 3. **Daily wages paid from the till**: payroll items (proper) or expenses (simple), or a
    choice per business?
+  <!-- Omi's Comment: Here, i think, payroll is important to keep track of expenses. But lets just say. we should think like this, if anything CAN be a module, it is a module. So if an owner wants payroll, they SELECt payroll. if they select expenses/till, they select them. On the preset, we'll say what modules are preloaded which they can enable/disable later. This gives the user control. 
+  
+  Something that is important worth noting here is, while we are thinking about the user journey and interconnectivity between each modules, we also need to make each module stand out enough so that they can also be used independently. OR, if there is a module that is useless without another module, they come together. There's a lot of thoguht that needs to go to these things. Modules in isolation MUST work well. But modules in connection with each other must work incredibly well too and must offer better than using them individually to give the tenannt owners an incentive. 
+   -->
 4. **Market purchases with drawer cash**: inventory purchases (cost per cup) or expenses
    (simple), or a choice per item?
+   <!-- Omi's Comment: Both. I think there should be a module called "Marketplace", where the owner can select what they want to use. So essentially, the marketplace offers a list of modules they can add to their business. Some modules require other modules. such as if you want accounting, you first need a business. so on and so forth. Some modules might not be compatible with other modules, we have to make rules for those things.  
+   
+   So essentially, there should be some "base modules" that are free and always included in every business. These are: Users, Access, Business, and Home. 
+   Then there's the marketplace where they can add modules.  -->
 5. **B2B invoicing**: inside Customers, or its own module?
+   <!-- Omi's Comment: I think there should be an entire module dedicated to customers. We 
+   should call it "CRM". However, we are not doing any lead generation or wtv. I think it's important to understand the scope of things we are doing. While we will be making a somewhat crm, we are not making a full fledged crm. We are just making a module called "CRM" that will handle customers, transactions and payments and stuff like that.  -->
 6. **Expense claims** reimbursed via payroll, cash, or either?
+   <!-- Omi's Comment: Both. I think there should be a module called "Marketplace", where the owner can select what they want to use. So essentially, the marketplace offers a list of modules they can add to their business. Some modules require other modules. such as if you want accounting, you first need a business. so on and so forth. Some modules might not be compatible with other modules, we have to make rules for those things.  -->
 7. **Business type and stage change**: allowed any time? Who may do it (owner only)?
+   <!-- Omi's Comment: Allowed any time but they will be charged the one they were using for that month, they'll only start geetting charged for the new one the next month. Owner only. Can be multiple owners btw. -->
 8. **Interface mode**: keep simple/standard/advanced and make it real, or drop it?
+   <!-- Omi's Comment: Make it real.  -->
 9. **Plan changes before billing**: free during pilots, or manual approval by you?
+   <!-- Omi's Comment: free during pilots, somewhat like me making an invitation link for them. once we start the billing, i will integrate paddle or something so everyone can use it themselves. -->
 10. **Access model**: is the model in 5.1 what you meant? Anything missing (e.g. access by
     time of day, by device, by IP for some people only)?
+    <!-- Omi's Comment: what? -->
 11. **Multi-entity groups**: Phase 2 or Phase 4?
+    <!-- Omi's Comment: as fast as possible. i'm not doing an mvp. i'm making a finished product. -->
 12. **Which pilot businesses** can you line up for Phase 3, and at which stage?
+    <!-- Omi's Comment: all. Any business that uses it will give us good data to work on our stuff. -->
 
 ---
 
@@ -1057,3 +1088,55 @@ Verified in the code on 5 October unless marked **(verify)**.
 | **Farhana**, HR manager | 30-person agency, Gulshan | laptop | English | leave, payroll, onboarding, documents, approvals |
 | **Arif**, team lead | same agency | phone | English | tasks, approvals for his team only |
 | **Mr. Chowdhury**, CFO | group of 3 companies, 900 people | laptop | English | consolidated books, strict access, SSO, audits |
+
+
+
+ <!-- Omi's Comment: A few more things. I like this next plan. But i think you're underestimating the idea of a finished product. 
+ 1. It needs to work end to end. All edge cases must be handled, all error or unhappy cases must be handled.
+ 2. What's the point of a module if it's not the best at what it does? The modules must be incredibly good at what they do individually. And when they add multiple modules, there needs to be such good synchronization that it incetivizes them to buy all the modules. You have full freedom to think of the modules anew. If you think you can merge two/more modules together and it'd be better, do it. If you think you need to add a new module to make the experience better, do it. 
+ 3. Ai isn't necessarily optional, because in the end ofthe day, i want the owner to mostly talk to a chatbot to know about most stuff. That is a future very far from what our existing junk is :P. but i think with some patience we will make it great. 
+
+ 
+ 
+ 
+  -->
+
+<!-- Omi's Comment: ADDITIONAL THINGS TO ADD TO THE PLAN
+
+1. Error Handling & Unhappy-Path UX — The plan covers data edge cases thoroughly but says nothing about what users SEE when things go wrong. We need a section on error UX standards: when to use toast vs inline vs blocking errors, retry vs discard flows, what happens when something partially fails (e.g. payroll half-posted when the server dies), undo/rollback affordances, and graceful degradation. Every screen should follow the same pattern, not invent its own.
+
+2. Data Migration & Onboarding from Existing Systems — Sign-up mentions "import from Excel" for items and people, but real businesses switching from paper or other software need much more: opening balances for books, inventory, customer dues, supplier dues, leave balances, and advance balances. There should be a cutover checklist per stage and possibly a "parallel run" period where they compare old and new. This is barely touched.
+
+3. Audit Trail & Compliance — Beyond the audit log that already exists, we need: immutability of financial records (no hard deletes of posted transactions), audit export formats for external auditors at S4/S5, change history on sensitive fields (salary changes, permission changes), and regulatory requirements (Bangladesh labour law reporting, digital commerce act). For a finished product, this matters.
+
+4. Backup, Disaster Recovery & Data Sovereignty — No mention of tenant data backup strategy, point-in-time recovery, or what happens if a tenant wants to leave (full data export in a portable format). The plan mentions "workspace restored from export" as an edge case but doesn't describe the export/import as a proper feature.
+
+5. Module Dependency Graph & the "Marketplace" Concept — My earlier comments say "modules should be independent but better together" and mention a Marketplace. The plan needs to formalize this with a dependency graph. For example: Payroll requires People, Inventory requires Sales or can be standalone, Books is auto-enabled when 2+ money modules are active. This needs its own section with explicit rules: required-by, enhances, conflicts-with, and what "standalone mode" means for each module. Base modules that are always included: Users, Access, Business, and Home.
+
+6. Downgrade & Business Failure Path — The plan only covers growth (S0→S5) but not the reverse. A business shrinking, losing staff, closing branches, dropping modules. What happens to the data? Do reports still work for historical periods when a module was active? Can they re-enable later and pick up where they left off? This is the inverse of section 4.6 and needs equal thought.
+
+7. Multi-Currency — Barely mentioned (one line about "currency of a foreign purchase"). For S5 groups with branches abroad, or even a Dhaka shop buying imported goods, this needs real design: per-branch currency, exchange rates, reporting currency, currency on journal entries.
+
+8. API & Developer Platform — S5 mentions "API" and "developer platform" in passing but there's no real section. We need: public API design (REST? versioning? rate limits?), webhooks for external systems, API key scoping (which modules, which branches), and documentation. If Mr. Chowdhury's group exports data nightly to a BI tool, the API needs to be properly designed.
+
+9. Performance & Observability in Production — Phase 4 mentions "stored daily totals" and "partitioning" but nothing about: monitoring and alerting (how do we know the system is slow?), SLAs we promise tenants, query performance budgets per page, or tenant isolation under load (one big tenant shouldn't slow others down).
+
+10. Accessibility (a11y) — Not mentioned once in the plan. Screen readers, keyboard navigation, colour contrast, ARIA labels. Especially important for Karim who "reads slowly" and uses a small phone. Bangladesh has users with visual impairments too. This should be a standard applied to every screen.
+
+11. Localization Beyond Bangla/English — The plan hardcodes two languages. If this is a SaaS, the architecture should support N languages even if we ship with 2. Think about Chittagonian, Sylheti, or Hindi/Urdu for garment factories with migrant workers.
+
+12. Tenant-to-Tenant Isolation Testing — RLS is mentioned as a rule, but there's no testing strategy for it. We need negative tests that verify tenant A CANNOT see tenant B's data even through AI queries, reports, exports, or error messages. This should be part of the standard test suite.
+
+13. Versioning & Feature Flags — How do we ship a half-finished module to pilots without exposing it to everyone? How do we A/B test a new Home layout? No mention of feature flags, canary releases, or staged rollouts. We need this before pilots start.
+
+14. The Chatbot / AI Assistant as a First-Class Interface — I said I want owners to "mostly talk to a chatbot." The plan treats AI as one screen (1D.3). If conversational AI is the primary interface for many users, it needs its own track: what actions can the AI take (not just read), confirmation flows before the AI does something, undo via chat, context across conversations, and how the AI handles permissions (it should never show data the user can't see).
+
+UNDERWEIGHTED AREAS TO EXPAND:
+
+15. Frontend Testing Strategy — Scenario tests are API-heavy. Playwright is mentioned once for screenshots, not for interaction testing. We need real browser interaction tests for every critical flow, not just screenshots.
+
+16. WhatsApp as a Channel — Mentioned for reminders and payslips but not designed. WhatsApp Business API has strict template approval rules, session windows, and costs. This deserves its own sub-section with what templates we need, cost model, and fallback to SMS.
+
+17. Printing — 58mm/80mm receipts, payslips, invoices, reports. Real businesses print A LOT. Only one line about receipt width in the whole plan. We need a printing standards section: what prints, on what paper sizes, in what language, with what branding, and how to preview before printing.
+
+-->
