@@ -154,6 +154,7 @@ only gate: GitHub Actions are switched off.
 | | |
 |---|---|
 | [Handbook](docs/handbook/README.md) | the complete guide: run, understand, operate, extend |
+| [Next plan](docs/PLAN_NEXT.md) | what comes next: every screen done properly, then one business from tea stall to enterprise |
 | [Implementation plan](docs/IMPLEMENTATION_PLAN.md) | the original plan, and §12: what each milestone built and why |
 | [Progress](docs/PROGRESS.md) | dated log, owner decisions, what's blocked on the owner |
 | [Going live](docs/handbook/10-production.md) · [Deploy runbook](docs/runbooks/deploy.md) | production at the lowest cost |

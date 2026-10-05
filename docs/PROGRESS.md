@@ -6,6 +6,9 @@ the README and site are repackaged, and the [handbook](handbook/README.md) docum
 everything. What each milestone built and why: `IMPLEMENTATION_PLAN.md` §12. Going live
 waits on the owner's cloud accounts (`handbook/10-production.md`). CI, CodeQL and Deploy
 workflows are switched off on GitHub (owner, 2026-10-05); `scripts/check.sh` is the gate.
+**Next:** [`PLAN_NEXT.md`](PLAN_NEXT.md) — Phase 0 groundwork, Phase 1 every screen done
+properly, Phase 2 one business from tea stall to enterprise with person-by-person access.
+Work restarts Thursday after the owner's review.
 
 ## Owner decisions, 2026-10-04 (follow these)
 
@@ -428,3 +431,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-05: M11: till PINs on registered devices, passkeys, new-device alerts, security policy and runbooks. Legal review with new draft terms, privacy, DPA and sub-processors pages.
 - 2026-10-05: M4.3 help centre, contact support, usage counts and the pilot playbook. Every milestone except M5 (billing, on hold) is built. Test-and-fix pass started.
 - 2026-10-05: Test-and-fix pass done (9 bugs fixed; outbox events now delivered before each response). README and site repackaged. Handbook (13 chapters) replaces the developer guide; implementation plan §12 records every milestone and decision.
+- 2026-10-05: Owner's review: too much is hard-coded, no growth path, screens don't connect. Wrote `PLAN_NEXT.md` (two main phases plus groundwork, go-live and scale).
