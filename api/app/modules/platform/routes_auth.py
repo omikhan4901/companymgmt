@@ -206,6 +206,8 @@ class CurrentWorkspace(Out):
     require_admin_mfa: bool = False
     # This person must turn on two-step verification before using the workspace.
     mfa_setup_required: bool = False
+    # A sandbox for trying the API (not real data).
+    sandbox: bool = False
 
 
 class PendingDeletion(BaseModel):
@@ -614,6 +616,7 @@ async def me(ctx: Ctx = Depends(signed_in(allow_deleted_workspace=True))) -> MeO
             scope_department_id=ctx.membership.scope_department_id,
             require_admin_mfa=ctx.tenant.require_admin_mfa,
             mfa_setup_required=needs_mfa(ctx),
+            sandbox=ctx.tenant.sandbox_of is not None,
             plan=PlanOut(
                 key=ent.plan.key,
                 name=ent.plan.name,

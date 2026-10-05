@@ -5391,6 +5391,11 @@ export interface components {
             role: string;
             /** Role Key */
             role_key: string;
+            /**
+             * Sandbox
+             * @default false
+             */
+            sandbox: boolean;
             /** Scope Department Id */
             scope_department_id: string | null;
             /** Slug */

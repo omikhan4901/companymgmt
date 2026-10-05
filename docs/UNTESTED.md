@@ -148,3 +148,9 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   far), `GET /v1/members/{id}`, `docs/api/README.md`, `sdk/typescript`, `sdk/python`.
   Contract tests and both SDKs' unit tests **were run and pass**; the SDKs were never
   pointed at a running server.
+- [ ] **Developer and security screens (web).** Settings → Developers (API keys: create
+  with permission picker, show once, usage chart, rotate, revoke; webhooks: editor with
+  event picker, signing secret shown once, test, delivery log, resend, delete; sandbox),
+  Settings → Security (company sign-in, network allowlist, own AI key), audit export
+  button, login "Sign in with your company account", `/sso/callback`, `sandbox` on the
+  session workspace. Types and lint pass; never opened in a browser; no e2e test.

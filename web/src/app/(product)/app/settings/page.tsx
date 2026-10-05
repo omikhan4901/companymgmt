@@ -1,19 +1,22 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, MapPin, Plus, Settings as SettingsIcon, ShieldCheck } from "lucide-react";
+import { Building2, Download, MapPin, Plus, Settings as SettingsIcon, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { api } from "@/api/client";
+import { api, download } from "@/api/client";
 import { useAttendanceSettings, useBranches } from "@/api/hooks";
 import { AddressCard } from "@/components/address-card";
 import { AIAllowances, AISettings, useIsOperator } from "@/components/ai/settings";
 import type { AuditEvent, Branch, Page, Workspace } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { BranchSheet } from "@/components/branch-sheet";
+import { ApiKeys, Sandbox } from "@/components/developers/api-keys";
+import { CompanySignIn, NetworkAllowlist, OwnAIKey } from "@/components/developers/security";
+import { Webhooks } from "@/components/developers/webhooks";
 import { PageHeader } from "@/components/page";
 import { PlanCards } from "@/components/plan-cards";
 import { Alert } from "@/components/ui/alert";
@@ -364,6 +367,16 @@ function Audit() {
       toast.error(errorMessage(e));
     }
   };
+  const exportLog = async () => {
+    const to = new Date();
+    const from = new Date(to.getTime() - 90 * 86_400_000);
+    const day = (d: Date) => d.toISOString().slice(0, 10);
+    try {
+      await download("/v1/audit/export", { from: day(from), to: day(to), format: "csv" }, `audit-${day(to)}.csv`);
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  };
   const rows = events.data?.pages.flatMap((p) => p.items) ?? [];
   return (
     <div className="flex flex-col gap-4">
@@ -382,6 +395,10 @@ function Audit() {
         <Button className="ml-auto" onClick={() => void verify()}>
           <ShieldCheck aria-hidden="true" />
           {t("settings.verifyChain")}
+        </Button>
+        <Button onClick={() => void exportLog()}>
+          <Download aria-hidden="true" />
+          {t("settings.exportAudit")}
         </Button>
       </div>
       <Card className="overflow-hidden">
@@ -425,7 +442,7 @@ function Audit() {
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { can } = useSession();
+  const { can, workspace } = useSession();
   const operator = useIsOperator();
   const tabs = [
     {
@@ -444,6 +461,30 @@ export default function SettingsPage() {
     { key: "plan", label: t("settings.tabs.plan"), content: <PlanTab />, show: can("workspace.manage") },
     { key: "ai", label: t("settings.tabs.ai"), content: <AISettings />, show: can("ai.manage") },
     { key: "audit", label: t("settings.tabs.audit"), content: <Audit />, show: can("audit.view") },
+    {
+      key: "developers",
+      label: t("settings.tabs.developers"),
+      content: (
+        <div className="flex max-w-3xl flex-col gap-5">
+          <ApiKeys />
+          <Webhooks />
+          <Sandbox />
+        </div>
+      ),
+      show: can("developers.manage") && Boolean(workspace?.plan.features.api),
+    },
+    {
+      key: "security",
+      label: t("settings.tabs.security"),
+      content: (
+        <div className="flex max-w-3xl flex-col gap-5">
+          <CompanySignIn />
+          <NetworkAllowlist />
+          <OwnAIKey />
+        </div>
+      ),
+      show: can("developers.manage"),
+    },
     {
       key: "data",
       label: t("privacy.tab"),

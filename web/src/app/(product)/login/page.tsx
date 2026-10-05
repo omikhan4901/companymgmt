@@ -40,7 +40,8 @@ function LoginForm() {
   const [hostSlug] = useState(() => (typeof window === "undefined" ? null : slugFromHost(window.location.host)));
   const place = useQuery({
     queryKey: ["public-workspace", hostSlug],
-    queryFn: () => api<{ name: string; slug: string; moved_to: string | null }>("/v1/public/workspace", { query: { slug: hostSlug ?? "" } }),
+    queryFn: () =>
+      api<{ name: string; slug: string; moved_to: string | null; sso: boolean; sso_required: boolean }>("/v1/public/workspace", { query: { slug: hostSlug ?? "" } }),
     enabled: !!hostSlug,
     retry: false,
   });
@@ -143,7 +144,59 @@ function LoginForm() {
           {t("auth.forgot")}
         </Link>
       )}
+      <CompanyAccount slug={hostSlug} offered={place.data?.sso ?? false} next={params.get("next")} />
     </AuthLayout>
+  );
+}
+
+/** "Sign in with your company account" (SSO). On a workspace's own address it's one
+ * button; elsewhere people type the workspace code first. */
+function CompanyAccount({ slug, offered, next }: { slug: string | null; offered: boolean; next: string | null }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  if (slug && !offered) return null;
+  const go = async (workspace: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const { url } = await api<{ url: string }>("/v1/sso/start", { body: { workspace, next: next && next.startsWith("/") ? next : null } });
+      window.location.assign(url);
+    } catch (e) {
+      setError(errorMessage(e));
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mt-6 border-t border-border pt-5">
+      {error && <Alert tone="error" className="mb-3">{error}</Alert>}
+      {slug ? (
+        <Button className="w-full" loading={busy} onClick={() => void go(slug)}>
+          {t("sso.button")}
+        </Button>
+      ) : open ? (
+        <form
+          className="flex items-end gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (code.trim()) void go(code.trim().toLowerCase());
+          }}
+        >
+          <Field label={t("auth.workspaceCode")} className="flex-1">
+            <Input autoCapitalize="none" value={code} onChange={(e) => setCode(e.target.value)} />
+          </Field>
+          <Button type="submit" loading={busy}>
+            {t("sso.continue")}
+          </Button>
+        </form>
+      ) : (
+        <Button variant="link" onClick={() => setOpen(true)}>
+          {t("sso.button")}
+        </Button>
+      )}
+    </div>
   );
 }
 
