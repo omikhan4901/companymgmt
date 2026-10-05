@@ -76,6 +76,8 @@ class WorkspaceOut(Out):
     fiscal_year_start_month: int
     require_admin_mfa: bool
     created_at: datetime
+    # This workspace is a sandbox (for trying the API) of another one.
+    sandbox_of: uuid.UUID | None = None
 
 
 class WorkspaceIn(In):

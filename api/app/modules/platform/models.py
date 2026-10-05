@@ -88,6 +88,8 @@ class Tenant(IdMixin, TimestampMixin, Base):
     ip_allowlist: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     # People with an email address must sign in with the company account (SSO).
     sso_enforced: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # A sandbox for trying the API and integrations: the workspace it belongs to.
+    sandbox_of: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("tenants.id", ondelete="SET NULL"))
 
 
 class Subscription(IdMixin, TenantScoped, TimestampMixin, Base):
@@ -256,6 +258,8 @@ class Membership(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):
     status: Mapped[str] = mapped_column(String(10), default="active")
     # Limits scoped permissions to this department and its sub-departments.
     scope_department_id: Mapped[uuid.UUID | None]
+    # The identity provider's id for this person (SCIM provisioning).
+    external_id: Mapped[str | None] = mapped_column(String(200))
 
 
 class Invite(IdMixin, TenantScoped, Base):

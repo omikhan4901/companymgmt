@@ -17,19 +17,19 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response
 from pydantic import BaseModel, Field, StringConstraints
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.core import audit, context, ipnet
 from app.core import permissions as perms
-from app.core.errors import Forbidden, Invalid, NotFound, PaymentRequired
+from app.core.errors import Conflict, Forbidden, Invalid, NotFound, PaymentRequired
 from app.core.schema import In
 from app.core.security.tokens import hash_secret, new_secret
 from app.core.spreadsheet import safe_cell
 from app.core.time import utcnow
-from app.modules.platform import catalog
+from app.modules.platform import catalog, workspaces
 from app.modules.platform.catalog import AUDIT_VIEW, DEVELOPERS_MANAGE
 from app.modules.platform.deps import API_KEY_PREFIX, Ctx, allow, people_only
-from app.modules.platform.models import ApiKey, ApiKeyUsage, Membership, Tenant, User
+from app.modules.platform.models import ApiKey, ApiKeyUsage, Membership, Subscription, Tenant, User
 
 router = APIRouter(prefix="/v1", tags=["developers"])
 
@@ -441,3 +441,61 @@ async def export_audit(
         media_type=media,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+# ---- Sandbox ---------------------------------------------------------------------------------
+
+
+class SandboxOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    slug: str
+
+
+@router.post("/workspace/sandbox", response_model=SandboxOut, status_code=201)
+async def create_sandbox(ctx: Ctx = Developer) -> SandboxOut:
+    """A separate workspace to try the API, webhooks and integrations without touching
+    real data. Same plan features, never billed, one per workspace; you're its owner.
+    Switch to it from the workspace menu; delete it like any workspace."""
+    if not ctx.is_owner:
+        raise Forbidden("Only the workspace owner can make a sandbox.", code="owner_only")
+    tenant = ctx.tenant
+    assert tenant is not None
+    assert ctx.entitlements is not None
+    if tenant.sandbox_of is not None:
+        raise Invalid("This is already a sandbox.", code="sandbox_of_sandbox")
+    existing = await ctx.db.scalar(
+        select(func.count())
+        .select_from(Tenant)
+        .where(Tenant.sandbox_of == tenant.id, Tenant.status == "active")
+    )
+    if existing:
+        raise Conflict("This workspace already has a sandbox.", code="sandbox_exists")
+    plan_key = ctx.entitlements.plan.key
+    modules = sorted(ctx.entitlements.modules | ctx.entitlements.locked_modules)
+    parent_id = tenant.id
+    sandbox = await workspaces.create_workspace(
+        ctx.db,
+        ctx.user,
+        name=f"{tenant.name} (sandbox)"[:120],
+        business_type=tenant.business_type,
+        country=tenant.country,
+        timezone=tenant.timezone,
+        currency=tenant.currency,
+        locale=tenant.locale,
+    )
+    sandbox.sandbox_of = parent_id
+    subscription = await ctx.db.scalar(select(Subscription).where(Subscription.tenant_id == sandbox.id))
+    assert subscription is not None
+    subscription.plan_key, subscription.status = plan_key, "active"
+    subscription.trial_plan_key = subscription.trial_ends_at = None
+    subscription.modules = [m for m in modules if not catalog.MODULES[m].core]
+    await audit.record(
+        ctx.db,
+        "workspace.sandbox_created",
+        target_type="workspace",
+        target_id=sandbox.id,
+        data={"from": str(parent_id)},
+    )
+    await ctx.db.commit()
+    return SandboxOut(id=sandbox.id, name=sandbox.name, slug=sandbox.slug)

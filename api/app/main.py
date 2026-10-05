@@ -43,6 +43,7 @@ from app.modules.platform.routes_developers import router as developers_router
 from app.modules.platform.routes_join import router as join_router
 from app.modules.platform.routes_webhooks import router as webhooks_router
 from app.modules.platform.routes_workspace import router as workspace_router
+from app.modules.platform.scim import router as scim_router
 from app.modules.platform.sso import router as sso_router
 from app.modules.privacy.routes import router as privacy_router
 from app.modules.reports.routes import internal_router as reports_internal_router
@@ -81,6 +82,7 @@ ROUTERS = (
     developers_router,
     webhooks_router,
     sso_router,
+    scim_router,
     welcome_router,
     internal_router,
     notifications_internal_router,
