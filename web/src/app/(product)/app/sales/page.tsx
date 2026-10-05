@@ -26,6 +26,7 @@ import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatDay, formatMoney, formatNumber, todayIn } from "@/lib/format";
 import { fromMinor, toMinor } from "@/lib/money";
 import { useTab } from "@/lib/use-tab";
+import { Tills } from "@/components/shop/tills";
 
 function useMoney() {
   const workspace = useWorkspace();
@@ -691,6 +692,7 @@ export default function SalesPage() {
     { key: "products", content: <Products />, show: can("sales.manage") },
     { key: "taxes", content: <Taxes />, show: can("sales.manage") },
     { key: "drawers", content: <Drawers />, show: can("sales.view") },
+    { key: "tills", content: <Tills />, show: can("sales.manage") },
   ].filter((x) => x.show);
   const [active, setActive] = useTab(tabs.map((x) => x.key));
   if (!hasModule("sales") || !tabs.length) return <EmptyState icon={<Store />} title={t("common.notAllowed")} />;

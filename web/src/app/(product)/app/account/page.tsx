@@ -30,6 +30,7 @@ import { formatDateTime } from "@/lib/format";
 import { ACCENT_SWATCH, ACCENTS, MODES, useTheme, type Accent, type Mode } from "@/lib/theme";
 import { MyData, PendingDeletion } from "@/components/privacy";
 import { useStepUp } from "@/components/step-up";
+import { TillPin } from "@/components/shop/tills";
 
 
 function Profile() {
@@ -372,7 +373,7 @@ function Sessions() {
 
 export default function AccountPage() {
   const { t } = useTranslation();
-  const { workspace } = useSession();
+  const { workspace, can } = useSession();
   return (
     <>
       <PageHeader title={t("account.title")} />
@@ -391,6 +392,7 @@ export default function AccountPage() {
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <TwoStep />
+          {can("sales.sell") && <TillPin />}
           <Sessions />
           {workspace && <MyData />}
         </div>

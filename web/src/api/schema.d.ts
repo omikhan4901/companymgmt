@@ -3616,6 +3616,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sales/my-pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Pin */
+        get: operations["my_pin_v1_sales_my_pin_get"];
+        /**
+         * Set Pin
+         * @description Set (or change) your till PIN. Only from a full sign-in, not from a till.
+         */
+        put: operations["set_pin_v1_sales_my_pin_put"];
+        post?: never;
+        /** Remove Pin */
+        delete: operations["remove_pin_v1_sales_my_pin_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/sales/products": {
         parameters: {
             query?: never;
@@ -3716,6 +3738,44 @@ export interface paths {
         put: operations["save_tax_rate_v1_sales_tax_rates__rate_id__put"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sales/tills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tills */
+        get: operations["list_tills_v1_sales_tills_get"];
+        put?: never;
+        /**
+         * Register Till
+         * @description Run this on the till itself: the browser keeps the returned token.
+         */
+        post: operations["register_till_v1_sales_tills_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sales/tills/{till_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Till */
+        delete: operations["revoke_till_v1_sales_tills__till_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3980,6 +4040,43 @@ export interface paths {
         put?: never;
         /** Move Task */
         post: operations["move_task_v1_tasks__task_id__move_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/till": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Till Info
+         * @description Who can unlock this till (names only).
+         */
+        get: operations["till_info_v1_till_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/till/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unlock */
+        post: operations["unlock_v1_till_unlock_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5130,6 +5227,16 @@ export interface components {
             start_date: string;
             /** Status */
             status: string;
+        };
+        /** CashierOut */
+        CashierOut: {
+            /**
+             * Membership Id
+             * Format: uuid
+             */
+            membership_id: string;
+            /** Name */
+            name: string;
         };
         /** CategoryTotal */
         CategoryTotal: {
@@ -7437,6 +7544,18 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** PinIn */
+        PinIn: {
+            /** Pin */
+            pin: string;
+        };
+        /** PinStatus */
+        PinStatus: {
+            /** Has Pin */
+            has_pin: boolean;
+            /** Locked Until */
+            locked_until?: string | null;
+        };
         /** PlanOut */
         PlanOut: {
             /** Features */
@@ -9634,6 +9753,42 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** TillIn */
+        TillIn: {
+            /** Branch Id */
+            branch_id?: string | null;
+            /** Name */
+            name: string;
+        };
+        /** TillInfo */
+        TillInfo: {
+            /** Cashiers */
+            cashiers: components["schemas"]["CashierOut"][];
+            /** Till */
+            till: string;
+            /** Workspace */
+            workspace: string;
+        };
+        /** TillOut */
+        TillOut: {
+            /** Branch Id */
+            branch_id: string | null;
+            /** Hint */
+            hint: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Seen At */
+            last_seen_at: string | null;
+            /** Name */
+            name: string;
+            /** Revoked */
+            revoked: boolean;
+            /** Token */
+            token?: string | null;
+        };
         /** TimesheetOut */
         TimesheetOut: {
             /**
@@ -9730,6 +9885,39 @@ export interface components {
             debit: number;
             /** Rows */
             rows: components["schemas"]["ReportRow"][];
+        };
+        /** UnlockIn */
+        UnlockIn: {
+            /**
+             * Membership Id
+             * Format: uuid
+             */
+            membership_id: string;
+            /** Pin */
+            pin: string;
+        };
+        /** UnlockOut */
+        UnlockOut: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Expires Session At
+             * Format: date-time
+             * @description When the cashier is signed out of the till
+             */
+            expires_session_at: string;
+            /** Name */
+            name: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
         };
         /** UnreadOut */
         UnreadOut: {
@@ -17934,6 +18122,77 @@ export interface operations {
             };
         };
     };
+    my_pin_v1_sales_my_pin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PinStatus"];
+                };
+            };
+        };
+    };
+    set_pin_v1_sales_my_pin_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PinStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_pin_v1_sales_my_pin_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     products_v1_sales_products_get: {
         parameters: {
             query?: {
@@ -18195,6 +18454,88 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TaxRateOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tills_v1_sales_tills_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TillOut"][];
+                };
+            };
+        };
+    };
+    register_till_v1_sales_tills_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TillIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TillOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_till_v1_sales_tills__till_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                till_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -18879,6 +19220,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TaskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    till_info_v1_till_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-till-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TillInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unlock_v1_till_unlock_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-till-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnlockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnlockOut"];
                 };
             };
             /** @description Validation Error */

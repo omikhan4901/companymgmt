@@ -191,3 +191,30 @@ class SaleLine(IdMixin, TenantScoped, Base):
     taxes: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     # For returns: the line returned.
     returned_line_id: Mapped[uuid.UUID | None]
+
+
+class Till(IdMixin, TenantScoped, TimestampMixin, Base):
+    """A browser registered as a till (shared shop device). Cashiers unlock it with their
+    PIN; a PIN works only on a registered till of the same workspace."""
+
+    __tablename__ = "tills"
+    __table_args__ = (UniqueConstraint("tenant_id", "id"),)
+
+    name: Mapped[str] = mapped_column(String(80))
+    branch_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    hint: Mapped[str] = mapped_column(String(8))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    last_seen_at: Mapped[datetime | None]
+    revoked_at: Mapped[datetime | None]
+
+
+class CashierPin(TenantScoped, TimestampMixin, Base):
+    """A member's till PIN (argon2 hash). Wrong PINs lock it for a while."""
+
+    __tablename__ = "cashier_pins"
+
+    membership_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    pin_hash: Mapped[str] = mapped_column(String(200))
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+    locked_until: Mapped[datetime | None]

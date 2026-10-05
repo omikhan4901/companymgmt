@@ -24,6 +24,7 @@ import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { fromMinor, toMinor } from "@/lib/money";
+import { LockTill } from "@/components/shop/tills";
 
 interface CartLine {
   key: string;
@@ -232,6 +233,7 @@ export default function PosPage() {
                 <Wallet aria-hidden="true" />
                 {t("pos.closeTitle")}
               </Button>
+              <LockTill />
             </div>
           ) : undefined
         }

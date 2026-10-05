@@ -46,6 +46,8 @@ DELETION_GRACE = timedelta(days=30)
 ADMIN_ROLES = ("owner", "admin")
 LAST_SEEN_EVERY = timedelta(minutes=5)
 API_KEY_PREFIX = "cmk_"
+# What a till session (PIN on a registered device) may do, at most.
+PIN_PERMISSIONS = frozenset({"sales.sell", "customers.view", "customers.manage", "expenses.record"})
 
 
 @dataclass
@@ -279,6 +281,9 @@ async def _bind_workspace(ctx: Ctx) -> None:
     ctx.role = role
     ctx.permissions = catalog.resolve(role.key, role.is_builtin, list(role.permissions or []))
     ctx.entitlements = await load_entitlements(ctx.db, tenant_id)
+    if ctx.session.method == "pin":
+        # A cashier who unlocked a shared till with their PIN: selling only.
+        ctx.permissions = ctx.permissions & PIN_PERMISSIONS
     if ctx.api_key is not None:
         if not ctx.entitlements.feature("api"):
             raise PaymentRequired("API access isn't included in this plan.", code="api_not_in_plan")
@@ -389,6 +394,12 @@ def signed_in(
     async def dep(request: Request, db: AsyncSession = Depends(get_db)) -> Ctx:
         ctx = await _authenticate(request, db)
         _no_api_key(ctx)
+        if (
+            ctx.session.method == "pin"
+            and request.method not in SAFE_METHODS
+            and not request.url.path.endswith("/logout")
+        ):
+            raise Forbidden("Sign in with your password to change your account.", code="till_session")
         if ctx.user.must_change_password and not allow_password_change:
             raise Forbidden("Please set a new password first.", code="password_change_required")
         if ctx.session.tenant_id is not None:

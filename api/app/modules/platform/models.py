@@ -168,8 +168,10 @@ class AuthSession(IdMixin, Base):
     reauth_at: Mapped[datetime | None]
     revoked_at: Mapped[datetime | None]
     revoke_reason: Mapped[str | None] = mapped_column(String(40))
-    # How they signed in: "password" or "sso".
+    # How they signed in: "password", "sso" or "pin" (a cashier on a registered till).
     method: Mapped[str] = mapped_column(String(10), default="password", server_default="password")
+    # The till a PIN session belongs to (revoking the till ends it).
+    device_id: Mapped[uuid.UUID | None]
 
 
 class RefreshToken(IdMixin, Base):

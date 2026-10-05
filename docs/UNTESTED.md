@@ -154,3 +154,12 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   Settings → Security (company sign-in, network allowlist, own AI key), audit export
   button, login "Sign in with your company account", `/sso/callback`, `sandbox` on the
   session workspace. Types and lint pass; never opened in a browser; no e2e test.
+
+## M11 Security hardening
+
+- [ ] **Till PINs on registered devices.** `app/modules/sales/tills.py` (register/revoke
+  tills, own PIN with weak-PIN refusal, `/v1/till` and `/v1/till/unlock` with the
+  `X-Till-Token` header, 5 wrong PINs → 15 min lock, PIN sessions limited to selling and
+  12 hours, account changes refused, revoking a till ends its sessions), migration
+  0026. `tests/test_tills.py` **run once and passed (3)**. Web: Sales → Tills, Account →
+  Till PIN, `/till` PIN pad, "Lock till" on the POS. Never opened in a browser.

@@ -49,6 +49,7 @@ from app.modules.privacy.routes import router as privacy_router
 from app.modules.reports.routes import internal_router as reports_internal_router
 from app.modules.reports.routes import router as reports_router
 from app.modules.sales.routes import router as sales_router
+from app.modules.sales.tills import router as tills_router
 from app.modules.tasks.routes import router as tasks_router
 from app.modules.welcome.routes import router as welcome_router
 
@@ -71,6 +72,7 @@ ROUTERS = (
     reports_router,
     automations_router,
     sales_router,
+    tills_router,
     customers_router,
     expenses_router,
     inventory_router,

@@ -2589,6 +2589,25 @@
     "title": "CalendarEntry",
     "type": "object"
    },
+   "CashierOut": {
+    "properties": {
+     "membership_id": {
+      "format": "uuid",
+      "title": "Membership Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "membership_id",
+     "name"
+    ],
+    "title": "CashierOut",
+    "type": "object"
+   },
    "CategoryTotal": {
     "properties": {
      "category_id": {
@@ -9463,6 +9482,46 @@
     "title": "PersonRef",
     "type": "object"
    },
+   "PinIn": {
+    "additionalProperties": false,
+    "properties": {
+     "pin": {
+      "pattern": "^\\d{4,8}$",
+      "title": "Pin",
+      "type": "string"
+     }
+    },
+    "required": [
+     "pin"
+    ],
+    "title": "PinIn",
+    "type": "object"
+   },
+   "PinStatus": {
+    "properties": {
+     "has_pin": {
+      "title": "Has Pin",
+      "type": "boolean"
+     },
+     "locked_until": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Locked Until"
+     }
+    },
+    "required": [
+     "has_pin"
+    ],
+    "title": "PinStatus",
+    "type": "object"
+   },
    "PlanOut": {
     "properties": {
      "features": {
@@ -16070,6 +16129,126 @@
     "title": "TemplateOut",
     "type": "object"
    },
+   "TillIn": {
+    "additionalProperties": false,
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "name": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "TillIn",
+    "type": "object"
+   },
+   "TillInfo": {
+    "properties": {
+     "cashiers": {
+      "items": {
+       "$ref": "#/components/schemas/CashierOut"
+      },
+      "title": "Cashiers",
+      "type": "array"
+     },
+     "till": {
+      "title": "Till",
+      "type": "string"
+     },
+     "workspace": {
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "till",
+     "workspace",
+     "cashiers"
+    ],
+    "title": "TillInfo",
+    "type": "object"
+   },
+   "TillOut": {
+    "properties": {
+     "branch_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Branch Id"
+     },
+     "hint": {
+      "title": "Hint",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_seen_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Seen At"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "revoked": {
+      "title": "Revoked",
+      "type": "boolean"
+     },
+     "token": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Token"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "branch_id",
+     "hint",
+     "last_seen_at",
+     "revoked"
+    ],
+    "title": "TillOut",
+    "type": "object"
+   },
    "TimesheetOut": {
     "properties": {
      "end": {
@@ -16334,6 +16513,63 @@
      "credit"
     ],
     "title": "TrialBalanceOut",
+    "type": "object"
+   },
+   "UnlockIn": {
+    "additionalProperties": false,
+    "properties": {
+     "membership_id": {
+      "format": "uuid",
+      "title": "Membership Id",
+      "type": "string"
+     },
+     "pin": {
+      "pattern": "^\\d{4,8}$",
+      "title": "Pin",
+      "type": "string"
+     }
+    },
+    "required": [
+     "membership_id",
+     "pin"
+    ],
+    "title": "UnlockIn",
+    "type": "object"
+   },
+   "UnlockOut": {
+    "properties": {
+     "access_token": {
+      "title": "Access Token",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "expires_session_at": {
+      "description": "When the cashier is signed out of the till",
+      "format": "date-time",
+      "title": "Expires Session At",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "access_token",
+     "expires_at",
+     "name",
+     "expires_session_at"
+    ],
+    "title": "UnlockOut",
     "type": "object"
    },
    "UnreadOut": {
@@ -28306,6 +28542,79 @@
     ]
    }
   },
+  "/v1/sales/my-pin": {
+   "delete": {
+    "operationId": "remove_pin_v1_sales_my_pin_delete",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Remove Pin",
+    "tags": [
+     "sales"
+    ]
+   },
+   "get": {
+    "operationId": "my_pin_v1_sales_my_pin_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PinStatus"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "My Pin",
+    "tags": [
+     "sales"
+    ]
+   },
+   "put": {
+    "description": "Set (or change) your till PIN. Only from a full sign-in, not from a till.",
+    "operationId": "set_pin_v1_sales_my_pin_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PinIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PinStatus"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Set Pin",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
   "/v1/sales/products": {
    "get": {
     "operationId": "products_v1_sales_products_get",
@@ -28687,6 +28996,107 @@
      }
     },
     "summary": "Save Tax Rate",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/tills": {
+   "get": {
+    "operationId": "list_tills_v1_sales_tills_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/TillOut"
+         },
+         "title": "Response List Tills V1 Sales Tills Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Tills",
+    "tags": [
+     "sales"
+    ]
+   },
+   "post": {
+    "description": "Run this on the till itself: the browser keeps the returned token.",
+    "operationId": "register_till_v1_sales_tills_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TillIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TillOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Register Till",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/sales/tills/{till_id}": {
+   "delete": {
+    "operationId": "revoke_till_v1_sales_tills__till_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "till_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Till Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Revoke Till",
     "tags": [
      "sales"
     ]
@@ -29712,6 +30122,115 @@
     "summary": "Move Task",
     "tags": [
      "tasks"
+    ]
+   }
+  },
+  "/v1/till": {
+   "get": {
+    "description": "Who can unlock this till (names only).",
+    "operationId": "till_info_v1_till_get",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "x-till-token",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Till-Token"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TillInfo"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Till Info",
+    "tags": [
+     "sales"
+    ]
+   }
+  },
+  "/v1/till/unlock": {
+   "post": {
+    "operationId": "unlock_v1_till_unlock_post",
+    "parameters": [
+     {
+      "in": "header",
+      "name": "x-till-token",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Till-Token"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UnlockIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UnlockOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Unlock",
+    "tags": [
+     "sales"
     ]
    }
   },
