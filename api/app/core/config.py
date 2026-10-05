@@ -85,13 +85,14 @@ class Settings(BaseSettings):
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     # People who run the platform (comma-separated emails). They can change things that
     # apply to every workspace, like AI allowances, and must use two-step sign-in.
-    platform_operators: list[str] = []
+    platform_operators: Annotated[list[str], NoDecode] = Field(default_factory=list)
 
     @field_validator("platform_operators", mode="before")
     @classmethod
     def _split_operators(cls, value: object) -> object:
-        if isinstance(value, str) and not value.startswith("["):
-            return [o.strip().lower() for o in value.split(",") if o.strip()]
+        if isinstance(value, str):
+            items = json.loads(value) if value.strip().startswith("[") else value.split(",")
+            return [str(o).strip().lower() for o in items if str(o).strip()]
         return value
 
     @property

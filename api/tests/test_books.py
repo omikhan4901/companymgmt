@@ -5,8 +5,9 @@ fill from templates the workspace defines."""
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -53,7 +54,9 @@ async def sell(owner: Account, product_id: str, quantity: str = "1", paid: int =
 
 
 def today() -> str:
-    return str(datetime.now(UTC).date())
+    # The workspace keeps its books in its own time zone (signup's default, Asia/Dhaka),
+    # so "today" is Dhaka's date, not UTC's (they differ from 18:00 to 24:00 UTC).
+    return str(datetime.now(ZoneInfo("Asia/Dhaka")).date())
 
 
 async def test_stock_follows_purchases_sales_and_counts(client: httpx.AsyncClient) -> None:
@@ -205,7 +208,7 @@ async def test_entries_by_hand_and_locked_periods(client: httpx.AsyncClient) -> 
     assert (await owner.post("/v1/accounting/entries", json=entry)).status_code == 201
     lopsided = {**entry, "lines": [{**entry["lines"][0]}, {**entry["lines"][1], "credit": 1}]}
     assert (await owner.post("/v1/accounting/entries", json=lopsided)).status_code == 422
-    yesterday = str(datetime.now(UTC).date() - timedelta(days=1))
+    yesterday = str(datetime.fromisoformat(today()).date() - timedelta(days=1))
     await owner.put("/v1/accounting/settings", json={"locked_until": yesterday})
     locked = await owner.post("/v1/accounting/entries", json={**entry, "entry_date": yesterday})
     assert (locked.status_code, locked.json()["code"]) == (409, "period_locked")
