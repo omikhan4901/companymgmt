@@ -4,9 +4,11 @@ import { Logo } from "./logo";
 
 const LINKS = [
   { href: "/pricing", label: "Pricing" },
-  { href: "/#security", label: "Security" },
+  { href: "/security", label: "Security" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
+  { href: "/dpa", label: "DPA" },
+  { href: "/subprocessors", label: "Sub-processors" },
 ];
 
 export function SiteFooter() {

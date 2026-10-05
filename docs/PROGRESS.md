@@ -378,6 +378,23 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
   Python SDKs in `sdk/`.
 - Web: Settings → Developers and Security; login with the company account.
 
+## M11: built (security hardening) and the legal review
+
+- **Tills with cashier PINs:** PINs only work on registered devices, lock after 5 wrong
+  tries, open a selling-only 12-hour session, and revoking a till ends its sessions.
+- **Passkeys** for passwordless, phishing-resistant sign-in (with clone detection).
+- **New-device sign-in emails**; sign-in records and ended sessions purged after a year.
+- Abuse limits on webhook test/resend and API key creation.
+- `pip-audit` and `npm audit`: no known vulnerabilities (2026-10-05).
+- `SECURITY.md`, `/.well-known/security.txt`, `/security` page, AI threat model
+  (`docs/security/ai.md`), incident runbook, ASVS table updated.
+- **Legal review** (`docs/legal/REVIEW.md`): what the product now does, how similar
+  services word their terms, the Bangladesh PDPO 2025, Labour Act and VAT points, 18 gaps
+  and their fixes, decisions for the owner and a lawyer. New drafts: terms, privacy,
+  DPA, sub-processors, security page.
+- Needs the owner: a lawyer's review of the drafts; a ZAP scan and penetration test
+  against a real deployment; a status page account.
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -406,3 +423,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-04: M9 built: inventory with weighted average cost, self-posting double-entry books, reports, tax-return templates.
 - 2026-10-04: M10 easy onboarding: addresses, join links with QR codes, sample data, first-day checklist.
 - 2026-10-05: M10 developer platform: API keys, webhooks, idempotency, OIDC sign-in, SCIM, allowlist, audit export, own AI key, sandbox, API contract, SDKs and web screens. Repository workflows switched off (owner).
+- 2026-10-05: M11: till PINs on registered devices, passkeys, new-device alerts, security policy and runbooks. Legal review with new draft terms, privacy, DPA and sub-processors pages.

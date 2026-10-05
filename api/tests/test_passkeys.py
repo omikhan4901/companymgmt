@@ -160,3 +160,19 @@ async def test_new_devices_are_reported_by_email(client: httpx.AsyncClient) -> N
     await outbox.dispatch()
     [alert] = [m for m in email.sent if "New sign-in" in m.subject]
     assert "Safari on iPhone" in alert.text
+
+
+async def test_old_security_logs_are_purged(client: httpx.AsyncClient) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    import psycopg
+
+    from app.jobs import maintenance
+    from tests.conftest import owner_dsn
+
+    await signup(client)
+    later = datetime.now(UTC) + timedelta(days=maintenance.SECURITY_LOG_DAYS + 31)
+    with psycopg.connect(owner_dsn(), autocommit=True) as conn:
+        counts = maintenance.purge_security_logs(conn, later)
+        assert counts["auth_events"] > 0
+        assert conn.execute("SELECT count(*) FROM auth_events").fetchone() == (0,)

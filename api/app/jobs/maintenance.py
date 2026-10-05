@@ -203,12 +203,41 @@ def apply_audit_retention(conn: psycopg.Connection, now: datetime) -> dict[str, 
     return purged
 
 
+SECURITY_LOG_DAYS = 365
+
+
+def purge_security_logs(conn: psycopg.Connection, now: datetime) -> dict[str, int]:
+    """Sign-in records and ended sessions older than a year (the privacy policy's promise)."""
+    cutoff = now - timedelta(days=SECURITY_LOG_DAYS)
+    counts: dict[str, int] = {}
+    with conn.transaction():
+        conn.execute("SELECT set_config('app.allow_purge', 'on', true)")
+        counts["auth_events"] = conn.execute(
+            "DELETE FROM auth_events WHERE created_at < %s", (cutoff,)
+        ).rowcount
+        old = [
+            r[0]
+            for r in conn.execute(
+                "SELECT id FROM auth_sessions "
+                "WHERE (revoked_at IS NOT NULL AND revoked_at < %s) OR expires_at < %s",
+                (cutoff, cutoff),
+            )
+        ]
+        if old:
+            conn.execute("DELETE FROM refresh_tokens WHERE session_id = ANY(%s)", (old,))
+        counts["auth_sessions"] = (
+            len(old) and conn.execute("DELETE FROM auth_sessions WHERE id = ANY(%s)", (old,)).rowcount
+        )
+    return counts
+
+
 def run(dsn: str, now: datetime | None = None) -> dict[str, Any]:
     now = now or datetime.now(UTC)
     with psycopg.connect(dsn, autocommit=True) as conn:
         return {
             "workspaces_purged": len(purge_deleted_workspaces(conn, now)),
             "audit_rows_purged": sum(apply_audit_retention(conn, now).values()),
+            "security_rows_purged": sum(purge_security_logs(conn, now).values()),
         }
 
 

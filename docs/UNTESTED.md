@@ -170,3 +170,8 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   0027), dependency `webauthn` + `@simplewebauthn/browser`. `tests/test_passkeys.py`
   (software authenticator) **run once and passed (2)**. Web: Account → Passkeys, login
   "Sign in with a passkey". Never tried with a real phone or security key.
+- [ ] **New-device sign-in emails, security-log purge, send limits.** `tokens._alert_new_device`,
+  `maintenance.purge_security_logs`; tests in `test_passkeys.py` **run and passed**.
+- [ ] **Legal pages (web).** New `/terms`, `/privacy`, `/dpa`, `/subprocessors`,
+  `/security`, footer links, `security.txt`. Types and lint pass; never opened in a
+  browser; drafts pending a lawyer.
