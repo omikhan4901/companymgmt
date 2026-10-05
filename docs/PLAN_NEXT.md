@@ -1760,7 +1760,7 @@ change stays hard-coded; every number is explainable; new work ships behind a fl
 | 12 | Pilots: any business that will use it |
 | 13 | A finished product, not an MVP; the assistant is not optional and will become the main interface |
 | 14 | A person can hold several roles; roles add up, personal overrides beat them |
-| 15 | Each business can brand and customise its workspace (logo, banner, colours, documents, labels, fields) |
+| 15 | **Branding** (not "assets") is the name for a business's logo, banner, colours, document templates, labels and fields; it's part of the Business base module (§5.5) |
 
 ### 14.2 Still open
 
@@ -1788,6 +1788,8 @@ Write answers under each.
     arrange an adviser and a lawyer before payroll ships with tax on by default?
 13. **Custom domains and white-label**: which plans include them? (Custom fields and branding
     are proposed for every plan.)
+14. **The equipment Assets module** (§6, 1C.5: laptops, freezers, motorbikes, who holds them,
+    servicing, depreciation) was proposed by me, separate from Branding. Keep it, or drop it?
 
 ---
 
