@@ -57,7 +57,9 @@ async def _new_refresh(db: AsyncSession, session: AuthSession) -> str:
     return secret
 
 
-async def start_session(db: AsyncSession, user: User, tenant_id: uuid.UUID | None, *, mfa: bool) -> Issued:
+async def start_session(
+    db: AsyncSession, user: User, tenant_id: uuid.UUID | None, *, mfa: bool, method: str = "password"
+) -> Issued:
     settings = get_settings()
     info = context.current()
     session = AuthSession(
@@ -68,12 +70,13 @@ async def start_session(db: AsyncSession, user: User, tenant_id: uuid.UUID | Non
         user_agent=(info.user_agent or "")[:300] or None,
         mfa_at=now() if mfa else None,
         reauth_at=now(),
+        method=method,
     )
     db.add(session)
     await db.flush()
     refresh = await _new_refresh(db, session)
     access, expires = create_access_token(user.id, session.id, tenant_id)
-    log_event(db, user.id, "session.started", session=session.id, mfa=mfa)
+    log_event(db, user.id, "session.started", session=session.id, mfa=mfa, method=method)
     return Issued(access, expires, refresh, session)
 
 

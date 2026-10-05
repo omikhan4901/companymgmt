@@ -15,25 +15,21 @@
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import hmac
-import ipaddress
 import json
 import logging
-import socket
 import time
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
 
 import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import events, ipnet
+from app.core import events, safehttp
 from app.core.config import get_settings
 from app.core.db import open_session
 from app.core.security import crypto
@@ -50,8 +46,7 @@ BACKOFF_MINUTES = (1, 5, 30, 120, 360, 720, 1440)
 MAX_ATTEMPTS = len(BACKOFF_MINUTES) + 1
 # Switch an endpoint off after this many failed attempts in a row.
 DISABLE_AFTER = 40
-TIMEOUT_SECONDS = 10
-MAX_URL = 500
+MAX_URL = safehttp.MAX_URL
 
 
 @dataclass(frozen=True)
@@ -105,57 +100,8 @@ PING = "ping"
 
 # ---- Addresses --------------------------------------------------------------------------
 
-
-class UnsafeAddress(ValueError):
-    pass
-
-
-def check_url(url: str) -> str:
-    """The URL if it's an acceptable webhook address (shape only; DNS is checked when
-    sending). Raises UnsafeAddress with a reason people can act on."""
-    url = url.strip()
-    if len(url) > MAX_URL:
-        raise UnsafeAddress("The address is too long.")
-    parts = urlsplit(url)
-    if parts.scheme != "https":
-        raise UnsafeAddress("Use an https:// address.")
-    if not parts.hostname or parts.username or parts.password:
-        raise UnsafeAddress("Use an address like https://example.com/hooks, without a username or password.")
-    if parts.port not in (None, 443, 8443):
-        raise UnsafeAddress("Use the standard https port (443 or 8443).")
-    host = parts.hostname.rstrip(".").lower()
-    literal = ipnet.parse(host)
-    if literal is not None and not ipnet.is_public(literal):
-        raise UnsafeAddress("Webhooks can only go to public internet addresses.")
-    if literal is None and ("." not in host or host.endswith((".local", ".internal", ".localhost", ".lan"))):
-        raise UnsafeAddress("Webhooks can only go to public internet addresses.")
-    return urlunsplit((parts.scheme, parts.netloc.lower(), parts.path or "/", parts.query, ""))
-
-
-async def resolve(host: str, port: int) -> list[str]:
-    """Every address the name points to (tests replace this)."""
-    infos = await asyncio.get_running_loop().getaddrinfo(host, port, type=socket.SOCK_STREAM)
-    return list(dict.fromkeys(str(info[4][0]) for info in infos))
-
-
-async def pinned_target(url: str) -> tuple[str, str]:
-    """(URL with the host replaced by a checked public IP, the original host name)."""
-    parts = urlsplit(url)
-    host = parts.hostname or ""
-    port = parts.port or 443
-    literal = ipnet.parse(host)
-    addresses = [host] if literal is not None else await resolve(host, port)
-    if not addresses:
-        raise UnsafeAddress("The address doesn't resolve.")
-    for address in addresses:
-        parsed = ipnet.parse(address)
-        if parsed is None or not ipnet.is_public(parsed):
-            raise UnsafeAddress("The address points to a private network.")
-    chosen = ipaddress.ip_address(addresses[0])
-    netloc = f"[{chosen}]" if chosen.version == 6 else str(chosen)
-    if parts.port:
-        netloc += f":{parts.port}"
-    return urlunsplit((parts.scheme, netloc, parts.path, parts.query, "")), host
+UnsafeAddress = safehttp.UnsafeAddress
+check_url = safehttp.check_url
 
 
 # ---- Signing ----------------------------------------------------------------------------
@@ -215,21 +161,9 @@ def wants(endpoint: WebhookEndpoint, public_name: str) -> bool:
 
 # ---- Sending ----------------------------------------------------------------------------
 
-# Tests swap in an httpx.MockTransport.
-transport: httpx.AsyncBaseTransport | None = None
-
 
 async def _post(url: str, body: bytes, headers: dict[str, str]) -> tuple[int, str | None]:
-    target, host = await pinned_target(url)
-    async with httpx.AsyncClient(
-        transport=transport, timeout=TIMEOUT_SECONDS, follow_redirects=False
-    ) as client:
-        response = await client.post(
-            target,
-            content=body,
-            headers={**headers, "Host": host},
-            extensions={"sni_hostname": host},
-        )
+    response = await safehttp.request("POST", url, content=body, headers=headers)
     return response.status_code, None
 
 

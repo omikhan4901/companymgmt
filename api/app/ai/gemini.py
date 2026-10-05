@@ -103,11 +103,11 @@ def _content(turn: Turn) -> dict[str, Any]:
 class Gemini:
     name = "gemini"
 
-    def __init__(self, transport: httpx.AsyncBaseTransport | None = None) -> None:
-        # `transport` lets tests answer instead of Google.
+    def __init__(self, transport: httpx.AsyncBaseTransport | None = None, key: str | None = None) -> None:
+        # `transport` lets tests answer instead of Google; `key` is a workspace's own key.
         self.transport = transport
         settings = get_settings()
-        self.key = settings.gemini_api_key.get_secret_value()
+        self.key = key or settings.gemini_api_key.get_secret_value()
         self.model = settings.gemini_model
         self.embed_model = settings.gemini_embed_model
         self.base = settings.gemini_base_url.rstrip("/")

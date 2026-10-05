@@ -18,6 +18,7 @@ from app.ai.features import FEATURES
 from app.ai.provider import AIUnavailable, Reply
 from app.core import audit
 from app.core.errors import Forbidden, Invalid, PaymentRequired, TooManyRequests, Unavailable
+from app.core.security import crypto
 from app.core.time import today, utcnow
 from app.modules.platform.ai_models import AIAllowance, AISettings, AIUsage
 from app.modules.platform.catalog import AI_MANAGE, AI_USE
@@ -39,6 +40,9 @@ class AIStatusOut(BaseModel):
     used: int
     resets_on: date
     signal_people: bool = False
+    # The workspace runs on its own Gemini key (no monthly allowance from us).
+    own_key: bool = False
+    own_key_hint: str | None = None
 
 
 class AISettingsIn(BaseModel):
@@ -83,7 +87,7 @@ async def status(ctx: Ctx) -> AIStatusOut:
     row = await settings(ctx)
     _, resets = _month(ctx)
     return AIStatusOut(
-        available=provider.available(),
+        available=provider.available() or bool(row.own_key_enc),
         enabled=row.enabled,
         terms_accepted=row.terms_accepted_at is not None,
         can_use=ctx.can(AI_USE),
@@ -93,7 +97,40 @@ async def status(ctx: Ctx) -> AIStatusOut:
         used=await used(ctx),
         resets_on=resets,
         signal_people=bool(row.signal_people),
+        own_key=bool(row.own_key_enc),
+        own_key_hint=row.own_key_hint if row.own_key_enc else None,
     )
+
+
+def _key_context(ctx: Ctx) -> str:
+    return f"ai-key:{ctx.tenant_id}"
+
+
+async def set_own_key(ctx: Ctx, key: str | None) -> AIStatusOut:
+    """Owner only, on plans with company sign-in. None removes it."""
+    if not ctx.is_owner:
+        raise Forbidden("Only the workspace owner can change this.", code="owner_only")
+    assert ctx.entitlements is not None
+    if key is not None and not ctx.entitlements.feature("sso"):
+        raise PaymentRequired(
+            "Using your own AI key isn't included in this plan.", code="feature_not_in_plan"
+        )
+    row = await ctx.db.scalar(select(AISettings).with_for_update())
+    if row is None:
+        row = AISettings(tenant_id=ctx.tenant_id, enabled=False, features=[], signal_people=False)
+        ctx.db.add(row)
+    row.own_key_enc = crypto.encrypt(key, context=_key_context(ctx)) if key else None
+    row.own_key_hint = key[-4:] if key else None
+    await ctx.db.flush()
+    await audit.record(
+        ctx.db,
+        "ai.own_key_set" if key else "ai.own_key_removed",
+        target_type="workspace",
+        target_id=ctx.tenant_id,
+        data={"hint": row.own_key_hint},
+    )
+    await ctx.db.commit()
+    return await status(ctx)
 
 
 async def save(ctx: Ctx, body: AISettingsIn) -> AIStatusOut:
@@ -135,15 +172,20 @@ async def save(ctx: Ctx, body: AISettingsIn) -> AIStatusOut:
 async def require(ctx: Ctx, feature: str) -> provider.Model:
     """The model to use for `feature`, or the reason it can't be used, in plain words."""
     ctx.require(AI_USE)
-    try:
-        model = provider.get_model()
-    except AIUnavailable as exc:
-        raise Unavailable(exc.message, code="ai_unavailable") from exc
     row = await settings(ctx)
+    if row.own_key_enc:
+        model = provider.with_key(crypto.decrypt(row.own_key_enc, context=_key_context(ctx)))
+    else:
+        try:
+            model = provider.get_model()
+        except AIUnavailable as exc:
+            raise Unavailable(exc.message, code="ai_unavailable") from exc
     if not row.enabled or row.terms_accepted_at is None:
         raise Forbidden("The assistant is switched off in this workspace.", code="ai_off")
     if feature not in (row.features or []):
         raise Forbidden("This workspace hasn't switched on this kind of help.", code="ai_feature_off")
+    if row.own_key_enc:
+        return model
     limit = await allowance(ctx)
     if limit == 0:
         raise PaymentRequired("Your plan doesn't include the assistant.", code="ai_not_in_plan")

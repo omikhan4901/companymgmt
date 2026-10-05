@@ -477,6 +477,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ai/own-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Own Key
+         * @description Run this workspace's AI on its own Gemini key (owner only).
+         */
+        put: operations["set_own_key_v1_ai_own_key_put"];
+        post?: never;
+        /** Remove Own Key */
+        delete: operations["remove_own_key_v1_ai_own_key_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ai/settings": {
         parameters: {
             query?: never;
@@ -1011,6 +1032,27 @@ export interface paths {
         };
         /** List Audit */
         get: operations["list_audit_v1_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Audit
+         * @description The audit log for a date range (UTC), with each entry's hash and the one before it,
+         *     so the chain can be checked outside the app or fed to a SIEM.
+         */
+        get: operations["export_audit_v1_audit_export_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3668,6 +3710,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sso/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Callback */
+        post: operations["callback_v1_sso_callback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sso/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings__v1_sso_settings_get"];
+        /**
+         * Save Settings
+         * @description Owner only: a mistake here can lock people out. The provider is checked before saving.
+         */
+        put: operations["save_settings_v1_sso_settings_put"];
+        post?: never;
+        /** Remove Settings */
+        delete: operations["remove_settings_v1_sso_settings_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sso/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start */
+        post: operations["start_v1_sso_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tasks": {
         parameters: {
             query?: never;
@@ -4122,6 +4220,13 @@ export interface components {
             enabled: boolean;
             /** Features */
             features: string[];
+            /**
+             * Own Key
+             * @default false
+             */
+            own_key: boolean;
+            /** Own Key Hint */
+            own_key_hint?: string | null;
             /**
              * Resets On
              * Format: date
@@ -4924,6 +5029,30 @@ export interface components {
             start_date: string;
             /** Status */
             status: string;
+        };
+        /** CallbackIn */
+        CallbackIn: {
+            /** Code */
+            code: string;
+            /** State */
+            state: string;
+        };
+        /** CallbackOut */
+        CallbackOut: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Next */
+            next?: string | null;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
         };
         /** CategoryTotal */
         CategoryTotal: {
@@ -6945,6 +7074,11 @@ export interface components {
             start: string;
             tasks: components["schemas"]["TaskSummary"] | null;
         };
+        /** OwnKeyIn */
+        OwnKeyIn: {
+            /** Key */
+            key: string;
+        };
         /** Page[AuditOut] */
         Page_AuditOut_: {
             /** Items */
@@ -7541,6 +7675,16 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+            /**
+             * Sso
+             * @default false
+             */
+            sso: boolean;
+            /**
+             * Sso Required
+             * @default false
+             */
+            sso_required: boolean;
         };
         /** PurchaseIn */
         PurchaseIn: {
@@ -8450,6 +8594,66 @@ export interface components {
             /** N */
             n: number;
         };
+        /** SsoIn */
+        SsoIn: {
+            /**
+             * Auto Join
+             * @default false
+             */
+            auto_join: boolean;
+            /** Client Id */
+            client_id: string;
+            /** Client Secret */
+            client_secret?: string | null;
+            /** Default Role Id */
+            default_role_id?: string | null;
+            /** Domains */
+            domains: string[];
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Enforce
+             * @default false
+             */
+            enforce: boolean;
+            /** Issuer */
+            issuer: string;
+        };
+        /** SsoOut */
+        SsoOut: {
+            /** Auto Join */
+            auto_join: boolean;
+            /** Client Id */
+            client_id: string;
+            /** Default Role Id */
+            default_role_id: string | null;
+            /** Domains */
+            domains: string[];
+            /** Enabled */
+            enabled: boolean;
+            /** Enforce */
+            enforce: boolean;
+            /** Issuer */
+            issuer: string;
+            /** Provider Checked At */
+            provider_checked_at: string | null;
+            /** Redirect Uri */
+            redirect_uri: string;
+            /** Version */
+            version: number;
+        };
+        /**
+         * SsoSetupOut
+         * @description What to enter at the provider before saving.
+         */
+        SsoSetupOut: {
+            connection: components["schemas"]["SsoOut"] | null;
+            /** Redirect Uri */
+            redirect_uri: string;
+        };
         /** StaffIn */
         StaffIn: {
             /** Name */
@@ -8474,20 +8678,10 @@ export interface components {
             /** Workspace Code */
             workspace_code: string;
         };
-        /** StartIn */
-        StartIn: {
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /** Start Date */
-            start_date?: string | null;
-            /**
-             * Template Id
-             * Format: uuid
-             */
-            template_id: string;
+        /** StartOut */
+        StartOut: {
+            /** Url */
+            url: string;
         };
         /** StatementOut */
         StatementOut: {
@@ -9563,6 +9757,28 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** StartIn */
+        app__modules__platform__sso__StartIn: {
+            /** Next */
+            next?: string | null;
+            /** Workspace */
+            workspace: string;
+        };
+        /** StartIn */
+        app__modules__tasks__schemas__StartIn: {
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -10487,6 +10703,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_own_key_v1_ai_own_key_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OwnKeyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIStatusOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_own_key_v1_ai_own_key_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIStatusOut"];
                 };
             };
         };
@@ -11680,6 +11949,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Page_AuditOut_"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_audit_v1_audit_export_get: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                format?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -15322,7 +15622,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["StartIn"];
+                "application/json": components["schemas"]["app__modules__tasks__schemas__StartIn"];
             };
         };
         responses: {
@@ -17633,6 +17933,143 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    callback_v1_sso_callback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CallbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallbackOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings__v1_sso_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SsoSetupOut"];
+                };
+            };
+        };
+    };
+    save_settings_v1_sso_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SsoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SsoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_settings_v1_sso_settings_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_v1_sso_start_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__platform__sso__StartIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StartOut"];
                 };
             };
             /** @description Validation Error */

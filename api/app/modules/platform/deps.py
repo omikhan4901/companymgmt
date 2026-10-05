@@ -263,6 +263,17 @@ async def _bind_workspace(ctx: Ctx) -> None:
     membership, role = row
     if not ipnet.allowed(context.current().ip, list(tenant.ip_allowlist or [])):
         raise Forbidden("This workspace can only be used from its company network.", code="ip_not_allowed")
+    if (
+        tenant.sso_enforced
+        and ctx.api_key is None
+        and ctx.session.method != "sso"
+        and ctx.user.email
+        and not (role.is_builtin and role.key == "owner")
+    ):
+        raise Forbidden(
+            "This workspace signs in with your company account.",
+            code="sso_required",
+        )
     ctx.tenant = tenant
     ctx.membership = membership
     ctx.role = role

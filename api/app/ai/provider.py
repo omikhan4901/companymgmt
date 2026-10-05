@@ -103,3 +103,12 @@ def get_model() -> Model:
 
             _cached = (name, FakeModel())
     return _cached[1]
+
+
+def with_key(key: str) -> Model:
+    """A workspace's own Gemini key (tests: the test model)."""
+    if _override is not None:
+        return _override
+    from app.ai.gemini import Gemini
+
+    return Gemini(key=key)

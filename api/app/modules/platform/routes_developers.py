@@ -8,11 +8,14 @@ can keep the old secret working for a while, so systems can switch over without 
 
 from __future__ import annotations
 
+import csv
+import io
+import json
 import uuid
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import select
 
@@ -21,9 +24,10 @@ from app.core import permissions as perms
 from app.core.errors import Forbidden, Invalid, NotFound, PaymentRequired
 from app.core.schema import In
 from app.core.security.tokens import hash_secret, new_secret
+from app.core.spreadsheet import safe_cell
 from app.core.time import utcnow
 from app.modules.platform import catalog
-from app.modules.platform.catalog import DEVELOPERS_MANAGE
+from app.modules.platform.catalog import AUDIT_VIEW, DEVELOPERS_MANAGE
 from app.modules.platform.deps import API_KEY_PREFIX, Ctx, allow, people_only
 from app.modules.platform.models import ApiKey, ApiKeyUsage, Membership, Tenant, User
 
@@ -346,3 +350,94 @@ async def set_allowlist(body: AllowlistIn, ctx: Ctx = Depends(allow(DEVELOPERS_M
     )
     await ctx.db.commit()
     return AllowlistOut(entries=entries, your_ip=ip)
+
+
+# ---- Audit log export ----------------------------------------------------------------------
+
+EXPORT_MAX = 100_000
+EXPORT_COLUMNS = (
+    "seq",
+    "occurred_at",
+    "actor_user_id",
+    "actor_name",
+    "action",
+    "target_type",
+    "target_id",
+    "data",
+    "ip",
+    "request_id",
+    "prev_hash",
+    "hash",
+)
+
+
+@router.get("/audit/export", response_class=Response)
+async def export_audit(
+    start: Annotated[date, Query(alias="from")],
+    end: Annotated[date, Query(alias="to")],
+    format: Annotated[str, Query(pattern="^(csv|jsonl)$")] = "jsonl",
+    ctx: Ctx = Depends(allow(AUDIT_VIEW)),
+) -> Response:
+    """The audit log for a date range (UTC), with each entry's hash and the one before it,
+    so the chain can be checked outside the app or fed to a SIEM."""
+    if end < start or (end - start).days > 366:
+        raise Invalid("Choose up to a year.", code="range_too_long")
+    rows = (
+        await ctx.db.execute(
+            select(audit.AuditEvent, User.name)
+            .outerjoin(User, User.id == audit.AuditEvent.actor_user_id)
+            .where(
+                audit.AuditEvent.occurred_at >= datetime.combine(start, datetime.min.time(), tzinfo=UTC),
+                audit.AuditEvent.occurred_at
+                < datetime.combine(end + timedelta(days=1), datetime.min.time(), tzinfo=UTC),
+            )
+            .order_by(audit.AuditEvent.seq)
+            .limit(EXPORT_MAX + 1)
+        )
+    ).all()
+    if len(rows) > EXPORT_MAX:
+        raise Invalid("Too many entries; choose a shorter range.", code="range_too_long")
+    records = [
+        {
+            "seq": e.seq,
+            "occurred_at": e.occurred_at.isoformat(),
+            "actor_user_id": str(e.actor_user_id) if e.actor_user_id else None,
+            "actor_name": e.actor_label or name,
+            "action": e.action,
+            "target_type": e.target_type,
+            "target_id": e.target_id,
+            "data": e.data,
+            "ip": e.ip,
+            "request_id": e.request_id,
+            "prev_hash": e.prev_hash,
+            "hash": e.hash,
+        }
+        for e, name in rows
+    ]
+    await audit.record(
+        ctx.db, "audit.exported", data={"from": start, "to": end, "format": format, "entries": len(records)}
+    )
+    await ctx.db.commit()
+    filename = f"audit-{start}-{end}.{format}"
+    if format == "jsonl":
+        body = "".join(json.dumps(r, ensure_ascii=False, sort_keys=True) + "\n" for r in records)
+        media = "application/x-ndjson"
+    else:
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(EXPORT_COLUMNS)
+        for r in records:
+            writer.writerow(
+                [
+                    safe_cell(
+                        json.dumps(r[c], ensure_ascii=False, sort_keys=True) if c == "data" else r[c] or ""
+                    )
+                    for c in EXPORT_COLUMNS
+                ]
+            )
+        body, media = out.getvalue(), "text/csv"
+    return Response(
+        content=body.encode(),
+        media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

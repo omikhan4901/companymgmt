@@ -12,7 +12,7 @@ import httpx
 import psycopg
 import pytest
 
-from app.core import ipnet, outbox
+from app.core import ipnet, outbox, safehttp
 from app.modules.platform import webhooks
 from tests.helpers import Account, add_staff, signup
 
@@ -189,9 +189,9 @@ async def test_names_that_resolve_to_private_networks_are_refused(monkeypatch: p
     async def rebinding(host: str, port: int) -> list[str]:
         return ["93.184.216.34", "127.0.0.1"]
 
-    monkeypatch.setattr(webhooks, "resolve", rebinding)
+    monkeypatch.setattr(safehttp, "resolve", rebinding)
     with pytest.raises(webhooks.UnsafeAddress):
-        await webhooks.pinned_target("https://hooks.example.com/x")
+        await safehttp.pinned_target("https://hooks.example.com/x")
 
 
 def test_signatures() -> None:
@@ -217,8 +217,8 @@ async def test_webhooks_are_signed_thin_and_retried(
     async def public_dns(host: str, port: int) -> list[str]:
         return ["93.184.216.34"]
 
-    monkeypatch.setattr(webhooks, "transport", httpx.MockTransport(handler))
-    monkeypatch.setattr(webhooks, "resolve", public_dns)
+    monkeypatch.setattr(safehttp, "transport", httpx.MockTransport(handler))
+    monkeypatch.setattr(safehttp, "resolve", public_dns)
 
     owner = await signup(client)
     on_plan(owner_sql, owner)
@@ -262,8 +262,8 @@ async def test_failed_deliveries_back_off(
     async def public_dns(host: str, port: int) -> list[str]:
         return ["93.184.216.34"]
 
-    monkeypatch.setattr(webhooks, "transport", httpx.MockTransport(lambda r: httpx.Response(503)))
-    monkeypatch.setattr(webhooks, "resolve", public_dns)
+    monkeypatch.setattr(safehttp, "transport", httpx.MockTransport(lambda r: httpx.Response(503)))
+    monkeypatch.setattr(safehttp, "resolve", public_dns)
     owner = await signup(client)
     on_plan(owner_sql, owner)
     endpoint = (

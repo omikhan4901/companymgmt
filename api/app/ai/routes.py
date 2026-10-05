@@ -14,7 +14,7 @@ from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
 from app.modules.platform.capabilities import invoke
 from app.modules.platform.catalog import AI_USE
-from app.modules.platform.deps import Ctx, allow, signed_in
+from app.modules.platform.deps import Ctx, allow, people_only, signed_in
 
 router = APIRouter(prefix="/v1/ai", tags=["ai"])
 
@@ -49,6 +49,23 @@ async def save_settings(
     body: workspace.AISettingsIn, ctx: Ctx = Depends(allow(None))
 ) -> workspace.AIStatusOut:
     return await workspace.save(ctx, body)
+
+
+class OwnKeyIn(BaseModel):
+    key: Annotated[str, StringConstraints(min_length=20, max_length=200, pattern=r"^[A-Za-z0-9_\-]+$")]
+
+
+@router.put("/own-key", response_model=workspace.AIStatusOut)
+async def set_own_key(body: OwnKeyIn, ctx: Ctx = Depends(allow(None))) -> workspace.AIStatusOut:
+    """Run this workspace's AI on its own Gemini key (owner only)."""
+    people_only(ctx)
+    return await workspace.set_own_key(ctx, body.key)
+
+
+@router.delete("/own-key", response_model=workspace.AIStatusOut)
+async def remove_own_key(ctx: Ctx = Depends(allow(None))) -> workspace.AIStatusOut:
+    people_only(ctx)
+    return await workspace.set_own_key(ctx, None)
 
 
 @router.post("/ask", response_model=assistant.AnswerOut)

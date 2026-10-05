@@ -86,6 +86,8 @@ class Tenant(IdMixin, TimestampMixin, Base):
     checklist_dismissed_at: Mapped[datetime | None]
     # Networks (CIDR) people and API keys may use the workspace from; empty = anywhere.
     ip_allowlist: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
+    # People with an email address must sign in with the company account (SSO).
+    sso_enforced: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class Subscription(IdMixin, TenantScoped, TimestampMixin, Base):
@@ -164,6 +166,8 @@ class AuthSession(IdMixin, Base):
     reauth_at: Mapped[datetime | None]
     revoked_at: Mapped[datetime | None]
     revoke_reason: Mapped[str | None] = mapped_column(String(40))
+    # How they signed in: "password" or "sso".
+    method: Mapped[str] = mapped_column(String(10), default="password", server_default="password")
 
 
 class RefreshToken(IdMixin, Base):
@@ -375,6 +379,42 @@ class WebhookDelivery(IdMixin, TenantScoped, Base):
     error: Mapped[str | None] = mapped_column(String(300))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[datetime | None]
+
+
+class SsoConnection(TenantScoped, TimestampMixin, Versioned, Base):
+    """Sign-in with the company's own account (OpenID Connect: Google Workspace,
+    Microsoft Entra ID, Okta and others). One per workspace."""
+
+    __tablename__ = "sso_connections"
+
+    tenant_id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    issuer: Mapped[str] = mapped_column(String(300))
+    client_id: Mapped[str] = mapped_column(String(300))
+    client_secret_enc: Mapped[str] = mapped_column(String(800))
+    # Email domains that belong to the company (lower case).
+    domains: Mapped[list[str]] = mapped_column(ARRAY(String(253)), default=list)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    # New people from these domains get an account on first sign-in, with this role.
+    auto_join: Mapped[bool] = mapped_column(Boolean, default=False)
+    default_role_id: Mapped[uuid.UUID | None]
+    # The provider's published settings (endpoints), refreshed daily.
+    provider: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    provider_fetched_at: Mapped[datetime | None]
+
+
+class SsoState(Base):
+    """A sign-in in progress (global: the callback doesn't know the workspace yet)."""
+
+    __tablename__ = "sso_states"
+
+    state_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"))
+    nonce: Mapped[str] = mapped_column(String(64))
+    verifier: Mapped[str] = mapped_column(String(128))
+    next_path: Mapped[str | None] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    expires_at: Mapped[datetime]
+    used_at: Mapped[datetime | None]
 
 
 class Branch(IdMixin, TenantScoped, TimestampMixin, Versioned, Base):

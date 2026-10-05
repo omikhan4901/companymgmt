@@ -49,6 +49,10 @@ class AISettings(TenantScoped, TimestampMixin, Versioned, Base):
     features: Mapped[list[str]] = mapped_column(JSONB, default=list)
     # Early-warning signals about individual people (heavy workloads); off unless chosen.
     signal_people: Mapped[bool] = mapped_column(Boolean, default=False, server_default=expression.false())
+    # The workspace's own Gemini key (encrypted): its AI runs on its own Google account,
+    # outside our monthly allowance.
+    own_key_enc: Mapped[str | None] = mapped_column(String(600))
+    own_key_hint: Mapped[str | None] = mapped_column(String(8))
 
 
 class AIUsage(IdMixin, TenantScoped, TimestampMixin, Base):

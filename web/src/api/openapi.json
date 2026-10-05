@@ -74,6 +74,22 @@
       "title": "Features",
       "type": "array"
      },
+     "own_key": {
+      "default": false,
+      "title": "Own Key",
+      "type": "boolean"
+     },
+     "own_key_hint": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Own Key Hint"
+     },
      "resets_on": {
       "format": "date",
       "title": "Resets On",
@@ -2571,6 +2587,64 @@
      "color"
     ],
     "title": "CalendarEntry",
+    "type": "object"
+   },
+   "CallbackIn": {
+    "additionalProperties": false,
+    "properties": {
+     "code": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+     },
+     "state": {
+      "maxLength": 200,
+      "minLength": 20,
+      "title": "State",
+      "type": "string"
+     }
+    },
+    "required": [
+     "state",
+     "code"
+    ],
+    "title": "CallbackIn",
+    "type": "object"
+   },
+   "CallbackOut": {
+    "properties": {
+     "access_token": {
+      "title": "Access Token",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "next": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "access_token",
+     "expires_at"
+    ],
+    "title": "CallbackOut",
     "type": "object"
    },
    "CategoryTotal": {
@@ -8710,6 +8784,22 @@
     "title": "OverviewOut",
     "type": "object"
    },
+   "OwnKeyIn": {
+    "properties": {
+     "key": {
+      "maxLength": 200,
+      "minLength": 20,
+      "pattern": "^[A-Za-z0-9_\\-]+$",
+      "title": "Key",
+      "type": "string"
+     }
+    },
+    "required": [
+     "key"
+    ],
+    "title": "OwnKeyIn",
+    "type": "object"
+   },
    "Page_AuditOut_": {
     "properties": {
      "items": {
@@ -10495,6 +10585,16 @@
      "slug": {
       "title": "Slug",
       "type": "string"
+     },
+     "sso": {
+      "default": false,
+      "title": "Sso",
+      "type": "boolean"
+     },
+     "sso_required": {
+      "default": false,
+      "title": "Sso Required",
+      "type": "boolean"
      }
     },
     "required": [
@@ -13334,6 +13434,183 @@
     "title": "SourceOut",
     "type": "object"
    },
+   "SsoIn": {
+    "additionalProperties": false,
+    "properties": {
+     "auto_join": {
+      "default": false,
+      "title": "Auto Join",
+      "type": "boolean"
+     },
+     "client_id": {
+      "maxLength": 300,
+      "minLength": 1,
+      "title": "Client Id",
+      "type": "string"
+     },
+     "client_secret": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Client Secret"
+     },
+     "default_role_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Default Role Id"
+     },
+     "domains": {
+      "items": {
+       "maxLength": 253,
+       "minLength": 3,
+       "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Domains",
+      "type": "array"
+     },
+     "enabled": {
+      "default": true,
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "enforce": {
+      "default": false,
+      "title": "Enforce",
+      "type": "boolean"
+     },
+     "issuer": {
+      "maxLength": 300,
+      "minLength": 10,
+      "title": "Issuer",
+      "type": "string"
+     }
+    },
+    "required": [
+     "issuer",
+     "client_id",
+     "domains"
+    ],
+    "title": "SsoIn",
+    "type": "object"
+   },
+   "SsoOut": {
+    "properties": {
+     "auto_join": {
+      "title": "Auto Join",
+      "type": "boolean"
+     },
+     "client_id": {
+      "title": "Client Id",
+      "type": "string"
+     },
+     "default_role_id": {
+      "anyOf": [
+       {
+        "format": "uuid",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Default Role Id"
+     },
+     "domains": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Domains",
+      "type": "array"
+     },
+     "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "enforce": {
+      "title": "Enforce",
+      "type": "boolean"
+     },
+     "issuer": {
+      "title": "Issuer",
+      "type": "string"
+     },
+     "provider_checked_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Provider Checked At"
+     },
+     "redirect_uri": {
+      "title": "Redirect Uri",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "issuer",
+     "client_id",
+     "domains",
+     "enabled",
+     "auto_join",
+     "default_role_id",
+     "enforce",
+     "redirect_uri",
+     "provider_checked_at",
+     "version"
+    ],
+    "title": "SsoOut",
+    "type": "object"
+   },
+   "SsoSetupOut": {
+    "description": "What to enter at the provider before saving.",
+    "properties": {
+     "connection": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SsoOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "redirect_uri": {
+      "title": "Redirect Uri",
+      "type": "string"
+     }
+    },
+    "required": [
+     "redirect_uri",
+     "connection"
+    ],
+    "title": "SsoSetupOut",
+    "type": "object"
+   },
    "StaffIn": {
     "additionalProperties": false,
     "properties": {
@@ -13415,37 +13692,17 @@
     "title": "StaffOut",
     "type": "object"
    },
-   "StartIn": {
-    "additionalProperties": false,
+   "StartOut": {
     "properties": {
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "start_date": {
-      "anyOf": [
-       {
-        "format": "date",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Start Date"
-     },
-     "template_id": {
-      "format": "uuid",
-      "title": "Template Id",
+     "url": {
+      "title": "Url",
       "type": "string"
      }
     },
     "required": [
-     "employee_id",
-     "template_id"
+     "url"
     ],
-    "title": "StartIn",
+    "title": "StartOut",
     "type": "object"
    },
    "StatementOut": {
@@ -16494,6 +16751,68 @@
     ],
     "title": "WriteOut",
     "type": "object"
+   },
+   "app__modules__platform__sso__StartIn": {
+    "additionalProperties": false,
+    "properties": {
+     "next": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "pattern": "^/[A-Za-z0-9/_\\-?=&.]*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next"
+     },
+     "workspace": {
+      "maxLength": 40,
+      "minLength": 3,
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace"
+    ],
+    "title": "StartIn",
+    "type": "object"
+   },
+   "app__modules__tasks__schemas__StartIn": {
+    "additionalProperties": false,
+    "properties": {
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "template_id": {
+      "format": "uuid",
+      "title": "Template Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "employee_id",
+     "template_id"
+    ],
+    "title": "StartIn",
+    "type": "object"
    }
   }
  },
@@ -17763,6 +18082,67 @@
      }
     },
     "summary": "Summarise",
+    "tags": [
+     "ai"
+    ]
+   }
+  },
+  "/v1/ai/own-key": {
+   "delete": {
+    "operationId": "remove_own_key_v1_ai_own_key_delete",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AIStatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Remove Own Key",
+    "tags": [
+     "ai"
+    ]
+   },
+   "put": {
+    "description": "Run this workspace's AI on its own Gemini key (owner only).",
+    "operationId": "set_own_key_v1_ai_own_key_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OwnKeyIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AIStatusOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Set Own Key",
     "tags": [
      "ai"
     ]
@@ -19593,6 +19973,64 @@
     "summary": "List Audit",
     "tags": [
      "workspace"
+    ]
+   }
+  },
+  "/v1/audit/export": {
+   "get": {
+    "description": "The audit log for a date range (UTC), with each entry's hash and the one before it,\nso the chain can be checked outside the app or fed to a SIEM.",
+    "operationId": "export_audit_v1_audit_export_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "from",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "From",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "to",
+      "required": true,
+      "schema": {
+       "format": "date",
+       "title": "To",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "format",
+      "required": false,
+      "schema": {
+       "default": "jsonl",
+       "pattern": "^(csv|jsonl)$",
+       "title": "Format",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Export Audit",
+    "tags": [
+     "developers"
     ]
    }
   },
@@ -24793,7 +25231,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/StartIn"
+        "$ref": "#/components/schemas/app__modules__tasks__schemas__StartIn"
        }
       }
      },
@@ -28038,6 +28476,161 @@
     "summary": "Void",
     "tags": [
      "sales"
+    ]
+   }
+  },
+  "/v1/sso/callback": {
+   "post": {
+    "operationId": "callback_v1_sso_callback_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CallbackIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CallbackOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Callback",
+    "tags": [
+     "sso"
+    ]
+   }
+  },
+  "/v1/sso/settings": {
+   "delete": {
+    "operationId": "remove_settings_v1_sso_settings_delete",
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Remove Settings",
+    "tags": [
+     "sso"
+    ]
+   },
+   "get": {
+    "operationId": "get_settings__v1_sso_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SsoSetupOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Get Settings ",
+    "tags": [
+     "sso"
+    ]
+   },
+   "put": {
+    "description": "Owner only: a mistake here can lock people out. The provider is checked before saving.",
+    "operationId": "save_settings_v1_sso_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SsoIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SsoOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Settings",
+    "tags": [
+     "sso"
+    ]
+   }
+  },
+  "/v1/sso/start": {
+   "post": {
+    "operationId": "start_v1_sso_start_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__platform__sso__StartIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StartOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Start",
+    "tags": [
+     "sso"
     ]
    }
   },

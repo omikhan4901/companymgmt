@@ -28,7 +28,7 @@ from app.core.time import utcnow
 from app.modules.platform import hooks
 from app.modules.platform.catalog import MEMBERS_INVITE, WORKSPACE_MANAGE
 from app.modules.platform.deps import Ctx, allow, public
-from app.modules.platform.models import JoinLink, Membership, Role, Tenant, User
+from app.modules.platform.models import JoinLink, Membership, Role, SsoConnection, Tenant, User
 from app.modules.platform.routes_workspace import _check_scope, _role_for_assignment
 from app.modules.platform.workspaces import slug_problem, slug_taken
 
@@ -80,6 +80,10 @@ class PublicWorkspaceOut(BaseModel):
     locale: str
     # Set when the address asked for is an old one: send people to the current one.
     moved_to: str | None = None
+    # Offer "Sign in with your company account".
+    sso: bool = False
+    # Everyone with an email must use it (the password form is for staff and the owner).
+    sso_required: bool = False
 
 
 @router.get("/public/workspace", response_model=PublicWorkspaceOut)
@@ -100,7 +104,16 @@ async def find_workspace(
         moved = tenant.slug if tenant else None
     if tenant is None:
         raise NotFound()
-    return PublicWorkspaceOut(name=tenant.name, slug=tenant.slug, locale=tenant.locale, moved_to=moved)
+    await set_tenant(db, tenant.id)
+    sso = await db.scalar(select(SsoConnection.enabled).where(SsoConnection.tenant_id == tenant.id))
+    return PublicWorkspaceOut(
+        name=tenant.name,
+        slug=tenant.slug,
+        locale=tenant.locale,
+        moved_to=moved,
+        sso=bool(sso),
+        sso_required=bool(sso) and tenant.sso_enforced,
+    )
 
 
 # ---- Join links -----------------------------------------------------------------------

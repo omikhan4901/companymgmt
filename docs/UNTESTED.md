@@ -130,3 +130,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   `/internal/webhooks/tick` (Cloud Scheduler job added to the runbook), new
   `member.removed` event. Covered by the run above with a mock transport; never sent
   to a real server (SNI pinning via `sni_hostname` unverified against real TLS).
+- [ ] **Company sign-in (OIDC SSO), own AI key, audit export.** `app/modules/platform/sso.py`
+  (PKCE + state + nonce, ID token checked against the provider's published keys,
+  auto-join, "require company sign-in" enforced in `_bind_workspace` via
+  `auth_sessions.method`), `app/core/safehttp.py` (shared SSRF-safe client, now also
+  used by webhooks), `PUT/DELETE /v1/ai/own-key`, `GET /v1/audit/export` (JSONL/CSV with
+  the hash chain), migration 0024. `tests/test_sso.py` **run once and passed (6 tests)**
+  against a pretend provider; never tried with a real Google/Entra/Okta tenant.
