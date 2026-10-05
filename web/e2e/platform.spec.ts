@@ -23,13 +23,13 @@ test("every new screen opens cleanly", async ({ page }, info) => {
     await expect(toggle).toBeChecked();
   }
 
-  await opens(page, "/app/pos", /till|Till/);
+  await opens(page, "/app/pos", "Sell");
   await opens(page, "/app/sales", "Sales");
-  await opens(page, "/app/customers", /Customers/);
+  await opens(page, "/app/customers", "Customers and dues");
   await opens(page, "/app/expenses", "Expenses");
-  await opens(page, "/app/inventory", /Stock|Inventory/);
+  await opens(page, "/app/inventory", "Stock");
   await expectAccessible(page, "inventory");
-  await opens(page, "/app/accounting", /Books|Accounting/);
+  await opens(page, "/app/accounting", "Accounts");
   await expectAccessible(page, "accounting");
   await opens(page, "/app/automations", "Automations");
   await opens(page, "/app/help", "Help");

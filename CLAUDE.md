@@ -11,12 +11,10 @@ The plan is `docs/IMPLEMENTATION_PLAN.md`; progress and the next step are in
   `git -c user.name=omikhan4901 -c user.email=mehboobehsankhan@gmail.com commit ...`
 - Work on and push to `main` only. Small conventional commits (`feat:`, `fix:`, `test:`,
   `docs:`, `chore:`, `refactor:`).
-- **Speed mode (owner, 2026-10-04, until the owner says otherwise):** write code and its
-  unit tests, run only lint and type checks (`ruff`, `mypy`, `lint-imports`, `tsc`,
-  `eslint`), commit and push to `main`; don't run the test suites. List everything
-  untested in `docs/UNTESTED.md`; a later test-and-fix pass works through it. The rule
-  below applies again after that pass. The GitHub CI workflow is switched off for now
-  (owner); see `docs/UNTESTED.md` for how to turn it back on.
+- Speed mode (2026-10-04) ended with the test-and-fix pass on 2026-10-05
+  (`docs/UNTESTED.md` records what ran and what still needs real services). GitHub
+  Actions are switched off while the repository goes private (owner), so
+  `scripts/check.sh` locally is the only gate.
 - **Run `scripts/check.sh` before every push.** Push only when it passes. Never leave
   `main` broken. Gate the commit/push on the script's own exit code
   (`./scripts/check.sh > log; [ $? -eq 0 ] && git push`), never on a pipe into `grep`.
