@@ -1,175 +1,480 @@
 # CompanyMgmt — the next implementation plan
 
-Written 5 October 2026 for the owner to read, change and approve before work restarts on
-Thursday. It replaces "build more milestones" with two phases of depth:
+**Version 2, revised 6 October 2026 after the owner's review.** Version 1 (5 October) and
+the owner's inline comments are in git history (commit `5c8a372`); every comment is folded
+into this version, and [§0.2](#02-what-changed-after-the-owners-review) shows where each
+one went.
 
-- **Phase 1 — Every screen, done properly.** Take each tab on its own, work out how real
-  businesses actually use it, find the intricate edge cases, test them, and build what's
-  missing — including the obvious links to neighbouring screens (the till's cash spent should
-  appear in Expenses; a purchase paid in cash should come out of the drawer; and so on).
-- **Phase 2 — One business, from tea stall to enterprise.** Stop thinking in tabs. Follow a
-  single business as it grows, and make the products work *together* at every stage:
-  data flows between modules, a growth path between sizes and plans, one place to set the
-  business up, and a permission system an owner can shape person by person.
+**The goal is a finished product, not an MVP.** Every module must be excellent on its own,
+much better together, work end to end, and handle every unhappy path. The owner should
+eventually run most of the business by talking to the assistant.
 
-Two more phases are proposed at the end (go-live and money; scale and reach), plus a short
-Phase 0 to prepare the ground.
+The work is organised as:
 
-Nothing in this document is built yet. Where it says **"today"**, that's what the code does
-now, checked on 5 October; items marked **(verify)** are suspected and get confirmed in the
-Phase 0 audit before anything is built on them.
+- **Phase 0 — Groundwork.** Audits, test tooling, baselines, feature flags.
+- **Phase 1 — Foundations, then every module done properly.** First the things every module
+  stands on (the module marketplace, business setup, the access engine, product-wide
+  standards); then each module taken on its own, its real use cases and edge cases, built to
+  work standalone and connected.
+- **Phase 2 — One business across its whole life.** Follow businesses from a tea stall to a
+  group of companies — and back down, sideways and out — making the modules work together at
+  every stage. Includes groups of companies and the assistant as a primary interface.
+- **Cross-cutting tracks** that run alongside: data migration, compliance, backups and
+  portability, multi-currency, the developer platform, performance and observability,
+  WhatsApp and SMS, printing, private integrations.
+- **Phase 3 — Go live and get paid. Phase 4 — Scale and reach.**
+
+Where it says **"today"**, that's what the code does now, checked on 5–6 October; items
+marked **(verify)** get confirmed in Phase 0 before anything is built on them.
 
 ---
 
 ## Contents
 
-0. [Why this plan, and what went wrong](#0-why-this-plan-and-what-went-wrong)
-1. [How we'll work](#1-how-well-work)
-2. [Phase 0 — Groundwork (2–3 days)](#2-phase-0--groundwork)
-3. [Phase 1 — Every screen, done properly](#3-phase-1--every-screen-done-properly)
-4. [Phase 2 — One business, from tea stall to enterprise](#4-phase-2--one-business-from-tea-stall-to-enterprise)
-5. [Phase 2 track — Access you can shape person by person](#5-phase-2-track--access-you-can-shape-person-by-person)
-6. [Proposed Phase 3 — Go live and get paid](#6-proposed-phase-3--go-live-and-get-paid)
-7. [Proposed Phase 4 — Scale and reach](#7-proposed-phase-4--scale-and-reach)
-8. [Order, effort and checkpoints](#8-order-effort-and-checkpoints)
-9. [Decisions the owner needs to make](#9-decisions-the-owner-needs-to-make)
-10. [Appendix A — Known gaps found so far](#appendix-a--known-gaps-found-so-far)
-11. [Appendix B — Personas used throughout](#appendix-b--personas-used-throughout)
+0. [Why this plan, and what changed after the review](#0-why-this-plan-and-what-changed-after-the-review)
+1. [The product model: base modules and a marketplace](#1-the-product-model-base-modules-and-a-marketplace)
+2. [Product-wide standards](#2-product-wide-standards)
+3. [How we'll work](#3-how-well-work)
+4. [Phase 0 — Groundwork](#4-phase-0--groundwork)
+5. [Phase 1 — Foundations](#5-phase-1--foundations)
+6. [Phase 1 — Every module done properly](#6-phase-1--every-module-done-properly)
+7. [Phase 2 — One business across its whole life](#7-phase-2--one-business-across-its-whole-life)
+8. [Phase 2 — Access you can shape person by person](#8-phase-2--access-you-can-shape-person-by-person)
+9. [Phase 2 — The assistant as a primary interface](#9-phase-2--the-assistant-as-a-primary-interface)
+10. [Cross-cutting tracks](#10-cross-cutting-tracks)
+11. [Phase 3 — Go live and get paid](#11-phase-3--go-live-and-get-paid)
+12. [Phase 4 — Scale and reach](#12-phase-4--scale-and-reach)
+13. [Honest estimates and checkpoints](#13-honest-estimates-and-checkpoints)
+14. [Decisions: made and still open](#14-decisions-made-and-still-open)
+15. [Appendix A — Known gaps](#appendix-a--known-gaps) · [Appendix B — Personas](#appendix-b--personas)
 
 ---
 
-## 0. Why this plan, and what went wrong
+## 0. Why this plan, and what changed after the review
+
+### 0.1 What went wrong in the first build
 
 The first build (M1–M11) was planned **feature by feature**: does the till sell, do the
-books balance, does leave respect the balance. Every one of those is tested and works. What
-was never planned is **how a real business lives in the product**:
+books balance, does leave respect the balance. Each works and is tested. What was never
+planned is **how a real business lives in the product**:
 
-- **Modules were built as islands joined by events, not as one business.** Money taken out of
-  the till for milk is recorded in Expenses with "paid from: drawer", and the drawer only
-  learns about it by matching the cashier and the time window. The till itself has no
-  "pay out" button, and Expenses doesn't show which till or shift the cash came from.
+- **Modules are islands joined by events.** Money taken from the till for milk is recorded
+  in Expenses with "paid from: drawer"; the drawer finds it by matching the cashier and the
+  time. The till has no "pay out" button, and Expenses doesn't show which till or shift.
 - **Configuration was hard-coded for the first ten minutes, then forgotten.** The business
-  type chosen at sign-up switches some modules on and is never used or changeable again. The
-  "interface mode" (simple/standard/advanced) is saved and does nothing. Sample items (tea,
-  coffee, samosa) look like built-ins. The till only links to "add items" when there are none.
-- **There's no path to grow.** Plans are enforced but can't be changed from the app. Nothing
-  helps a tea stall that opens a second branch, hires an accountant, or becomes an office.
-- **Access control is role-shaped, not person-shaped.** One role per member, plus one
-  department scope. No branch scope, no "only their own records", no per-person extra or
-  removed permission, no money limits, no hiding salaries from a manager who can see people.
-- **Tests proved rules, not journeys.** 321 tests check that each rule is correct; none check
-  that a new owner can find where to add their own menu.
+  type picks modules once and can't be changed; "interface mode" is saved and does nothing;
+  sample items look like built-ins; the till only links to "add items" when there are none.
+- **There's no path to grow, shrink or change.** Plans can't be changed in the app; nothing
+  helps a stall open a branch, an agency downsize, or a seasonal business wind down.
+- **Access is role-shaped, not person-shaped.** One role and one department scope per member.
+- **Tests proved rules, not journeys**, and the assistant was treated as one screen rather
+  than the way owners should eventually work.
 
-The fix is not more features. It's depth: understand each screen's real use (Phase 1), then
-how they fit together for one business over time (Phase 2).
+### 0.2 What changed after the owner's review
+
+| Owner's point | Where it's handled now |
+|---|---|
+| Not linear by business type: everyone picks the modules they want; business types are only presets | §1 (base + marketplace), §6 order by dependency, not by market |
+| "If anything can be a module, it's a module"; independent but much better together; merge/split freely | §1.3 catalogue, §1.4 merges, §1.5 better-together matrix, §1.6 rules |
+| Base modules always included: Users, Access, Business, Home | §1.2 |
+| A "Marketplace" to add modules; requires/conflicts rules | §1.6, §5.1 |
+| Customers becomes **CRM** (customers, transactions, payments — no lead generation) | §1.3, §6 CRM |
+| 11th edge-case axis: security | §3.2 |
+| Exit criteria: accessibility, 2 s on 3G, localized errors with recovery, printing | §2, §3.3 |
+| Testing: isolation everywhere incl. AI/reports/exports, a11y, performance, offline, real browser interaction tests | §3.4 |
+| Phase 0: technical-debt audit and a ZAP baseline | §4 (0.8, 0.9) |
+| Books: plain-language P&L through the assistant; immutability; auditor export | §6 Books, §9, §10.2 |
+| Kiosk security, stolen tablets, fingerprints | §6 Attendance |
+| Payroll compliance: statutory registers, minimum wages, overtime caps, tax on by default | §6 Payroll, §10.2 |
+| Home as a personal command centre: widgets, quick actions, the assistant | §6 Home, §9 |
+| Reports: saved, shared, a builder, goals | §6 Reports |
+| Sign-up: mobile-first, "what else can you do", demo mode without signing up | §6 Sign-up |
+| Missing stages: seasonal, pivot, closure, downsizing | §7.3, §7.6 |
+| Access like Discord: personal overrides beat the role | §8.1 |
+| "Access by time/device/IP — what?" | explained in §8.1 (6) and §14.2 |
+| Estimates are optimistic; new standards need line items | §13 (re-estimated, roughly 2.5×) |
+| bKash/bank APIs for one company privately | §10.9 |
+| Business type change: any time, new plan billed from next month, owners only (several owners allowed) | §7.5, §14.1 |
+| Interface mode: make it real | §5.2 |
+| Plan changes before billing: free for pilots via an invitation | §7.5, §11 |
+| Groups of companies as fast as possible | §7.7 moved into Phase 2 core |
+| Pilots: any business | §11 |
+| AI is not optional; owners will mostly talk to the assistant | §9 (own track) |
+| Error UX standards | §2.1 |
+| Data migration and cut-over | §10.1 |
+| Audit trail and compliance | §10.2 |
+| Backup, disaster recovery, portability | §10.3 |
+| Module dependency graph and marketplace | §1.6 |
+| Downgrade and business failure path | §7.6 |
+| Multi-currency | §10.4 |
+| API and developer platform | §10.5 (much already exists; what to extend) |
+| Performance and observability | §2.3, §10.6 |
+| Accessibility | §2.2 |
+| More than two languages | §2.5 |
+| Tenant isolation testing | §3.4 (extends the existing sweep) |
+| Feature flags and staged rollout | §4 (0.10), §10.7 |
+| The assistant as a first-class interface | §9 |
+| Frontend interaction tests | §3.4 |
+| WhatsApp as a channel | §10.8 |
+| Printing | §2.4 |
 
 ---
 
-## 1. How we'll work
+## 1. The product model: base modules and a marketplace
 
-### 1.1 The loop for every screen and every journey
+### 1.1 Principles
 
-1. **Read** the screen and its API as they are today; list what it does and doesn't do.
-2. **Scenarios first.** Write how 3 personas (Appendix B) actually use it, in their own words
-   and in Bangladesh's reality: cash, credit to regulars, bKash, power cuts, shared phones,
-   Bangla, Friday weekends, Ramadan hours, festival bonuses.
-3. **Edge cases.** Enumerate them deliberately along ten axes (1.2).
-4. **Classify** each finding: *bug*, *missing link* (to another screen), *missing feature*,
-   *confusing UX*, *wrong default*, *needs a decision*. Record it in the **gap register**
-   (`docs/gaps.md`, created in Phase 0).
-5. **Owner review** of the scenario list and the decisions for that screen (short, async).
-6. **Tests first** for every accepted item: API tests for rules, a browser scenario for the
-   journey, both languages, phone and desktop.
-7. **Build** the smallest change that makes the scenarios work.
-8. **Walk it** in the browser as each persona, in Bangla and English, on a phone.
-9. **Document**: handbook chapter 5 (module), chapter 7 (flows), the in-app help article.
-10. **Done** when the exit criteria (1.3) hold.
+1. **If something can be a module, it's a module.** A business adds what it needs, the way
+   it would add apps to a phone. Business types (tea stall, office, factory…) are only
+   **presets**: a bundle of modules and sensible defaults, all changeable later.
+2. **Every module is excellent on its own.** Someone who only wants payroll gets a payroll
+   product that beats a spreadsheet and the alternatives, without being pushed into others.
+3. **Every pair of modules is better together than apart**, visibly: each connection removes
+   double entry, adds a number nobody could see before, or catches a mistake. That is the
+   reason to add the next module.
+4. **A module that is useless alone comes bundled** with what it needs (§1.6 rules).
+5. **Turning a module off never deletes data.** History stays readable, reports for past
+   periods still work, and turning it on again picks up where it left off.
+6. **The assistant spans everything.** It isn't a module you add; it grows with each module
+   you add (§9).
 
-### 1.2 The ten edge-case axes
+### 1.2 Base modules (always on, free on every plan)
 
-Every screen gets examined along all ten. They're how "incredibly intricate" becomes
-systematic instead of hopeful.
+| Base module | What it is | Today |
+|---|---|---|
+| **Business** | the business itself: name, type/preset, stage, places (branches), structure (departments, positions), money settings, calendars, the module marketplace, Business setup | spread across Settings; no marketplace screen |
+| **Users** | people who sign in: accounts, invitations, join links, staff without email, devices, sessions, passkeys, company sign-in | exists (Team, Account) |
+| **Access** | roles, templates, personal overrides, scopes, limits, field visibility, approvals engine, audit log | roles + one department scope; approvals only for leave and time fixes |
+| **Home** | each person's command centre: widgets from every module, quick actions, the assistant, notifications | fixed HR-shaped cards |
+
+Also always present but not "modules": **Notifications**, **Help**, **the assistant** (§9),
+**Reports framework** (each module adds its reports), **Data rights** (export, delete,
+restore).
+
+**Decision needed (§14.2):** "Users" and **People** (HR profiles) are different things — a
+cashier may sign in without an HR record in a shop that doesn't use HR, and a factory may
+keep HR records for workers who never sign in. Today every member automatically gets a
+People profile. Proposal: People becomes a marketplace module; Users stays base.
+
+### 1.3 The module catalogue (rethought)
+
+| Module | Standalone value (alone it must beat a spreadsheet) | Requires | Today |
+|---|---|---|---|
+| **People** (HR records) | employee files, org chart, documents per person, employment history, reminders (contracts, probation) | — | People |
+| **Attendance** | clock in/out with location, kiosk, shifts and rosters, timesheets, lateness | People | Attendance |
+| **Leave** | requests, balances, calendar, policies, approvals | People | Leave |
+| **Payroll** | salaries, runs, payslips, statutory registers, bank/wallet files | People | Payroll |
+| **Point of Sale** | the till, drawers, receipts, offline, tills and PINs, payment methods | — | Sales & POS |
+| **CRM** | customers, their transactions and dues, payments, statements, reminders, invoices and quotes for B2B (no lead generation) | — | Customers & dues |
+| **Purchasing** *(new, split)* | suppliers, purchase orders, supplier bills and payments, what you owe | — | inside Inventory |
+| **Inventory** | stock per place, units, recipes, counts, transfers, valuation, expiry | — | Inventory (requires Sales today) |
+| **Expenses** | spending, receipts, petty cash, claims, recurring bills | — | Expenses |
+| **Books** | double-entry accounting that keeps itself, reports, tax returns | — (useful alone as manual books) | Accounting |
+| **Projects & Tasks** | projects, boards, recurring tasks, time logs, budgets | — | Tasks & projects |
+| **Communication** *(merged)* | announcements, notices to acknowledge, scheduled posts | — | Announcements |
+| **Documents** | company documents, policies, templates, private files per person, expiry reminders | — | Documents |
+| **Automations** | rules that react and remind | — | Automations (always on today) |
+| **Assets** *(new)* | equipment and who holds it, maintenance, depreciation | — | none |
+| **Developer platform** | API keys, webhooks, company sign-in, SCIM | — | spread in Settings |
+
+### 1.4 Proposed merges and splits (owner decides, §14.2)
+
+- **Split Purchasing out of Inventory.** A restaurant that doesn't count stock still has
+  suppliers and bills; a shop that counts stock buys from suppliers. Both modules stand alone;
+  together, received purchase orders add stock automatically.
+- **Inventory no longer requires Point of Sale.** A warehouse or factory tracks stock without
+  selling at a till.
+- **Customers becomes CRM** and absorbs invoices and quotes (owner's decision).
+- **Announcements becomes Communication**, ready for notices that must be acknowledged,
+  scheduled posts and, later, WhatsApp broadcasts. Documents stays separate (it's a library,
+  not a feed).
+- **Approvals moves into Access (base)** as an engine every module uses, not a module.
+- **Reports becomes a framework in the base**, with each module contributing its reports.
+- **Considered and rejected:** merging Attendance and Leave (each is useful alone: many shops
+  track attendance without formal leave), merging Expenses into Books (most owners want
+  Expenses without accounting).
+
+### 1.5 Better together: what each connection adds
+
+The incentive to add the next module. Each line becomes a scenario test in Phase 2.
+
+| When you have… | …and add | You get |
+|---|---|---|
+| Point of Sale | Inventory | stock moves with every sale, margin per item, low-stock alerts, recipes turn cups into milk and sugar used |
+| Point of Sale | CRM | credit sales, dues, statements, reminders, a customer's history at the till |
+| Point of Sale | Expenses | pay-outs from the till become expenses with their shift; the drawer count includes them |
+| Point of Sale | Payroll | daily wages paid from the drawer, recorded once |
+| Point of Sale | Attendance | cashiers clock in and open their drawer in one step; sales per person per shift |
+| Purchasing | Inventory | received orders add stock at the right cost |
+| Purchasing | Expenses | supplier bills that aren't stock become expenses |
+| Any money module | Books | everything posts itself; P&L, balance sheet and tax returns with no bookkeeping |
+| Attendance | Payroll | overtime, absences and late rules flow into pay |
+| Leave | Payroll | unpaid leave, encashment, maternity rules in pay |
+| Leave | Attendance | absences are explained; rosters show who's away |
+| People | anything | one profile shows a person's attendance, leave, pay, tasks, sales, claims, assets |
+| Projects & Tasks | Payroll + Attendance | time × cost per hour = project cost |
+| Projects & Tasks | CRM | invoices per project = revenue; project profitability |
+| Expenses | Projects | costs per project or client |
+| Documents | People | private files on each profile; templates filled from profiles (offer letters) |
+| Communication | Attendance | notices to one shift; acknowledgements tracked |
+| Assets | People + Payroll | who holds what; deductions for lost items at final settlement |
+| Automations | anything | rules across modules (dues overdue → reminder; drawer short → notify owner) |
+
+### 1.6 The rules: requires, enhances, conflicts, standalone mode
+
+Formalised in code as a module manifest (one per module):
+
+- **requires**: cannot be enabled without (Payroll → People).
+- **enhances**: optional connections switched on automatically when both are present
+  (Point of Sale + Inventory), each with its own setting to turn off.
+- **conflicts**: cannot be on together (none expected yet; the mechanism exists for later,
+  e.g. two payroll engines for different countries).
+- **standalone mode**: what the module does when its usual partners are absent (Payroll
+  without Attendance: overtime entered by hand; Books without money modules: manual journal;
+  Inventory without Purchasing: stock received by adjustment with a cost).
+- **plan availability**: which plans include it; per-module pricing is a Phase 3 decision.
+- **data when off**: read-only history, still in exports and the assistant's answers for past
+  periods.
+- **switching**: enabling shows what it adds and which connections light up; disabling shows
+  what stops (and that nothing is deleted). Billing changes from the next month (owner's rule).
+
+### 1.7 Presets
+
+A preset = modules on + defaults (roles, leave types, categories, chart of accounts, tax
+presets, Home layout, first-day flow, interface mode). Presets: tea stall/food stall,
+restaurant, grocery/retail, pharmacy, office/agency, factory, NGO, other. Choosing a new
+preset later shows a diff and never removes data.
+
+---
+
+## 2. Product-wide standards
+
+Every screen follows these; Phase 1 Foundations builds the shared pieces once.
+
+### 2.1 Errors and unhappy paths
+
+- **Three kinds of message, used consistently:**
+  *inline* (a field is wrong: next to the field, in the person's language, saying how to fix
+  it); *blocking* (the action can't happen: a dialog that explains why and offers the way
+  forward — "Your plan allows 15 people. Upgrade, or remove someone"); *toast* (only for
+  success, or for a background failure with a "see details" link that stays in the
+  notification list).
+- **Every error message is translated** and maps to a stable code; no raw server text.
+- **Retry or keep:** network failures keep the person's input and offer *Try again*; offline
+  actions go to a visible queue with *Send now* / *Discard*.
+- **Partial failure:** long operations (payroll finalize, imports, backfills, bulk edits) run
+  as **jobs** with progress, are all-or-nothing in one transaction where possible, and
+  otherwise record exactly what finished and resume safely (idempotent steps). The person sees
+  "38 of 40 done, 2 need attention" with links.
+- **Undo** where it's safe (archive, move, mark read, send to the bin for 30 days); **reverse**
+  where it's money (never delete posted records); **confirm** only for irreversible actions.
+- **Graceful degradation:** if AI, email or a payment provider is down, the rest works and a
+  banner says what's affected.
+- An **error catalogue** (`docs/standards/errors.md`) lists every code, its message in both
+  languages and the recovery path; a test fails if a code has no message.
+
+### 2.2 Accessibility
+
+Today the browser tests run axe (WCAG 2.2 AA) and a no-sideways-scroll check on every page
+they visit; the standard below makes it explicit and wider.
+
+- Every screen keyboard-navigable in a logical order, with visible focus.
+- Every control labelled for screen readers; actions announced ("Sale saved, ৳120").
+- Contrast AA in both themes and every accent; text resizable to 200% without loss.
+- Touch targets at least 44 px; the till and kiosk at 56 px+ with icons beside words for
+  people who read slowly.
+- Plain language, short sentences, numbers formatted for the person's language.
+- Manual checks per screen with a screen reader (TalkBack on Android, NVDA on Windows).
+
+### 2.3 Performance budgets
+
+- Every screen usable within **2 seconds on a slow 3G phone** with realistic data (a year of a
+  busy shop, 500 people); the till's actions under 300 ms locally (offline-first).
+- API p95 under 300 ms for reads and 600 ms for writes at the S4 volume; reports either fast
+  or computed in the background with a "ready" notification.
+- Budgets checked in CI-equivalent (`check.sh`) with seeded volume data (§3.4).
+
+### 2.4 Printing
+
+What prints: receipts (58 and 80 mm thermal), A4/A5 invoices and quotes, payslips, statements,
+purchase orders, statutory registers, reports, shelf labels and barcodes, kiosk QR cards.
+Standards: a print preview for every printable; both languages with the right fonts;
+the business's logo, address, tax number and footer from Business setup; page numbers and
+totals carried over pages; works from a phone (share as PDF) and a desktop printer;
+Bluetooth/USB thermal printers in Phase 4.
+
+### 2.5 Languages: built for many, shipped with two
+
+Ship English and Bangla; build so a third is a translation file, not code: a language
+registry, per-person language, per-business default, number and date formats per language,
+fonts for each script in PDFs, emails and receipts, right-to-left support for Urdu/Arabic
+later. Candidates after launch: Hindi and Urdu (workers in garment factories), Arabic (staff
+abroad). Chittagonian and Sylheti are mostly spoken, not written, so they're better served by
+voice in the assistant (§9) than by translation files.
+
+### 2.6 Security on every screen
+
+The 11th edge-case axis (§3.2) applies to every screen; the platform already has the
+foundations (row-level security, the isolation sweep, CSP, rate limits, upload checks).
+
+### 2.7 Explainable numbers
+
+Every number links to where it came from: a total to its lines, a P&L figure to its journal
+entries, a balance to its ledger, a payslip line to the attendance that produced it.
+
+---
+
+## 3. How we'll work
+
+### 3.1 The loop for every module and every journey
+
+1. **Read** the module and its API as they are today.
+2. **Scenarios first**, per persona (Appendix B), in Bangladesh's reality.
+3. **Edge cases** along the eleven axes (§3.2).
+4. **Classify** findings: *bug*, *missing link*, *missing feature*, *confusing UX*,
+   *wrong default*, *needs a decision*; record them in `docs/gaps.md`.
+5. **Owner review** of scenarios and decisions (short, async, in the plan files).
+6. **Standalone and connected**: design what the module does alone and with each partner
+   (§1.5–1.6).
+7. **Tests first**: API rules, browser interaction tests, both languages, phone and desktop.
+8. **Build** behind a feature flag (§10.7).
+9. **Walk it** as each persona, in Bangla and English, on a phone, with a screen reader.
+10. **Document**: handbook, help articles, the assistant's knowledge of the module.
+11. **Done** when the exit criteria (§3.3) hold; flag turned on for pilots, then everyone.
+
+### 3.2 The eleven edge-case axes
 
 | Axis | Examples of what to try |
 |---|---|
-| **Time** | midnight in Dhaka vs UTC; month and year end; leap day; a shift crossing midnight; a sale at 23:59 with the drawer closed at 00:05; backdated entries; a locked accounting period; Friday weekends; Ramadan hours; daylight saving for branches abroad |
-| **Money** | rounding to the poisha and to the nearest taka; inclusive vs exclusive tax; compound tax; discounts on top of tax; refunds of discounted items; very large amounts; zero and negative; change given; partial payments; overpayment |
-| **Quantity** | fractions (0.5 kg, 250 ml); units vs packs (a carton of 12); negative stock; selling what was never received; returns of more than sold; wastage; staff meals |
-| **People** | someone who left; someone on leave; someone in two branches; a manager who is also staff; the owner as a cashier; staff without email; two people with the same name; Bangla-only names |
-| **Permissions** | each role; a scoped manager looking outside their scope; an API key; a till PIN session; a member removed mid-session; the last owner; a custom role with odd combinations |
-| **Concurrency** | two cashiers on one drawer; two tabs editing the same thing; double-clicks; the same offline sale sent twice; a payroll run recomputed while someone edits a salary |
-| **Connectivity** | offline at the till; a request that times out but succeeded; slow 3G; the app left open overnight; a refresh mid-form |
-| **Volume** | 5 records vs 50,000; a 300-line purchase; a 2,000-person payroll; a year of daily sales on the reports page; long names; 50 branches |
-| **Language and devices** | Bangla digits typed into amounts; mixed-script names; right-to-left text pasted in; a 360 px phone; a shared tablet; printing on 58 mm and 80 mm |
-| **Lifecycle** | a module switched off and on again; the plan dropping to Free; a workspace restored from export; sample data removed after real data was added; a branch closed |
-<!-- Omi's Comment: Missing an 11th axis — Security. Things like: SQL injection in search fields, XSS in user-entered names/notes, CSRF on state-changing actions, IDOR (accessing another tenant's sale by guessing the ID), file upload exploits (receipt photos), rate limiting on login/PIN, session fixation on shared devices, and what happens when someone inspects the API from the browser console. Every screen should be tested for these too. -->
+| **Time** | midnight in Dhaka vs UTC; month and year end; leap day; a shift across midnight; a sale at 23:59 with the drawer closed at 00:05; backdated entries; locked periods; Friday weekends; Ramadan hours; daylight saving for branches abroad |
+| **Money** | rounding to the poisha and to the taka; inclusive vs exclusive and compound tax; discounts on top of tax; refunds of discounted items; very large, zero and negative amounts; change given; partial payments and overpayment; currencies (§10.4) |
+| **Quantity** | fractions (0.5 kg, 250 ml); units vs packs; negative stock; selling what was never received; returns of more than sold; wastage; staff meals |
+| **People** | someone who left; on leave; in two branches; a manager who is also staff; the owner as a cashier; staff without email; same names; Bangla-only names |
+| **Permissions** | each role and template; personal overrides; a scoped manager outside their scope; an API key; a till PIN session; a member removed mid-session; the last owner; limits at the boundary |
+| **Concurrency** | two cashiers on one drawer; two tabs editing one thing; double-clicks; the same offline sale twice; a payroll run recomputed while a salary is edited |
+| **Connectivity** | offline at the till; a request that timed out but succeeded; slow 3G; the app open overnight; a refresh mid-form; the server dying mid-job |
+| **Volume** | 5 vs 50,000 records; a 300-line purchase; a 2,000-person payroll; a year on a report; long names; 50 branches |
+| **Language and devices** | Bangla digits in amounts; mixed scripts; right-to-left text pasted in; a 360 px phone; a shared tablet; 58 and 80 mm printing; screen readers |
+| **Lifecycle** | a module off and on again; the plan dropping to Free; restored from export; sample data removed after real data; a branch closed; the business downsizing or closing |
+| **Security** | injection in search and text fields; script in names and notes (XSS); cross-site requests on state changes; another tenant's ids (IDOR); malicious uploads (receipts, documents, imports); brute force on sign-in and PINs; session fixation and leftovers on shared devices; what the browser console and the raw API reveal; the assistant asked to reveal data the person can't see |
 
-### 1.3 Exit criteria for a screen
+### 3.3 Exit criteria for a module or screen
 
-- Every accepted scenario works end to end for every persona it applies to.
-- Every edge case found has a test or a written reason why not.
-- Every link to another screen that a real user would expect exists in both directions
-  ("see the sale" from a customer's statement; "see the customer" from a sale).
-- Nothing on the screen is hard-coded that a real business would want to change; everything
-  configurable is findable from the screen itself (a "set up" link where it applies).
-- Empty states teach: they say what this screen is for and what to do first.
-- Help article updated; handbook chapters 5 and 7 updated.
-- `E2E=1 scripts/check.sh` passes.
-<!-- Omi's Comment: Exit criteria should also include: (1) the screen is keyboard-navigable and passes basic a11y checks (contrast, ARIA labels, screen reader announces actions), (2) the screen loads under 2 seconds on a 3G connection with realistic data volume, (3) every error state has a clear, localized message and a recovery path (not just a red toast that disappears), and (4) printing works where applicable (receipt, payslip, report). -->
+- Every accepted scenario works end to end, standalone and connected, for every persona.
+- Every edge case has a test or a written reason why not.
+- Links to other modules exist in both directions; every number is explainable (§2.7).
+- Nothing a real business would change is hard-coded; settings are reachable from the screen.
+- Empty states teach; sample data is labelled; first use is guided.
+- **Errors** follow §2.1: localized, with a recovery path, no disappearing red toasts.
+- **Accessibility** per §2.2, including a manual screen-reader pass.
+- **Performance** within the §2.3 budget on 3G with realistic volume.
+- **Printing** per §2.4 wherever the screen has something to print.
+- **Security** axis checked; isolation tests cover every new route, report, export and
+  assistant capability.
+- The assistant can answer questions about the module and (where allowed) act on it (§9).
+- Help article and handbook updated; `E2E=1 scripts/check.sh` passes.
 
-### 1.4 Testing additions
+### 3.4 Testing additions
 
-- **Scenario tests** (new): long, story-like API tests per persona ("a tea stall's Saturday")
-  in `api/tests/scenarios/`, reusable fixtures for each persona's workspace.
-- **Persona demo workspaces**: `scripts/seed_persona.py tea|retail|office|factory|group`
-  to create a realistic workspace for walking through screens by hand.
-- **Clock control** in tests (freeze "now" in a chosen time zone) so time edge cases are
-  routine, not accidents like the books-test failure found on 5 October.
-- **Visual walkthrough**: a Playwright script that screenshots every screen per persona in
-  both languages and both sizes, for the owner to review in one place.
-- <!-- Omi's Comment: Testing additions should also include: (1) Cross-tenant isolation tests — a test suite that creates two tenants and verifies every API endpoint, report, export, and AI query returns ZERO data from the other tenant. (2) Accessibility audit per screen — automated axe-core checks in Playwright plus a manual checklist for keyboard and screen reader. (3) Performance regression tests — key pages benchmarked with realistic data (10k sales, 500 people) and compared against a budget. (4) Offline resilience tests — simulate network drop mid-action and verify data integrity on reconnect. -->
+- **Scenario tests**: long, story-like API tests per persona in `api/tests/scenarios/`.
+- **Browser interaction tests for every critical flow** (not only screenshots): selling,
+  paying out, closing a drawer, approving, running payroll, inviting with custom access —
+  desktop and phone, both languages.
+- **Tenant isolation everywhere**: the existing sweep calls every id route as another
+  workspace; extend it to list endpoints, reports, exports, search, webhooks, the assistant's
+  answers and tool calls, and error messages (no other tenant's names or ids leaking into
+  text). A test creates two tenants with overlapping names and checks every surface returns
+  nothing from the other.
+- **Accessibility** per screen: axe in Playwright (exists) plus keyboard-only runs of each
+  critical flow and a manual screen-reader checklist.
+- **Performance regression**: seeded volume datasets (10k sales, 500 people, 50k stock
+  movements); key pages and endpoints timed against budgets.
+- **Offline resilience**: drop the network mid-sale, mid-payroll-step, mid-import; kill the
+  server mid-job; check nothing is lost or doubled.
+- **Clock control**: freeze "now" in any zone (the 5 October books-test failure was a time
+  zone assumption).
+- **Persona seeds**: `scripts/seed_persona.py <persona>` for walking through by hand.
+- **Visual walkthrough** screenshots per persona, language and size for the owner.
+- **Security**: a ZAP baseline per release; tests for each security-axis case.
 
 ---
 
-## 2. Phase 0 — Groundwork
-
-Two to three days before Phase 1 starts. Small, but makes everything after it faster.
+## 4. Phase 0 — Groundwork
 
 | # | Task | Output |
 |---|---|---|
-| 0.1 | **Gap register**: `docs/gaps.md` with every known gap (Appendix A to start), each with screen, type, severity, persona affected, status | the single list Phase 1 and 2 burn down |
-| 0.2 | **Configuration audit**: list every hard-coded default and preset in the code (business types, modules, roles, leave types, holidays, expense categories, chart of accounts, tax presets, sample data, report settings, notification rules), and for each: can an owner see it? change it? where? | a table in `docs/gaps.md`; feeds 4.4 |
-| 0.3 | **Cross-module map as it is today**: every event and who listens, every place one module reads another, every screen link | a diagram in the handbook; shows the missing links |
-| 0.4 | **Persona seeds** and scenario-test scaffolding (1.4) | `scripts/seed_persona.py`, `api/tests/scenarios/` |
-| 0.5 | **Clock control** in tests | a fixture to freeze time in any zone |
-| 0.6 | **Walkthrough screenshots** of every screen per persona | a folder the owner reviews before Phase 1 starts |
-| 0.7 | Fix the **verify** items in Appendix A: confirm or strike each | updated Appendix A |
-<!-- Omi's Comment: Phase 0 should also include: (0.8) Technical debt audit — identify any architectural shortcuts that will block Phase 1/2 work: are services properly isolated? Is the event system reliable (at-least-once delivery, dead letter queue)? Are database indexes adequate for the volume axis? Is the offline queue in the browser resilient to crashes? This is cheaper to fix now than mid-Phase 1. (0.9) Security baseline — run a basic OWASP ZAP scan on the existing app and fix anything critical before building more surface area. -->
+| 0.1 | **Gap register** `docs/gaps.md`, seeded from Appendix A | the single list Phase 1 and 2 burn down |
+| 0.2 | **Configuration audit**: every hard-coded default and preset; can an owner see/change it, where | table in `docs/gaps.md`; feeds Business setup |
+| 0.3 | **Cross-module map as it is today**: events, listeners, reads, links | handbook diagram |
+| 0.4 | **Persona seeds** and scenario-test scaffolding | `scripts/seed_persona.py`, `api/tests/scenarios/` |
+| 0.5 | **Clock control** in tests | fixture |
+| 0.6 | **Walkthrough screenshots** per persona | folder for the owner |
+| 0.7 | Confirm or strike every **(verify)** item | updated Appendix A |
+| 0.8 | **Technical-debt audit**: service isolation; the outbox (at-least-once delivery exists; add a dead-letter view and alerts for events that exhausted their 8 attempts); database indexes for the volume axis; the browser's offline sale queue (today `localStorage`: survives reloads, not storage clearing; consider IndexedDB with a visible queue); long operations as resumable jobs | a short report with fixes ranked |
+| 0.9 | **Security baseline**: OWASP ZAP scan of the current app locally; fix anything high | report + fixes |
+| 0.10 | **Feature flags**: per-workspace and per-person flags managed by platform operators, used to ship modules to pilots first | flags in the platform and the web app |
+| 0.11 | **Error catalogue** skeleton and the shared error components (§2.1) | `docs/standards/errors.md`, components |
+| 0.12 | **Volume datasets** for performance budgets | seed scripts |
 
 ---
 
-## 3. Phase 1 — Every screen, done properly
+## 5. Phase 1 — Foundations
 
-### 3.0 Order
+Everything in §6 stands on these, so they come first.
 
-Grouped into clusters, in the order a growing business meets them. Each cluster ends with a
-checkpoint where the owner walks it.
+### 5.1 The module marketplace
 
-| Cluster | Screens | Why this order |
-|---|---|---|
-| **1A The shop's money** | Till (POS), Sales, Expenses, Customers & dues, Inventory, Books | the tea stall's daily life, and the owner's own example; money must reconcile before anything else matters |
-| **1B People and time** | People, Attendance, Leave, Payroll | every business with staff; payroll draws on all of them |
-| **1C Work** | Tasks & projects, Announcements, Documents, Approvals | offices and agencies |
-| **1D Seeing the business** | Home, Reports, Ask (AI), Automations, Notifications | only meaningful once the data above is right |
-| **1E Running the workspace** | Team, Settings, Account, Sign-up & first day, Help, public site | the frame around everything |
+- Module manifests in code (§1.6), replacing `catalog.MODULES`.
+- A **Marketplace** screen: every module with what it does alone, what it adds to the
+  modules you have, its plan, and one-tap enable/disable with a preview of effects.
+- The rules engine: requires, enhances (each connection with its own switch), conflicts,
+  standalone mode, data when off.
+- Presets rebuilt as bundles (§1.7); changing preset shows a diff.
+- "What else can you do?" suggestions on Home based on what the business does (§6 Home).
 
-Each screen below has: **purpose**, **today**, **real scenarios**, **links to build**,
-**edge cases to test**, **likely build items**, **questions for the owner**. The lists are
-starting points; step 2 of the loop (scenarios first) will grow them.
+### 5.2 Business setup and a real interface mode
+
+- One **Business setup** area organised in the business's words (your business, places,
+  people structure, money, what you sell and buy, time and pay, access, automations), with
+  every default from the configuration audit given a home.
+- **Interface mode made real** (owner's decision): *simple* hides advanced fields, tabs and
+  options (variants, dimensions, approval chains, accounting jargon) and uses bigger controls;
+  *standard* is today's; *advanced* shows everything. Per business with a per-person override,
+  and every screen declares which of its parts belong to which mode.
+- **Setup health**: a checklist that adapts to the modules and stage.
+
+### 5.3 The access engine
+
+Built early because every module's permissions depend on it; full design in §8. Includes the
+**approvals engine** (chains, thresholds, delegation) that modules register request types with.
+
+### 5.4 Shared components for the standards
+
+Errors (§2.1), jobs with progress, print preview and layouts (§2.4), widgets for Home, the
+explain-this-number link (§2.7), language registry (§2.5), feature flags (§4 0.10).
 
 ---
 
-### 1A. The shop's money
+## 6. Phase 1 — Every module done properly
+
+### 6.0 Order
+
+**By dependency, not by market** (owner's decision: shops and offices matter equally). Each
+module is first made excellent **standalone**, then its connections to modules already done
+are built and tested. Order:
+
+1. **People** (many others link to it) and **Users/Access screens** on the new engine
+2. **Point of Sale**, **Expenses**, **CRM**, **Purchasing**, **Inventory**, **Books**
+3. **Attendance**, **Leave**, **Payroll**
+4. **Projects & Tasks**, **Communication**, **Documents**, **Assets**
+5. **Home**, **Reports**, **Automations**, **Notifications** (they show everything above)
+6. **Sign-up, first day, demo mode, help and the public site**
+
+Each module below has: purpose, today, real scenarios, links to build, edge cases, likely
+build items, and (where the owner commented) additions. Section names keep their v1 numbers
+(1A.1, 1B.2…) so the owner's notes still line up.
+
+### 6.1 Money in and out (Point of Sale, Sales, Expenses, CRM, Inventory, Purchasing, Books)
 
 #### 1A.1 Till (`/app/pos`, `/till`)
 
@@ -228,8 +533,14 @@ payment); pay-out / cash-in / drawing actions; shift handover; item variants and
 per-branch prices; barcode field and search; quick-keys layout per branch; stock-out reasons
 (staff meal, wastage); "always show edit items" for managers.
 
-**Questions for the owner.** Should bKash/Nagad be recorded methods only (no integration)
-for now? Do variants come before per-branch prices? Is owner drawing visible to managers?
+**Decided.** bKash, Nagad, card and bank transfer are *recorded* payment methods now; real
+integrations can be switched on per business later (§10.9).
+**Still open (§14.2).** Variants before per-branch prices? Is owner drawing visible to
+managers?
+
+**Standalone vs connected.** Alone: a till with items, drawers and a simple daily summary.
+With CRM: credit and dues. With Inventory: stock and margin. With Expenses: pay-outs. With
+Payroll: wages from the drawer. With Books: everything posted.
 
 #### 1A.2 Sales (`/app/sales`)
 
@@ -294,7 +605,7 @@ across two categories; backdated rent for last month; negative expense (refund f
 approval and reimbursement (payroll or cash); recurring expenses; approval thresholds;
 project/cost-centre tags; supplier bills; filters by source (till, petty cash, bank, claims).
 
-#### 1A.4 Customers & dues (`/app/customers`)
+#### 1A.4 CRM — customers, transactions and payments (`/app/customers`, renamed)
 
 **Purpose.** Know who owes what ("baki khata"), collect it, and stay friendly.
 
@@ -316,12 +627,17 @@ specific sale vs the oldest first; a return credited to a customer with no dues;
 merged with a duplicate; a phone number shared by two customers; deleting a customer with
 history.
 
-**Likely build items.** Ageing and overdue list; write-off; merge duplicates; invoices with
-terms for B2B (could become its own module — see question); customer groups and price lists;
-SMS reminder option.
+**Likely build items.** Ageing and overdue list; write-off; merge duplicates; **quotes and
+invoices with terms** for B2B (decided: inside CRM); customer groups and price lists;
+contacts per business customer; a customer's full history across modules (sales, invoices,
+payments, projects); SMS/WhatsApp reminders (§10.8).
 
-**Question for the owner.** Should B2B invoicing (quotes → invoices → payments, with due
-dates) be part of Customers, or a separate "Invoices" module for offices and agencies?
+**Scope (owner's decision).** CRM covers customers, their transactions, invoices and
+payments. It does **not** do lead generation, pipelines or marketing campaigns.
+
+**Standalone vs connected.** Alone: a customer book with invoices, payments and statements
+(an agency that never uses a till). With Point of Sale: credit at the till. With Projects:
+invoices per project. With Books: receivables and revenue posted.
 
 #### 1A.5 Inventory (`/app/inventory`)
 
@@ -352,9 +668,35 @@ transit when a branch closes; purchase with a line returned to the supplier; cos
 product with zero stock; recipe change mid-day; unit conversion rounding; 300-line purchase
 from a spreadsheet.
 
-**Likely build items.** Units and pack sizes; recipes / bill of materials; purchase orders;
-supplier returns; batches and expiry (optional per item); reorder suggestions; stock
-valuation report matching the books.
+**Likely build items.** Units and pack sizes; recipes / bill of materials; batches and expiry
+(optional per item); reorder suggestions; stock valuation report matching the books.
+Purchase orders, supplier bills and supplier returns move to **Purchasing** (1A.7).
+
+**Standalone vs connected.** Inventory no longer requires Point of Sale (a warehouse or
+factory counts stock without a till). Alone: items, places, counts, transfers, adjustments
+with a cost. With Point of Sale: stock moves with sales. With Purchasing: received orders add
+stock at cost. With Books: stock value on the balance sheet.
+
+#### 1A.7 Purchasing (new module, split from Inventory)
+
+**Purpose.** Know what you've ordered, what you owe suppliers, and pay them on time.
+
+**Today.** Suppliers, purchases (received, with input tax and amount paid) and supplier
+payments live inside Inventory and require stock tracking.
+
+**Scenarios.** A restaurant that doesn't count stock still gets a monthly bill from its
+gas supplier; a grocery orders 40 items, receives 36 this week and 4 next week; a supplier
+gives 30 days' credit; a damaged carton goes back to the supplier; the owner wants "who do I
+owe, and when is it due?"
+
+**Build.** Suppliers with terms; purchase orders (draft → sent → partly received →
+received → closed); supplier bills (from an order or standalone); payments from bank,
+drawer or petty cash; supplier returns and credit notes; supplier statements; due-date
+reminders; import price lists.
+
+**Standalone vs connected.** Alone: orders, bills and what you owe. With Inventory: receiving
+adds stock. With Expenses: non-stock bills appear as expenses. With Point of Sale: pay a
+supplier from the drawer. With Books: payables posted.
 
 #### 1A.6 Books (`/app/accounting`)
 
@@ -379,14 +721,24 @@ moved backwards; reversing an entry that was already reversed; a sale voided aft
 period was locked (post to the current period with a note); rounding differences; very old
 data in a new chart.
 
-**Likely build items.** Plain-language P&L ("you earned ৳…, spent ৳…, kept ৳…"); opening
-balances; bank reconciliation; dimensions (branch, project); fixed assets and depreciation;
-"where did this number come from" drill-down everywhere.
-<!-- Omi's Comment: The "plain-language P&L" is a perfect candidate for the AI chatbot to own. Instead of building a separate simplified view, the owner should be able to ask "did I make money this month?" in the chatbot and get a beautifully formatted, contextual answer with drill-down links. This is where the AI-as-primary-interface vision starts — the Books module feeds data, the AI presents it in human words. Also: Books must enforce immutability — no hard delete of posted journal entries, only reversals. External auditors at S4/S5 will need a read-only export of the full journal with timestamps and who posted each entry. -->
+**Likely build items.** Opening balances; bank reconciliation; dimensions (branch, project);
+fixed assets and depreciation (with Assets); "where did this number come from" drill-down
+everywhere.
+
+**Added after review.**
+- **The assistant presents the books** (§9): "Did I make money this month?" gets a formatted
+  answer in plain words with drill-down links, instead of a separate simplified screen. Books
+  supplies exact numbers through capabilities; the assistant explains them.
+- **Immutability:** posted journal entries are never edited or deleted, only reversed; the
+  database enforces it (append-only, as the audit log already is), and corrections show both
+  the original and the reversal.
+- **Auditor export:** the full journal with timestamps, who posted each entry and from which
+  source, in a portable format (CSV/Excel plus a signed manifest), and a time-limited
+  read-only **auditor access** role (§8).
 
 ---
 
-### 1B. People and time
+### 6.2 People and time
 
 #### 1B.1 People (`/app/people`)
 
@@ -447,11 +799,27 @@ after people clocked in; GPS accuracy 300 m in a dense area; phone clock wrong b
 (server time wins); two clock-ins from two devices at once; a branch moved (new location
 area) with historic records; a person transferred mid-month (which branch's rules?);
 daylight saving for a branch abroad; a kiosk tablet offline for a shift.
-<!-- Omi's Comment: Kiosk mode needs serious security thought. If the shared tablet is at the counter, what stops someone from exiting the kiosk app and browsing the owner's data? The kiosk should be a locked-down mode: no URL bar, no back button to the main app, only PIN entry and clock in/out. Think of it like the till's PIN session but for attendance. Also: what if the tablet is stolen? Remote wipe or lock of the kiosk device. And biometrics — many cheap Androids have fingerprint readers, could we use that instead of PINs for faster clock-in? -->
 
 **Likely build items.** Shifts and rosters; per-branch and per-shift lateness rules; kiosk
 mode with PINs or QR; overtime approval; breaks; bulk corrections; Ramadan/seasonal
 schedules; absence rules feeding payroll.
+
+**Added after review: kiosk security.**
+- **Locked-down mode:** a kiosk is a registered device (like a till) that opens only the
+  clock-in screen: no menu, no links into the app, no back navigation to other pages; leaving
+  kiosk mode needs an owner or manager PIN. Installed as an app (PWA) in full-screen, so
+  there's no address bar; on Android the owner can also pin the screen (OS feature).
+- **Nothing to steal on the device:** the kiosk holds only its own device token; no owner
+  session. Revoking the device from Business setup ends it immediately (as tills do today).
+  "Wipe" means revoke plus clearing its local data on next contact; a stolen tablet that never
+  reconnects has nothing useful on it.
+- **Abuse limits:** PIN lockouts per person and per device; buddy-punching checks (a photo at
+  clock-in, optional; the same person clocking in on two devices).
+- **Fingerprints:** browsers can't read fingerprint sensors directly, but **passkeys** use
+  the phone's fingerprint or face unlock, and the product already supports passkeys. A kiosk
+  passkey per worker on a shared tablet is limited by how many passkeys a device stores;
+  realistic options are (a) each worker's own phone with a passkey (fingerprint) clocking in at
+  the branch, (b) the shared kiosk with PIN or QR card. To test with real devices in Phase 1.
 
 #### 1B.3 Leave (`/app/leave`)
 
@@ -517,11 +885,25 @@ finalized run after payslips were seen; currency change; 2,000 people in one run
 **Likely build items.** Pay frequencies (daily/weekly/monthly) and pay groups; paid-from
 account; piece rate; provident fund and gratuity; arrears; final settlement; bank and wallet
 file formats; payslip delivery by WhatsApp/email.
-<!-- Omi's Comment: Payroll is the module where regulatory compliance is non-negotiable. Bangladesh Labour Act 2006 has specific rules: minimum wage by sector, overtime caps (2 hours/day), maternity leave (16 weeks), gratuity formula, festival bonus norms, and mandatory registers (wage register, leave register, etc.) that a labour inspector can ask for. The payroll module should generate these statutory registers, not just payslips. Also: tax deduction at source (TDS) for salaried employees above the threshold — the editable tax table exists but is off by default, meaning nobody's using it. This needs to be on by default with the current Bangladesh tax slabs, with the owner able to override. -->
+
+**Added after review: compliance is not optional.**
+- **Statutory registers** a labour inspector can ask for, generated from the data: wage
+  register, attendance register, leave register, overtime register, service book entries, in
+  the formats the Bangladesh Labour Act 2006 and Labour Rules 2015 expect.
+- **Rules enforced or warned:** minimum wages by sector (a table the owner can update, with
+  the gazette date it reflects); overtime caps (warn above the legal daily and weekly limits);
+  maternity leave and benefit; festival bonus norms; gratuity formula on leaving.
+- **Tax deduction at source on by default** for salaried staff above the threshold, using the
+  current income tax slabs, with the owner able to override or switch off. **Condition:** the
+  slabs and every statutory rule above are checked by a tax adviser and a labour lawyer
+  before release, each table shows "last checked on … against …", and the product warns when
+  a new Finance Act is due (July). Shipping wrong tax by default is worse than shipping it
+  off; the check makes default-on safe.
+- Detail in §10.2.
 
 ---
 
-### 1C. Work
+### 6.3 Work
 
 #### 1C.1 Tasks & projects (`/app/tasks`)
 
@@ -545,9 +927,9 @@ tasks; moving a task between projects with different members; 2,000 tasks on one
 due dates in a different branch's time zone; a checklist of 100 items.
 
 **Likely build items.** Recurring tasks; time logging; dependencies; project budgets and
-clients; guest access (with section 5); templates.
+clients; guest access (with §8); templates.
 
-#### 1C.2 Announcements (`/app/announcements`)
+#### 1C.2 Communication (was Announcements, `/app/announcements`)
 
 **Today.** Posts to everyone, branches or departments; pinned; read receipts; managers post
 within their scope; notifications. No scheduling, expiry, acknowledgement or attachments.
@@ -585,11 +967,29 @@ from the notification on a phone without opening the app.
 
 **Build.** A general approval engine: request types registered by modules, **chains** and
 **thresholds** set in Business setup, delegation, reminders and escalation after N days,
-approve from notification/email links, a history per request, and the limits from 5.1.
+approve from notification/email links, a history per request, and the limits from §8.1.
 
 ---
 
-### 1D. Seeing the business
+#### 1C.5 Assets (new module)
+
+**Purpose.** Know what equipment the business owns, where it is, who holds it, and what it's
+worth.
+
+**Scenarios.** A laptop given to a new designer and returned when they leave; a deep freezer at
+a branch that needs servicing every 6 months; a delivery motorbike with insurance renewal; the
+accountant depreciating a ৳80,000 fridge over 5 years.
+
+**Build.** Asset register (tag, category, place, holder, purchase cost and date, warranty);
+assign and return with signatures (acknowledgements); maintenance schedules and history;
+reminders (insurance, service, warranty end) via Automations; depreciation posted to Books;
+lost/damaged assets at final settlement (with Payroll); QR labels to print.
+
+**Standalone vs connected.** Alone: the register and reminders. With People: who holds what on
+each profile; offboarding returns. With Purchasing: assets created from a purchase. With
+Books: depreciation. With Payroll: deductions on leaving (where the law allows).
+
+### 6.4 Seeing the business
 
 #### 1D.1 Home (`/app`)
 
@@ -604,7 +1004,18 @@ waiting, birthdays and work anniversaries. Mr. Chowdhury: a group dashboard.
 
 **Build.** Cards per module and role, arranged by stage and permissions; owner can pin and
 reorder; numbers link to their source; a branch switcher for multi-branch owners.
-<!-- Omi's Comment: Home is the most important screen in the entire product — it's the first thing every user sees every day. It should feel like a personal command center, not a generic dashboard. Think widget system: each module registers the cards it can show, the user drags and resizes them, and the layout is saved per person. There should be a "quick actions" bar at the top (open drawer, clock in, approve requests, record expense) that changes based on role and context (time of day, what's pending). Home is also where the AI chatbot should be most prominent — a floating assistant that greets you with "3 things to know today" and lets you ask anything. -->
+
+**Added after review: Home as a personal command centre.**
+- **Widget system:** each module registers widgets (with sizes and what permission they need);
+  people add, remove, drag and resize them; layouts saved per person; presets and roles give
+  sensible starting layouts; owners can push a layout to a role.
+- **Quick actions bar** at the top that changes with role and context: *open drawer* in the
+  morning for a cashier, *clock in* when not clocked in, *approve 3 requests* when some are
+  waiting, *record expense*, *close drawer* in the evening.
+- **The assistant on Home:** a greeting with "3 things to know today" (computed from the
+  modules the person can see, with links), and an always-available ask box (§9).
+- **"What else can you do?"**: suggestions from the marketplace based on what the business
+  does (sells on credit often → CRM reminders; many pay-outs for milk → Inventory recipes).
 
 #### 1D.2 Reports (`/app/reports`)
 
@@ -615,12 +1026,20 @@ with weekly/monthly emails and signals. Shop reports live in Sales and Books.
 sellers, margin), Money (P&L in plain words, cash flow, dues ageing, supplier dues), Stock
 (value, slow movers, wastage), People (existing), Work (project time and profitability);
 comparisons (this week vs last); export to Excel; every report schedulable by email.
-<!-- Omi's Comment: Reports should also support: (1) Saved/custom reports — let the owner define their own filters, columns, and groupings and save them with a name ("My Friday comparison"). (2) Shared reports — an owner creates a report and shares it with a manager, who sees only the data their permissions allow. (3) Report builder for advanced users (S4/S5) — pick dimensions, measures, filters, chart type, like a simple BI tool inside the app. (4) Goal tracking — "I want to make ৳50,000 this month" with a progress bar on Home and Reports. This makes Reports not just backwards-looking but motivational. -->
+
+**Added after review.**
+1. **Saved reports:** filters, columns and groupings saved with a name ("My Friday
+   comparison").
+2. **Shared reports:** shared with a manager, who sees only what their access allows (the same
+   report definition, evaluated with their permissions).
+3. **Report builder** for S4/S5 (advanced interface mode): pick dimensions, measures, filters
+   and chart type, like a small BI tool, over a governed data model (no raw SQL).
+4. **Goals:** "৳50,000 this month" with progress on Home and Reports, per branch or person,
+   with the assistant noting when you're behind.
 
 #### 1D.3 Ask (AI), 1D.4 Automations, 1D.5 Notifications
 
-- **Ask:** capabilities for every new screen (pay-outs, claims, recipes, ageing); re-run the
-  parity test; 30 real questions per persona in both languages as a test set.
+- **Ask:** now its own track (§9).
 - **Automations:** new triggers (drawer difference over ৳X, pay-out over a limit, dues 30
   days overdue, stock expiring, claim waiting 3 days, licence expiring) and steps (send a
   WhatsApp/SMS later, create a purchase order draft).
@@ -629,7 +1048,7 @@ comparisons (this week vs last); export to Excel; every report schedulable by em
 
 ---
 
-### 1E. Running the workspace
+### 6.5 Running the workspace
 
 #### 1E.1 Team (`/app/team`)
 
@@ -637,7 +1056,7 @@ comparisons (this week vs last); export to Excel; every report schedulable by em
 (built-in and custom), password resets for staff, removal. One role and one department
 scope per member.
 
-**Build.** The permission builder from section 5; bulk invite from the people list; templates
+**Build.** The permission builder from §8; bulk invite from the people list; templates
 per business type; "copy access from"; "view as"; offboarding checklist (revoke access,
 return assets, final settlement, archive).
 
@@ -646,7 +1065,7 @@ return assets, final settlement, archive).
 **Today.** Tabs: modules, branches, plan, AI, audit (plus developers, security, data and
 platform where allowed). The plan tab shows the plan and limits but can't change them.
 
-**Build.** Section 4.4. Every hard-coded default from the Phase 0 audit gets a home.
+**Build.** Foundations §5.2. Every hard-coded default from the Phase 0 audit gets a home.
 
 #### 1E.3 Account (`/app/account`)
 
@@ -665,25 +1084,48 @@ cup within five; Nasrin imports her item list from Excel; Farhana imports 30 peo
 sell; office: add people → set leave → invite); sample data marked "sample" everywhere with
 "replace with my own"; import from Excel for items, customers, suppliers and opening stock,
 not only people.
-<!-- Omi's Comment: Sign-up and first day is make-or-break. If Rahim can't sell his first cup in 5 minutes, he'll never come back. This needs to be obsessively mobile-first — most Bangladeshi small business owners will sign up on a phone, not a laptop. The entire first-day flow should work flawlessly on a 360px screen in Bangla. Also: the Marketplace concept connects here — after the first-day flow, there should be a "What else can you do?" screen showing available modules with one-tap enable, not buried in Settings. Think app store, not enterprise configuration. And: what about a demo mode? Let someone try the product WITHOUT signing up — a read-only sample business they can tap around in. That's how you get someone who's never used software before to trust it. -->
+
+**Added after review.**
+- **Mobile-first, obsessively:** the whole sign-up and first day designed and tested on a
+  360 px phone in Bangla first, then scaled up; no step needs a laptop. Target: Rahim sells his
+  first cup within five minutes of opening the site.
+- **"What else can you do?"** after the first-day flow: the marketplace as an app-store-style
+  screen with one-tap enable, not buried in Settings.
+- **Demo mode without signing up:** a sample business per preset that anyone can open from the
+  public site and tap around in, read-only (or resettable every hour), clearly marked as a
+  demo, never mixed with real tenants (a dedicated demo workspace per preset, rebuilt nightly).
 
 #### 1E.5 Help and the public site
 
 Every screen links to its help article; articles cover the new scenarios; the public site's
-claims are re-checked against what's built after each cluster.
+claims are re-checked against what's built after each group of modules.
+
 
 ---
 
-## 4. Phase 2 — One business, from tea stall to enterprise
+## 7. Phase 2 — One business across its whole life
 
-### 4.1 The aim
+### 7.1 The aim
 
-Follow one business through six stages. At each stage ask: what does the owner need, which
-modules are involved, how does data flow between them, what must they configure, and what
-happens at the **transition** to the next stage. The output is not features in isolation but
-a product that grows with its customer.
+Phase 1 makes each module excellent. Phase 2 follows businesses through their real lives
+— growing, shrinking, changing shape, having seasons, and closing — and makes the modules
+work together at every point. The output is a product that fits a business at every stage
+without a migration, a consultant, or lost history.
 
-### 4.2 The six stages
+### 7.2 For each stage or life event, the deliverables
+
+1. **Journey script**: a day, a week and a month-end (or the event itself), step by step with
+   screens and data.
+2. **Module map**: which modules are on, and the connections between them (§1.5).
+3. **Configuration**: what the owner sets up, in order, in Business setup.
+4. **Access**: the people and what each may do (§8).
+5. **Transitions**: the trigger, what the product suggests, what changes, what the owner
+   chooses, and what happens to existing data.
+6. **The assistant's role**: what the owner would ask at this stage and get answered (§9).
+7. **Scenario test** (API) and **browser walkthrough** for the whole journey.
+8. **Gaps** into the register, fixed in the stage's build list.
+
+### 7.3 Growth stages
 
 | Stage | Example | People | Branches | What changes |
 |---|---|---|---|---|
@@ -692,23 +1134,15 @@ a product that grows with its customer.
 | **S2 Two locations** | second outlet | 10–25 | 2–3 | branch managers, transfers, per-branch P&L, shared customers |
 | **S3 Office / agency** | 30-person agency | 20–60 | 1–2 | leave, payroll, projects, documents, approvals, an accountant |
 | **S4 Multi-branch company** | retailer or factory | 100–500 | 5–30 | regions, HR team, approval chains, rosters, budgets, audits |
-| **S5 Enterprise / group** | group of companies | 500–5,000 | many | several legal entities, consolidated reports, SSO/SCIM, API, strict access, data export to their systems |
-<!-- Omi's Comment: Missing stages for real life: (1) Seasonal business — a business that scales up massively for Eid/Ramadan/Pohela Boishakh and scales back down. Temporary staff, temporary branches (pop-up stalls), temporary inventory. What happens to those records after the season? (2) Business closure — the sad path. An owner shuts down: final settlements for all staff, final supplier payments, close the books, export everything, cancel the plan. The product should handle this gracefully, not leave orphan data. (3) Business pivot — a tea stall becomes a restaurant, an agency becomes a consultancy. The business type changes but the history stays. This connects to the "downgrade path" comment at the end. -->
+| **S5 Group** | group of companies | 500–5,000 | many | several legal entities, consolidated reports, SSO/SCIM, API, strict access |
 
-### 4.3 For each stage, the deliverables
+These are not a ladder every business climbs: a factory starts at S4 with no till; a tea
+stall may add HR and payroll without ever adding stock. The stages are lenses for testing
+combinations, not a path the product forces.
 
-1. **Journey script**: a day, a week and a month-end, written as steps with screens and data.
-2. **Module map**: which modules are on, and the data that flows between them (4.5).
-3. **Configuration**: what the owner sets up, in order, and where (4.4).
-4. **Roles and access**: the people and what each may do (section 5).
-5. **Transition to the next stage**: the trigger (hiring an accountant, opening a branch),
-   what the product suggests, what changes automatically, what the owner chooses.
-6. **Scenario test**: the journey as an automated API test + a browser walkthrough.
-7. **Gaps** into the register, fixed in the stage's build list.
+### 7.3a Stage by stage: first sketches
 
-### 4.3a Stage by stage: first sketches
-
-These are starting points for each stage's journey script (4.3 step 1); Phase 2 turns each
+These are starting points for each stage's journey script (§7.2 step 1); Phase 2 turns each
 into a full script, a scenario test and a build list.
 
 #### S0 — Rahim's tea stall (owner + 2 helpers, 1 stall)
@@ -752,7 +1186,7 @@ into a full script, a scenario test and a build list.
 - **Modules.** Same as S1 plus branch-aware everything; Attendance with rosters; Approvals
   (refunds and pay-outs over limits).
 - **Connections.** Transfers ↔ stock both ends + books per branch; branch P&L (dimensions);
-  shared customers across branches; branch managers' access scoped to their branch (5.1).
+  shared customers across branches; branch managers' access scoped to their branch (§8.1).
 - **Configure.** Branches, branch prices, branch managers, approval limits.
 - **Transition to S3 or S4.** Becomes an office-style business (S3) or keeps adding
   branches (S4).
@@ -792,263 +1226,508 @@ into a full script, a scenario test and a build list.
   results; shared HR directory and SSO; inter-company services billed monthly; external
   auditors get read-only access for a month; data exported nightly to their BI tool via the
   API.
-- **Modules.** All, plus group layer (4.7), developer platform, audit exports.
+- **Modules.** All, plus group layer (§7.7), developer platform, audit exports.
 - **Connections.** Inter-company transactions mirrored in both companies' books; group roles
   (CFO sees all books, nothing else); SCIM groups → access templates.
 - **Configure.** Group, companies, group roles, SSO, SCIM, API keys, retention policies.
 
-### 4.4 Business setup: one place to shape the business
 
-Replace scattered settings with a **Business setup** area, organised by the business's own
-words, not by module:
+### 7.4 Other life events (added after review)
 
-- **Your business**: name, type, size stage, country, currency, time zone, week, fiscal year,
-  logo, address. **Business type and stage can be changed**: changing shows a preview of what
-  will switch on, which defaults it would add, and what stays untouched (never deletes data).
-- **Places**: branches with hours, location area, tills, price lists, stock locations.
-- **People structure**: departments, positions, reporting lines, shifts.
-- **Money**: payment methods, taxes, drawers and petty cash, bank accounts, chart of
-  accounts, approval limits, fiscal locks.
-- **What you sell and buy**: items, categories, variants, units, recipes, suppliers.
-- **Time and pay**: work week, holidays, leave types, salary structure, bonuses, overtime.
-- **Access**: roles, permission templates, member overrides (section 5).
-- **Automations and notifications**: defaults per business type.
-- **Interface mode** that actually does something: *simple* hides advanced fields and tabs
-  (variants, dimensions, approval chains); *advanced* shows everything. Per workspace, with
-  a per-person override.
-- **Setup health**: a checklist that adapts to the stage ("you sell on credit but no
-  customer has a credit limit", "two branches but no branch managers").
+#### E1 — A seasonal business
 
-Every default from the configuration audit (Phase 0.2) gets a home here.
+**Example.** Shirin runs a clothing stall that triples for Eid-ul-Fitr: a pop-up second stall
+for three weeks, 6 temporary sellers, a large stock bought on credit, then back to one stall
+and 2 people.
 
-### 4.5 The connections that make it one product
+**Needs.** Temporary branches with start and end dates (archived automatically, history
+kept); temporary staff with contract end dates (access ends by itself, final pay generated);
+seasonal stock and price lists; a season report ("Eid 2026: sales, profit, what's left");
+leftover stock marked down or returned to suppliers; next year's season copied from this one.
 
-To be designed in detail during Phase 2. The core flows:
+**Modules.** Point of Sale, Inventory, Purchasing, Payroll (daily/weekly), People, Books,
+Reports; Access with time-bound grants.
+
+#### E2 — A pivot
+
+**Example.** Rahim's tea stall becomes a small restaurant: a kitchen, a menu with recipes,
+table service, 6 staff.
+
+**Needs.** Change the preset (shows a diff: adds modules and defaults, removes nothing);
+items and history kept; new categories and recipes; reports compare before and after the
+pivot; the assistant knows the business changed ("since March you're a restaurant").
+
+#### E3 — Downsizing (the inverse of growth)
+
+**Example.** Nasrin's grocery loses money for a year: closes one of two branches, lets 6 of 18
+people go, drops payroll to quarterly bonuses only, stops Inventory and keeps a simple till.
+
+**Needs.**
+- **Branch closure:** stock transferred or written off, drawers closed, customers' dues moved
+  to the remaining branch, staff transferred or settled, the branch archived (reports for its
+  history still work).
+- **Layoffs:** final settlements in bulk with the legal notice period and compensation
+  (retrenchment rules under the Labour Act), access removed on the last day, documents
+  (termination letters, experience certificates) from templates.
+- **Dropping modules:** read-only history, still in reports and the assistant for past
+  periods, re-enabling picks up where it left off; stock frozen at its last count with value
+  kept in the books.
+- **Plan downgrade:** effective from next month (owner's rule); nothing deleted; over-limit
+  modules read-only.
+- **Insight before it's too late:** signals for falling margin, rising costs, cash running low
+  (Reports and the assistant), so downsizing is a choice, not a surprise.
+
+#### E4 — Closing the business
+
+**Needs.** A guided **close-down**: final pay and settlements for everyone; final supplier
+payments and customer collections (or write-offs); stock sold off or written off; the books
+closed with a final balance sheet; statutory registers and tax records exported for the years
+the law requires them kept; a complete portable export (§10.3); the plan cancelled; the
+workspace kept read-only for a retention period, then deleted with the existing 30-day
+restore and deletion certificate.
+
+### 7.5 The growth path, plan changes and billing rules
+
+- **Plan changes in the app.** Until billing exists: pilots get plans through an **operator
+  invitation** (a link that grants a plan until a date, free). After billing: self-serve.
+- **Owner's billing rule:** any change (plan, preset, modules) takes effect immediately for
+  use, but the current month is billed on the old plan and the new plan from the next month.
+- **Owners only** may change plan, preset and modules; a business can have several owners
+  (supported today).
+- **Suggestions, not walls:** "14 of 15 people" a week before; "second branch — branch
+  managers can now see only their branch".
+
+### 7.6 The connections that make it one product
 
 ```
-           ┌─────────── Till / Sales ───────────┐
- Customers ◀─ credit, payments ─▶ Drawer ◀─ pay-outs, cash-in, drawings
-     │                              │
-     ▼                              ▼
-  Dues ageing                Expenses ◀─ claims ◀─ People
-     │                              │        ▲
-     ▼                              ▼        │ approvals
-   Books ◀────── every money movement ───────┤
-     ▲                              ▲        │
- Inventory ◀─ recipes, purchases ─ Suppliers  │
-     ▲                                       │
+           ┌──────── Point of Sale ─────────┐
+   CRM ◀─ credit, payments ─▶ Drawer ◀─ pay-outs, cash-in, drawings, wages
+     │                         │
+     ▼                         ▼
+ Dues ageing             Expenses ◀─ claims ◀─ People ─▶ Assets
+     │                         │        ▲
+     ▼                         ▼        │ approvals (Access)
+   Books ◀────── every money movement ──┤
+     ▲                         ▲        │
+ Inventory ◀─ receiving ─ Purchasing     │
+     ▲                                  │
  Payroll ◀─ attendance, overtime, leave, advances, claims
      │
      └─▶ paid from bank / drawer / wallet ─▶ Books
- Tasks/Projects ◀─ time, expenses, revenue ─▶ project profitability
- Reports / Home / AI ◀─ everything, through capabilities
+ Projects ◀─ time, expenses, invoices (CRM) ─▶ project profitability
+ Home / Reports / Assistant ◀─ everything, through capabilities and permissions
 ```
 
-Each arrow gets: the event or call that carries it, what the user sees on both ends (links in
-both directions), how a mistake on one end is corrected on the other (reversal, not delete),
-and a scenario test.
+Each arrow gets: the event or call that carries it, what the person sees on both ends (links
+in both directions), how a mistake on one end is corrected on the other (reversal, not
+delete), what happens when either module is off (standalone mode), and a scenario test.
 
-### 4.6 Growth path and plans
+### 7.7 Groups of companies (moved into Phase 2 core)
 
-- **Plan changes in the app**, before billing exists: the owner chooses a plan; until M5 it's
-  a request the platform operator approves (or free during pilots). Limits, read-only and
-  module locks already exist.
-- **Suggestions, not walls**: "you have 14 people, your plan allows 15" a week before; "you
-  opened a second branch — branch managers can now see only their branch".
-- **Downgrades** never delete: extra modules read-only, extra branches archived, data exported.
-- **Stage-aware Home and checklists** (4.4 setup health).
+The owner wants this as soon as possible. Design:
 
-### 4.7 Multi-entity (S5)
-
-Groups run several companies: one login, many workspaces exists today (switching). What S5
-needs: a **group** above workspaces with shared people directory and SSO, consolidated
-reports across companies, inter-company transfers, and group-level roles (a CFO who sees all
-companies' books). A design question, not a quick build; may move to Phase 4.
-
----
-<!-- Omi's Comment: this section is good, but we also need to think of the inverse situation. Where a company keeps tanking profit and downsizes. -->
-## 5. Phase 2 track — Access you can shape person by person
-
-The owner asked for "very, very highly configurable" permissions when adding a member,
-without losing the safety of roles. Today: one role (built-in or custom) + one department
-scope per member.
-
-### 5.1 The model
-
-**Effective access = role template + this person's changes, within their scopes, under their
-limits.**
-<!-- Omi's Comment: Think of it like discord permissions. Role permissions are good, but personal permissions override role permissions. -->
-1. **Role templates** stay (Owner, Admin, Manager, Accountant, Cashier, Employee, custom), now
-   with sensible versions per business type ("Shop manager", "Head cashier", "HR officer").
-2. **Per-person changes**: grant or remove any permission for one person, on top of the role,
-   without creating a custom role. Shown as a diff: "Cashier, plus *see stock*, minus *give
-   credit*".
-3. **Scopes per permission**, not one per person:
-   - *Everything* · *These branches* · *These departments (and below)* · *Their own team*
-     (needs reports-to) · *Only their own records*.
-   - Example: Karim may *sell* at Gulshan and Banani, *see sales* only at Gulshan, *approve
-     leave* for the Kitchen department.
-4. **Limits**, with money and counts:
-   - approve expenses up to ৳10,000; refunds up to ৳2,000; discounts up to 10%; voids only
-     within 10 minutes of the sale; pay-outs up to ৳1,000 per shift; credit to customers up
-     to their limit only.
-   - Above a limit: the action becomes a request in the approvals inbox, not a refusal.
-5. **Field visibility**: salaries, national IDs, cost prices and margins, customers' phone
-   numbers, bank details — each can be hidden even from someone who can see the record.
-6. **Time-bound access**: "acting manager while Rina is on leave, 10–20 Oct", expires itself;
-   **delegation** of approvals while away.
-7. **Segregation of duties** warnings: the same person able to create a supplier and pay it,
-   or prepare and approve payroll; the owner can accept the risk with a reason (audited).
-8. **Module access levels in plain words**: for each module, *No access · See · Use · Manage ·
-   Approve*, mapped to the underlying permissions, with an "advanced" view of the raw list.
-
-### 5.2 The screens
-
-- **Add a member**: name → how they sign in → **start from a template** → adjust per module
-  (levels, scopes, limits, hidden fields) → **preview "what Karim will see"** (a real
-  rendering of their Home and menu) → invite.
-- **Member's access page**: the effective permissions with where each comes from (role,
-  personal change, temporary grant), history of changes, "copy access from another person".
-- **Bulk**: apply a change to several people; compare two people's access.
-- **View as**: owners and admins can open the app as a member (read-only, audited).
-
-### 5.3 Engineering notes
-
-- A permission evaluator replaces `catalog.resolve()` + `scope_department_id`:
-  `can(ctx, permission, resource)` → considers role, personal grants/denies, scopes, limits,
-  time windows. Services ask about a **resource** (this sale, this branch, this person), not
-  only a permission.
-- Tables: `member_grants` (permission, effect allow/deny, scope type, scope ids, limit,
-  valid from/to), `field_policies`, `delegations`.
-- Branch scope requires every relevant record to carry a branch (most do: sales, drawers,
-  expenses, purchases, employees; customers don't yet).
-- "Own team" requires reports-to (1B.1).
-- Every existing scoped check (`in_scope`, `scope_departments`) migrates to the evaluator;
-  the isolation sweep and capability parity tests extend to cover grants, scopes and limits.
-- Existing roles and memberships migrate unchanged (a role with no personal changes behaves
-  exactly as today).
-- Performance: effective permissions computed once per request (cache by membership +
-  version), as today.
-
-### 5.4 Edge cases to design for
-
-A person with a deny on something their role grants; a grant on a module that's switched
-off; a limit in a currency the workspace changed; a temporary grant that expires mid-action;
-the last person who can approve payroll going on leave; an API key made by someone whose
-access later shrinks (keys already shrink with their maker — keep it so); SSO users whose
-role comes from the identity provider (SCIM groups → templates).
+- A **group** above workspaces: one login, a shared people directory (optional), group
+  owners and group roles (a CFO who sees every company's books and nothing else).
+- Each company keeps its own books, payroll, tax numbers and currency; nothing mixes by
+  accident (row-level security per company stays the foundation).
+- **Consolidated reports**: P&L, balance sheet and headcount across companies, with
+  currency translation (§10.4) and eliminations of inter-company transactions.
+- **Inter-company transactions**: a sale from company A to B mirrored as a purchase in B,
+  linked, both sides reversible together.
+- **Shared services**: group-level suppliers and customers (optional), group SSO and SCIM,
+  group-level audit export.
+- **Engineering:** a `groups` layer with memberships; cross-company queries only through
+  group-scoped, read-only functions (the same pattern as today's cross-tenant aggregates), never
+  by turning row-level security off. Builds on the access engine (§8) and multi-currency.
 
 ---
 
-## 6. Proposed Phase 3 — Go live and get paid
+## 8. Phase 2 — Access you can shape person by person
 
-Can partly run in parallel with Phase 2 once Phase 1A is done.
+(The engine is built in Foundations §5.3; the screens and the full model land here.)
 
-1. **Deploy** (handbook chapter 10), on the cheapest schedule; uptime check; budget alert.
-2. **Pilots**: 2–3 businesses at different stages (a stall, a shop, an office), using
-   `pilot-playbook.md`; weekly visits; their findings go into the gap register with top
-   priority.
-3. **Billing (M5)**: Paddle for international cards; **bKash/Nagad/SSLCommerz** for
-   Bangladesh (needs trade licence and merchant accounts); plan changes from 4.6 become
-   self-serve; invoices in BDT with VAT if registered.
-4. **Legal**: lawyer's review of terms, privacy, DPA; tax adviser on the salary tax table.
-5. **Support**: WhatsApp support number, in-app help, a status page.
+### 8.1 The model: like Discord, personal settings beat the role
+
+**Effective access = the person's roles, then their personal overrides on top, within scopes,
+under limits and conditions.**
+
+1. **Several roles per person**, combined (Discord-style): Karim can be *Cashier* and *Stock
+   keeper*; he gets everything either role allows.
+2. **Personal overrides beat roles.** For any permission, a person can be set to *allow*,
+   *deny* or *inherit* (from roles). Order of evaluation:
+   1. Owners have everything (the last owner can't be removed).
+   2. A personal **deny** wins over everything else.
+   3. A personal **allow** wins over the roles.
+   4. Otherwise the roles decide (any role that allows → allowed).
+   The member's access page shows each permission with where it came from ("allowed by
+   *Cashier*", "denied for Karim personally").
+3. **Role templates per preset**: "Shop manager", "Head cashier", "HR officer", "Auditor"
+   (read-only, time-limited).
+4. **Scopes per permission**: *everything* · *these branches* · *these departments (and
+   below)* · *their own team* (reports-to) · *only their own records*.
+5. **Limits**: approve expenses up to ৳10,000; refunds up to ৳2,000; discounts up to 10%;
+   voids within 10 minutes; pay-outs up to ৳1,000 per shift. Above a limit the action becomes
+   an approval request, not a refusal.
+6. **Conditions** — this is what decision 10 in v1 meant, in plain words. Optional rules on
+   *when and where* someone may use a permission, on top of *what*:
+   - **time of day**: Karim may sell only between 6 a.m. and 11 p.m. (outside it the till
+     won't open for him);
+   - **device**: cashiers may sell only on a registered till, not from their own phone;
+   - **network**: the accountant may open the books only from the office network (the
+     workspace-wide allowlist exists today; this makes it per person).
+   Useful for shops worried about after-hours sales or staff using the app at home. The owner
+   decides whether to build these (§14.2).
+7. **Field visibility**: salaries, national IDs, cost prices and margins, customers' phone
+   numbers, bank details — hideable even when the record is visible.
+8. **Time-bound access and delegation**: "acting manager 10–20 Oct"; approvals delegated
+   while someone is on leave.
+9. **Segregation of duties** warnings (create a supplier and pay it; prepare and approve
+   payroll), acceptable with a reason, audited.
+10. **Plain-language levels per module**: *No access · See · Use · Manage · Approve*, with an
+    "advanced" view of individual permissions.
+
+### 8.2 The screens
+
+- **Add a member**: how they sign in → roles (one or more) → per-module levels, scopes,
+  limits, hidden fields, conditions → **preview "what Karim will see"** → invite.
+- **Member's access page**: effective access with sources, history of changes, copy from
+  another person, compare two people.
+- **Bulk changes**, **view as** (read-only, audited), and **access reviews** for S4/S5
+  (quarterly "confirm each person still needs this" for managers).
+
+### 8.3 Engineering notes
+
+- An evaluator `can(ctx, permission, resource)` replaces `catalog.resolve()` and the single
+  `scope_department_id`; services ask about a resource (this sale, this branch, this person).
+- Tables: `member_roles` (many), `member_overrides` (permission, allow/deny, scope, limit,
+  conditions, valid from/to), `field_policies`, `delegations`.
+- Branch scope needs a branch on every relevant record (missing today on customers).
+- Existing members migrate unchanged (one role, no overrides behaves exactly as today).
+- The isolation sweep and capability parity tests extend to roles, overrides, scopes, limits
+  and conditions; the assistant uses the same evaluator (§9).
+
+---
+
+## 9. Phase 2 — The assistant as a primary interface
+
+The owner's direction: owners should mostly talk to the assistant. Today it answers questions
+with sources, proposes some writes for confirmation, drafts text and automations, and is off
+until a key is set and the workspace opts in. This track makes it the main way to run the
+business, without ever weakening access control.
+
+### 9.1 What it must do
+
+- **Answer anything the person may see**, across every module, with exact numbers from
+  capabilities (never guessed), formatted answers (tables, small charts, cards) and links to
+  the source ("did I make money this month?" → P&L in words with drill-downs).
+- **Act on anything the person may do**, through write capabilities: always shown as a
+  proposal with exactly what will change, confirmed with one tap; above limits it creates the
+  approval request instead.
+- **Undo through chat**: "undo that" reverses the last confirmed action where a reversal
+  exists (money: a reversal entry; tasks: restore), within a time window.
+- **Proactive briefings**: "3 things to know today" on Home; a weekly brief (exists);
+  warnings from signals (cash running low, dues overdue).
+- **Context across conversations**: remembers the business (from data, not chat) and the
+  person's preferences when they allow it; memory is visible and deletable.
+- **Voice in Bangla**: speak a question or a sale ("দুইটা চা, একটা সিঙ্গারা") for people who
+  read slowly; speech-to-text through the provider port.
+- **Any language the person writes in**, answering in the same.
+
+### 9.2 What it must never do
+
+- See or reveal data the person can't (it calls capabilities as them; tested by the
+  isolation and parity suites).
+- Act without confirmation, or around a limit or approval.
+- Follow instructions found inside data (documents, names, notes): tool results stay data
+  (exists, threat model in `docs/security/ai.md`).
+
+### 9.3 Making it work in practice
+
+- **Capabilities for every module** as Phase 1 finishes each one (part of the exit criteria).
+- **Evaluation sets**: 30+ real questions and actions per persona in both languages with the
+  expected answers; run on every change to prompts, models or capabilities.
+- **Cost control** (AI is not optional, but it costs per use): included allowance per plan,
+  cheaper models for simple questions, caching repeated questions, the business's own key
+  (exists), usage visible to owners and operators.
+- **Chat as a surface everywhere**: a floating assistant on every screen that knows which
+  screen and record you're on ("explain this payslip").
+
+---
+
+## 10. Cross-cutting tracks
+
+These run alongside Phase 1 and 2, each with its own owner review.
+
+### 10.1 Data migration and cut-over
+
+- **Importers for every module** (Excel/CSV templates in both languages, preview with row
+  errors, all-or-nothing): items with prices and variants; customers with opening dues;
+  suppliers with opening dues; opening stock with cost per place; an opening trial balance;
+  leave balances (exists); salaries and advance balances; assets.
+- **A go-live date per business**: everything before it is an opening balance; reports start
+  there; the assistant knows.
+- **Cut-over checklist per preset/stage** in Business setup.
+- **Parallel run**: a period where the business keeps its old method too; side-by-side
+  reports to compare (daily takings, stock, payroll totals) before switching off the old way.
+- Later: importers from common tools (Tally exports, other POS exports).
+
+### 10.2 Audit trail and compliance
+
+- **Immutability**: posted financial records (sales, journal entries, payroll runs, stock
+  movements) can't be edited or deleted, only reversed; enforced in the database.
+- **Change history** with before/after on sensitive fields: salaries, bank details,
+  permissions, prices, tax settings, branch locations.
+- **Auditor access and exports** (§6 Books): a time-limited read-only role; the journal, audit
+  log (hash-chained today) and statutory registers in portable formats.
+- **Bangladesh labour law**: statutory registers and rules (§6 Payroll), notice periods and
+  retrenchment, maternity, minimum wages by sector — checked by a labour lawyer.
+- **VAT**: tax-return templates exist; whether receipts and invoices meet Mushak
+  requirements is a question for a VAT consultant before claiming it.
+- **Data protection** (PDPO 2025): retention schedules per data type, consent records,
+  data-subject requests (exists in part).
+- **Digital commerce rules** only if online selling is added later.
+
+### 10.3 Backups, disaster recovery and data portability
+
+- **Today:** Neon point-in-time restore; nightly encrypted dumps to R2 for 30 days; restore
+  runbook drilled locally; owners export a workspace as a ZIP and restore it into a new one;
+  deletion with a 30-day undo and a signed certificate.
+- **Add:** targets written down (recovery point ≤ 5 minutes via point-in-time restore;
+  recovery time ≤ 4 hours); a tested **single-business restore** from a backup; quarterly
+  drills on production; **portable exports** per module in CSV/Excel with a documented format
+  (not only our ZIP); **scheduled exports** to the business's own storage (Google Drive,
+  S3) for S4/S5; a status page.
+
+### 10.4 Multi-currency
+
+- Base currency per business; **currency per branch** (branches abroad); **transaction
+  currency** on sales, invoices, purchases, bills and expenses with the exchange rate at that
+  date; rates entered by hand or fetched daily; journal lines store both amounts; month-end
+  **revaluation** of open foreign balances; **reporting currency** for groups (§7.7); rounding
+  rules per currency (some have no minor unit).
+- Money stays integer minor units per currency (today's rule), with the currency always beside
+  the amount.
+
+### 10.5 API and developer platform
+
+**Already built** (M10): the `/v1` REST API with a versioned contract and breaking-change
+check; API keys with chosen permissions, rate limits, network ranges, expiry, rotation and
+usage logs; signed webhooks with a catalogue, retries, delivery log and resend; idempotency
+keys; TypeScript and Python SDKs; OIDC sign-in; SCIM; sandbox workspaces; a developer guide
+and `/developers` page.
+
+**To extend:** keys scoped by branch and module through the new access engine; API coverage
+and webhook events for every new module; a **changes feed** ("everything changed since
+cursor X") and bulk export endpoints for BI tools; published SDKs (npm, PyPI); OAuth apps
+for third-party integrations (later); developer portal pages per module.
+
+### 10.6 Performance and observability
+
+- **Promises (SLOs)**: 99.5% availability at launch, aiming for 99.9%; the §2.3 budgets.
+- **Monitoring**: request latency and errors per endpoint and per tenant, job queues, outbox
+  backlog and dead letters, database load; alerts to the owner's phone; error tracking
+  (Sentry); uptime checks.
+- **Fairness between tenants**: per-tenant rate limits, statement timeouts, background jobs
+  that can't starve others, report row limits; the largest tenants can move to their own
+  database (S5) without code changes.
+- **Slow-query log** reviewed monthly; indexes from the Phase 0 audit.
+
+### 10.7 Feature flags and staged rollout
+
+Flags per workspace, per person and by percentage, managed by platform operators; kill
+switches for risky features; every new module ships to pilots first; experiments (e.g. a new
+Home layout) measured only with anonymous usage counts; Cloud Run revisions with traffic
+splitting for canary releases; database changes in expand-then-contract steps so any revision
+can roll back.
+
+### 10.8 WhatsApp and SMS
+
+- **WhatsApp Business Platform** (Meta's Cloud API, or through a provider): needs a verified
+  business and a phone number; messages a business starts must use **pre-approved
+  templates**; free-form replies only within a 24-hour window after the person writes; priced
+  per message by category (utility, authentication, marketing) and country — check current
+  rates before deciding who pays.
+- **Templates we'd need** (both languages): payslip ready, dues reminder with amount, receipt,
+  sign-in code, leave decision, shift reminder, approval request.
+- **Opt-in** recorded per person/customer; stop words honoured.
+- **SMS fallback** through a Bangladeshi gateway (branded sender names need registration) for
+  people without WhatsApp.
+- **Cost model**: included messages per plan, then credits — a decision (§14.2).
+
+### 10.9 Private integrations for one company (bKash, banks)
+
+How to integrate a payment provider or bank **for one client first** without making it a
+platform-wide feature, and without blocking the SaaS:
+
+- **A provider port**, like the AI provider port: `PaymentProvider` (charge, refund, status,
+  webhook), `PayoutProvider` (bulk salary payments). Each integration is an adapter in
+  `api/app/integrations/<provider>/`.
+- **Per-business integration settings**: credentials stored encrypted with the existing field
+  encryption; enabled for that business only by a platform operator through a feature flag.
+- **The client's own merchant or bank account.** The money flows to *their* bKash merchant
+  account or *their* bank; you are the technology provider. This is usually the realistic
+  route in Bangladesh: the client applies for the merchant account (trade licence, bank
+  account), the provider gives sandbox and production credentials, and you build against
+  them. Agree in writing what you're responsible for.
+- **Aggregators** (e.g. SSLCommerz) offer bKash, Nagad and cards through one integration with
+  simpler onboarding; often the fastest first step.
+- **Banks**: corporate salary payments are usually **files** uploaded to the bank's corporate
+  portal (BEFTN formats) rather than live APIs; generating the right file per bank is the
+  practical first integration. Host-to-host links come later and need the bank's IT team.
+- **Inbound webhooks** per business with signature checks (the webhook verification
+  pattern exists for our outgoing webhooks; mirror it).
+- **Graduating to the platform**: when a second client wants it, the adapter becomes a
+  marketplace connector with self-serve setup.
+
+---
+
+## 11. Phase 3 — Go live and get paid
+
+1. **Deploy** (handbook chapter 10) on the cheapest schedule, with monitoring (§10.6).
+2. **Pilots**: any business that will use it (owner's decision), invited free through
+   operator invitation links; weekly check-ins; their findings go to the top of the gap
+   register.
+3. **Billing (M5)**: international cards (Paddle or similar) and a Bangladeshi gateway for
+   BDT (trade licence and merchant account needed); the billing rules in §7.5; invoices with
+   VAT if registered; per-module or per-plan pricing decided in §14.2.
+4. **Legal and compliance**: lawyer's review of terms, privacy and DPA; tax adviser and labour
+   lawyer on payroll tables and registers; VAT consultant on receipts and invoices.
+5. **Support**: WhatsApp support number, in-app help, status page.
 6. **Security before real data**: ZAP scan, penetration test, restore drill on production.
 
-## 7. Proposed Phase 4 — Scale and reach
+## 12. Phase 4 — Scale and reach
 
-1. **Mobile**: installable app (PWA) with offline for the till and attendance first; push
-   notifications; later native wrappers if needed.
-2. **Payments and messages**: bKash/Nagad payment links on customer reminders; SMS for
-   staff without smartphones; WhatsApp Business API for payslips and reminders.
-3. **Integrations**: bank statement import (CSV, then bank APIs); BEFTN salary files;
-   accounting export to Tally/QuickBooks; e-commerce orders into Sales.
-4. **Performance at size**: stored daily totals for reports; partitioning for large tables;
-   files moved from Postgres to R2; load tests at 5,000 people and 1 million sales.
-5. **Multi-entity groups** (4.7) if not done in Phase 2.
-6. **Assets** (laptops, machines) and **vehicles/deliveries** if pilots ask.
-7. **Marketplace of presets**: business-type templates others can share (a pharmacy preset,
-   a restaurant preset with recipes).
+1. **Mobile**: installable app with offline for the till, kiosk and attendance; push
+   notifications; native wrappers only if needed (Bluetooth printers, NFC).
+2. **Live payments and messaging** from §10.8–10.9 as connectors.
+3. **Integrations**: bank statements, accounting exports, e-commerce orders into Sales.
+4. **Performance at size**: stored daily totals, partitioning, files on R2, dedicated
+   databases for the largest tenants; load tests at 5,000 people and a million sales.
+5. **Preset marketplace**: shareable presets (pharmacy, restaurant with recipes, garment
+   factory).
+6. **More languages** (§2.5).
 
 ---
 
-## 8. Order, effort and checkpoints
+## 13. Honest estimates and checkpoints
 
-Rough working days for one developer with AI help; revised after Phase 0's audit.
+### 13.1 Why the v1 estimates were wrong
 
-| Phase | Sub-phase | Effort | Checkpoint (owner) |
-|---|---|---|---|
-| 0 | Groundwork | 2–3 d | review walkthrough screenshots and the gap register |
-| 1A | Shop's money (6 screens) | 12–18 d | run a tea stall's day yourself on a phone |
-| 1B | People and time (4) | 10–14 d | run a month of payroll for a 10-person shop |
-| 1C | Work (4) | 6–9 d | run an agency's week |
-| 1D | Seeing the business (5) | 6–8 d | check Home and Reports for each persona |
-| 1E | Running the workspace (6) | 5–7 d | invite people and set up a business from scratch |
-| 2 | Stages S0–S5 journeys + business setup + connections | 15–25 d | walk each stage's journey; approve transitions |
-| 2 | Access you can shape | 8–12 d | add five people with different access; "view as" each |
-| 3 | Go live and get paid | 5–10 d + pilots' calendar time | first paying pilot |
-| 4 | Scale and reach | as pilots require | — |
-<!-- Omi's Comment: These estimates are optimistic for a "finished product" standard. 1A alone lists payment methods, pay-outs, shift handover, variants, modifiers, per-branch prices, barcodes, stock-out reasons — that's not 12-18 days of polished, tested, accessible, bilingual work. Be honest about this: either the scope per phase needs trimming (ship a subset, then iterate), or the estimates need doubling. I'd rather have realistic estimates and know the true timeline than hit week 3 of 1A and realize we're 40% done. Also: these estimates don't include any of the new items from my comments (error UX standards, a11y, printing, module marketplace, etc.). Those need their own line items or the estimates are meaningless. -->
+v1 sized this plan at roughly 70–110 days. The owner is right that this was optimistic: it
+assumed skeleton depth per item, and it left out the standards (errors, accessibility,
+performance, printing), the marketplace, migration, compliance and everything the review
+added. Below, each item is re-sized for a **finished-product standard** in the same units as
+v1: focused developer-days with AI help, including tests, both languages, documentation and
+the owner's review loop.
+
+### 13.2 Sizes
+
+| Area | Items | Days |
+|---|---|---|
+| **Phase 0** | 0.1–0.12 | 6–10 |
+| **Foundations** | marketplace and rules 10–15 · Business setup and interface mode 12–18 · access engine and approvals 20–30 · shared standards components (errors, jobs, print, widgets, languages, flags) 15–25 | 57–88 |
+| **Modules: money** | Point of Sale 25–35 · Sales 8–12 · Expenses 10–15 · CRM 15–25 · Purchasing 10–15 · Inventory 20–30 · Books 20–30 | 108–162 |
+| **Modules: people** | People 12–18 · Attendance (with kiosk) 15–25 · Leave 10–15 · Payroll (with compliance) 25–40 | 62–98 |
+| **Modules: work** | Projects & Tasks 15–20 · Communication 6–10 · Documents 8–12 · Assets 8–12 | 37–54 |
+| **Modules: seeing and running** | Home 12–18 · Reports 15–25 · Automations 8–12 · Notifications 5–8 · Sign-up, demo, help, site 12–18 | 52–81 |
+| **Phase 2 journeys** | six stages + four life events, connections, growth and shrink paths | 35–55 |
+| **Groups of companies** | §7.7 | 15–25 |
+| **Access screens and model** | §8 (beyond the engine) | 10–15 |
+| **Assistant track** | §9 | 25–40 |
+| **Cross-cutting** | migration 15–25 · compliance 15–25 · backups/portability 6–10 · multi-currency 15–25 · API extension 10–15 · observability 8–12 · WhatsApp/SMS 10–15 · each private integration 10–20 | 89–147 |
+| **Phase 3** | deploy, pilots setup, billing, legal follow-ups (calendar time for reviews extra) | 15–25 |
+| **Total** | | **≈ 510–800 days** |
+
+### 13.3 What that means in calendar time
+
+At v1's estimating standard, that's two to three years for one developer. In practice the
+first build (planned at ~150 days) was written in about six days of AI sessions, but to
+skeleton depth. Depth work is limited less by typing code than by: understanding real use,
+the owner's reviews, testing on real phones, legal and tax checks, and pilots' feedback.
+
+A realistic expectation, assuming the owner reviews within two days and sessions run most
+days: **Phase 0 and Foundations in 4–6 weeks; the money and people modules in 3–4 months;
+work, seeing-and-running and Phase 2 in another 3–4 months; with the cross-cutting tracks
+alongside — roughly 8–12 months to a finished product ready for paid launch.** Pilots should
+start much earlier: after Foundations plus the money modules (about 3 months), on feature
+flags, because real use is the best test there is.
+
+To go faster without cutting the standard: run independent modules in parallel AI sessions
+(separate worktrees, one module each), keep owner reviews short and frequent, and let pilots
+reorder priorities.
+
+### 13.4 Checkpoints (the owner walks each)
+
+| After | Walk |
+|---|---|
+| Phase 0 | the gap register, configuration audit and screenshots |
+| Foundations | enable/disable modules, change preset, set up a business, add five people with different access, "view as" each |
+| Money modules | a tea stall's day and a grocery's month on a phone, in Bangla |
+| People modules | a month of payroll for a 10-person shop with daily wages, and a statutory register |
+| Work and seeing | an agency's week; Home and Reports for each persona; the assistant answering 30 questions |
+| Phase 2 | each stage and life event end to end, including closing a business |
 
 **Rules that carry over:** English and Bangla everywhere; logic in services; modules never
-import the AI layer; every route declares access; every tenant table has RLS; the public site
-only claims what's built; `scripts/check.sh` before every push; commits as the owner, no AI
-co-author lines.
+import the AI layer; every route declares access; every tenant table has row-level security;
+the public site only claims what's built; `scripts/check.sh` before every push; commits as
+the owner with no AI co-author lines.
 
-**New rules:**
-- No screen is "done" without its scenarios and exit criteria (1.3).
-- Every link between modules is visible in both directions.
-- Nothing a real business would change stays hard-coded; it gets a home in Business setup.
-- Every number on screen can be explained (a link to where it came from).
+**New rules:** no module is done without its exit criteria (§3.3); modules work standalone
+and connected; every connection is visible in both directions; nothing a business would
+change stays hard-coded; every number is explainable; new work ships behind a flag.
 
 ---
 
-## 9. Decisions the owner needs to make
+## 14. Decisions: made and still open
 
-Answer these in this file (write under each) before or during Phase 1.
+### 14.1 Made by the owner (6 October)
 
-1. **Order of Phase 1 clusters**: is 1A (shop) → 1B (people) → 1C (work) → 1D → 1E right, or
-   should offices (1B/1C) come first for the agency market chosen in §2.0 of the first plan?
-   <!-- Omi's Comment: If i'm being honest, both are very important to me. there shouldn't be like a linear progression. like a shop owner might also need HR features for his shop, and a factory worker might also need some retail features. In the end, it needs to be highly customizable for everyone's business. think of it as, "Adding modules to my company". If i wanna keep stock, i'll add the stock module. If i wanna keep employees, i'll add the employees module. etc etc. The "Tea shop", "Office" etc are just presets. The main goal is to let the user choose what features they want for their business. -->
-2. **Payment methods at the till**: recorded methods only (cash, bKash, Nagad, card, bank)
-   for now, real integrations in Phase 4?
-   <!-- Omi's Comment: I want to probably add something like a bkash api or a bank api, but honestly getting access for those things are hard. If i ever set up this, for the first few companies, i might set it up just for them privately. So while we are making this as a saas, do give me some notes on how to pull some strings and code to make it just for one company in the future.  -->
-3. **Daily wages paid from the till**: payroll items (proper) or expenses (simple), or a
-   choice per business?
-  <!-- Omi's Comment: Here, i think, payroll is important to keep track of expenses. But lets just say. we should think like this, if anything CAN be a module, it is a module. So if an owner wants payroll, they SELECt payroll. if they select expenses/till, they select them. On the preset, we'll say what modules are preloaded which they can enable/disable later. This gives the user control. 
-  
-  Something that is important worth noting here is, while we are thinking about the user journey and interconnectivity between each modules, we also need to make each module stand out enough so that they can also be used independently. OR, if there is a module that is useless without another module, they come together. There's a lot of thoguht that needs to go to these things. Modules in isolation MUST work well. But modules in connection with each other must work incredibly well too and must offer better than using them individually to give the tenannt owners an incentive. 
-   -->
-4. **Market purchases with drawer cash**: inventory purchases (cost per cup) or expenses
-   (simple), or a choice per item?
-   <!-- Omi's Comment: Both. I think there should be a module called "Marketplace", where the owner can select what they want to use. So essentially, the marketplace offers a list of modules they can add to their business. Some modules require other modules. such as if you want accounting, you first need a business. so on and so forth. Some modules might not be compatible with other modules, we have to make rules for those things.  
-   
-   So essentially, there should be some "base modules" that are free and always included in every business. These are: Users, Access, Business, and Home. 
-   Then there's the marketplace where they can add modules.  -->
-5. **B2B invoicing**: inside Customers, or its own module?
-   <!-- Omi's Comment: I think there should be an entire module dedicated to customers. We 
-   should call it "CRM". However, we are not doing any lead generation or wtv. I think it's important to understand the scope of things we are doing. While we will be making a somewhat crm, we are not making a full fledged crm. We are just making a module called "CRM" that will handle customers, transactions and payments and stuff like that.  -->
-6. **Expense claims** reimbursed via payroll, cash, or either?
-   <!-- Omi's Comment: Both. I think there should be a module called "Marketplace", where the owner can select what they want to use. So essentially, the marketplace offers a list of modules they can add to their business. Some modules require other modules. such as if you want accounting, you first need a business. so on and so forth. Some modules might not be compatible with other modules, we have to make rules for those things.  -->
-7. **Business type and stage change**: allowed any time? Who may do it (owner only)?
-   <!-- Omi's Comment: Allowed any time but they will be charged the one they were using for that month, they'll only start geetting charged for the new one the next month. Owner only. Can be multiple owners btw. -->
-8. **Interface mode**: keep simple/standard/advanced and make it real, or drop it?
-   <!-- Omi's Comment: Make it real.  -->
-9. **Plan changes before billing**: free during pilots, or manual approval by you?
-   <!-- Omi's Comment: free during pilots, somewhat like me making an invitation link for them. once we start the billing, i will integrate paddle or something so everyone can use it themselves. -->
-10. **Access model**: is the model in 5.1 what you meant? Anything missing (e.g. access by
-    time of day, by device, by IP for some people only)?
-    <!-- Omi's Comment: what? -->
-11. **Multi-entity groups**: Phase 2 or Phase 4?
-    <!-- Omi's Comment: as fast as possible. i'm not doing an mvp. i'm making a finished product. -->
-12. **Which pilot businesses** can you line up for Phase 3, and at which stage?
-    <!-- Omi's Comment: all. Any business that uses it will give us good data to work on our stuff. -->
+| # | Decision |
+|---|---|
+| 1 | No linear order by business type: everyone adds the modules they want; types are presets |
+| 2 | Payment methods recorded now; real bKash/bank integrations may be built privately for one client first (§10.9) |
+| 3 | If something can be a module, it's a module; payroll and expenses are separate modules the owner chooses; modules excellent alone and much better together |
+| 4 | A marketplace of modules with requires/conflicts rules; base modules always included: Users, Access, Business, Home |
+| 5 | Customers becomes **CRM**: customers, transactions, invoices and payments; no lead generation |
+| 6 | Expense claims can be reimbursed through payroll or cash (the business chooses) |
+| 7 | Preset/plan changes allowed any time by owners (several owners allowed); billed on the old plan for the current month, the new one from next month |
+| 8 | Interface mode: make it real |
+| 9 | Plan changes before billing: free for pilots through operator invitations; self-serve once billing exists |
+| 10 | Access works like Discord: personal overrides beat roles |
+| 11 | Groups of companies as soon as possible (Phase 2 core) |
+| 12 | Pilots: any business that will use it |
+| 13 | A finished product, not an MVP; the assistant is not optional and will become the main interface |
+
+### 14.2 Still open
+
+Write answers under each.
+
+1. **People as a module.** Make People (HR records) a marketplace module separate from Users
+   (who can sign in)? Proposed: yes (§1.2).
+2. **Merges and splits** in §1.4: split Purchasing from Inventory; Inventory without Point of
+   Sale; Announcements → Communication; Approvals into Access; Reports as a base framework.
+   Agree with each?
+3. **Access conditions** (§8.1 point 6: time of day, device, network per person): build them?
+4. **Pricing**: plan tiers (today) or per-module prices on top of a base plan? Both affect the
+   marketplace screen.
+5. **The assistant's cost**: included questions per plan (today), or unlimited on paid plans
+   with fair use, or the business's own key? Voice costs more than text.
+6. **Point of Sale details**: variants before per-branch prices? Owner drawings visible to
+   managers?
+7. **Kiosk sign-in**: PIN/QR on a shared tablet, workers' own phones with passkeys
+   (fingerprint), or both?
+8. **Demo mode**: read-only, or editable and reset every hour?
+9. **WhatsApp/SMS costs**: included per plan, credits, or passed through?
+10. **Multi-currency at launch** or after pilots?
+11. **A third language**: which, and when?
+12. **Who checks the legal tables** (tax slabs, minimum wages, labour registers, VAT): can you
+    arrange an adviser and a lawyer before payroll ships with tax on by default?
 
 ---
 
-## Appendix A — Known gaps found so far
+## Appendix A — Known gaps
 
-Verified in the code on 5 October unless marked **(verify)**.
+Verified in the code on 5–6 October unless marked **(verify)**. These seed `docs/gaps.md` in Phase 0.
 
 | # | Screen | Gap | Type |
 |---|---|---|---|
@@ -1076,6 +1755,18 @@ Verified in the code on 5 October unless marked **(verify)**.
 | A23 | Tasks | No recurring tasks, time logs, dependencies, budgets or clients | missing feature |
 | A24 | Announcements / Documents | No scheduling, expiry, must-acknowledge notices, folders, templates or private per-person documents | missing feature |
 | A20 | Settings | `.env` with an empty `PLATFORM_OPERATORS` crashed start-up; fixed 5 Oct | bug (fixed) |
+| A25 | Access | Approvals are a separate inbox for two request types, not an engine every module uses | missing feature |
+| A26 | Inventory | Requires Sales & POS; a warehouse can't track stock without a till | wrong default |
+| A27 | People | Every member gets a People profile automatically, mixing "who signs in" with "HR records" | design question |
+| A28 | Platform | No feature flags to ship to pilots first | missing feature |
+| A29 | All | No error catalogue; errors are toasts that disappear | confusing UX |
+| A30 | Till | Offline sales queue in `localStorage`; no visible queue to send or discard | bug risk |
+| A31 | Platform | Outbox events that fail 8 times stay undelivered with no dead-letter view or alert | missing feature |
+| A32 | Money | Single currency per business; no transaction currency or exchange rates | missing feature |
+| A33 | Payroll | Salary tax off by default; no statutory registers, minimum-wage or overtime-cap checks | missing feature |
+| A34 | Sign-up | No demo mode; trying the product requires signing up | missing feature |
+| A35 | Books | Posted entries are reversed, not edited, by convention in the services; the database does not enforce it (journal tables are ordinary tenant tables, not append-only) | compliance risk |
+| A36 | Home | No widgets, quick actions or layout per person | missing feature |
 
 ## Appendix B — Personas used throughout
 
@@ -1088,55 +1779,7 @@ Verified in the code on 5 October unless marked **(verify)**.
 | **Farhana**, HR manager | 30-person agency, Gulshan | laptop | English | leave, payroll, onboarding, documents, approvals |
 | **Arif**, team lead | same agency | phone | English | tasks, approvals for his team only |
 | **Mr. Chowdhury**, CFO | group of 3 companies, 900 people | laptop | English | consolidated books, strict access, SSO, audits |
+| **Shirin**, owner | seasonal clothing stall, Eid pop-ups | phone | Bangla | temporary branch and staff, big stock on credit, season report |
+| **Jahanara**, sewing operator | garment factory, 800 workers | none; kiosk at the gate | Bangla, low literacy | clocks in with a card or PIN; payslip read aloud by the assistant |
+| **Mr. Haque**, external auditor | audits Mr. Chowdhury's group | laptop | English | time-limited read-only access; journal and registers export |
 
-
-
- <!-- Omi's Comment: A few more things. I like this next plan. But i think you're underestimating the idea of a finished product. 
- 1. It needs to work end to end. All edge cases must be handled, all error or unhappy cases must be handled.
- 2. What's the point of a module if it's not the best at what it does? The modules must be incredibly good at what they do individually. And when they add multiple modules, there needs to be such good synchronization that it incetivizes them to buy all the modules. You have full freedom to think of the modules anew. If you think you can merge two/more modules together and it'd be better, do it. If you think you need to add a new module to make the experience better, do it. 
- 3. Ai isn't necessarily optional, because in the end ofthe day, i want the owner to mostly talk to a chatbot to know about most stuff. That is a future very far from what our existing junk is :P. but i think with some patience we will make it great. 
-
- 
- 
- 
-  -->
-
-<!-- Omi's Comment: ADDITIONAL THINGS TO ADD TO THE PLAN
-
-1. Error Handling & Unhappy-Path UX — The plan covers data edge cases thoroughly but says nothing about what users SEE when things go wrong. We need a section on error UX standards: when to use toast vs inline vs blocking errors, retry vs discard flows, what happens when something partially fails (e.g. payroll half-posted when the server dies), undo/rollback affordances, and graceful degradation. Every screen should follow the same pattern, not invent its own.
-
-2. Data Migration & Onboarding from Existing Systems — Sign-up mentions "import from Excel" for items and people, but real businesses switching from paper or other software need much more: opening balances for books, inventory, customer dues, supplier dues, leave balances, and advance balances. There should be a cutover checklist per stage and possibly a "parallel run" period where they compare old and new. This is barely touched.
-
-3. Audit Trail & Compliance — Beyond the audit log that already exists, we need: immutability of financial records (no hard deletes of posted transactions), audit export formats for external auditors at S4/S5, change history on sensitive fields (salary changes, permission changes), and regulatory requirements (Bangladesh labour law reporting, digital commerce act). For a finished product, this matters.
-
-4. Backup, Disaster Recovery & Data Sovereignty — No mention of tenant data backup strategy, point-in-time recovery, or what happens if a tenant wants to leave (full data export in a portable format). The plan mentions "workspace restored from export" as an edge case but doesn't describe the export/import as a proper feature.
-
-5. Module Dependency Graph & the "Marketplace" Concept — My earlier comments say "modules should be independent but better together" and mention a Marketplace. The plan needs to formalize this with a dependency graph. For example: Payroll requires People, Inventory requires Sales or can be standalone, Books is auto-enabled when 2+ money modules are active. This needs its own section with explicit rules: required-by, enhances, conflicts-with, and what "standalone mode" means for each module. Base modules that are always included: Users, Access, Business, and Home.
-
-6. Downgrade & Business Failure Path — The plan only covers growth (S0→S5) but not the reverse. A business shrinking, losing staff, closing branches, dropping modules. What happens to the data? Do reports still work for historical periods when a module was active? Can they re-enable later and pick up where they left off? This is the inverse of section 4.6 and needs equal thought.
-
-7. Multi-Currency — Barely mentioned (one line about "currency of a foreign purchase"). For S5 groups with branches abroad, or even a Dhaka shop buying imported goods, this needs real design: per-branch currency, exchange rates, reporting currency, currency on journal entries.
-
-8. API & Developer Platform — S5 mentions "API" and "developer platform" in passing but there's no real section. We need: public API design (REST? versioning? rate limits?), webhooks for external systems, API key scoping (which modules, which branches), and documentation. If Mr. Chowdhury's group exports data nightly to a BI tool, the API needs to be properly designed.
-
-9. Performance & Observability in Production — Phase 4 mentions "stored daily totals" and "partitioning" but nothing about: monitoring and alerting (how do we know the system is slow?), SLAs we promise tenants, query performance budgets per page, or tenant isolation under load (one big tenant shouldn't slow others down).
-
-10. Accessibility (a11y) — Not mentioned once in the plan. Screen readers, keyboard navigation, colour contrast, ARIA labels. Especially important for Karim who "reads slowly" and uses a small phone. Bangladesh has users with visual impairments too. This should be a standard applied to every screen.
-
-11. Localization Beyond Bangla/English — The plan hardcodes two languages. If this is a SaaS, the architecture should support N languages even if we ship with 2. Think about Chittagonian, Sylheti, or Hindi/Urdu for garment factories with migrant workers.
-
-12. Tenant-to-Tenant Isolation Testing — RLS is mentioned as a rule, but there's no testing strategy for it. We need negative tests that verify tenant A CANNOT see tenant B's data even through AI queries, reports, exports, or error messages. This should be part of the standard test suite.
-
-13. Versioning & Feature Flags — How do we ship a half-finished module to pilots without exposing it to everyone? How do we A/B test a new Home layout? No mention of feature flags, canary releases, or staged rollouts. We need this before pilots start.
-
-14. The Chatbot / AI Assistant as a First-Class Interface — I said I want owners to "mostly talk to a chatbot." The plan treats AI as one screen (1D.3). If conversational AI is the primary interface for many users, it needs its own track: what actions can the AI take (not just read), confirmation flows before the AI does something, undo via chat, context across conversations, and how the AI handles permissions (it should never show data the user can't see).
-
-UNDERWEIGHTED AREAS TO EXPAND:
-
-15. Frontend Testing Strategy — Scenario tests are API-heavy. Playwright is mentioned once for screenshots, not for interaction testing. We need real browser interaction tests for every critical flow, not just screenshots.
-
-16. WhatsApp as a Channel — Mentioned for reminders and payslips but not designed. WhatsApp Business API has strict template approval rules, session windows, and costs. This deserves its own sub-section with what templates we need, cost model, and fallback to SMS.
-
-17. Printing — 58mm/80mm receipts, payslips, invoices, reports. Real businesses print A LOT. Only one line about receipt width in the whole plan. We need a printing standards section: what prints, on what paper sizes, in what language, with what branding, and how to preview before printing.
-
--->
