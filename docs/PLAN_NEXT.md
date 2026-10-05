@@ -91,6 +91,8 @@ planned is **how a real business lives in the product**:
 | Sign-up: mobile-first, "what else can you do", demo mode without signing up | §6 Sign-up |
 | Missing stages: seasonal, pivot, closure, downsizing | §7.3, §7.6 |
 | Access like Discord: personal overrides beat the role | §8.1 |
+| A person can hold several roles | §8.1 point 1 (each role with its own scope) |
+| Branding: logo, banner and customization per business | §5.5 |
 | "Access by time/device/IP — what?" | explained in §8.1 (6) and §14.2 |
 | Estimates are optimistic; new standards need line items | §13 (re-estimated, roughly 2.5×) |
 | bKash/bank APIs for one company privately | §10.9 |
@@ -452,6 +454,55 @@ Built early because every module's permissions depend on it; full design in §8.
 
 Errors (§2.1), jobs with progress, print preview and layouts (§2.4), widgets for Home, the
 explain-this-number link (§2.7), language registry (§2.5), feature flags (§4 0.10).
+
+### 5.5 Branding and customization
+
+Every business should feel the product is *theirs*. Today there's none of this: no logo, no
+banner; the accent colour is a per-device preference, not the business's.
+
+(Not to be confused with the **Assets** module, which is equipment. Brand files live in the
+Business base module, under Business setup → *Your brand*.)
+
+**Brand**
+- **Logo** (square and wide versions), **banner/cover image**, **brand colour** chosen from
+  palettes that stay readable in light and dark mode (contrast checked automatically, as
+  today's accents are), business name in English and Bangla, tagline.
+- Where it appears: the app header and sign-in page for the business's staff, Home's banner,
+  the installable app's icon and splash screen (PWA), receipts, invoices, quotes, payslips,
+  statements, purchase orders, reports, emails, WhatsApp templates (where allowed), join links
+  and QR cards, the demo-free public business card (`/v1/public/workspace` exists today).
+- **Per-branch overrides**: a branch's own address, phone, receipt footer, or sub-brand (a
+  group running "Cha Ghor" and "Cha Ghor Express").
+- Files: images checked by content and size, resized into the sizes each place needs, stored
+  in R2 (not the database), served from the business's address.
+
+**Documents and messages**
+- **Templates** for receipts (58/80 mm), invoices, quotes, payslips, letters (offer,
+  appointment, experience), statements: choose a layout, show/hide fields, header and footer
+  text in both languages, terms and notes, signature images.
+- **Numbering series**: prefixes and sequences per branch and year (INV-GUL-2026-0001).
+- **Email sender name** and reply-to per business; branded email layout.
+
+**The words and the shape of the business**
+- **Custom labels**: rename things in the business's own words ("Outlets" for branches,
+  "Members" for employees, "Shift" for drawer session), in both languages.
+- **Custom fields** on people, customers, suppliers, items, assets, projects (text, number, date,
+  choice, file), usable in filters, reports, imports, templates and the assistant.
+- **Custom lists**: categories, reasons (void, wastage, leave), tags.
+- **Default views**: column choices and sorting per list, saved per person or pushed by owners.
+
+**Addresses and white-label (by plan)**
+- The business's own address `<slug>.companymgmt.app` (reserved and checked today; needs
+  wildcard DNS) with its logo on the sign-in page.
+- **Custom domain** (`hr.theircompany.com`) and **white-label** (no CompanyMgmt branding in
+  the app, emails and documents) for higher plans — a pricing decision (§14.2).
+
+**Edge cases.** A huge or transparent logo; a logo with text that's unreadable in dark mode; a
+brand colour too light for contrast (offer the nearest accessible shade); a Bangla business
+name longer than the receipt width; changing the logo after 10,000 receipts (old receipts
+reprint with the logo they were issued with? decision: reprints show the logo at the time,
+stored per document); a banner on a 360 px phone; a branch sub-brand inside a group; custom
+labels that collide with built-in words; custom fields deleted while used in a report.
 
 ---
 
@@ -1351,8 +1402,19 @@ The owner wants this as soon as possible. Design:
 **Effective access = the person's roles, then their personal overrides on top, within scopes,
 under limits and conditions.**
 
-1. **Several roles per person**, combined (Discord-style): Karim can be *Cashier* and *Stock
-   keeper*; he gets everything either role allows.
+1. **Several roles per person** (owner's decision), combined Discord-style. Karim can be
+   *Cashier* **and** *Stock keeper*; he gets everything either role allows.
+   - **Each role assignment can carry its own scope**: Rina is *Manager* at Banani and
+     *Cashier* at Gulshan; she approves refunds at Banani but only sells at Gulshan.
+   - **Roles add up; they never take away.** Only a personal *deny* (point 2) removes
+     something a role grants, so giving someone an extra role can't silently reduce their access.
+   - **Limits from several roles**: the highest applies (a role allowing refunds up to ৳2,000 and
+     another up to ৳5,000 gives ৳5,000), unless a personal limit is set.
+   - **Shown clearly**: the member's page lists their roles with each role's scope, and every
+     permission says which role (or personal setting) it comes from.
+   - **Templates combine**: "Cashier + Stock keeper" can be saved as a quick preset for inviting.
+   - **Owner is a role too**: a business can have several owners (supported today); "owner" can
+     be combined with nothing else because it already includes everything.
 2. **Personal overrides beat roles.** For any permission, a person can be set to *allow*,
    *deny* or *inherit* (from roles). Order of evaluation:
    1. Owners have everything (the last owner can't be removed).
@@ -1399,7 +1461,7 @@ under limits and conditions.**
 
 - An evaluator `can(ctx, permission, resource)` replaces `catalog.resolve()` and the single
   `scope_department_id`; services ask about a resource (this sale, this branch, this person).
-- Tables: `member_roles` (many), `member_overrides` (permission, allow/deny, scope, limit,
+- Tables: `member_roles` (a person's roles, each with an optional scope), `member_overrides` (permission, allow/deny, scope, limit,
   conditions, valid from/to), `field_policies`, `delegations`.
 - Branch scope needs a branch on every relevant record (missing today on customers).
 - Existing members migrate unchanged (one role, no overrides behaves exactly as today).
@@ -1625,7 +1687,7 @@ the owner's review loop.
 | Area | Items | Days |
 |---|---|---|
 | **Phase 0** | 0.1–0.12 | 6–10 |
-| **Foundations** | marketplace and rules 10–15 · Business setup and interface mode 12–18 · access engine and approvals 20–30 · shared standards components (errors, jobs, print, widgets, languages, flags) 15–25 | 57–88 |
+| **Foundations** | marketplace and rules 10–15 · Business setup and interface mode 12–18 · access engine with multiple roles and approvals 22–32 · shared standards components (errors, jobs, print, widgets, languages, flags) 15–25 · branding and customization (brand, templates, labels, custom fields) 15–22 | 74–112 |
 | **Modules: money** | Point of Sale 25–35 · Sales 8–12 · Expenses 10–15 · CRM 15–25 · Purchasing 10–15 · Inventory 20–30 · Books 20–30 | 108–162 |
 | **Modules: people** | People 12–18 · Attendance (with kiosk) 15–25 · Leave 10–15 · Payroll (with compliance) 25–40 | 62–98 |
 | **Modules: work** | Projects & Tasks 15–20 · Communication 6–10 · Documents 8–12 · Assets 8–12 | 37–54 |
@@ -1636,7 +1698,7 @@ the owner's review loop.
 | **Assistant track** | §9 | 25–40 |
 | **Cross-cutting** | migration 15–25 · compliance 15–25 · backups/portability 6–10 · multi-currency 15–25 · API extension 10–15 · observability 8–12 · WhatsApp/SMS 10–15 · each private integration 10–20 | 89–147 |
 | **Phase 3** | deploy, pilots setup, billing, legal follow-ups (calendar time for reviews extra) | 15–25 |
-| **Total** | | **≈ 510–800 days** |
+| **Total** | | **≈ 530–825 days** |
 
 ### 13.3 What that means in calendar time
 
@@ -1697,6 +1759,8 @@ change stays hard-coded; every number is explainable; new work ships behind a fl
 | 11 | Groups of companies as soon as possible (Phase 2 core) |
 | 12 | Pilots: any business that will use it |
 | 13 | A finished product, not an MVP; the assistant is not optional and will become the main interface |
+| 14 | A person can hold several roles; roles add up, personal overrides beat them |
+| 15 | Each business can brand and customise its workspace (logo, banner, colours, documents, labels, fields) |
 
 ### 14.2 Still open
 
@@ -1722,6 +1786,8 @@ Write answers under each.
 11. **A third language**: which, and when?
 12. **Who checks the legal tables** (tax slabs, minimum wages, labour registers, VAT): can you
     arrange an adviser and a lawyer before payroll ships with tax on by default?
+13. **Custom domains and white-label**: which plans include them? (Custom fields and branding
+    are proposed for every plan.)
 
 ---
 
@@ -1767,6 +1833,8 @@ Verified in the code on 5–6 October unless marked **(verify)**. These seed `do
 | A34 | Sign-up | No demo mode; trying the product requires signing up | missing feature |
 | A35 | Books | Posted entries are reversed, not edited, by convention in the services; the database does not enforce it (journal tables are ordinary tenant tables, not append-only) | compliance risk |
 | A36 | Home | No widgets, quick actions or layout per person | missing feature |
+| A37 | Business | No branding (logo, banner, brand colour), document templates, numbering series, custom labels or custom fields | missing feature |
+| A38 | Access | One role per member | missing feature |
 
 ## Appendix B — Personas used throughout
 
