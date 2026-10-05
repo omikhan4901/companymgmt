@@ -1,0 +1,16 @@
+{
+  "name": "@companymgmt/sdk",
+  "version": "0.1.0",
+  "description": "Client for the CompanyMgmt API: keys, retries with idempotency keys, pagination and webhook verification.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --experimental-strip-types src/index.test.ts"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}

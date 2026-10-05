@@ -17,6 +17,8 @@ if [ -f "$root/api/pyproject.toml" ]; then
   step "api: migrations in sync with models"
   uv run alembic upgrade head >/dev/null
   uv run alembic check
+  step "api: public API contract (no breaking changes)"
+  uv run python -m scripts.api_contract check
   step "api: tests"
   uv run pytest -q
 fi

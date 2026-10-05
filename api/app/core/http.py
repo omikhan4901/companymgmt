@@ -63,3 +63,23 @@ async def read_body(request: Request, limit: int, *, message: str, code: str) ->
             raise Invalid(message, code=code)
         chunks.append(chunk)
     return b"".join(chunks)
+
+
+def deprecated(sunset: str, successor: str | None = None) -> Any:
+    """A route dependency marking an operation as on its way out: clients see
+    `Deprecation: true`, `Sunset: <date>` and, when there is one, a `Link` to the
+    replacement (RFC 8594). Keep it working until the sunset date (docs/api/README.md)."""
+    from datetime import date
+
+    from fastapi import Response as _Response
+
+    day = date.fromisoformat(sunset)
+    http_date = day.strftime("%a, %d %b %Y 00:00:00 GMT")
+
+    async def mark(response: _Response) -> None:
+        response.headers["Deprecation"] = "true"
+        response.headers["Sunset"] = http_date
+        if successor:
+            response.headers["Link"] = f'<{successor}>; rel="successor-version"'
+
+    return mark

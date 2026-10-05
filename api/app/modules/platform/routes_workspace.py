@@ -517,6 +517,12 @@ def _member_query() -> Select[Membership, User, Role]:
     )
 
 
+@router.get("/members/{member_id}", response_model=MemberOut)
+async def get_member(member_id: uuid.UUID, ctx: Ctx = Depends(allow(MEMBERS_VIEW))) -> MemberOut:
+    member, user, role = await _load_member(ctx, member_id)
+    return _member_out(member, user, role)
+
+
 @router.get("/members", response_model=Page[MemberOut])
 async def list_members(
     ctx: Ctx = Depends(allow(MEMBERS_VIEW)),

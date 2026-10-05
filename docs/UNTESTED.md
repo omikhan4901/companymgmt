@@ -143,3 +143,8 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   `memberships.external_id`, `POST /v1/workspace/sandbox` (`tenants.sandbox_of`, same
   plan, never billed), migration 0025. `tests/test_scim.py` **run once and passed (4)**.
   Not tried against a real Okta/Entra app; SCIM doesn't check the plan's people limit.
+- [ ] **API contract, SDKs, developer docs.** `api/scripts/api_contract.py` + snapshot
+  `docs/api/openapi-v1.json` (step in `check.sh`), `http.deprecated()` helper (unused so
+  far), `GET /v1/members/{id}`, `docs/api/README.md`, `sdk/typescript`, `sdk/python`.
+  Contract tests and both SDKs' unit tests **were run and pass**; the SDKs were never
+  pointed at a running server.
