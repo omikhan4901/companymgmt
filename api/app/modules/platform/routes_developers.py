@@ -19,7 +19,7 @@ from fastapi import APIRouter, Depends, Query, Response
 from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import func, select
 
-from app.core import audit, context, ipnet
+from app.core import audit, context, ipnet, ratelimit
 from app.core import permissions as perms
 from app.core.errors import Conflict, Forbidden, Invalid, NotFound, PaymentRequired
 from app.core.schema import In
@@ -34,6 +34,7 @@ from app.modules.platform.models import ApiKey, ApiKeyUsage, Membership, Subscri
 router = APIRouter(prefix="/v1", tags=["developers"])
 
 KEY_DAYS_MAX = 730
+KEY_RULE = ratelimit.Rule("api-key-create", 30, 3600)
 GRACE_HOURS_MAX = 168
 
 
@@ -185,6 +186,7 @@ async def list_keys(ctx: Ctx = Developer) -> list[ApiKeyOut]:
 @router.post("/api-keys", response_model=ApiKeyOut, status_code=201)
 async def create_key(body: ApiKeyIn, ctx: Ctx = Developer) -> ApiKeyOut:
     assert ctx.membership is not None
+    await ratelimit.enforce(KEY_RULE, str(ctx.tenant_id))
     granted = _check_permissions(ctx, body.permissions)
     token, secret = _token(ctx.tenant_id)
     key = ApiKey(

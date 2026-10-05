@@ -10,7 +10,7 @@ from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy import select
 
-from app.core import audit
+from app.core import audit, ratelimit
 from app.core.errors import Invalid, NotFound
 from app.core.http import check_if_match
 from app.core.ids import uuid7
@@ -23,6 +23,8 @@ from app.modules.platform.routes_developers import Developer
 from app.modules.platform.webhooks import PING, PUBLIC_EVENTS, UnsafeAddress
 
 router = APIRouter(prefix="/v1/webhooks", tags=["developers"])
+# Sends on demand (test, resend) per workspace: enough for debugging, not for flooding.
+SEND_RULE = ratelimit.Rule("webhook-send", 60, 3600)
 
 MAX_ENDPOINTS = 20
 
@@ -214,6 +216,7 @@ def _delivery_out(d: WebhookDelivery) -> DeliveryOut:
 @router.post("/{endpoint_id}/test", response_model=DeliveryOut)
 async def send_test(endpoint_id: uuid.UUID, ctx: Ctx = Developer) -> DeliveryOut:
     """Send a `ping` now and show what came back."""
+    await ratelimit.enforce(SEND_RULE, str(ctx.tenant_id))
     endpoint = await _load(ctx, endpoint_id)
     payload = {
         "id": str(uuid7()),
@@ -251,6 +254,7 @@ async def list_deliveries(
 @router.post("/deliveries/{delivery_id}/resend", response_model=DeliveryOut)
 async def resend(delivery_id: uuid.UUID, ctx: Ctx = Developer) -> DeliveryOut:
     """Send the same event again now (same event id, so receivers can tell it's a repeat)."""
+    await ratelimit.enforce(SEND_RULE, str(ctx.tenant_id))
     original = await ctx.db.get(WebhookDelivery, delivery_id)
     if original is None:
         raise NotFound()

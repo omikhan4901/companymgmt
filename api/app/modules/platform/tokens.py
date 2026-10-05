@@ -62,6 +62,7 @@ async def start_session(
 ) -> Issued:
     settings = get_settings()
     info = context.current()
+    await _alert_new_device(db, user, info.ip, info.user_agent, method)
     session = AuthSession(
         user_id=user.id,
         tenant_id=tenant_id,
@@ -78,6 +79,82 @@ async def start_session(
     access, expires = create_access_token(user.id, session.id, tenant_id)
     log_event(db, user.id, "session.started", session=session.id, mfa=mfa, method=method)
     return Issued(access, expires, refresh, session)
+
+
+KNOWN_DEVICE_DAYS = 180
+
+
+def device_label(user_agent: str | None) -> str:
+    """A short, human description of a browser ("Chrome on Windows")."""
+    ua = user_agent or ""
+    browser = next(
+        (
+            name
+            for key, name in (
+                ("Edg/", "Edge"),
+                ("OPR/", "Opera"),
+                ("Firefox/", "Firefox"),
+                ("Chrome/", "Chrome"),
+                ("Safari/", "Safari"),
+            )
+            if key in ua
+        ),
+        "A browser",
+    )
+    system = next(
+        (
+            name
+            for key, name in (
+                ("iPhone", "iPhone"),
+                ("iPad", "iPad"),
+                ("Android", "Android"),
+                ("Mac OS X", "macOS"),
+                ("Windows", "Windows"),
+                ("Linux", "Linux"),
+            )
+            if key in ua
+        ),
+        "an unknown system",
+    )
+    return f"{browser} on {system}"
+
+
+async def _alert_new_device(
+    db: AsyncSession, user: User, ip: str | None, user_agent: str | None, method: str
+) -> None:
+    """Email people when their account is opened from a browser it hasn't seen for half a
+    year (not on their very first sign-in, and not for till PIN unlocks)."""
+    if not user.email or method == "pin":
+        return
+    since = now() - timedelta(days=KNOWN_DEVICE_DAYS)
+    seen_before = await db.scalar(
+        select(AuthSession.id).where(AuthSession.user_id == user.id, AuthSession.created_at >= since).limit(1)
+    )
+    if seen_before is None:
+        return
+    known = await db.scalar(
+        select(AuthSession.id)
+        .where(
+            AuthSession.user_id == user.id,
+            AuthSession.created_at >= since,
+            AuthSession.user_agent == ((user_agent or "")[:300] or None),
+        )
+        .limit(1)
+    )
+    if known is not None:
+        return
+    emails.send(
+        db,
+        "new_signin",
+        user.email,
+        user.locale,
+        name=user.name,
+        device=device_label(user_agent),
+        ip=ip or "unknown",
+        when=now().strftime("%Y-%m-%d %H:%M"),
+        link=emails.link("/app/account"),
+    )
+    log_event(db, user.id, "login.new_device", ip=ip)
 
 
 def access_for(session: AuthSession) -> tuple[str, datetime]:

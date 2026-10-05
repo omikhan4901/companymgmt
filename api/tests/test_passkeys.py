@@ -140,3 +140,23 @@ async def test_bad_answers_are_refused(client: httpx.AsyncClient) -> None:
 
     # Unknown keys are refused.
     assert (await sign_in(client, Authenticator())).status_code == 401
+
+
+async def test_new_devices_are_reported_by_email(client: httpx.AsyncClient) -> None:
+    from app.core import email, outbox
+
+    owner = await signup(client)
+    email.sent.clear()
+    same = await client.post("/v1/auth/login", json={"email": owner.email, "password": owner.password})
+    assert same.status_code == 200
+    await outbox.dispatch()
+    assert not [m for m in email.sent if "New sign-in" in m.subject]
+    other = await client.post(
+        "/v1/auth/login",
+        json={"email": owner.email, "password": owner.password},
+        headers={"user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0) Safari/604.1"},
+    )
+    assert other.status_code == 200
+    await outbox.dispatch()
+    [alert] = [m for m in email.sent if "New sign-in" in m.subject]
+    assert "Safari on iPhone" in alert.text

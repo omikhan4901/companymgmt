@@ -11,6 +11,16 @@ from app.core.config import get_settings
 from app.core.email import Mail, as_payload
 
 _T: dict[str, dict[str, tuple[str, str]]] = {
+    "new_signin": {
+        "en": (
+            "New sign-in to your CompanyMgmt account",
+            "Hi {name},\n\nYour account was just signed in to from a device we haven't seen before:\n\n{device}\nAddress: {ip}\nWhen: {when} (UTC)\n\nIf this was you, there's nothing to do. If it wasn't, sign out of all devices and change your password now:\n{link}",
+        ),
+        "bn": (
+            "আপনার CompanyMgmt অ্যাকাউন্টে নতুন সাইন-ইন",
+            "প্রিয় {name},\n\nআগে দেখা হয়নি এমন একটি ডিভাইস থেকে এইমাত্র আপনার অ্যাকাউন্টে সাইন ইন করা হয়েছে:\n\n{device}\nঠিকানা: {ip}\nসময়: {when} (UTC)\n\nআপনি করে থাকলে কিছু করতে হবে না। না করে থাকলে এখনই সব ডিভাইস থেকে সাইন আউট করে পাসওয়ার্ড বদলান:\n{link}",
+        ),
+    },
     "verify": {
         "en": (
             "Confirm your email",
