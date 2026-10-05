@@ -94,7 +94,7 @@ planned is **how a real business lives in the product**:
 | A person can hold several roles | §8.1 point 1 (each role with its own scope) |
 | Branding: logo, banner and customization per business | §5.5 |
 | "Access by time/device/IP — what?" | explained in §8.1 (6) and §14.2 |
-| Estimates are optimistic; new standards need line items | §13 (re-estimated, roughly 2.5×) |
+| Estimates are optimistic; new standards need line items | §13 (sized per item; real time in session-days) |
 | bKash/bank APIs for one company privately | §10.9 |
 | Business type change: any time, new plan billed from next month, owners only (several owners allowed) | §7.5, §14.1 |
 | Interface mode: make it real | §5.2 |
@@ -1673,16 +1673,21 @@ platform-wide feature, and without blocking the SaaS:
 
 ## 13. Honest estimates and checkpoints
 
-### 13.1 Why the v1 estimates were wrong
+### 13.1 Two different clocks
 
-v1 sized this plan at roughly 70–110 days. The owner is right that this was optimistic: it
-assumed skeleton depth per item, and it left out the standards (errors, accessibility,
-performance, printing), the marketplace, migration, compliance and everything the review
-added. Below, each item is re-sized for a **finished-product standard** in the same units as
-v1: focused developer-days with AI help, including tests, both languages, documentation and
-the owner's review loop.
+The first build shows the gap between "developer-days" and what actually happens here:
 
-### 13.2 Sizes
+- v1 estimated M1–M11 at **about 150–207 developer-days** (7–10 months for a person).
+- It was built in **4 working days of AI sessions** (30 Sep, 1 Oct, 4 Oct, 5 Oct in the commit
+  log) — roughly 40–50× faster than estimated, but to skeleton depth.
+
+So this plan uses two measures:
+
+- **Size** in developer-days (§13.2), useful only to compare items with each other and to
+  talk to anyone hiring human developers.
+- **Session-days**: days of AI build sessions, the real build time here (§13.3).
+
+### 13.2 Size of each area (developer-days, for comparison only)
 
 | Area | Items | Days |
 |---|---|---|
@@ -1700,23 +1705,49 @@ the owner's review loop.
 | **Phase 3** | deploy, pilots setup, billing, legal follow-ups (calendar time for reviews extra) | 15–25 |
 | **Total** | | **≈ 530–825 days** |
 
-### 13.3 What that means in calendar time
+### 13.3 Real time: session-days and calendar
 
-At v1's estimating standard, that's two to three years for one developer. In practice the
-first build (planned at ~150 days) was written in about six days of AI sessions, but to
-skeleton depth. Depth work is limited less by typing code than by: understanding real use,
-the owner's reviews, testing on real phones, legal and tax checks, and pilots' feedback.
+**Build time.** v1 ran about 40–50× faster than its developer-day estimate, at skeleton depth.
+This plan asks for much more per item: scenarios first, eleven edge-case axes, standards
+(errors, accessibility, performance, printing), both languages, browser tests, standalone and
+connected modes, and a walkthrough per persona. Assume depth work runs **3–5× slower per item
+than v1**, so roughly **10–15× faster than developer-days**:
 
-A realistic expectation, assuming the owner reviews within two days and sessions run most
-days: **Phase 0 and Foundations in 4–6 weeks; the money and people modules in 3–4 months;
-work, seeing-and-running and Phase 2 in another 3–4 months; with the cross-cutting tracks
-alongside — roughly 8–12 months to a finished product ready for paid launch.** Pilots should
-start much earlier: after Foundations plus the money modules (about 3 months), on feature
-flags, because real use is the best test there is.
+| Area | Developer-days | Session-days (estimate) |
+|---|---|---|
+| Phase 0 | 6–10 | 1 |
+| Foundations (marketplace, setup, access, standards, branding) | 74–112 | 6–10 |
+| Money modules | 108–162 | 8–14 |
+| People modules | 62–98 | 5–8 |
+| Work modules | 37–54 | 3–5 |
+| Seeing and running | 52–81 | 4–7 |
+| Phase 2 journeys, groups, access screens | 60–95 | 5–8 |
+| Assistant track | 25–40 | 2–4 |
+| Cross-cutting tracks | 89–147 | 7–12 |
+| Phase 3 (deploy, billing setup) | 15–25 | 2–3 |
+| **Total** | **≈ 530–825** | **≈ 43–72 session-days** |
 
-To go faster without cutting the standard: run independent modules in parallel AI sessions
-(separate worktrees, one module each), keep owner reviews short and frequent, and let pilots
-reorder priorities.
+That is **about 2–3½ months of sessions** at five session-days a week, if nothing else limits
+it.
+
+**What actually sets the calendar** isn't writing code:
+
+- **Usage limits**: sessions pause when the plan's limit is reached (it happened during v1).
+- **The owner's reviews**: each module has an owner checkpoint; a 2-day turnaround per
+  checkpoint adds weeks across ~20 modules unless reviews are batched.
+- **Real devices and real people**: testing on cheap Android phones, a thermal printer, a
+  shared tablet; pilots using it for weeks.
+- **Outside experts**: a tax adviser, labour lawyer and VAT consultant before payroll and
+  receipts can claim compliance; merchant accounts for payments.
+- **Usage that only time reveals**: a month-end, a payroll cycle, an Eid season.
+
+**Realistic calendar:** Foundations and the money modules in **3–5 weeks**; everything in
+Phases 1–2 and the tracks in **3–4 months**; pilots running from about week 5 on feature
+flags; paid launch once pilots have run at least one full month-end and payroll cycle and the
+legal checks are back.
+
+**Parallel sessions** can shorten build time further: independent modules (e.g. Payroll and
+CRM) in separate sessions and worktrees, merged through the same `scripts/check.sh` gate.
 
 ### 13.4 Checkpoints (the owner walks each)
 
