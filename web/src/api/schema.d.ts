@@ -5030,30 +5030,6 @@ export interface components {
             /** Status */
             status: string;
         };
-        /** CallbackIn */
-        CallbackIn: {
-            /** Code */
-            code: string;
-            /** State */
-            state: string;
-        };
-        /** CallbackOut */
-        CallbackOut: {
-            /** Access Token */
-            access_token: string;
-            /**
-             * Expires At
-             * Format: date-time
-             */
-            expires_at: string;
-            /** Next */
-            next?: string | null;
-            /**
-             * Token Type
-             * @default bearer
-             */
-            token_type: string;
-        };
         /** CategoryTotal */
         CategoryTotal: {
             /** Category Id */
@@ -8594,6 +8570,30 @@ export interface components {
             /** N */
             n: number;
         };
+        /** SsoCallbackIn */
+        SsoCallbackIn: {
+            /** Code */
+            code: string;
+            /** State */
+            state: string;
+        };
+        /** SsoCallbackOut */
+        SsoCallbackOut: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Next */
+            next?: string | null;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+        };
         /** SsoIn */
         SsoIn: {
             /**
@@ -8654,6 +8654,18 @@ export interface components {
             /** Redirect Uri */
             redirect_uri: string;
         };
+        /** SsoStartIn */
+        SsoStartIn: {
+            /** Next */
+            next?: string | null;
+            /** Workspace */
+            workspace: string;
+        };
+        /** SsoStartOut */
+        SsoStartOut: {
+            /** Url */
+            url: string;
+        };
         /** StaffIn */
         StaffIn: {
             /** Name */
@@ -8678,10 +8690,20 @@ export interface components {
             /** Workspace Code */
             workspace_code: string;
         };
-        /** StartOut */
-        StartOut: {
-            /** Url */
-            url: string;
+        /** StartIn */
+        StartIn: {
+            /**
+             * Employee Id
+             * Format: uuid
+             */
+            employee_id: string;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Template Id
+             * Format: uuid
+             */
+            template_id: string;
         };
         /** StatementOut */
         StatementOut: {
@@ -9756,28 +9778,6 @@ export interface components {
         WriteOut: {
             /** Text */
             text: string;
-        };
-        /** StartIn */
-        app__modules__platform__sso__StartIn: {
-            /** Next */
-            next?: string | null;
-            /** Workspace */
-            workspace: string;
-        };
-        /** StartIn */
-        app__modules__tasks__schemas__StartIn: {
-            /**
-             * Employee Id
-             * Format: uuid
-             */
-            employee_id: string;
-            /** Start Date */
-            start_date?: string | null;
-            /**
-             * Template Id
-             * Format: uuid
-             */
-            template_id: string;
         };
     };
     responses: never;
@@ -15622,7 +15622,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__tasks__schemas__StartIn"];
+                "application/json": components["schemas"]["StartIn"];
             };
         };
         responses: {
@@ -17955,7 +17955,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CallbackIn"];
+                "application/json": components["schemas"]["SsoCallbackIn"];
             };
         };
         responses: {
@@ -17965,7 +17965,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CallbackOut"];
+                    "application/json": components["schemas"]["SsoCallbackOut"];
                 };
             };
             /** @description Validation Error */
@@ -18059,7 +18059,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["app__modules__platform__sso__StartIn"];
+                "application/json": components["schemas"]["SsoStartIn"];
             };
         };
         responses: {
@@ -18069,7 +18069,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["StartOut"];
+                    "application/json": components["schemas"]["SsoStartOut"];
                 };
             };
             /** @description Validation Error */

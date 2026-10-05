@@ -123,7 +123,7 @@ def _challenge(verifier: str) -> str:
 # ---- Signing in ------------------------------------------------------------------------
 
 
-class StartIn(In):
+class SsoStartIn(In):
     workspace: Annotated[
         str, StringConstraints(min_length=3, max_length=40, to_lower=True, strip_whitespace=True)
     ]
@@ -131,7 +131,7 @@ class StartIn(In):
     next: Annotated[str | None, StringConstraints(max_length=200, pattern=r"^/[A-Za-z0-9/_\-?=&.]*$")] = None
 
 
-class StartOut(BaseModel):
+class SsoStartOut(BaseModel):
     url: str
 
 
@@ -146,8 +146,10 @@ async def _connection_for(db: AsyncSession, slug: str) -> tuple[Tenant, SsoConne
     return tenant, connection
 
 
-@router.post("/start", response_model=StartOut)
-async def start(body: StartIn, db: AsyncSession = Depends(get_db), _: None = Depends(public())) -> StartOut:
+@router.post("/start", response_model=SsoStartOut)
+async def start(
+    body: SsoStartIn, db: AsyncSession = Depends(get_db), _: None = Depends(public())
+) -> SsoStartOut:
     await ratelimit.enforce(ratelimit.LOGIN_IP, context.current().ip or "unknown")
     tenant, connection = await _connection_for(db, body.workspace)
     try:
@@ -179,7 +181,7 @@ async def start(body: StartIn, db: AsyncSession = Depends(get_db), _: None = Dep
         }
     )
     endpoint = provider["authorization_endpoint"]
-    return StartOut(url=f"{endpoint}{'&' if '?' in endpoint else '?'}{query}")
+    return SsoStartOut(url=f"{endpoint}{'&' if '?' in endpoint else '?'}{query}")
 
 
 async def exchange(connection: SsoConnection, provider: dict[str, Any], code: str, verifier: str) -> str:
@@ -243,12 +245,12 @@ async def verify_id_token(
     return claims
 
 
-class CallbackIn(In):
+class SsoCallbackIn(In):
     state: Annotated[str, StringConstraints(min_length=20, max_length=200)]
     code: Annotated[str, StringConstraints(min_length=1, max_length=2000)]
 
 
-class CallbackOut(TokenOut):
+class SsoCallbackOut(TokenOut):
     next: str | None = None
 
 
@@ -311,14 +313,14 @@ async def _default_role(db: AsyncSession, connection: SsoConnection) -> Role:
     return role
 
 
-@router.post("/callback", response_model=CallbackOut)
+@router.post("/callback", response_model=SsoCallbackOut)
 async def callback(
-    body: CallbackIn,
+    body: SsoCallbackIn,
     request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db),
     _: None = Depends(public()),
-) -> CallbackOut:
+) -> SsoCallbackOut:
     _check_origin(request)
     await ratelimit.enforce(ratelimit.LOGIN_IP, context.current().ip or "unknown")
     state = await db.scalar(
@@ -349,7 +351,7 @@ async def callback(
     issued = await start_session(db, user, tenant_id, mfa=True, method="sso")
     log_event(db, user.id, "sso.signed_in", tenant=str(tenant_id), subject=str(claims.get("sub")))
     tokens = await _tokens(db, response, issued)
-    return CallbackOut(**tokens.model_dump(), next=next_path)
+    return SsoCallbackOut(**tokens.model_dump(), next=next_path)
 
 
 # ---- Settings -------------------------------------------------------------------------

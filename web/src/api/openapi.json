@@ -2589,64 +2589,6 @@
     "title": "CalendarEntry",
     "type": "object"
    },
-   "CallbackIn": {
-    "additionalProperties": false,
-    "properties": {
-     "code": {
-      "maxLength": 2000,
-      "minLength": 1,
-      "title": "Code",
-      "type": "string"
-     },
-     "state": {
-      "maxLength": 200,
-      "minLength": 20,
-      "title": "State",
-      "type": "string"
-     }
-    },
-    "required": [
-     "state",
-     "code"
-    ],
-    "title": "CallbackIn",
-    "type": "object"
-   },
-   "CallbackOut": {
-    "properties": {
-     "access_token": {
-      "title": "Access Token",
-      "type": "string"
-     },
-     "expires_at": {
-      "format": "date-time",
-      "title": "Expires At",
-      "type": "string"
-     },
-     "next": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Next"
-     },
-     "token_type": {
-      "default": "bearer",
-      "title": "Token Type",
-      "type": "string"
-     }
-    },
-    "required": [
-     "access_token",
-     "expires_at"
-    ],
-    "title": "CallbackOut",
-    "type": "object"
-   },
    "CategoryTotal": {
     "properties": {
      "category_id": {
@@ -13434,6 +13376,64 @@
     "title": "SourceOut",
     "type": "object"
    },
+   "SsoCallbackIn": {
+    "additionalProperties": false,
+    "properties": {
+     "code": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+     },
+     "state": {
+      "maxLength": 200,
+      "minLength": 20,
+      "title": "State",
+      "type": "string"
+     }
+    },
+    "required": [
+     "state",
+     "code"
+    ],
+    "title": "SsoCallbackIn",
+    "type": "object"
+   },
+   "SsoCallbackOut": {
+    "properties": {
+     "access_token": {
+      "title": "Access Token",
+      "type": "string"
+     },
+     "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+     },
+     "next": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next"
+     },
+     "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "access_token",
+     "expires_at"
+    ],
+    "title": "SsoCallbackOut",
+    "type": "object"
+   },
    "SsoIn": {
     "additionalProperties": false,
     "properties": {
@@ -13611,6 +13611,48 @@
     "title": "SsoSetupOut",
     "type": "object"
    },
+   "SsoStartIn": {
+    "additionalProperties": false,
+    "properties": {
+     "next": {
+      "anyOf": [
+       {
+        "maxLength": 200,
+        "pattern": "^/[A-Za-z0-9/_\\-?=&.]*$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next"
+     },
+     "workspace": {
+      "maxLength": 40,
+      "minLength": 3,
+      "title": "Workspace",
+      "type": "string"
+     }
+    },
+    "required": [
+     "workspace"
+    ],
+    "title": "SsoStartIn",
+    "type": "object"
+   },
+   "SsoStartOut": {
+    "properties": {
+     "url": {
+      "title": "Url",
+      "type": "string"
+     }
+    },
+    "required": [
+     "url"
+    ],
+    "title": "SsoStartOut",
+    "type": "object"
+   },
    "StaffIn": {
     "additionalProperties": false,
     "properties": {
@@ -13692,17 +13734,37 @@
     "title": "StaffOut",
     "type": "object"
    },
-   "StartOut": {
+   "StartIn": {
+    "additionalProperties": false,
     "properties": {
-     "url": {
-      "title": "Url",
+     "employee_id": {
+      "format": "uuid",
+      "title": "Employee Id",
+      "type": "string"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "template_id": {
+      "format": "uuid",
+      "title": "Template Id",
       "type": "string"
      }
     },
     "required": [
-     "url"
+     "employee_id",
+     "template_id"
     ],
-    "title": "StartOut",
+    "title": "StartIn",
     "type": "object"
    },
    "StatementOut": {
@@ -16750,68 +16812,6 @@
      "text"
     ],
     "title": "WriteOut",
-    "type": "object"
-   },
-   "app__modules__platform__sso__StartIn": {
-    "additionalProperties": false,
-    "properties": {
-     "next": {
-      "anyOf": [
-       {
-        "maxLength": 200,
-        "pattern": "^/[A-Za-z0-9/_\\-?=&.]*$",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Next"
-     },
-     "workspace": {
-      "maxLength": 40,
-      "minLength": 3,
-      "title": "Workspace",
-      "type": "string"
-     }
-    },
-    "required": [
-     "workspace"
-    ],
-    "title": "StartIn",
-    "type": "object"
-   },
-   "app__modules__tasks__schemas__StartIn": {
-    "additionalProperties": false,
-    "properties": {
-     "employee_id": {
-      "format": "uuid",
-      "title": "Employee Id",
-      "type": "string"
-     },
-     "start_date": {
-      "anyOf": [
-       {
-        "format": "date",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Start Date"
-     },
-     "template_id": {
-      "format": "uuid",
-      "title": "Template Id",
-      "type": "string"
-     }
-    },
-    "required": [
-     "employee_id",
-     "template_id"
-    ],
-    "title": "StartIn",
     "type": "object"
    }
   }
@@ -25231,7 +25231,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__tasks__schemas__StartIn"
+        "$ref": "#/components/schemas/StartIn"
        }
       }
      },
@@ -28486,7 +28486,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/CallbackIn"
+        "$ref": "#/components/schemas/SsoCallbackIn"
        }
       }
      },
@@ -28497,7 +28497,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/CallbackOut"
+         "$ref": "#/components/schemas/SsoCallbackOut"
         }
        }
       },
@@ -28600,7 +28600,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/app__modules__platform__sso__StartIn"
+        "$ref": "#/components/schemas/SsoStartIn"
        }
       }
      },
@@ -28611,7 +28611,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/StartOut"
+         "$ref": "#/components/schemas/SsoStartOut"
         }
        }
       },
