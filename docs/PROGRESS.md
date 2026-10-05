@@ -226,7 +226,7 @@ architecture one-pager. Only built features and measured numbers.
 - Next: M4, the pilot release. Deployment waits on the owner's cloud accounts (see
   "Blocked on the owner"); everything else in M4 is being built meanwhile.
 
-## M4: partly done (pilot release; paused)
+## M4: done (pilot release)
 
 - **M4.1 spreadsheet import: done.** Owners and admins bring a company in from a CSV:
   people (matched to existing profiles by code, then email, and updated), departments
@@ -254,8 +254,11 @@ architecture one-pager. Only built features and measured numbers.
   "Design" and "design" as one new department.
 - **Paused here at the owner's request (2026-10-01).** Everything above is tested and
   pushed. What's left is listed under "Future work" in the README. `docs/GUIDE.md` is the
-  developer guide for picking the code up by hand. Next when work resumes: M4.3 in-app
-  help and contact support, then the pilot playbook.
+  developer guide for picking the code up by hand.
+- **M4.3 (2026-10-05): done.** Help centre in English and Bangla with search, "Contact
+  support" from the account menu on any screen (emails `SUPPORT_EMAIL` with the page),
+  operators' product-use counts with nothing personal, and `docs/pilot-playbook.md`.
+  The live deploy, status page and restore drill need the owner's accounts.
 
 ## M6: done (AI copilot, read-only)
 
@@ -424,3 +427,4 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-04: M10 easy onboarding: addresses, join links with QR codes, sample data, first-day checklist.
 - 2026-10-05: M10 developer platform: API keys, webhooks, idempotency, OIDC sign-in, SCIM, allowlist, audit export, own AI key, sandbox, API contract, SDKs and web screens. Repository workflows switched off (owner).
 - 2026-10-05: M11: till PINs on registered devices, passkeys, new-device alerts, security policy and runbooks. Legal review with new draft terms, privacy, DPA and sub-processors pages.
+- 2026-10-05: M4.3 help centre, contact support, usage counts and the pilot playbook. Every milestone except M5 (billing, on hold) is built. Test-and-fix pass started.
