@@ -2,9 +2,11 @@
 
 Current work: **the owner's 2026-10-04 plan** (below): marketing site → M6 → M7 → M8 →
 M9 → M10 → M11, then a legal review. The marketing site and M6 (AI copilot) are done
-and tested. M7, M8 and M9 are built but not yet tested (speed mode; see
-`docs/UNTESTED.md`). Now: M10. M5 (Paddle billing) is on hold. Going live still waits
-on the owner's cloud accounts (`runbooks/deploy.md`).
+and tested. M7, M8, M9 and M10 are built; M10's new tests were run, the rest wait for
+the test-and-fix pass (`docs/UNTESTED.md`). Now: M11 security, the legal review, then the
+full test-and-fix pass. M5 (Paddle billing) is on hold. Going live still waits on the
+owner's cloud accounts (`runbooks/deploy.md`). CI, CodeQL and Deploy workflows are
+switched off on GitHub (owner, 2026-10-05: the repository is going private).
 
 ## Owner decisions, 2026-10-04 (follow these)
 
@@ -91,6 +93,14 @@ input; list what does under "Blocked on the owner".
   it's live, move the assistant from "coming next" to the features on the home page.
 - Check the Bangladesh salary tax table (Payroll → Settings) against the Finance
   Ordinance 2025 with a tax adviser before turning tax deduction on.
+- Make the GitHub repository private (Settings → General → Danger zone → Change
+  visibility): this session's GitHub access can't change repository settings.
+- Easy onboarding addresses: wildcard DNS and custom domains for `*.companymgmt.app`
+  on Cloudflare Pages, and API CORS for those origins.
+- M10 needing infrastructure or a decision: SAML (most providers also speak OpenID
+  Connect, which is built), a dedicated database per enterprise customer, table
+  partitioning and read replicas (only worth it with real load), load tests against a
+  real deployment, publishing the SDKs to npm and PyPI (needs accounts).
 
 ## Decisions made while building
 
@@ -345,6 +355,29 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
   and stock always reconciles across thousands of random operations (written, not yet
   run).
 
+## M10: built (enterprise and developer platform)
+
+- **Easy onboarding:** workspace addresses (`<slug>.companymgmt.app`, old addresses
+  never reused), join links with QR codes and WhatsApp sharing, sample data, a first-day
+  checklist.
+- **API keys:** scoped to chosen permissions (never more than the maker holds now, never
+  owner-only), per-key rate limits, network ranges, expiry, rotation with a grace period,
+  daily usage, last use. Account routes refuse keys.
+- **Webhooks:** a public event catalogue (`employee.onboarded`, `leave.approved`,
+  `sale.completed`…) with thin payloads, HMAC-SHA256 signatures, retries with backoff for
+  ~1.5 days, endpoints switched off after 40 failures, delivery log, resend, test ping.
+  Requests go only to public HTTPS addresses, pinned to the checked IP (`core/safehttp`).
+- **Idempotency-Key** on every write (24 h, per key or session).
+- **Company sign-in (OpenID Connect):** Google Workspace, Entra ID, Okta and others; PKCE,
+  nonce, keys from the provider; auto-join; "require company sign-in" enforced per request.
+- **SCIM 2.0** user provisioning (Okta- and Entra-style PATCH), **network allowlist**,
+  **audit log export** with the hash chain, **own Gemini key** per workspace, **sandbox
+  workspaces**.
+- **Public API contract:** `docs/api/openapi-v1.json` + a breaking-change check in
+  `check.sh`; deprecation headers; developer guide `docs/api/README.md`; TypeScript and
+  Python SDKs in `sdk/`.
+- Web: Settings → Developers and Security; login with the company account.
+
 ## Log
 
 - 2026-09-30: Plan approved. Repo created. M1 API, web app, site, tests, CI and infra built and pushed. M1.5 marketing kit written. Legacy README points here.
@@ -371,3 +404,5 @@ Built in speed mode (see `docs/UNTESTED.md` for what still needs running).
 - 2026-10-04: Owner switched to speed mode (code and unit tests, lint and types only; `docs/UNTESTED.md`). M7 built: actions with confirmation, writing help, automations, signals.
 - 2026-10-04: M8 built: configurable taxes, the till with offline sales, receipts, returns and voids, dues, expenses.
 - 2026-10-04: M9 built: inventory with weighted average cost, self-posting double-entry books, reports, tax-return templates.
+- 2026-10-04: M10 easy onboarding: addresses, join links with QR codes, sample data, first-day checklist.
+- 2026-10-05: M10 developer platform: API keys, webhooks, idempotency, OIDC sign-in, SCIM, allowlist, audit export, own AI key, sandbox, API contract, SDKs and web screens. Repository workflows switched off (owner).
