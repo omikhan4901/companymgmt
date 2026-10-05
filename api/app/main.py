@@ -19,6 +19,7 @@ from app.core.errors import install_error_handlers
 from app.core.idempotency import IdempotencyMiddleware
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
+from app.core.outbox import FlushMiddleware
 from app.modules.accounting.routes import router as accounting_router
 from app.modules.announcements.routes import router as announcements_router
 from app.modules.approvals.routes import router as approvals_router
@@ -134,7 +135,9 @@ def create_app() -> FastAPI:
         openapi_url="/v1/openapi.json",
     )
     install_error_handlers(app)
-    # Innermost: replays need the request context (and its size limit) set up first.
+    # Innermost: deliver this request's outbox events before its response goes out.
+    app.add_middleware(FlushMiddleware)
+    # Replays need the request context (and its size limit) set up first.
     app.add_middleware(IdempotencyMiddleware)
     app.add_middleware(
         CORSMiddleware,

@@ -41,7 +41,7 @@ from app.modules.platform.models import Membership, Tenant, User, WebhookDeliver
 log = logging.getLogger(__name__)
 
 SIGNATURE_HEADER = "CompanyMgmt-Signature"
-# Minutes to wait before each retry; the first attempt is immediate.
+# Minutes to wait before each retry; the first attempt goes out with the next per-minute run.
 BACKOFF_MINUTES = (1, 5, 30, 120, 360, 720, 1440)
 MAX_ATTEMPTS = len(BACKOFF_MINUTES) + 1
 # Switch an endpoint off after this many failed attempts in a row.
@@ -230,8 +230,8 @@ def new_delivery(endpoint: WebhookEndpoint, payload: dict[str, Any]) -> WebhookD
 
 @events.on("*", later=True)
 async def fan_out(db: AsyncSession, event: events.Event) -> None:
-    """After an event is saved: queue a delivery for every endpoint that wants it, and
-    try each once straight away."""
+    """After an event is saved: queue a delivery for every endpoint that wants it. The
+    per-minute job sends them, so a slow receiver never holds up the change itself."""
     payload = payload_for(event)
     if payload is None:
         return
@@ -241,10 +241,8 @@ async def fan_out(db: AsyncSession, event: events.Event) -> None:
         if wants(e, payload["type"])
     ]
     for endpoint in endpoints:
-        delivery = new_delivery(endpoint, payload)
-        db.add(delivery)
-        await db.flush()
-        await attempt(db, endpoint, delivery)
+        db.add(new_delivery(endpoint, payload))
+    await db.flush()
 
 
 async def deliver_due(now: datetime | None = None, limit: int = 200) -> int:

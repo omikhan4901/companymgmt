@@ -242,6 +242,8 @@ async def test_webhooks_are_signed_thin_and_retried(
     await add_staff(owner, name="Karim Mia")
     for _ in range(3):
         await outbox.dispatch()
+    # Deliveries are queued with the change and sent by the per-minute job.
+    assert await webhooks.deliver_due() == 1
     sent = json.loads(received[-1].content)
     assert sent["type"] == "employee.onboarded"
     assert set(sent["data"]) == {"membership_id"}
@@ -272,6 +274,7 @@ async def test_failed_deliveries_back_off(
     await add_staff(owner)
     for _ in range(3):
         await outbox.dispatch()
+    assert await webhooks.deliver_due() == 1
     [delivery] = (await owner.get(f"/v1/webhooks/{endpoint['id']}/deliveries")).json()
     assert (delivery["status"], delivery["attempts"], delivery["response_status"]) == ("pending", 1, 503)
     assert delivery["next_attempt_at"] is not None

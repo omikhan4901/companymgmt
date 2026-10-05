@@ -95,7 +95,9 @@ async def test_subscribers_run_in_the_transaction(
     ]
 
 
-async def test_later_subscribers_go_through_the_outbox(client: httpx.AsyncClient, subscribers: None) -> None:
+async def test_later_subscribers_go_through_the_outbox(
+    client: httpx.AsyncClient, subscribers: None, owner_sql: psycopg.Connection
+) -> None:
     owner = await signup(client)
     got: list[tuple[str, str]] = []
 
@@ -103,10 +105,24 @@ async def test_later_subscribers_go_through_the_outbox(client: httpx.AsyncClient
     async def mail(db: AsyncSession, event: events.Event) -> None:
         got.append((event.name, str(event.tenant_id)))
 
+    # Delivered after the change is committed, before the response goes out.
     await ask_leave(owner)
-    assert got == []
-    await outbox.dispatch()
     assert got == [("leave.requested", owner.tenant_id)]
+
+    # A later subscriber that fails doesn't undo the change: the event waits in the
+    # outbox, and the scheduled dispatcher delivers it once the problem is gone.
+    @events.on("leave.requested", later=True)
+    async def flaky(db: AsyncSession, event: events.Event) -> None:
+        raise RuntimeError("mail server down")
+
+    await ask_leave(owner, offset=7)
+    assert len((await owner.get("/v1/leave/requests")).json()) == 2
+    events._later["leave.requested"].remove(flaky)
+    got.clear()
+    # It backs off before trying again; move the retry to now.
+    owner_sql.execute("UPDATE outbox_events SET available_at = now() WHERE dispatched_at IS NULL")
+    await outbox.dispatch()
+    assert ("leave.requested", owner.tenant_id) in got
 
 
 async def test_events_follow_audit_retention(

@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any
 
@@ -29,6 +30,8 @@ Handler = Callable[[dict[str, Any]], Awaitable[None]]
 _handlers: dict[str, Handler] = {}
 
 MAX_ATTEMPTS = 8
+# Events queued while handling the current request (see `FlushMiddleware`).
+_request_ids: ContextVar[list[uuid.UUID] | None] = ContextVar("outbox_request_ids", default=None)
 
 
 class OutboxEvent(Base):
@@ -65,6 +68,9 @@ def enqueue(
     db.add(event)
     pending: list[uuid.UUID] = db.info.setdefault("outbox_pending", [])
     pending.append(event.id)
+    collected = _request_ids.get()
+    if collected is not None:
+        collected.append(event.id)
     return event.id
 
 
@@ -120,3 +126,36 @@ async def dispatch(ids: list[uuid.UUID] | None = None, limit: int = 50) -> int:
                 delivered += 1
         await db.commit()
     return delivered
+
+
+class FlushMiddleware:
+    """Delivers the outbox events a request queued just before its response goes out, so
+    their effects (the books, notifications, automations) are there when the person looks.
+    Events whose transaction rolled back simply aren't found. Anything that fails is left
+    for the scheduled dispatcher; the response is never held up by an error here."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        ids: list[uuid.UUID] = []
+        token = _request_ids.set(ids)
+        flushed = False
+
+        async def flush_then_send(message: Any) -> None:
+            nonlocal flushed
+            if message["type"] == "http.response.start" and ids and not flushed:
+                flushed = True
+                try:
+                    await dispatch(list(ids))
+                except Exception:  # the scheduled dispatcher will retry
+                    log.exception("inline outbox dispatch failed")
+            await send(message)
+
+        try:
+            await self.app(scope, receive, flush_then_send)
+        finally:
+            _request_ids.reset(token)

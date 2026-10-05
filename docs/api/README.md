@@ -169,6 +169,8 @@ Both SDKs ship this as `verifyWebhook`.
 
 ### Delivery rules
 
+- Deliveries go out within about a minute of the event (a slow receiver never holds up
+  the change in CompanyMgmt). **Send test** and **Resend** go out at once.
 - Answer `2xx` within 10 seconds; do slow work afterwards. Redirects aren't followed.
 - Anything else is retried after 1 min, 5 min, 30 min, 2 h, 6 h, 12 h and 24 h (8 tries).
   After 40 failures in a row the endpoint is switched off; fix it and switch it back on.
