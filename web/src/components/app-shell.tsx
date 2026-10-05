@@ -1,16 +1,26 @@
 "use client";
 
-import { Building2, Check, ChevronsUpDown, LogOut, Search, UserRound } from "lucide-react";
+import {
+  Building2,
+  Check,
+  ChevronsUpDown,
+  CircleHelp,
+  LifeBuoy,
+  LogOut,
+  Search,
+  UserRound,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { DropdownMenu as M } from "radix-ui";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/session";
 import { cn } from "@/lib/cn";
 
 import { CommandPalette, useCommandPalette } from "./command-palette";
+import { SupportDialog } from "./help/support";
 import { LogoMark } from "./logo";
 import { NotificationBell } from "./notifications";
 import { isActive, useNavItems } from "./nav-items";
@@ -29,12 +39,19 @@ function WorkspaceSwitcher() {
       <span className="truncate text-xs text-muted">{workspace?.role}</span>
     </span>
   );
-  if (workspaces.length < 2) return <div className="flex min-w-0 items-center gap-2.5">{label}</div>;
+  if (workspaces.length < 2)
+    return <div className="flex min-w-0 items-center gap-2.5">{label}</div>;
   return (
     <M.Root>
-      <M.Trigger className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1 hover:bg-surface-2" aria-label={t("nav.switchWorkspace")}>
+      <M.Trigger
+        className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1 hover:bg-surface-2"
+        aria-label={t("nav.switchWorkspace")}
+      >
         {label}
-        <ChevronsUpDown className="size-4 shrink-0 text-muted" aria-hidden="true" />
+        <ChevronsUpDown
+          className="size-4 shrink-0 text-muted"
+          aria-hidden="true"
+        />
       </M.Trigger>
       <MenuContent align="start">
         <MenuLabel>{t("nav.switchWorkspace")}</MenuLabel>
@@ -61,35 +78,52 @@ function UserMenu() {
   const { t } = useTranslation();
   const { me, signOut } = useSession();
   const router = useRouter();
+  const [contact, setContact] = useState(false);
   return (
-    <M.Root>
-      <M.Trigger className="rounded-full" aria-label={t("nav.account")}>
-        <Avatar name={me?.name ?? "?"} className="size-9" />
-      </M.Trigger>
-      <MenuContent>
-        <div className="px-2.5 py-2">
-          <p className="truncate text-sm font-semibold">{me?.name}</p>
-          <p className="truncate text-xs text-muted">{me?.email ?? me?.username}</p>
-        </div>
-        <MenuSeparator />
-        <MenuItem asChild>
-          <Link href="/app/account">
-            <UserRound aria-hidden="true" />
-            {t("nav.account")}
-          </Link>
-        </MenuItem>
-        <MenuItem
-          onSelect={async () => {
-            await signOut();
-            router.replace("/login");
-          }}
-          className="text-danger [&_svg]:text-danger"
-        >
-          <LogOut aria-hidden="true" />
-          {t("nav.signOut")}
-        </MenuItem>
-      </MenuContent>
-    </M.Root>
+    <>
+      <M.Root>
+        <M.Trigger className="rounded-full" aria-label={t("nav.account")}>
+          <Avatar name={me?.name ?? "?"} className="size-9" />
+        </M.Trigger>
+        <MenuContent>
+          <div className="px-2.5 py-2">
+            <p className="truncate text-sm font-semibold">{me?.name}</p>
+            <p className="truncate text-xs text-muted">
+              {me?.email ?? me?.username}
+            </p>
+          </div>
+          <MenuSeparator />
+          <MenuItem asChild>
+            <Link href="/app/account">
+              <UserRound aria-hidden="true" />
+              {t("nav.account")}
+            </Link>
+          </MenuItem>
+          <MenuItem asChild>
+            <Link href="/app/help">
+              <CircleHelp aria-hidden="true" />
+              {t("help.title")}
+            </Link>
+          </MenuItem>
+          <MenuItem onSelect={() => setContact(true)}>
+            <LifeBuoy aria-hidden="true" />
+            {t("support.title")}
+          </MenuItem>
+          <MenuSeparator />
+          <MenuItem
+            onSelect={async () => {
+              await signOut();
+              router.replace("/login");
+            }}
+            className="text-danger [&_svg]:text-danger"
+          >
+            <LogOut aria-hidden="true" />
+            {t("nav.signOut")}
+          </MenuItem>
+        </MenuContent>
+      </M.Root>
+      <SupportDialog open={contact} onOpenChange={setContact} />
+    </>
   );
 }
 
@@ -101,7 +135,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2"
+      >
         {t("app.skip")}
       </a>
 
@@ -110,7 +147,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link href="/app" aria-label="CompanyMgmt" className="mb-3">
           <LogoMark size={40} />
         </Link>
-        <nav aria-label={t("nav.main")} className="flex flex-col items-center gap-1.5">
+        <nav
+          aria-label={t("nav.main")}
+          className="flex flex-col items-center gap-1.5"
+        >
           {items.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -120,7 +160,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex h-[54px] w-[64px] flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium transition-colors",
-                  active ? "bg-accent-soft text-accent-soft-text" : "text-muted hover:bg-surface-2 hover:text-text",
+                  active
+                    ? "bg-accent-soft text-accent-soft-text"
+                    : "text-muted hover:bg-surface-2 hover:text-text",
                 )}
               >
                 <item.icon className="size-5" aria-hidden="true" />
@@ -147,8 +189,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="hidden h-10 w-72 items-center gap-2.5 rounded-[10px] border border-border bg-surface px-3 text-sm text-muted hover:border-border-strong md:flex"
             >
               <Search className="size-4" aria-hidden="true" />
-              <span className="flex-1 text-left">{t("palette.placeholder")}</span>
-              <kbd className="rounded border border-border px-1.5 font-sans text-[11px]">⌘K</kbd>
+              <span className="flex-1 text-left">
+                {t("palette.placeholder")}
+              </span>
+              <kbd className="rounded border border-border px-1.5 font-sans text-[11px]">
+                ⌘K
+              </kbd>
             </button>
             <button
               type="button"
@@ -165,13 +211,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main id="main" className="mx-auto max-w-[1400px] px-4 pb-28 pt-6 md:px-7 md:pt-8 lg:pb-12">
+        <main
+          id="main"
+          className="mx-auto max-w-[1400px] px-4 pb-28 pt-6 md:px-7 md:pt-8 lg:pb-12"
+        >
           {children}
         </main>
       </div>
 
       {/* Tab bar (phones and tablets) */}
-      <nav aria-label={t("nav.main")} className="print:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur lg:hidden">
+      <nav
+        aria-label={t("nav.main")}
+        className="print:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur lg:hidden"
+      >
         <div className="mx-auto flex max-w-lg justify-around px-1 pb-[env(safe-area-inset-bottom)]">
           {items.slice(0, 5).map((item) => {
             const active = isActive(pathname, item.href);
@@ -180,7 +232,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={cn("flex min-h-16 min-w-14 flex-1 flex-col items-center justify-center gap-1 text-[11px]", active ? "font-semibold text-accent-soft-text" : "text-muted")}
+                className={cn(
+                  "flex min-h-16 min-w-14 flex-1 flex-col items-center justify-center gap-1 text-[11px]",
+                  active ? "font-semibold text-accent-soft-text" : "text-muted",
+                )}
               >
                 <item.icon className="size-5" aria-hidden="true" />
                 {item.short}

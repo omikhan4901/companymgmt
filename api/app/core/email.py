@@ -24,6 +24,8 @@ class Mail:
     subject: str
     text: str
     html: str | None = None
+    # Replies go here (support messages: back to the person who wrote).
+    reply_to: str | None = None
 
 
 # Messages "sent" with the memory backend (tests read them).
@@ -37,6 +39,8 @@ def _send_smtp(mail: Mail) -> None:
     msg["From"] = settings.mail_from
     msg["To"] = mail.to
     msg["Subject"] = mail.subject
+    if mail.reply_to:
+        msg["Reply-To"] = mail.reply_to
     msg.set_content(mail.text)
     if mail.html:
         msg.add_alternative(mail.html, subtype="html")
@@ -70,4 +74,7 @@ async def _on_email(payload: dict[str, Any]) -> None:
 
 
 def as_payload(mail: Mail) -> dict[str, Any]:
-    return {"to": mail.to, "subject": mail.subject, "text": mail.text, "html": mail.html}
+    payload: dict[str, Any] = {"to": mail.to, "subject": mail.subject, "text": mail.text, "html": mail.html}
+    if mail.reply_to:
+        payload["reply_to"] = mail.reply_to
+    return payload

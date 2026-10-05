@@ -175,3 +175,13 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
 - [ ] **Legal pages (web).** New `/terms`, `/privacy`, `/dpa`, `/subprocessors`,
   `/security`, footer links, `security.txt`. Types and lint pass; never opened in a
   browser; drafts pending a lawyer.
+
+## M4.3 Help and support
+
+- [ ] **Help centre, contact support, product usage.** `/app/help` (articles in English
+  and Bangla with search, `components/help/articles.ts`), "Help" and "Contact support"
+  in the account menu, `POST /v1/support` (email to `SUPPORT_EMAIL` with reply-to and a
+  copy to the sender, 10 per hour), `GET /v1/operator/usage` (counts only, through the
+  `app_usage_counts` function, migration 0028) shown in Settings → Platform,
+  `docs/pilot-playbook.md`. `test_support.py` and `articles.test.ts` **run and passed**;
+  screens never opened in a browser.

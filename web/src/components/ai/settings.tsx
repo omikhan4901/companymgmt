@@ -9,13 +9,13 @@ import { api, ApiError } from "@/api/client";
 import type { AIAllowance, AIStatus } from "@/api/types";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/choice";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, Td, Th } from "@/components/ui/table";
 import { errorMessage } from "@/lib/errors";
-import { normalizeDigits } from "@/lib/format";
+import { formatNumber, normalizeDigits } from "@/lib/format";
 
 import { aiKeys, UsageLine, useAIStatus } from "./ai";
 
@@ -181,5 +181,38 @@ export function AIAllowances() {
         {t("common.save")}
       </Button>
     </div>
+  );
+}
+
+
+interface UsageData {
+  days: number;
+  workspaces_total: number;
+  workspaces_new: number;
+  events: { event: string; count: number; workspaces: number }[];
+}
+
+/** Operators: how the product is used (counts only, nothing personal). */
+export function ProductUsage() {
+  const { t } = useTranslation();
+  const usage = useQuery({ queryKey: ["operator", "usage"], queryFn: () => api<UsageData>("/v1/operator/usage", { query: { days: 30 } }) });
+  if (!usage.data) return null;
+  return (
+    <Card className="mt-5">
+      <CardHeader
+        title={t("operator.usageTitle")}
+        sub={t("operator.usageSub", { total: formatNumber(usage.data.workspaces_total), fresh: formatNumber(usage.data.workspaces_new) })}
+      />
+      <ul className="flex flex-col gap-1 p-5 pt-4 text-sm">
+        {usage.data.events.slice(0, 40).map((e) => (
+          <li key={e.event} className="flex justify-between gap-3 border-b border-border py-1 last:border-0">
+            <code className="text-xs">{e.event}</code>
+            <span className="tabular-nums text-muted">
+              {formatNumber(e.count)} · {t("operator.inWorkspaces", { count: e.workspaces, formatted: formatNumber(e.workspaces) })}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }

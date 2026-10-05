@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { api, download } from "@/api/client";
 import { useAttendanceSettings, useBranches } from "@/api/hooks";
 import { AddressCard } from "@/components/address-card";
-import { AIAllowances, AISettings, useIsOperator } from "@/components/ai/settings";
+import { AIAllowances, AISettings, ProductUsage, useIsOperator } from "@/components/ai/settings";
 import type { AuditEvent, Branch, Page, Workspace } from "@/api/types";
 import { useSession, useWorkspace } from "@/auth/session";
 import { BranchSheet } from "@/components/branch-sheet";
@@ -491,7 +491,17 @@ export default function SettingsPage() {
       content: <WorkspaceData />,
       show: can("workspace.manage") || can("workspace.export") || can("workspace.delete"),
     },
-    { key: "operator", label: t("settings.tabs.operator"), content: <AIAllowances />, show: operator.data?.operator === true },
+    {
+      key: "operator",
+      label: t("settings.tabs.operator"),
+      content: (
+        <>
+          <AIAllowances />
+          <ProductUsage />
+        </>
+      ),
+      show: operator.data?.operator === true,
+    },
   ].filter((x) => x.show);
   const [active, setActive] = useTab(tabs.map((x) => x.key));
   if (!tabs.length) return <EmptyState icon={<SettingsIcon />} title={t("common.notAllowed")} />;

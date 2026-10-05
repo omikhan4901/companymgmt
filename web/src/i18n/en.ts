@@ -1873,6 +1873,28 @@ const en = {
     unsupported: "This browser can't use passkeys.",
     signIn: "Sign in with a passkey",
   },
+  help: {
+    title: "Help",
+    search: "Search help",
+    open: "Open",
+    nothing: "Nothing matches. Ask us instead.",
+  },
+  support: {
+    title: "Contact support",
+    sub: "We read every message and reply by email. The page you're on is sent with it.",
+    topic: "What is it about?",
+    topics: { question: "A question", problem: "Something's wrong", idea: "An idea" },
+    message: "Message",
+    messageHelp: "What were you trying to do, and what happened?",
+    send: "Send",
+    sent: "Sent. Your reference is {{reference}}.",
+  },
+  operator: {
+    usageTitle: "Product use (last 30 days)",
+    usageSub: "{{total}} active workspaces, {{fresh}} new. Counts only: no names or content.",
+    inWorkspaces_one: "{{formatted}} workspace",
+    inWorkspaces_other: "{{formatted}} workspaces",
+  },
   errors: {
     notFound: "We couldn't find that page.",
     goHome: "Go home",

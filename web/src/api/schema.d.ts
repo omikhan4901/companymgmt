@@ -2937,6 +2937,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/operator/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Usage
+         * @description Product analytics for operators: event counts across workspaces, nothing personal.
+         */
+        get: operations["usage_v1_operator_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/payroll/loans": {
         parameters: {
             query?: never;
@@ -4001,6 +4021,26 @@ export interface paths {
         put?: never;
         /** Start */
         post: operations["start_v1_sso_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Contact Support
+         * @description Send a question, problem or idea to the team. The reply goes to your email.
+         */
+        post: operations["contact_support_v1_support_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9441,6 +9481,23 @@ export interface components {
              */
             paid_from: "drawer" | "petty_cash" | "bank" | "other";
         };
+        /** SupportIn */
+        SupportIn: {
+            /** Message */
+            message: string;
+            /** Page */
+            page?: string | null;
+            /**
+             * Topic
+             * @enum {string}
+             */
+            topic: "question" | "problem" | "idea";
+        };
+        /** SupportOut */
+        SupportOut: {
+            /** Reference */
+            reference: string;
+        };
         /** SwitchIn */
         SwitchIn: {
             /**
@@ -10072,6 +10129,26 @@ export interface components {
             requests: number;
             /** Writes */
             writes: number;
+        };
+        /** UsageOut */
+        UsageOut: {
+            /** Days */
+            days: number;
+            /** Events */
+            events: components["schemas"]["UsageRow"][];
+            /** Workspaces New */
+            workspaces_new: number;
+            /** Workspaces Total */
+            workspaces_total: number;
+        };
+        /** UsageRow */
+        UsageRow: {
+            /** Count */
+            count: number;
+            /** Event */
+            event: string;
+            /** Workspaces */
+            workspaces: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -16736,6 +16813,37 @@ export interface operations {
             };
         };
     };
+    usage_v1_operator_usage_get: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     loans_v1_payroll_loans_get: {
         parameters: {
             query?: {
@@ -19123,6 +19231,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SsoStartOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contact_support_v1_support_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportOut"];
                 };
             };
             /** @description Validation Error */

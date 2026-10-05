@@ -6,12 +6,13 @@ from __future__ import annotations
 import uuid
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from pydantic import BaseModel, Field, StringConstraints
 
 from app.ai import actions, assistant, automations, brief, operator, workspace, writing
 from app.ai.context import RequestContext, build_context
 from app.ai.tools import tool_specs
+from app.modules.platform import support
 from app.modules.platform.capabilities import invoke
 from app.modules.platform.catalog import AI_USE
 from app.modules.platform.deps import Ctx, allow, people_only, signed_in
@@ -127,6 +128,15 @@ async def forget(conversation_id: uuid.UUID, ctx: Ctx = Depends(allow(AI_USE))) 
 
 
 operator_router = APIRouter(prefix="/v1/operator", tags=["operator"])
+
+
+@operator_router.get("/usage", response_model=support.UsageOut)
+async def usage(
+    days: Annotated[int, Query(ge=1, le=365)] = 30, ctx: Ctx = Depends(signed_in())
+) -> support.UsageOut:
+    """Product analytics for operators: event counts across workspaces, nothing personal."""
+    operator.require_operator(ctx)
+    return await support.usage(ctx, days)
 
 
 @operator_router.get("/ai-allowances", response_model=list[operator.AllowanceOut])

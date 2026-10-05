@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     email_backend: Literal["console", "memory", "smtp"] = "console"
     smtp_url: SecretStr = SecretStr("")
     mail_from: str = "CompanyMgmt <no-reply@localhost>"
+    # Where "Contact support" messages go (empty: logged only, e.g. in development).
+    support_email: str = ""
 
     turnstile_secret: SecretStr = SecretStr("")
     # Failed logins (per account or IP) before a Turnstile challenge is required.

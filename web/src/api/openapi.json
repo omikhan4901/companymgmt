@@ -14881,6 +14881,57 @@
     "title": "SupplierPaymentIn",
     "type": "object"
    },
+   "SupportIn": {
+    "additionalProperties": false,
+    "properties": {
+     "message": {
+      "maxLength": 4000,
+      "minLength": 5,
+      "title": "Message",
+      "type": "string"
+     },
+     "page": {
+      "anyOf": [
+       {
+        "maxLength": 300,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Page"
+     },
+     "topic": {
+      "enum": [
+       "question",
+       "problem",
+       "idea"
+      ],
+      "title": "Topic",
+      "type": "string"
+     }
+    },
+    "required": [
+     "topic",
+     "message"
+    ],
+    "title": "SupportIn",
+    "type": "object"
+   },
+   "SupportOut": {
+    "properties": {
+     "reference": {
+      "title": "Reference",
+      "type": "string"
+     }
+    },
+    "required": [
+     "reference"
+    ],
+    "title": "SupportOut",
+    "type": "object"
+   },
    "SwitchIn": {
     "additionalProperties": false,
     "properties": {
@@ -16634,6 +16685,60 @@
      "writes"
     ],
     "title": "UsageDay",
+    "type": "object"
+   },
+   "UsageOut": {
+    "properties": {
+     "days": {
+      "title": "Days",
+      "type": "integer"
+     },
+     "events": {
+      "items": {
+       "$ref": "#/components/schemas/UsageRow"
+      },
+      "title": "Events",
+      "type": "array"
+     },
+     "workspaces_new": {
+      "title": "Workspaces New",
+      "type": "integer"
+     },
+     "workspaces_total": {
+      "title": "Workspaces Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "days",
+     "workspaces_total",
+     "workspaces_new",
+     "events"
+    ],
+    "title": "UsageOut",
+    "type": "object"
+   },
+   "UsageRow": {
+    "properties": {
+     "count": {
+      "title": "Count",
+      "type": "integer"
+     },
+     "event": {
+      "title": "Event",
+      "type": "string"
+     },
+     "workspaces": {
+      "title": "Workspaces",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "event",
+     "count",
+     "workspaces"
+    ],
+    "title": "UsageRow",
     "type": "object"
    },
    "ValidationError": {
@@ -26455,6 +26560,52 @@
     ]
    }
   },
+  "/v1/operator/usage": {
+   "get": {
+    "description": "Product analytics for operators: event counts across workspaces, nothing personal.",
+    "operationId": "usage_v1_operator_usage_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "days",
+      "required": false,
+      "schema": {
+       "default": 30,
+       "maximum": 365,
+       "minimum": 1,
+       "title": "Days",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UsageOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Usage",
+    "tags": [
+     "operator"
+    ]
+   }
+  },
   "/v1/payroll/loans": {
    "get": {
     "operationId": "loans_v1_payroll_loans_get",
@@ -29755,6 +29906,48 @@
     "summary": "Start",
     "tags": [
      "sso"
+    ]
+   }
+  },
+  "/v1/support": {
+   "post": {
+    "description": "Send a question, problem or idea to the team. The reply goes to your email.",
+    "operationId": "contact_support_v1_support_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SupportIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SupportOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Contact Support",
+    "tags": [
+     "support"
     ]
    }
   },
