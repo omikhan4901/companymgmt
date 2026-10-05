@@ -1327,6 +1327,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/passkeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Passkeys */
+        get: operations["list_passkeys_v1_auth_passkeys_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/passkeys/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login */
+        post: operations["login_v1_auth_passkeys_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/passkeys/login/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login Options */
+        post: operations["login_options_v1_auth_passkeys_login_options_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/passkeys/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register */
+        post: operations["register_v1_auth_passkeys_register_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/passkeys/register/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register Options */
+        post: operations["register_options_v1_auth_passkeys_register_options_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/passkeys/{passkey_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove */
+        delete: operations["remove_v1_auth_passkeys__passkey_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/password/change": {
         parameters: {
             query?: never;
@@ -6949,19 +7051,6 @@ export interface components {
             /** Version */
             version: number;
         };
-        /** LoginIn */
-        LoginIn: {
-            /** Captcha Token */
-            captcha_token?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Password */
-            password: string;
-            /** Username */
-            username?: string | null;
-            /** Workspace */
-            workspace?: string | null;
-        };
         /** LoginOut */
         LoginOut: {
             /** Access Token */
@@ -7244,6 +7333,18 @@ export interface components {
             /** Operator */
             operator: boolean;
         };
+        /** OptionsOut */
+        OptionsOut: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Options */
+            options: {
+                [key: string]: unknown;
+            };
+        };
         /** OverviewOut */
         OverviewOut: {
             attendance: components["schemas"]["AttendanceSummary"] | null;
@@ -7313,6 +7414,25 @@ export interface components {
             title: string;
             /** Version */
             version: number;
+        };
+        /** PasskeyOut */
+        PasskeyOut: {
+            /** Backed Up */
+            backed_up: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Name */
+            name: string;
         };
         /** PasswordChangeIn */
         PasswordChangeIn: {
@@ -8119,6 +8239,23 @@ export interface components {
         RecoveryCodesOut: {
             /** Recovery Codes */
             recovery_codes: string[];
+        };
+        /** RegisterIn */
+        RegisterIn: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Credential */
+            credential: {
+                [key: string]: unknown;
+            };
+            /**
+             * Name
+             * @default Passkey
+             */
+            name: string;
         };
         /** ReportRow */
         ReportRow: {
@@ -10086,6 +10223,33 @@ export interface components {
         WriteOut: {
             /** Text */
             text: string;
+        };
+        /** LoginIn */
+        app__modules__platform__passkeys__LoginIn: {
+            /**
+             * Challenge Id
+             * Format: uuid
+             */
+            challenge_id: string;
+            /** Credential */
+            credential: {
+                [key: string]: unknown;
+            };
+            /** Workspace */
+            workspace?: string | null;
+        };
+        /** LoginIn */
+        app__modules__platform__routes_auth__LoginIn: {
+            /** Captcha Token */
+            captcha_token?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Password */
+            password: string;
+            /** Username */
+            username?: string | null;
+            /** Workspace */
+            workspace?: string | null;
         };
     };
     responses: never;
@@ -12624,7 +12788,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginIn"];
+                "application/json": components["schemas"]["app__modules__platform__routes_auth__LoginIn"];
             };
         };
         responses: {
@@ -12829,6 +12993,161 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TokenOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_passkeys_v1_auth_passkeys_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOut"][];
+                };
+            };
+        };
+    };
+    login_v1_auth_passkeys_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__modules__platform__passkeys__LoginIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_options_v1_auth_passkeys_login_options_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionsOut"];
+                };
+            };
+        };
+    };
+    register_v1_auth_passkeys_register_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_options_v1_auth_passkeys_register_options_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OptionsOut"];
+                };
+            };
+        };
+    };
+    remove_v1_auth_passkeys__passkey_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                passkey_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

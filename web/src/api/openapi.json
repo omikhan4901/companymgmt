@@ -7806,70 +7806,6 @@
     "title": "LoanOut",
     "type": "object"
    },
-   "LoginIn": {
-    "additionalProperties": false,
-    "properties": {
-     "captcha_token": {
-      "anyOf": [
-       {
-        "maxLength": 4096,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Captcha Token"
-     },
-     "email": {
-      "anyOf": [
-       {
-        "format": "email",
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Email"
-     },
-     "password": {
-      "maxLength": 128,
-      "minLength": 1,
-      "title": "Password",
-      "type": "string"
-     },
-     "username": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Username"
-     },
-     "workspace": {
-      "anyOf": [
-       {
-        "maxLength": 40,
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Workspace"
-     }
-    },
-    "required": [
-     "password"
-    ],
-    "title": "LoginIn",
-    "type": "object"
-   },
    "LoginOut": {
     "properties": {
      "access_token": {
@@ -8680,6 +8616,26 @@
     "title": "OperatorMe",
     "type": "object"
    },
+   "OptionsOut": {
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "options": {
+      "additionalProperties": true,
+      "title": "Options",
+      "type": "object"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "options"
+    ],
+    "title": "OptionsOut",
+    "type": "object"
+   },
    "OverviewOut": {
     "properties": {
      "attendance": {
@@ -8911,6 +8867,49 @@
      "link"
     ],
     "title": "PassageOut",
+    "type": "object"
+   },
+   "PasskeyOut": {
+    "properties": {
+     "backed_up": {
+      "title": "Backed Up",
+      "type": "boolean"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+     },
+     "last_used_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Used At"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "created_at",
+     "last_used_at",
+     "backed_up"
+    ],
+    "title": "PasskeyOut",
     "type": "object"
    },
    "PasswordChangeIn": {
@@ -11416,6 +11415,34 @@
      "recovery_codes"
     ],
     "title": "RecoveryCodesOut",
+    "type": "object"
+   },
+   "RegisterIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "name": {
+      "default": "Passkey",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "RegisterIn",
     "type": "object"
    },
    "ReportRow": {
@@ -17090,6 +17117,103 @@
     ],
     "title": "WriteOut",
     "type": "object"
+   },
+   "app__modules__platform__passkeys__LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "challenge_id": {
+      "format": "uuid",
+      "title": "Challenge Id",
+      "type": "string"
+     },
+     "credential": {
+      "additionalProperties": true,
+      "title": "Credential",
+      "type": "object"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "challenge_id",
+     "credential"
+    ],
+    "title": "LoginIn",
+    "type": "object"
+   },
+   "app__modules__platform__routes_auth__LoginIn": {
+    "additionalProperties": false,
+    "properties": {
+     "captcha_token": {
+      "anyOf": [
+       {
+        "maxLength": 4096,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Captcha Token"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "format": "email",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "password": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Password",
+      "type": "string"
+     },
+     "username": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Username"
+     },
+     "workspace": {
+      "anyOf": [
+       {
+        "maxLength": 40,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workspace"
+     }
+    },
+    "required": [
+     "password"
+    ],
+    "title": "LoginIn",
+    "type": "object"
    }
   }
  },
@@ -20721,7 +20845,7 @@
      "content": {
       "application/json": {
        "schema": {
-        "$ref": "#/components/schemas/LoginIn"
+        "$ref": "#/components/schemas/app__modules__platform__routes_auth__LoginIn"
        }
       }
      },
@@ -20955,6 +21079,191 @@
      }
     },
     "summary": "Mfa Verify",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys": {
+   "get": {
+    "operationId": "list_passkeys_v1_auth_passkeys_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/PasskeyOut"
+         },
+         "title": "Response List Passkeys V1 Auth Passkeys Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Passkeys",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/login": {
+   "post": {
+    "operationId": "login_v1_auth_passkeys_login_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/app__modules__platform__passkeys__LoginIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/TokenOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Login",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/login/options": {
+   "post": {
+    "operationId": "login_options_v1_auth_passkeys_login_options_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OptionsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Login Options",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/register": {
+   "post": {
+    "operationId": "register_v1_auth_passkeys_register_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RegisterIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PasskeyOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Register",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/register/options": {
+   "post": {
+    "operationId": "register_options_v1_auth_passkeys_register_options_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/OptionsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Register Options",
+    "tags": [
+     "auth"
+    ]
+   }
+  },
+  "/v1/auth/passkeys/{passkey_id}": {
+   "delete": {
+    "operationId": "remove_v1_auth_passkeys__passkey_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "passkey_id",
+      "required": true,
+      "schema": {
+       "format": "uuid",
+       "title": "Passkey Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Remove",
     "tags": [
      "auth"
     ]

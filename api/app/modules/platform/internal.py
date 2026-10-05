@@ -46,6 +46,10 @@ async def daily_maintenance(_: None = Depends(internal_only)) -> dict[str, int]:
             ("refresh_tokens", "DELETE FROM refresh_tokens WHERE expires_at < now() - interval '1 day'"),
             ("challenges", "DELETE FROM auth_challenges WHERE expires_at < now() - interval '1 day'"),
             ("sso_states", "DELETE FROM sso_states WHERE expires_at < now() - interval '1 day'"),
+            (
+                "webauthn_challenges",
+                "DELETE FROM webauthn_challenges WHERE expires_at < now() - interval '1 day'",
+            ),
             ("email_tokens", "DELETE FROM email_tokens WHERE expires_at < now() - interval '7 days'"),
             ("outbox", "DELETE FROM outbox_events WHERE dispatched_at < now() - interval '14 days'"),
             ("rate_limits", "DELETE FROM rate_limits WHERE window_start < now() - interval '1 day'"),

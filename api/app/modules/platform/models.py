@@ -15,6 +15,7 @@ from typing import Any
 
 from sqlalchemy import (
     ARRAY,
+    BigInteger,
     Boolean,
     CheckConstraint,
     Date,
@@ -22,6 +23,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    LargeBinary,
     Numeric,
     SmallInteger,
     String,
@@ -179,6 +181,36 @@ class RefreshToken(IdMixin, Base):
 
     session_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_sessions.id"), index=True)
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    expires_at: Mapped[datetime]
+    used_at: Mapped[datetime | None]
+
+
+class Passkey(IdMixin, Base):
+    """A passkey (WebAuthn credential) someone registered: phishing-resistant sign-in
+    with their device's fingerprint, face or PIN."""
+
+    __tablename__ = "passkeys"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    credential_id: Mapped[bytes] = mapped_column(LargeBinary, unique=True)
+    public_key: Mapped[bytes] = mapped_column(LargeBinary)
+    sign_count: Mapped[int] = mapped_column(BigInteger, default=0)
+    transports: Mapped[list[str]] = mapped_column(JSONB, default=list)
+    name: Mapped[str] = mapped_column(String(80))
+    backed_up: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    last_used_at: Mapped[datetime | None]
+
+
+class WebAuthnChallenge(IdMixin, Base):
+    """A one-time WebAuthn challenge (registering a passkey, or signing in with one)."""
+
+    __tablename__ = "webauthn_challenges"
+
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    purpose: Mapped[str] = mapped_column(String(10))
+    challenge: Mapped[bytes] = mapped_column(LargeBinary)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     expires_at: Mapped[datetime]
     used_at: Mapped[datetime | None]

@@ -1862,6 +1862,17 @@ const en = {
     delete: "Delete",
     unlock: "Unlock",
   },
+  passkeys: {
+    title: "Passkeys",
+    sub: "Sign in with your fingerprint, face or device PIN instead of a password. Safer: they can't be phished or reused.",
+    add: "Add a passkey",
+    added: "Passkey added.",
+    added_on: "added {{date}}",
+    used_on: "last used {{date}}",
+    synced: "Synced",
+    unsupported: "This browser can't use passkeys.",
+    signIn: "Sign in with a passkey",
+  },
   errors: {
     notFound: "We couldn't find that page.",
     goHome: "Go home",

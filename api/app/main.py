@@ -37,6 +37,7 @@ from app.modules.payroll.routes import router as payroll_router
 from app.modules.people.routes import router as people_router
 from app.modules.platform.deps import public
 from app.modules.platform.internal import router as internal_router
+from app.modules.platform.passkeys import router as passkeys_router
 from app.modules.platform.routes_auth import plans_router
 from app.modules.platform.routes_auth import router as auth_router
 from app.modules.platform.routes_developers import router as developers_router
@@ -57,6 +58,7 @@ log = logging.getLogger("app")
 
 ROUTERS = (
     auth_router,
+    passkeys_router,
     plans_router,
     workspace_router,
     imports_router,

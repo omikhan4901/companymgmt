@@ -18,6 +18,7 @@ dependencies = [
     "pyotp>=2.9",
     "httpx>=0.28",
     "weasyprint>=66",
+    "webauthn>=2.2",
 ]
 
 [dependency-groups]

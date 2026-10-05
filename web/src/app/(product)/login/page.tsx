@@ -23,6 +23,7 @@ import { currentLang } from "@/i18n";
 import { errorMessage } from "@/lib/errors";
 import { slugFromHost } from "@/lib/address";
 import { safeNext } from "@/lib/nav";
+import { PasskeySignIn } from "@/components/passkeys";
 
 interface Credentials {
   email: string;
@@ -144,6 +145,7 @@ function LoginForm() {
           {t("auth.forgot")}
         </Link>
       )}
+      <PasskeySignIn onToken={done} workspace={hostSlug} />
       <CompanyAccount slug={hostSlug} offered={place.data?.sso ?? false} next={params.get("next")} />
     </AuthLayout>
   );

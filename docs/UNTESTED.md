@@ -163,3 +163,10 @@ Last fully green commit: `86be8ac` (M6 done, all API, web and browser tests pass
   12 hours, account changes refused, revoking a till ends its sessions), migration
   0026. `tests/test_tills.py` **run once and passed (3)**. Web: Sales → Tills, Account →
   Till PIN, `/till` PIN pad, "Lock till" on the POS. Never opened in a browser.
+- [ ] **Passkeys (WebAuthn).** `app/modules/platform/passkeys.py` (register with step-up,
+  list, remove; discoverable passwordless sign-in counting as two-step; single-use
+  5-minute challenges; RP id = web domain, workspace subdomains accepted as origins;
+  sign-count clone detection), tables `passkeys`, `webauthn_challenges` (migration
+  0027), dependency `webauthn` + `@simplewebauthn/browser`. `tests/test_passkeys.py`
+  (software authenticator) **run once and passed (2)**. Web: Account → Passkeys, login
+  "Sign in with a passkey". Never tried with a real phone or security key.

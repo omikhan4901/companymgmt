@@ -31,6 +31,7 @@ import { ACCENT_SWATCH, ACCENTS, MODES, useTheme, type Accent, type Mode } from 
 import { MyData, PendingDeletion } from "@/components/privacy";
 import { useStepUp } from "@/components/step-up";
 import { TillPin } from "@/components/shop/tills";
+import { Passkeys } from "@/components/passkeys";
 
 
 function Profile() {
@@ -392,6 +393,7 @@ export default function AccountPage() {
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <TwoStep />
+          <Passkeys />
           {can("sales.sell") && <TillPin />}
           <Sessions />
           {workspace && <MyData />}
